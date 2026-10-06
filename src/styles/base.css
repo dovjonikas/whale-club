@@ -62,11 +62,18 @@ input {
   white-space: nowrap;
 }
 
+/* The app passes taps through to the scene wherever it has nothing of its own. */
 #app {
   position: relative;
   height: 100%;
   display: grid;
   grid-template-rows: auto 1fr auto;
+  pointer-events: none;
+}
+
+.header > *,
+.bottom > * {
+  pointer-events: auto;
 }
 
 /* The header: the title and three quiet buttons. */

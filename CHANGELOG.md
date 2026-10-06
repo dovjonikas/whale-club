@@ -2,6 +2,30 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.2.0 - 2026-10-06
+
+Stage 2: the growth, the collectibles and the sky.
+
+- 60 collectibles (three worlds, two lines each, ten tiers) drawn into the
+  scene as they unlock; locked ones shown as silhouettes with the true
+  number of days to go in the Collection sheet. An unlock is a burst, a
+  sound and one line.
+- Creatures grow with a visible stage-up moment and a line.
+- All done: the whale surfaces over the horizon with a sound and a glow;
+  from day 90 it wears the red jacket.
+- Every day-star is a button: tap it to see what was done that day.
+- The daily surprise after the first thing done: a sea fact line, a
+  visitor crossing the scene, or a glow, chosen by the date so nothing
+  repeats until the pool is spent.
+- The check-in: call and response, two taps, once a day.
+- The weekly recap: N/7 and one line, on Sunday or the first open of a
+  new week, never what was missed.
+- The rules sheet, with the day count and a small streak.
+- Sound: synthesised tones behind a tap gate, a mute button that remembers.
+- Share: the scene as a PNG with the day count, through the share sheet
+  where there is one and as a download elsewhere.
+- One notice above the row at a time: install leaf, recap, check-in.
+
 ## 0.1.0 - 2026-10-06
 
 Stage 1: the row and the scene.

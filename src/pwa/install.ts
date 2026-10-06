@@ -70,7 +70,7 @@ function showLeaf(
       .then(() => prompt.userChoice)
       .then(() => leaf.remove())
   })
-  slot.replaceChildren(leaf)
+  if (slot.childElementCount === 0) slot.replaceChildren(leaf)
 }
 
 function iosBody(): string {

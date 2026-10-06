@@ -34,7 +34,8 @@ export async function seed(page: Page, data: SeedData): Promise<void> {
   }
   await page.addInitScript(
     ([key, json]) => {
-      localStorage.setItem(key, json)
+      // Init scripts run on every navigation; a reload must keep what the app saved.
+      if (localStorage.getItem(key) === null) localStorage.setItem(key, json)
     },
     [STORAGE_KEY, JSON.stringify(payload)] as const,
   )
@@ -66,7 +67,8 @@ export async function longPress(page: Page, target: Locator): Promise<void> {
   if (!box) throw new Error('target has no box')
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
   await page.mouse.down()
-  await page.waitForTimeout(700)
+  // Well past the 500 ms threshold: a busy runner has fired the press late before.
+  await page.waitForTimeout(900)
   await page.mouse.up()
 }
 
@@ -83,4 +85,10 @@ export async function waitForServiceWorker(page: Page): Promise<void> {
   await page.waitForFunction(() => navigator.serviceWorker.controller !== null, undefined, {
     timeout: 20_000,
   })
+}
+
+/** Closes the install leaf if this device shows one, so the notice slot is free. */
+export async function dismissInstallLeaf(page: Page): Promise<void> {
+  const leaf = page.getByRole('complementary', { name: 'install' })
+  if (await leaf.isVisible()) await leaf.getByRole('button', { name: 'not now' }).click()
 }

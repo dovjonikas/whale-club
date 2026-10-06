@@ -26,7 +26,13 @@ export const voice = {
   weekGood: 'a good week.', // TODO-VOICE
   weekBad: 'a week. there is another one.', // TODO-VOICE
   stageUp: 'it grew.', // TODO-VOICE
-  unlock: 'new. look.', // TODO-VOICE
+  unlock: (name: string) => `new: ${name}.`, // TODO-VOICE
+  collection: {
+    empty: 'nothing yet. add a thing.', // TODO-VOICE
+    next: (days: number) => (days === 1 ? 'in 1 day' : `in ${days} days`),
+  },
+  shareDone: 'picture saved.', // TODO-VOICE
+  shareFailed: 'could not make the picture.', // TODO-VOICE
   starPlaced: 'a star for today.', // TODO-VOICE
   checkin: {
     question1: 'how are you living?',

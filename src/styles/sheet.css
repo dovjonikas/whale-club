@@ -234,7 +234,12 @@
 
 /* The install leaf: a small card above the row, closable. */
 .leaf {
-  margin: 0 calc(var(--safe-right) + var(--s4)) var(--s3) calc(var(--safe-left) + var(--s4));
+  max-width: 520px;
+  margin: 0 auto var(--s3);
+  padding-left: calc(var(--safe-left) + var(--s4));
+  padding-right: calc(var(--safe-right) + var(--s4));
+  box-sizing: border-box;
+  width: calc(100% - 2 * var(--s4));
   padding: var(--s3) var(--s4);
   border-radius: var(--r);
   background: var(--card);
@@ -283,4 +288,152 @@
   width: auto;
   height: 32px;
   padding: 0 var(--s2);
+}
+
+/* The check-in and the recap share the leaf's shape. */
+.checkin .leaf-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-variation-settings:
+    'opsz' 72,
+    'SOFT' 100,
+    'WONK' 1;
+  font-size: var(--t-md);
+  color: var(--star-pale);
+}
+
+.recap-count {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-variation-settings:
+    'opsz' 144,
+    'SOFT' 100;
+  font-size: 32px;
+  line-height: 1;
+  color: var(--star-pale);
+}
+
+.recap-line {
+  display: block;
+  margin-top: var(--s1);
+  color: var(--ink-dim);
+}
+
+/* The Collection: per thing, ten tiles, locked ones as silhouettes. */
+.collection-thing + .collection-thing {
+  margin-top: var(--s6);
+}
+
+.collection-title {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin: 0 0 var(--s3);
+  font-size: var(--t-md);
+  font-weight: 700;
+}
+
+.collection-creature {
+  width: 36px;
+  height: 36px;
+  display: inline-grid;
+  place-items: center;
+}
+
+.collection-creature svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.collection-total {
+  margin-left: auto;
+  font-size: var(--t-xs);
+  font-weight: 400;
+  color: var(--ink-dim);
+}
+
+.tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--s2);
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s1);
+  padding: var(--s2) var(--s1);
+  border-radius: 10px;
+  background: rgba(2, 4, 9, 0.4);
+  border: 1px solid transparent;
+  text-align: center;
+}
+
+.tile-art {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+}
+
+.tile-art svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.tile-caption {
+  font-size: var(--t-xs);
+  color: var(--ink);
+  line-height: 1.2;
+  overflow-wrap: break-word;
+}
+
+/* A silhouette: the same drawing, flattened to one dark shade. */
+.tile.is-locked .tile-art {
+  filter: grayscale(1) brightness(0.25) contrast(1.4);
+  opacity: 0.8;
+}
+
+.tile.is-locked .tile-caption {
+  color: var(--ink-dim);
+}
+
+.tile.is-next {
+  border-color: var(--card-edge);
+}
+
+.tile.is-next .tile-caption {
+  color: var(--star);
+}
+
+/* The rules. */
+.rules {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--s4);
+}
+
+.rules li {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-variation-settings:
+    'opsz' 144,
+    'SOFT' 100,
+    'WONK' 1;
+  font-size: var(--t-lg);
+  line-height: 1.2;
+  color: var(--star-pale);
+}
+
+.rules-note {
+  margin-top: var(--s6);
 }
