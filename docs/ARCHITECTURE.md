@@ -24,7 +24,7 @@ src/
     header.ts        the title and the four buttons
     notices.ts       one notice above the row at a time
     checkin.ts, recap.ts   the two rituals, as notice builders
-    collectionSheet.ts, rulesSheet.ts
+    collectionSheet.ts, rulesSheet.ts, clubSheet.ts
     share.ts         the scene drawn into a PNG, shared or downloaded
     sound.ts         synthesised tones behind the tap gate, and mute
     surprise.ts, facts.ts  the daily surprise and the sea facts it draws from
@@ -42,6 +42,7 @@ src/
     types.ts         AppData, Thing, DayRecord, Settings
     store.ts         load, save, actions, subscribe; the only localStorage reader for data
     migrate.ts       a strict guard from stored JSON to AppData, by version
+    code.ts          the share code: things and days as one gzipped base64url string
     derive.ts        last7, stage, totalDone, stars, streak, lines: all arithmetic, nothing stored
     dates.ts         local YYYY-MM-DD keys and week arithmetic
   pwa/
@@ -117,7 +118,17 @@ entry, a `voice.ts` line under `unlock`, a row in `docs/COLLECTIBLES.md`,
 and a case in `tests/e2e/collectibles.e2e.ts` that seeds the days and
 expects it.
 
-## 7. The service worker
+## 7. The club and the share code
+
+`store/code.ts` turns things and days into one string: ids become
+indexes, a day is a list of indexes, the JSON is gzipped where
+`CompressionStream` exists and base64url-encoded, with a prefix that says
+which (`wc1.` plain, `wc1z.` gzipped). A buddy's code is kept in
+`settings.buddy.code` and decoded on demand into synthetic things with
+`buddy-N` ids, so every derive function works on it unchanged. Anything
+that fails to decode is refused whole with one line. Nothing is uploaded.
+
+## 8. The service worker
 
 `vite-plugin-pwa` in `generateSW` mode. Every built file has a content
 hash in its name and is precached; `index.html` is precached with a
@@ -127,7 +138,7 @@ calls `registration.update()` on every open, on every return to the
 foreground, and hourly. The e2e test for this serves its own copy of the
 build and changes the worker under an open page.
 
-## 8. Tests
+## 9. Tests
 
 Playwright only, against `vite preview` of the production build, in three
 projects: iPhone 13, Pixel 5, desktop 1366x768. Tests go through the real

@@ -77,6 +77,7 @@ async function renderScene(scene: Scene, data: AppData): Promise<Blob> {
   await document.fonts.load('900 32px "Fraunces Variable"').catch(() => undefined)
   ctx.fillStyle = '#fff4d6'
   ctx.font = '900 28px "Fraunces Variable", Georgia, serif'
+  ctx.textAlign = 'left'
   ctx.textBaseline = 'top'
   ctx.fillText(BRAND.name, 20, 18)
   ctx.font = '700 14px "Atkinson Hyperlegible", system-ui, sans-serif'

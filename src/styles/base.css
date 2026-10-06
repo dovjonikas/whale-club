@@ -95,15 +95,16 @@ input {
     'opsz' 144,
     'SOFT' 100,
     'WONK' 1;
-  font-size: var(--t-lg);
+  font-size: 22px;
   letter-spacing: -0.01em;
   color: var(--star-pale);
+  white-space: nowrap;
   text-shadow: 0 0 24px rgba(255, 217, 138, 0.35);
 }
 
 .header-actions {
   display: flex;
-  gap: var(--s1);
+  gap: 0;
 }
 
 .icon-button {

@@ -17,6 +17,7 @@ import { setupInstallLeaf } from '../pwa/install'
 import { openAddSheet } from './addSheet'
 import { animate } from './card'
 import { checkinNotice } from './checkin'
+import { openClubSheet } from './clubSheet'
 import { openCollectionSheet } from './collectionSheet'
 import { renderHeader } from './header'
 import { Line } from './line'
@@ -81,6 +82,9 @@ export function startApp(root: HTMLElement): void {
       },
       onRules() {
         openRulesSheet(store)
+      },
+      onClub() {
+        openClubSheet(store)
       },
       onShare() {
         shareScene(scene, store.get())

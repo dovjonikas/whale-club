@@ -104,3 +104,23 @@ The daily surprise is picked from one shuffled list (facts, visitors,
 glows) by the date, so every device agrees and nothing repeats until the
 whole list has been seen. Novelty, not rarity, is what the research says
 the reward responds to.
+
+## 2026-10-06 The share code is the data
+
+The club has no server. A person's code is their things and days as one
+gzipped base64url string, pasted once and kept, so the buddy's scene can be
+drawn offline and nothing is ever uploaded. Ids become indexes and a day is
+a list of indexes to keep a year of days under a few kilobytes. The code is
+versioned (`wc1`) and a code that does not decode is refused whole.
+
+## 2026-10-06 The buddy's scene is read only
+
+A buddy's scene is drawn from their code at the time it was pasted; it does
+not update by itself and nothing in it can be tapped. Keeping each other
+current is a message between two people, which is the point of the club.
+
+## 2026-10-06 Lighthouse is measured through Playwright's Chromium
+
+chrome-launcher cannot spawn a browser on the development machine, so the
+audit connects to a Chromium that Playwright launches with a debugging
+port. The numbers are in STATE.md.
