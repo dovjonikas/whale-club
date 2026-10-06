@@ -78,8 +78,12 @@ for (const { name, options } of targets) {
   await page.waitForTimeout(1200)
   await page.screenshot({ path: resolve(out, `${name}-scene.png`) })
   await page.getByRole('button', { name: 'practice', exact: true }).click()
-  await page.waitForTimeout(350)
+  await page.waitForTimeout(1500)
   await page.screenshot({ path: resolve(out, `${name}-all-done.png`) })
+  await page.waitForTimeout(1600)
+  await page.getByRole('button', { name: 'Collection' }).click()
+  await page.waitForTimeout(500)
+  await page.screenshot({ path: resolve(out, `${name}-collection.png`) })
   await context.close()
 }
 await browser.close()

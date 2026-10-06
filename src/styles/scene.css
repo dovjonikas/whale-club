@@ -111,3 +111,284 @@ canvas.particles {
     transform: translate3d(120vw, 0, 0);
   }
 }
+
+/* The day-stars' buttons: invisible hit areas over the canvas stars, in the
+   same layer as the sky so parallax moves them together. */
+.star-hits {
+  position: absolute;
+  inset: -3%;
+  height: calc(var(--horizon) + 6%);
+  bottom: auto;
+  z-index: 3;
+}
+
+.day-star {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  border-radius: 50%;
+}
+
+.day-star:focus-visible {
+  outline: 2px solid var(--star);
+}
+
+/* Collectibles: placed by their centre, sized for the phone and scaled. */
+.collectible {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+
+.collectible svg {
+  position: static;
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.collectible[data-world='garden'] {
+  transform: translate(-50%, -100%);
+}
+
+.collectible[data-motion='drift'] {
+  animation: drift 14s ease-in-out infinite alternate;
+}
+
+.collectible[data-motion='swim'] {
+  animation: swim-slow 9s ease-in-out infinite alternate;
+}
+
+.collectible[data-motion='sway'] {
+  transform-origin: 50% 100%;
+  animation: sway 5s ease-in-out infinite alternate;
+}
+
+.collectible[data-motion='twinkle'] {
+  animation: twinkle 4s ease-in-out infinite alternate;
+}
+
+.collectible[data-motion='sweep'] {
+  animation: twinkle 6s ease-in-out infinite alternate;
+}
+
+.collectible.is-new {
+  animation: unlock 1.4s var(--ease-bounce) both;
+}
+
+.collectible[data-world='garden'].is-new {
+  animation-name: unlock-garden;
+}
+
+@keyframes swim-slow {
+  from {
+    transform: translate(-50%, -50%) translate3d(-24px, 0, 0);
+  }
+  to {
+    transform: translate(-50%, -50%) translate3d(24px, -8px, 0);
+  }
+}
+
+@keyframes sway {
+  from {
+    transform: translate(-50%, -100%) rotate(-3deg);
+  }
+  to {
+    transform: translate(-50%, -100%) rotate(3deg);
+  }
+}
+
+@keyframes twinkle {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes unlock {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1.25);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes unlock-garden {
+  0% {
+    transform: translate(-50%, -100%) scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: translate(-50%, -100%) scale(1.25);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -100%) scale(1);
+  }
+}
+
+/* The whale: rises over the horizon, holds, sinks. */
+.whale {
+  position: absolute;
+  left: 50%;
+  top: var(--horizon);
+  width: min(70vw, 420px);
+  transform: translate(-50%, 40%);
+  opacity: 0;
+  animation: surface 5.5s var(--ease) forwards;
+}
+
+.whale svg {
+  position: static;
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+@keyframes surface {
+  0% {
+    transform: translate(-50%, 40%);
+    opacity: 0;
+  }
+  25% {
+    transform: translate(-50%, -62%);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(-50%, -58%);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, 40%);
+    opacity: 0;
+  }
+}
+
+/* A visitor crosses the scene once. */
+.visitor {
+  position: absolute;
+  width: 60px;
+}
+
+.visitor svg {
+  position: static;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.visitor[data-kind='fish'],
+.visitor[data-kind='turtle'] {
+  top: 72%;
+  animation: swim-by 14s linear forwards;
+}
+
+.visitor[data-kind='turtle'] {
+  top: 66%;
+  width: 80px;
+  animation-duration: 22s;
+}
+
+.visitor[data-kind='jelly'] {
+  left: 70%;
+  top: 80%;
+  width: 50px;
+  animation: rise-away 16s ease-in-out forwards;
+}
+
+.visitor[data-kind='meteor'] {
+  left: 10%;
+  top: 8%;
+  width: 140px;
+  animation: streak 1.6s ease-out forwards;
+}
+
+.visitor[data-kind='firefly'] {
+  left: 30%;
+  top: 44%;
+  width: 160px;
+  animation: fireflies 10s ease-in-out forwards;
+}
+
+@keyframes rise-away {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(-30px, -120px, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes streak {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(60vw, 16vh, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes fireflies {
+  from {
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* The water brightens for a moment. */
+.scene-glow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--horizon);
+  bottom: 0;
+  z-index: 2;
+  background: radial-gradient(ellipse at 50% 0%, rgba(62, 242, 224, 0.35), transparent 60%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scene-glow.is-on {
+  animation: glow-pulse 2.6s ease-out forwards;
+}
+
+@keyframes glow-pulse {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

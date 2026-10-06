@@ -90,3 +90,16 @@ export function dayNumber(data: AppData, today: DateKey): number {
 export function worldOf(data: AppData, thingId: string): World | undefined {
   return data.things.find((t) => t.id === thingId)?.world
 }
+
+/** Everything a thing has unlocked so far, by its days done. */
+export function unlockedFor(
+  data: AppData,
+  thing: Thing,
+  list: readonly { id: string; world: World; line: Line; days: number }[],
+): string[] {
+  const line = lineFor(data, thing)
+  const total = totalDone(data, thing.id)
+  return list
+    .filter((c) => c.world === thing.world && c.line === line && c.days <= total)
+    .map((c) => c.id)
+}

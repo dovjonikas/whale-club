@@ -73,3 +73,34 @@ screenshot after a year is a dense band of light.
 The onboarding example and the screenshots use "run", "read" and
 "practice", not anything from the author's own life. The repository is
 public.
+
+## 2026-10-06 The line says the rarest thing
+
+A tap can set off several things at once: the whale when the day is
+complete, a new collectible, a creature that grew, the timer's end. The
+scene shows all of them; the line says one, the rarest first: unlock, then
+the whole day done, then the timer's end, then growth, then the tap. A
+single-thing day is "all done" every day, so "all done" must not hide a
+collectible that comes once.
+
+## 2026-10-06 Day-stars are buttons, drawn on canvas
+
+The stars are painted on a canvas (cheap, hundreds of them, twinkle), but
+each one also gets an invisible button at its position, so a star can be
+tapped, reached with a keyboard, and found by a test by its label. The
+button layer is not part of the parallax: at depth 0.25 the canvas drifts
+two pixels at most, and a button that keeps moving is one a finger misses
+and one Playwright never finds stable.
+
+## 2026-10-06 One notice at a time
+
+The install leaf, the weekly recap and the check-in share one slot above
+the row, in that order; the next appears when the one before is closed.
+Three cards stacked above the row would push the row off a phone screen.
+
+## 2026-10-06 The surprise pool is walked, not drawn
+
+The daily surprise is picked from one shuffled list (facts, visitors,
+glows) by the date, so every device agrees and nothing repeats until the
+whole list has been seen. Novelty, not rarity, is what the research says
+the reward responds to.

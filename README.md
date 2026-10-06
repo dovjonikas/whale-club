@@ -13,7 +13,9 @@ is enabled)
 <p align="center">
   <img src="docs/screenshots/iphone-scene.png" alt="Whale Club on an iPhone: a night sky of stars laid out as a calendar, a sea, and three cards with creatures" width="280">
   &nbsp;&nbsp;
-  <img src="docs/screenshots/android-all-done.png" alt="Whale Club on an Android phone after every thing is done for the day" width="280">
+  <img src="docs/screenshots/android-all-done.png" alt="Whale Club on an Android phone after every thing is done for the day: the whale surfaces" width="280">
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/iphone-collection.png" alt="The Collection sheet: unlocked collectibles and silhouettes of the next ones" width="280">
 </p>
 
 <p align="center">
@@ -46,11 +48,20 @@ is enabled)
 - **Installable.** Works offline from the home screen on iPhone and
   Android, updates itself, no account, no server, no tracking. Everything
   stays in your browser.
-
-Coming in the next stages: collectibles unlocked by total days (with the
-locked ones shown as silhouettes), the whale surfacing when everything is
-done, a daily surprise, a silly daily check-in, a weekly recap, sound, a
-share image, and a buddy slot.
+- **Collectibles.** Each thing unlocks its own path at 3, 7, 14, 21, 30,
+  45, 60, 90, 120 and 180 days: plankton glow, a fish, a jellyfish at
+  night, a lighthouse, the red jacket, the whale's song; a comet, the
+  aurora, an astronaut; a sunflower field, a scarecrow, fireflies. Sixty in
+  all, drawn into the scene as they come. The locked ones are silhouettes
+  with the real number of days to go.
+- **All done, the whale surfaces.** Over the horizon, with a sound. From
+  day 90 it wears the red jacket.
+- **A daily surprise** after the first thing done: a sea fact, a visitor
+  crossing the scene, a glow. Never the same one until the pool is spent.
+- **A check-in** once a day. Two taps. It is silly on purpose.
+- **A weekly recap**: "5/7." and one line. Never what was missed.
+- **Sound** behind a tap gate, one button to mute. **Share** the scene as a
+  picture with "day N of whale club" on it.
 
 ## Tech
 

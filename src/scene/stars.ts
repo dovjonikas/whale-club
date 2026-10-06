@@ -85,18 +85,9 @@ export class StarField {
     this.draw(performance.now() / 1000)
   }
 
-  /** Where a date's star is, for a tap on the sky. */
-  starAt(x: number, y: number): DayStar | undefined {
-    let best: DayStar | undefined
-    let bestDistance = 22
-    for (const star of this.dayStars) {
-      const d = Math.hypot(star.x - x, star.y - y)
-      if (d < bestDistance) {
-        best = star
-        bestDistance = d
-      }
-    }
-    return best
+  /** Where every day-star is, in canvas pixels. */
+  positions(): readonly DayStar[] {
+    return this.dayStars
   }
 
   start(): void {
@@ -120,8 +111,9 @@ export class StarField {
     const weeks = Math.max(MIN_ROWS, weekIndex(firstWeek, this.today) + 1)
     const left = 0.08 * this.width
     const right = 0.92 * this.width
-    const top = 0.1 * this.height
-    const bottom = 0.86 * this.height
+    // The first row sits under the title, so it starts a little way down.
+    const top = 0.17 * this.height
+    const bottom = 0.88 * this.height
     const cellW = (right - left) / 7
     const cellH = (bottom - top) / weeks
     this.dayStars = this.dates.map((date) => {

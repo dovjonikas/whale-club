@@ -9,6 +9,7 @@ import { addThing, card, longPress } from './helpers'
 test('a long press opens the timer, and the timer ending counts as done', async ({ page }) => {
   await page.clock.install()
   await page.goto('')
+  await addThing(page, 'run')
   await addThing(page, 'practice', { timer: 15 })
   await longPress(page, card(page, 'practice'))
   const sheet = page.getByRole('dialog', { name: /practice/ })
