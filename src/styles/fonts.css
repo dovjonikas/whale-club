@@ -1,0 +1,11 @@
+/* Latin subsets only: the full Fraunces package ships six scripts and the
+   service worker would precache every one of them for an app that speaks
+   English. */
+@font-face {
+  font-family: 'Fraunces Variable';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('../../node_modules/@fontsource-variable/fraunces/files/fraunces-latin-full-normal.woff2')
+    format('woff2-variations');
+}

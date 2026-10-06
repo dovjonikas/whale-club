@@ -1,0 +1,113 @@
+/* The scene sits behind everything, full screen; the UI is laid over it. */
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--abyss);
+}
+
+.layer {
+  position: absolute;
+  inset: -3%;
+  will-change: transform;
+}
+
+.sky {
+  background: linear-gradient(180deg, var(--zenith) 0%, var(--night) 100%);
+  height: calc(var(--horizon) + 6%);
+  bottom: auto;
+}
+
+.sea {
+  top: calc(var(--horizon) - 3%);
+  background: linear-gradient(180deg, #0a2447 0%, var(--deep) 30%, var(--abyss) 100%);
+}
+
+/* A thin band of lighter water right under the horizon, the moon's path. */
+.sea::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 3%;
+  height: 10%;
+  background: linear-gradient(180deg, rgba(62, 242, 224, 0.12), transparent);
+}
+
+.shore {
+  top: calc(var(--horizon) - 2.5%);
+  height: 7%;
+  bottom: auto;
+  pointer-events: none;
+}
+
+.shore svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+canvas.stars,
+canvas.particles {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+canvas.particles {
+  z-index: 1;
+}
+
+/* Quiet day: the whole scene dims, nothing is removed. An overlay rather
+   than a filter, because filters on a full-screen layer stutter on phones. */
+.scene-dim {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: var(--abyss);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-slow) var(--ease);
+}
+
+.scene[data-quiet='true'] .scene-dim {
+  opacity: 0.45;
+}
+
+/* Collectibles and the whale live here, placed in scene coordinates. */
+.scene-things {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.scene-things svg {
+  position: absolute;
+  overflow: visible;
+}
+
+.drift {
+  animation: drift 14s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(14px, -6px, 0);
+  }
+}
+
+@keyframes swim-by {
+  from {
+    transform: translate3d(-20vw, 0, 0);
+  }
+  to {
+    transform: translate3d(120vw, 0, 0);
+  }
+}
