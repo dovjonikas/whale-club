@@ -62,6 +62,9 @@ is enabled)
 - **A weekly recap**: "5/7." and one line. Never what was missed.
 - **Sound** behind a tap gate, one button to mute. **Share** the scene as a
   picture with "day N of whale club" on it.
+- **The club.** One buddy slot: name the person who pushes you, paste
+  their code, and their scene sits beside yours. Read only, no server; the
+  code is the data.
 
 ## Tech
 

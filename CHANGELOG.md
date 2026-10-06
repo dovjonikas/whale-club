@@ -2,6 +2,19 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.3.0 - 2026-10-06
+
+Stage 3: your Tyler.
+
+- The club: one buddy slot. Name the person who pushes you, paste their
+  code, and their scene (sky, creatures, collectibles) is drawn beside
+  yours, read only, from the code alone. No server.
+- Your own share code, gzipped and base64url, with copy and send.
+- A fifth header button for the club; the header fits five on a 375px phone.
+- Notice buttons are 44px tall; a polish pass on iPhone 13 mini, iPhone 13,
+  Pixel 5, 1366x768 and 1920x1080 found no overflow and no small targets.
+- The share picture's title is left-aligned again (it was clipped).
+
 ## 0.2.0 - 2026-10-06
 
 Stage 2: the growth, the collectibles and the sky.
