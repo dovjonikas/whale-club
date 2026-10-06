@@ -5,7 +5,7 @@
  */
 export function shoreSvg(): string {
   // Hand-placed so the grass clumps rather than lines up like a lawn.
-  const tufts: [number, number][] = [
+  const clumps: [number, number][] = [
     [40, 14],
     [58, 20],
     [150, 10],
@@ -19,6 +19,7 @@ export function shoreSvg(): string {
     [838, 11],
     [960, 15],
   ]
+  const tufts = clumps
     .map(
       ([x, h], i) =>
         `<path d="M${x} 50 q 3 ${-h * 0.6} ${i % 2 ? 6 : -4} ${-h} M${x + 5} 50 q 2 ${-h * 0.5} 5 ${-h * 0.7}" stroke="var(--leaf)" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.8"/>`,
