@@ -1,0 +1,209 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--abyss);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-sm);
+  line-height: 1.4;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+body {
+  /* 100dvh so the iPhone's toolbars never leave a gap; 100vh as the fallback. */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+input {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--glow);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+#app {
+  position: relative;
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/* The header: the title and three quiet buttons. */
+.header {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--safe-top) + var(--s3)) calc(var(--safe-right) + var(--s4)) var(--s2)
+    calc(var(--safe-left) + var(--s4));
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-variation-settings:
+    'opsz' 144,
+    'SOFT' 100,
+    'WONK' 1;
+  font-size: var(--t-lg);
+  letter-spacing: -0.01em;
+  color: var(--star-pale);
+  text-shadow: 0 0 24px rgba(255, 217, 138, 0.35);
+}
+
+.header-actions {
+  display: flex;
+  gap: var(--s1);
+}
+
+.icon-button {
+  width: var(--touch);
+  height: var(--touch);
+  display: grid;
+  place-items: center;
+  border-radius: var(--r-pill);
+  color: var(--ink-dim);
+  font-size: 20px;
+  transition:
+    color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.icon-button:hover,
+.icon-button[aria-pressed='true'] {
+  color: var(--star);
+}
+
+.icon-button:active {
+  transform: scale(0.92);
+}
+
+.icon-button svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The middle of the screen belongs to the scene; the UI only passes taps through. */
+.stage {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* The bottom block: one line of voice, then the row. */
+.bottom {
+  position: relative;
+  z-index: 2;
+  /* A grid item defaults to min-width auto and would grow to the row instead of letting it scroll. */
+  min-width: 0;
+  padding: 0 0 calc(var(--safe-bottom) + var(--s3));
+}
+
+.line {
+  min-height: 1.6em;
+  margin: 0 calc(var(--safe-right) + var(--s4)) var(--s2) calc(var(--safe-left) + var(--s4));
+  font-size: var(--t-sm);
+  color: var(--ink);
+  opacity: 0.9;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.line.is-fading {
+  opacity: 0;
+}
+
+.line.is-quiet {
+  color: var(--ink-dim);
+}
+
+/* The empty first screen. */
+.onboarding {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: var(--s4);
+  pointer-events: none;
+}
+
+.onboarding[hidden] {
+  display: none;
+}
+
+.onboarding p {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-variation-settings:
+    'opsz' 72,
+    'SOFT' 100,
+    'WONK' 1;
+  font-size: var(--t-lg);
+  color: var(--star-pale);
+}
+
+.onboarding small {
+  display: block;
+  margin-top: var(--s2);
+  font-size: var(--t-sm);
+  color: var(--ink-dim);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

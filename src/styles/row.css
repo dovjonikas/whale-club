@@ -1,0 +1,199 @@
+/* The row of things: horizontal, one card each, the add card at the end. */
+.row {
+  display: flex;
+  gap: var(--s3);
+  padding: var(--s2) calc(var(--safe-right) + var(--s4)) var(--s2)
+    calc(var(--safe-left) + var(--s4));
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .row {
+    justify-content: center;
+  }
+}
+
+.card {
+  flex: 0 0 auto;
+  width: 108px;
+  min-height: 132px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--s2);
+  padding: var(--s3) var(--s2) var(--s3);
+  border-radius: var(--r);
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  scroll-snap-align: start;
+  text-align: center;
+  -webkit-touch-callout: none;
+  transition:
+    transform var(--dur-fast) var(--ease),
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
+}
+
+@media (min-width: 900px) {
+  .card {
+    width: 150px;
+    min-height: 168px;
+  }
+}
+
+.card:active {
+  transform: scale(0.96);
+}
+
+.card[aria-pressed='true'] {
+  border-color: var(--world-color);
+  box-shadow:
+    0 0 0 1px var(--world-color),
+    0 0 28px var(--world-glow);
+}
+
+.card[data-world='sea'] {
+  --world-color: var(--glow);
+  --world-glow: rgba(62, 242, 224, 0.35);
+}
+
+.card[data-world='sky'] {
+  --world-color: var(--star);
+  --world-glow: rgba(255, 217, 138, 0.35);
+}
+
+.card[data-world='garden'] {
+  --world-color: var(--sun);
+  --world-glow: rgba(242, 201, 76, 0.35);
+}
+
+.creature {
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  transform-origin: 50% 80%;
+}
+
+@media (min-width: 900px) {
+  .creature {
+    width: 76px;
+    height: 76px;
+  }
+}
+
+.creature svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.card.is-jumping .creature {
+  animation: jump 520ms var(--ease-bounce);
+}
+
+.card.is-swimming .creature {
+  animation: swim 2.4s ease-in-out infinite;
+}
+
+.card.is-growing .creature {
+  animation: grow 900ms var(--ease-bounce);
+}
+
+@keyframes jump {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  35% {
+    transform: translate3d(0, -18px, 0) scale(1.08, 0.94);
+  }
+  70% {
+    transform: translate3d(0, 2px, 0) scale(0.96, 1.04);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes swim {
+  0%,
+  100% {
+    transform: translate3d(-6px, 0, 0) rotate(-4deg);
+  }
+  50% {
+    transform: translate3d(6px, -4px, 0) rotate(4deg);
+  }
+}
+
+@keyframes grow {
+  0% {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.card-name {
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--ink);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card-mode {
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+}
+
+/* Seven dots, the last seven days, today last. The only counting in the app. */
+.dots {
+  display: flex;
+  gap: 4px;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(232, 240, 245, 0.18);
+  transition: background var(--dur) var(--ease);
+}
+
+.dot.is-on {
+  background: var(--world-color);
+  box-shadow: 0 0 6px var(--world-glow);
+}
+
+.dot.is-today {
+  outline: 1px solid rgba(232, 240, 245, 0.35);
+  outline-offset: 1px;
+}
+
+.card-add {
+  justify-content: center;
+  color: var(--ink-dim);
+  border-style: dashed;
+  font-size: var(--t-lg);
+}
+
+.card-add:hover {
+  color: var(--ink);
+}
