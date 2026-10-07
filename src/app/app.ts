@@ -16,6 +16,7 @@ import { pick, voice } from '../voice'
 import { setupInstallLeaf } from '../pwa/install'
 import { openAddSheet } from './addSheet'
 import { animate } from './card'
+import { host } from './host'
 import { checkinNotice } from './checkin'
 import { openClubSheet } from './clubSheet'
 import { openCollectionSheet } from './collectionSheet'
@@ -39,7 +40,7 @@ const JACKET_ID = 'sea-a-jacket'
 /** Wires the store, the scene, the row and the sheets together. One per page. */
 export function startApp(root: HTMLElement): void {
   const store = new Store()
-  const scene = new Scene(document.body)
+  const scene = new Scene(host())
   const timers = new TimerService()
   const sound = new Sound(!store.get().settings.sound)
 

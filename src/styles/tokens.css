@@ -37,6 +37,8 @@
   --r: 14px;
   --r-pill: 999px;
   --touch: 44px;
+  /* The width of the phone frame on screens wider than a phone. */
+  --frame-w: 430px;
 
   --dur-fast: 120ms;
   --dur: 260ms;

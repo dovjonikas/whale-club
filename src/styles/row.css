@@ -15,12 +15,6 @@
   display: none;
 }
 
-@media (min-width: 900px) {
-  .row {
-    justify-content: center;
-  }
-}
-
 .card {
   flex: 0 0 auto;
   width: 108px;
@@ -43,13 +37,6 @@
     transform var(--dur-fast) var(--ease),
     border-color var(--dur) var(--ease),
     box-shadow var(--dur) var(--ease);
-}
-
-@media (min-width: 900px) {
-  .card {
-    width: 150px;
-    min-height: 168px;
-  }
 }
 
 .card:active {
@@ -84,13 +71,6 @@
   display: grid;
   place-items: center;
   transform-origin: 50% 80%;
-}
-
-@media (min-width: 900px) {
-  .creature {
-    width: 76px;
-    height: 76px;
-  }
 }
 
 .creature svg {

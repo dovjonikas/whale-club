@@ -1,4 +1,6 @@
 /** One line at the top of the screen, one tap. Only one shows at a time. */
+import { host } from './host'
+
 let current: HTMLButtonElement | null = null
 
 export function showToast(text: string, onTap?: () => void): void {
@@ -11,7 +13,7 @@ export function showToast(text: string, onTap?: () => void): void {
     hide()
     onTap?.()
   })
-  document.body.append(toast)
+  host().append(toast)
   current = toast
   requestAnimationFrame(() => toast.classList.add('is-open'))
   if (!onTap) setTimeout(hide, 4000)

@@ -1,11 +1,12 @@
 import { addDays, todayKey } from '../store/dates'
 import type { Store } from '../store/store'
 import { voice } from '../voice'
+import { openInstallSheet } from './installSheet'
 
 /**
- * The install leaf: a small card above the row that says how to put the
- * app on the home screen. iPhone Safari has no install API, so it gets
- * the two steps and the Share glyph; Android Chrome gets one Install
+ * The install leaf: a small card above the row that offers to put the app
+ * on the home screen. iPhone Safari has no install API, so its button
+ * opens a sheet with the three steps, big, with the icons to look for; Android Chrome gets one Install
  * button once the browser offers `beforeinstallprompt`; a desktop gets
  * nothing. Closing it is remembered for seven days.
  */
@@ -55,7 +56,7 @@ function showLeaf(
   leaf.innerHTML = `
     <div>${bodyHtml}</div>
     <div class="leaf-actions">
-      ${prompt ? `<button type="button" class="button-primary leaf-install">${voice.install.button}</button>` : ''}
+      <button type="button" class="button-primary leaf-install">${prompt ? voice.install.button : voice.install.iosHow}</button>
       <button type="button" class="button-quiet leaf-close">${voice.install.close}</button>
     </div>`
   const close = (): void => {
@@ -64,7 +65,10 @@ function showLeaf(
   }
   leaf.querySelector('.leaf-close')?.addEventListener('click', close)
   leaf.querySelector('.leaf-install')?.addEventListener('click', () => {
-    if (!prompt) return
+    if (!prompt) {
+      openInstallSheet()
+      return
+    }
     void prompt
       .prompt()
       .then(() => prompt.userChoice)
@@ -74,10 +78,8 @@ function showLeaf(
 }
 
 function iosBody(): string {
-  const share = `<svg class="leaf-share" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg>`
-  const [one, two] = voice.install.iosSteps
   return `<span class="leaf-title">${voice.install.ios}</span>
-    <ol><li>${one} ${share}</li><li>${two}</li></ol>`
+    <span class="leaf-lead">${voice.install.iosLead}</span>`
 }
 
 function isStandalone(): boolean {
