@@ -26,6 +26,8 @@ src/
     header.ts        the title and the four buttons
     notices.ts       one notice above the row at a time
     checkin.ts, recap.ts   the two rituals, as notice builders
+    thingSheet.ts    a thing's own sheet: name, emoji, minutes, the seven days, today's exception
+    daysField.ts     the seven day chips, shared with the add sheet
     collectionSheet.ts
     menuSheet.ts     the club: the rules, one sentence, the postcard size
     postcard.ts      the scene repainted from the data as a 1080px PNG
@@ -128,6 +130,19 @@ The Collection screen and the silhouettes read the same list. Add the
 entry, a `voice.ts` line under `unlock`, a row in `docs/COLLECTIBLES.md`,
 and a case in `tests/e2e/collectibles.e2e.ts` that seeds the days and
 expects it.
+
+## 5a. Days
+
+A thing carries `days`, seven booleans from Monday, all true unless the
+person turns some off. A day record can carry `extra` (also today) and
+`skip` (not today), which change that one date only. `plannedOn` is
+the one question everything asks: the exception if there is one, else the
+weekday. The row shows planned things; the rest go to the "not today"
+strip. `last7` walks back over planned days until it has seven,
+`weekDots` marks days off as rest, `streak` skips days with nothing
+planned, `allDoneToday` and `missedYesterday` look at planned things
+only, and the recap divides by planned days. `totalDone` and the stones
+are unchanged: every counted day is a step.
 
 ## 6a. Stones
 

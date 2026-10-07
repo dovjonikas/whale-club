@@ -574,3 +574,28 @@
   background: rgba(255, 217, 138, 0.22);
   color: var(--star);
 }
+
+/* The seven day chips: one line, Monday first. */
+.day-chips {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--s1);
+}
+
+.day-chip {
+  height: var(--touch);
+  border-radius: 12px;
+  border: 1px solid var(--card-edge);
+  background: rgba(2, 4, 9, 0.4);
+  color: var(--ink-dim);
+  font-weight: 700;
+  transition:
+    background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.day-chip[aria-pressed='true'] {
+  background: rgba(62, 242, 224, 0.16);
+  border-color: var(--glow);
+  color: var(--star-pale);
+}

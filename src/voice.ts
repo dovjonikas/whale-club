@@ -80,6 +80,18 @@ export const voice = {
     rare: 'rare',
     legendary: 'legendary',
   },
+  days: {
+    label: 'days',
+    short: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+    names: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+    today: 'today only',
+    notToday: 'not today',
+    alsoToday: 'also today',
+    save: 'save',
+    edit: (name: string) => `edit ${name}`,
+  },
+  /** A day with nothing planned. Calm, no star, nothing missed. */
+  restDay: 'nothing planned. rest is part of it.', // TODO-VOICE
   /** The menu's one screen: the rules and this. */
   clubLine: 'whale club is you and whoever you send your whale to.',
   postcard: {

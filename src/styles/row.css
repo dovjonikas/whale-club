@@ -2,6 +2,7 @@
    five and the add button are on a 320px screen without a scroll. */
 .row {
   display: flex;
+  justify-content: center;
   gap: var(--s2);
   padding: var(--s2) calc(var(--safe-right) + var(--s4)) var(--s2)
     calc(var(--safe-left) + var(--s4));
@@ -254,4 +255,124 @@
   .card-lock svg {
     display: none;
   }
+}
+
+/* A day the thing is not planned on: a small dash, never an empty dot. */
+.dot.is-rest {
+  height: 2px;
+  margin-top: 2.5px;
+  aspect-ratio: auto;
+  border-radius: 1px;
+  background: rgba(232, 240, 245, 0.28);
+}
+
+/* The thing's sheet: three dots at the card's corner, opposite the stone. */
+.card-edit {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: var(--touch);
+  height: var(--touch);
+  display: grid;
+  place-items: center;
+  color: var(--ink-dim);
+  opacity: 0.7;
+}
+
+.card-edit svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.card-edit:hover,
+.card-edit:focus-visible {
+  opacity: 1;
+  color: var(--ink);
+}
+
+/* Not today: one thin strip under the row, open on a tap. */
+.not-today {
+  margin: var(--s1) calc(var(--safe-right) + var(--s4)) 0 calc(var(--safe-left) + var(--s4));
+}
+
+.not-today[hidden] {
+  display: none;
+}
+
+.not-today-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s2);
+  width: 100%;
+  height: var(--touch);
+  border-radius: var(--r-pill);
+  border: 1px dashed var(--card-edge);
+  color: var(--ink-dim);
+  font-size: var(--t-xs);
+  font-weight: 700;
+}
+
+.not-today-count {
+  min-width: 18px;
+  padding: 0 6px;
+  border-radius: var(--r-pill);
+  background: rgba(232, 240, 245, 0.1);
+}
+
+.not-today-list {
+  list-style: none;
+  margin: var(--s2) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s2);
+}
+
+.not-today-list[hidden] {
+  display: none;
+}
+
+.not-today-item {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: var(--s2);
+  padding: 0 var(--s2);
+  border-radius: var(--r);
+  background: rgba(6, 18, 43, 0.5);
+  border: 1px solid var(--card-edge);
+}
+
+.not-today-creature {
+  width: 36px;
+  height: 36px;
+  opacity: 0.55;
+  filter: grayscale(0.4);
+}
+
+.not-today-creature svg {
+  width: 100%;
+  height: 100%;
+}
+
+.not-today-name {
+  height: var(--touch);
+  text-align: left;
+  color: var(--ink-dim);
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.also-today {
+  font-size: var(--t-xs);
+}
+
+/* A day with nothing planned: the add button is a card of its own, not a sliver. */
+.row[data-count='0'] .card-add {
+  flex: 0 0 108px;
+  min-height: 132px;
 }

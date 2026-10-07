@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import { recapFor } from '../../src/app/recap'
-import { emptyData } from '../../src/store/types'
+import { emptyData, EVERY_DAY } from '../../src/store/types'
 import { addThing, dateKey, dismissInstallLeaf, seed } from './helpers'
 
 /**
@@ -33,7 +33,7 @@ test('the recap says N/7 for the week and never what was missed', async ({ page 
   // The same arithmetic the app runs, on the same seed, so the test knows
   // which week the app will recap whatever day it runs on.
   const data = emptyData()
-  data.things = things.map((t) => ({ ...t, emoji: '•', mode: 'tap' }))
+  data.things = things.map((t) => ({ ...t, emoji: '•', mode: 'tap', days: [...EVERY_DAY] }))
   for (const [k, v] of Object.entries(days)) data.days[k] = { done: v.done, minutes: {} }
   const expected = recapFor(data)
   if (!expected) throw new Error('the seed should always produce a recap')
@@ -41,7 +41,7 @@ test('the recap says N/7 for the week and never what was missed', async ({ page 
   await page.goto('')
   await dismissInstallLeaf(page)
   const recap = page.getByRole('complementary', { name: 'weekly recap' })
-  await expect(recap).toContainText(`${expected.count}/7.`)
+  await expect(recap).toContainText(`${expected.count}/${expected.planned}.`)
   await expect(recap).not.toContainText(/miss/i)
   await recap.getByRole('button', { name: 'ok' }).click()
   await expect(recap).toBeHidden()

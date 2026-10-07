@@ -2,7 +2,7 @@
 
 ## Done
 
-v0.5.0, live at https://dovjonikas.github.io/whale-club/ after the push.
+v0.6.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
 - **v0.1.0 to v0.3.0**: the row, the scene, the sky as a calendar, creatures, PWA, collectibles, the whale, rituals, sound, share; a buddy slot (since removed).
 - **v0.4.0**: postcards instead of a buddy; the phone-wide frame; the install leaf after the first thing; Lighthouse through Edge.
@@ -12,6 +12,7 @@ v0.5.0, live at https://dovjonikas.github.io/whale-club/ after the push.
   - **lock in**: a visible button on every card, the dial (10 to 120, step 5, remembered per thing), the whole-screen session with the creature growing from an egg, spark or seed, breathing and blinking, the sky turning, wake lock, an optional generated sea sound; leaving for more than 15 s marks the session and the creature waits; a clean end is a full day, a left one counts as done without a star or a step towards a stone; stop writes the minutes only;
   - notices moved under the header; data version 2 with a migration from 1;
   - the third rule is now the author's: "you never give up on yourself".
+- **v0.6.0**: days. A thing's sheet (three dots on its card) with seven day chips, all on by default, and today's exception ("not today" / "also today"); the add sheet has the same line; the first screen shows only today's things, the rest in a "not today" strip; week dots with a dash for a day off; last7, streak, all done, missed yesterday and the recap count planned days only; a rest day is one quiet line, no star, no dim; data version 3.
 
 ## How the timer worked before v0.5 (the audit asked for)
 
@@ -24,12 +25,13 @@ v0.5.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 ## Verified
 
 - `npm run lint`, `tsc --noEmit`, `npm run build`: clean.
-- `npm test`: 121 passed, 14 skipped (device-specific), on iPhone 13, Pixel 5 and desktop. The Android "leaving for more than 15 seconds" test failed once under full load because Playwright's clock keeps running after a fast-forward; it now checks the time set aside directly and passes on every run since.
-- Screenshots regenerated: scene, stone, crack, find, dial, session start, session grown, all done, collection, menu, postcards.
+- `npm test`: 151 passed, 14 skipped (device-specific), on iPhone 13, Pixel 5 and desktop. New: days (the strip on a Saturday, also today for one day, not today, the seven chips, a new thing's days, three a week reaching the whale, the dots, a streak across a weekend, all done with a thing off, a rest day, the migration from version 2).
+- Screenshots regenerated, including the not-today strip, the thing's sheet with the day chips, and a rest day.
+- Known: on a 320px phone the day chips are 37px wide (44px tall); everything from 375px up is 44px both ways.
 
 ## Next
 
-v0.6.0 (the author's brief of 2026-10-07): days. Seven day toggles per thing in its sheet, "not today" and "also today", consistency counted over planned days only, rest days.
+Nothing queued. Ideas the author has mentioned and not asked for yet: the author's own voice lines (src/voice.ts).
 
 ## How to run
 
@@ -52,5 +54,5 @@ npx lighthouse https://dovjonikas.github.io/whale-club/ --chrome-flags="--headle
 
 ## For the author to do by hand
 
-1. **Voice**: replace every line marked `TODO-VOICE` in `src/voice.ts`. New in v0.5: `lockIn.broken`, `lockIn.stopped`, `stones.fell`, `stones.waiting`. Keep each under about 40 characters so it fits one row on a 320px phone; `tests/e2e/lines.e2e.ts` checks that. A few tests assert the current strings; change them in the same commit.
+1. **Voice**: replace every line marked `TODO-VOICE` in `src/voice.ts`. New in v0.5: `lockIn.broken`, `lockIn.stopped`, `stones.fell`, `stones.waiting`; in v0.6: `restDay`. Keep each under about 40 characters so it fits one row on a 320px phone; `tests/e2e/lines.e2e.ts` checks that. A few tests assert the current strings; change them in the same commit.
 2. **On the phone**: add it to the home screen, start a lock-in and lock the phone for a minute, to see "you left. it waited." with your own eyes.

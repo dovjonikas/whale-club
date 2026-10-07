@@ -186,6 +186,9 @@ input {
 }
 
 .line {
+  text-shadow:
+    0 1px 2px rgba(2, 4, 9, 0.9),
+    0 0 12px rgba(2, 4, 9, 0.8);
   /* Text only: taps go through it to a stone floating behind. */
   pointer-events: none;
   min-height: 1.6em;

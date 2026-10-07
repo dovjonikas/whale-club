@@ -70,7 +70,7 @@ for (const thing of things) {
 }
 
 const data = {
-  version: 2,
+  version: 3,
   things,
   days,
   cracked,
@@ -185,6 +185,38 @@ for (const { name, options } of targets) {
   await page.clock.fastForward('18:00')
   await page.clock.runFor(3000)
   await shot(page, 'iphone-session.png')
+  await context.close()
+}
+
+// Days on the iPhone: practice is off on Wednesdays, then every thing is.
+for (const [file, off] of [
+  ['days', ['practice']],
+  ['rest', ['run', 'read', 'practice']],
+]) {
+  const week = (id) => (off.includes(id) ? [true, true, false, true, true, true, true] : undefined)
+  const dayData = {
+    ...data,
+    things: things.map((t) => (week(t.id) ? { ...t, days: week(t.id) } : t)),
+  }
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.setFixedTime(NOW)
+  await page.addInitScript(
+    (json) => localStorage.setItem('whaleclub:data', json),
+    JSON.stringify(dayData),
+  )
+  await page.goto(base)
+  await page.waitForTimeout(1200)
+  if (file === 'days') {
+    await page.locator('.not-today-toggle').click()
+    await page.waitForTimeout(300)
+    await shot(page, 'iphone-not-today.png')
+    await page.getByRole('button', { name: 'edit read' }).click()
+    await page.waitForTimeout(500)
+    await shot(page, 'iphone-days.png')
+  } else {
+    await shot(page, 'iphone-rest.png')
+  }
   await context.close()
 }
 await browser.close()

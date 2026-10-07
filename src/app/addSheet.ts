@@ -1,5 +1,6 @@
 import type { Mode, Thing } from '../store/types'
 import type { Store } from '../store/store'
+import { daysField } from './daysField'
 import { openSheet } from './sheet'
 
 const EMOJI = ['🏃', '🎻', '📚', '🧘', '💧', '✍️', '🎹', '🚴', '🧹', '🥦', '💻', '🌱']
@@ -44,6 +45,7 @@ export function openAddSheet(store: Store, onAdded: (thing: Thing) => void): voi
               <input class="input" name="custom" type="number" inputmode="numeric" min="1" max="600" aria-label="custom minutes" placeholder="20" style="width: 88px" />
             </div>
           </div>
+          <div class="days-slot"></div>
           <button type="submit" class="button-primary">add</button>
           <p class="sheet-note">tap a card when it is done. hold it for a timer.</p>
         </form>`
@@ -53,6 +55,8 @@ export function openAddSheet(store: Store, onAdded: (thing: Thing) => void): voi
       const emojiInput = body.querySelector<HTMLInputElement>('input[name=emoji]')
       const customInput = body.querySelector<HTMLInputElement>('input[name=custom]')
       const minutesField = body.querySelector<HTMLElement>('.minutes-field')
+      const days = daysField([true, true, true, true, true, true, true])
+      body.querySelector('.days-slot')?.replaceWith(days.element)
       if (!form || !nameInput || !emojiInput || !customInput || !minutesField) return
 
       const press = (selector: string, value: string): void => {
@@ -110,7 +114,10 @@ export function openAddSheet(store: Store, onAdded: (thing: Thing) => void): voi
           nameInput.focus()
           return
         }
-        const input = mode === 'timer' ? { name, emoji, mode, minutes } : { name, emoji, mode }
+        const input =
+          mode === 'timer'
+            ? { name, emoji, mode, minutes, days: days.value() }
+            : { name, emoji, mode, days: days.value() }
         const thing = store.addThing(input)
         if (!thing) return
         close()

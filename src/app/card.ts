@@ -1,12 +1,12 @@
 import { creatureSvg } from '../scene/creatures'
-import type { Line, Stage } from '../store/derive'
+import type { Dot, Line, Stage } from '../store/derive'
 import type { Thing } from '../store/types'
 import { voice } from '../voice'
 
 /** What a card shows: all of it derived, none of it stored. */
 export interface CardView {
   done: boolean
-  dots: readonly boolean[]
+  dots: readonly Dot[]
   stage: Stage
   line: Line
   /** Stones earned and waiting to be cracked. */
@@ -32,6 +32,9 @@ export function createCard(thing: Thing): HTMLElement {
       <span class="dots" aria-hidden="true">${'<span class="dot"></span>'.repeat(7)}</span>
       <span class="visually-hidden card-days"></span>
     </button>
+    <button type="button" class="card-edit">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg>
+    </button>
     <button type="button" class="card-lock">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.5 1.5M10 3h4"/></svg>
       <span>${voice.lockIn.button}</span>
@@ -51,6 +54,12 @@ export function lock(card: HTMLElement): HTMLButtonElement {
   return button
 }
 
+export function edit(card: HTMLElement): HTMLButtonElement {
+  const button = card.querySelector<HTMLButtonElement>('.card-edit')
+  if (!button) throw new Error('card without edit')
+  return button
+}
+
 export function updateCard(card: HTMLElement, thing: Thing, view: CardView): void {
   const button = main(card)
   const name = card.querySelector('.card-name')
@@ -63,6 +72,7 @@ export function updateCard(card: HTMLElement, thing: Thing, view: CardView): voi
   card.dataset.done = String(view.done)
   card.dataset.stage = String(view.stage)
   lock(card).setAttribute('aria-label', `${voice.lockIn.button}: ${thing.name}`)
+  edit(card).setAttribute('aria-label', voice.days.edit(thing.name))
 
   const stone = card.querySelector<HTMLElement>('.card-stone')
   if (stone) {
@@ -82,13 +92,15 @@ export function updateCard(card: HTMLElement, thing: Thing, view: CardView): voi
   }
 
   card.querySelectorAll('.dot').forEach((dot, i) => {
-    dot.classList.toggle('is-on', view.dots[i] === true)
+    dot.classList.toggle('is-on', view.dots[i] === 'done')
+    dot.classList.toggle('is-rest', view.dots[i] === 'rest')
     dot.classList.toggle('is-today', i === 6)
   })
   const days = card.querySelector('.card-days')
-  const count = view.dots.filter(Boolean).length
+  const count = view.dots.filter((d) => d === 'done').length
+  const planned = view.dots.filter((d) => d !== 'rest').length
   if (days) {
-    days.textContent = `${String(count)} of the last 7 days${view.waiting > 0 ? `, ${voice.stones.onCard}` : ''}`
+    days.textContent = `${String(count)} of ${String(planned)} planned days this week${view.waiting > 0 ? `, ${voice.stones.onCard}` : ''}`
   }
 }
 
