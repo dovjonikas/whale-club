@@ -36,7 +36,5 @@ npm run icons      # after changing public/icons/icon.svg
 
 ## For the author to do by hand
 
-1. **GitHub Pages**: repo Settings, Pages, Source: GitHub Actions. The next push to `main` (or a re-run of the Deploy workflow) publishes to https://dovjonikas.github.io/whale-club/. Then replace the "(placeholder until Pages is enabled)" note in README.md.
-2. **Voice**: replace every line marked `TODO-VOICE` in `src/voice.ts`. Keys: firstOpen, example, thingAdded, tap (sea / sky / garden lists), untap, timerStart, timerEnd, allDone, missedDay, quietDay, weekGood, weekBad, stageUp, unlock(name), starPlaced, checkin.after, install, shareDone, shareFailed, club (yourTyler, who, copied, bad), rules. Keep each under about 60 characters: the line slot is one row on a phone. Tests assert a few of the current strings (untap, allDone, timerEnd, missedDay, unlock, shareDone, the first rule, the check-in answers); change those tests in the same commit.
-3. **Lighthouse** on the live URL (see Verified).
+1. **GitHub Pages** is enabled (source: GitHub Actions) and the first deploy went through: https://dovjonikas.github.io/whale-club/. Every push to main redeploys.
 4. **On the phone**: open the live URL in Safari, Share, Add to Home Screen; tap once to open the sound gate.

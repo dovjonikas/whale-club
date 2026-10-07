@@ -7,8 +7,7 @@ show up, the scene fills: a star in the sky, a creature that grows, a
 collectible unlocked. Miss a day and the sea goes quiet for a day. That is
 all that happens.
 
-**Live:** https://dovjonikas.github.io/whale-club/ (placeholder until Pages
-is enabled)
+**Live:** https://dovjonikas.github.io/whale-club/
 
 <p align="center">
   <img src="docs/screenshots/iphone-scene.png" alt="Whale Club on an iPhone: a night sky of stars laid out as a calendar, a sea, and three cards with creatures" width="280">
