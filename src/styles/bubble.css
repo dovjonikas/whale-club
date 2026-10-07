@@ -1,0 +1,119 @@
+/* The bubble (src/brand/bubble.ts): its states, and the pop when a thing is
+   done. Transform and opacity only; the drawing itself carries the state it
+   was made in, so this sheet only moves between states. */
+.bubble {
+  display: block;
+  overflow: visible;
+}
+
+/* Filling swells the colour in from the middle; emptying again is quicker. */
+.bubble .bubble-fill {
+  opacity: 0;
+  transform: scale(0.6);
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 140ms var(--ease-out),
+    transform 140ms var(--ease-out);
+}
+
+.bubble[data-done='true'] .bubble-fill {
+  opacity: 1;
+  transform: none;
+  transition-duration: 200ms, 240ms;
+}
+
+/* The glyph turns dark on the colour: two inks crossfading, never a colour change. */
+.bubble .bubble-mark-light {
+  opacity: 1;
+  transition: opacity 120ms var(--ease-out);
+}
+
+.bubble .bubble-mark-dark {
+  opacity: 0;
+  transition: opacity 120ms var(--ease-out);
+}
+
+.bubble[data-done='true'] .bubble-mark-light {
+  opacity: 0;
+  transition-duration: 160ms;
+}
+
+.bubble[data-done='true'] .bubble-mark-dark {
+  opacity: 1;
+  transition-duration: 160ms;
+  transition-delay: 60ms;
+}
+
+.bubble .bubble-hand {
+  opacity: 0;
+}
+
+.bubble[data-manual='true'] .bubble-hand {
+  opacity: 1;
+}
+
+/* Done: the signature breaks into three drops and a new one rises in its
+   place, within 300 ms. Rare (once a thing a day) and a celebration, so a
+   one-shot keyframe; the fill under it stays an interruptible transition. */
+.bubble .bubble-sign,
+.bubble .bubble-drop {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.is-popping .bubble-sign {
+  animation: bubble-sign 300ms var(--ease-out);
+}
+
+.is-popping .bubble-drop {
+  animation: bubble-drop 240ms var(--ease-out) var(--d, 0ms);
+}
+
+@keyframes bubble-sign {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  40% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes bubble-drop {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy));
+  }
+}
+
+/* Reduced motion: the bubble only fills, as a fade; nothing swells or pops.
+   The global rule cuts every duration, so these win it back for opacity. */
+@media (prefers-reduced-motion: reduce) {
+  .bubble .bubble-fill {
+    transform: none;
+  }
+  .bubble .bubble-fill,
+  .bubble .bubble-mark {
+    transition-property: opacity !important;
+    transition-duration: 200ms !important;
+    transition-delay: 0ms !important;
+  }
+  .is-popping .bubble-sign,
+  .is-popping .bubble-drop {
+    animation: none !important;
+  }
+}
