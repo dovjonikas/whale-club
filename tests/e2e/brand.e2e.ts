@@ -5,6 +5,7 @@ import { fold, glyphFor } from '../../src/brand/match'
 import { dayBubble } from '../../src/app/thingMark'
 import { LANTERN_COLORS } from '../../src/app/sceneData'
 import { migrate } from '../../src/store/migrate'
+import { DATA_VERSION } from '../../src/store/types'
 
 /**
  * The brand's own sign language: the glyphs, the names they are picked
@@ -139,7 +140,7 @@ test('things from before 0.12 trade their emoji for its glyph, or their name for
     cracked: {},
     settings: { sound: true },
   })
-  expect(data.version).toBe(7)
+  expect(data.version).toBe(DATA_VERSION)
   // What a person chose (the emoji) wins over a guess at their words.
   expect(data.things.map((t) => t.icon)).toEqual(['violin', 'violin', LETTER, 'run', 'piano'])
   // The emoji is kept for the record.

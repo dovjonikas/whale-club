@@ -1,5 +1,6 @@
 import { type Page } from '@playwright/test'
 import { expect, test, card, clearNotices, seed, stored } from './helpers'
+import { DATA_VERSION } from '../../src/store/types'
 
 /**
  * Days: optional planning that adds nothing to the first screen. A thing's
@@ -236,5 +237,5 @@ test('data from before days plans every thing on every day', async ({ page }) =>
   await card(page, 'read').click()
   const data = await stored(page)
   expect(data.things[0]).toMatchObject({ days: [true, true, true, true, true, true, true] })
-  expect((data as unknown as { version: number }).version).toBe(7)
+  expect((data as unknown as { version: number }).version).toBe(DATA_VERSION)
 })

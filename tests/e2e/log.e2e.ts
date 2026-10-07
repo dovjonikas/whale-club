@@ -1,5 +1,6 @@
 import { type Page } from '@playwright/test'
 import { expect, test, clearNotices, dateKey, seed, stored } from './helpers'
+import { DATA_VERSION } from '../../src/store/types'
 
 /**
  * The log, the one view of what has been done, and the lanterns a session
@@ -93,7 +94,7 @@ test('data from before 0.10 turns finished lock-ins into lanterns, dim where lef
     version: number
     days: Record<string, { sessions?: unknown[] }>
   }
-  expect(data.version).toBe(7)
+  expect(data.version).toBe(DATA_VERSION)
   expect(data.days[dateKey(-3)]?.sessions).toEqual([{ thing: 't1', minutes: 25 }])
   expect(data.days[dateKey(-2)]?.sessions).toEqual([{ thing: 't1', minutes: 10, left: true }])
   expect(data.days[dateKey(-1)]?.sessions).toBeUndefined()

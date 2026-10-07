@@ -1,4 +1,5 @@
 import { expect, test, addThing, card, dateKey, seed, stored } from './helpers'
+import { DATA_VERSION } from '../../src/store/types'
 
 /**
  * The first screen and the row: one sentence, an example, and up to five
@@ -74,7 +75,7 @@ test('data from before 0.9 loses its mode and every thing gets a lock-in length'
     version: number
     things: Record<string, unknown>[]
   }
-  expect(data.version).toBe(7)
+  expect(data.version).toBe(DATA_VERSION)
   expect(data.things.map((t) => t.mode)).toEqual([undefined, undefined])
   expect(data.things.map((t) => t.minutes)).toEqual([15, 25])
 })

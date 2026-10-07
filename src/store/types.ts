@@ -98,6 +98,13 @@ export interface DayRecord {
 
 export type PostcardFormat = 'story' | 'square'
 
+/** One thing bought in the dock, with the krill paid for it then. */
+export interface Purchase {
+  item: string
+  date: DateKey
+  price: number
+}
+
 export interface Settings {
   sound: boolean
   /** When the install leaf was last closed; it comes back seven days later. */
@@ -114,8 +121,11 @@ export interface Settings {
   explained?: string[]
 }
 
+/** The shape of the saved record; migrate.ts brings every earlier one up to it. */
+export const DATA_VERSION = 8
+
 export interface AppData {
-  version: 7
+  version: typeof DATA_VERSION
   things: Thing[]
   days: Record<DateKey, DayRecord>
   /**
@@ -130,6 +140,24 @@ export interface AppData {
    * so they are kept here for their names, worlds and colours.
    */
   retired?: Thing[]
+  /**
+   * What the dock sold, each with its price then. Krill earned is never
+   * stored (src/store/krill.ts works it out from the days); only this is,
+   * so the balance can never disagree with the history.
+   */
+  bought?: Purchase[]
+  /** The one dock item being saved for, shown as a line under the krill. */
+  goal?: string
+  /** Dock items taken out of the scene from the dock ("hide"). */
+  hidden?: string[]
+  /** Who wears each worn item: item id to thing id. */
+  wears?: Record<string, string>
+  /**
+   * Where each find and dock item stands: a spot id (src/scene/spots.ts) or
+   * "chest". An item without a record is placed by itself, so a person who
+   * never arranges still has a whole scene.
+   */
+  placement?: Record<string, string>
 }
 
 export const MAX_THINGS = 5
@@ -165,5 +193,5 @@ export const WORLD_ORDER: readonly World[] = ['sea', 'sky', 'garden']
 export const EVERY_DAY: readonly boolean[] = [true, true, true, true, true, true, true]
 
 export function emptyData(): AppData {
-  return { version: 7, things: [], days: {}, cracked: {}, settings: { sound: true } }
+  return { version: DATA_VERSION, things: [], days: {}, cracked: {}, settings: { sound: true } }
 }

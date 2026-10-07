@@ -3,7 +3,8 @@ import prettier from 'eslint-config-prettier'
 import tseslint from 'typescript-eslint'
 
 export default tseslint.config(
-  { ignores: ['dist', 'dev-dist', 'node_modules', 'playwright-report', 'test-results'] },
+  // .claude holds local, untracked tooling (probes, settings); it is not part of the project.
+  { ignores: ['dist', 'dev-dist', 'node_modules', 'playwright-report', 'test-results', '.claude'] },
   js.configs.recommended,
   ...tseslint.configs.strictTypeChecked.map((c) => ({ ...c, files: ['**/*.ts'] })),
   ...tseslint.configs.stylisticTypeChecked.map((c) => ({ ...c, files: ['**/*.ts'] })),
