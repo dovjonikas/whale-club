@@ -26,7 +26,7 @@ const STARTERS: readonly Omit<Thing, 'createdAt'>[] = [
   {
     id: 'lab-run',
     name: 'run',
-    emoji: '🏃',
+    icon: 'run',
     kind: 'tap',
     minutes: 15,
     days: [...EVERY_DAY],
@@ -37,7 +37,7 @@ const STARTERS: readonly Omit<Thing, 'createdAt'>[] = [
   {
     id: 'lab-read',
     name: 'read',
-    emoji: '📚',
+    icon: 'read',
     kind: 'lockIn',
     minutes: 20,
     days: [...EVERY_DAY],
@@ -48,7 +48,7 @@ const STARTERS: readonly Omit<Thing, 'createdAt'>[] = [
   {
     id: 'lab-practice',
     name: 'practice',
-    emoji: '🌱',
+    icon: 'music',
     kind: 'lockIn',
     minutes: 30,
     // Weekdays and Saturday: Sunday off, so a rest dash shows in the dots.

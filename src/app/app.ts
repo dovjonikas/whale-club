@@ -197,7 +197,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     },
     onAlsoToday(thing) {
       store.setToday(thing.id, 'extra')
-      line.say(`${thing.emoji} ${thing.name}: ${voice.days.alsoToday}.`, { quiet: true })
+      line.say(`${thing.name}: ${voice.days.alsoToday}.`, { quiet: true })
     },
     onAdd() {
       openAddSheet(store, added)

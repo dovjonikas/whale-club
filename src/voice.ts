@@ -65,16 +65,22 @@ export const voice = {
     title: 'new homework',
     name: 'name',
     placeholder: 'run',
-    emoji: 'emoji',
-    ownEmoji: 'your own emoji',
     button: 'add',
     /** From the first open's "start light": three small things to begin with. */
     starters: 'start with something small',
     starterThings: [
-      { emoji: '💧', name: 'a glass of water' }, // TODO-VOICE
-      { emoji: '💪', name: '10 push-ups' }, // TODO-VOICE
-      { emoji: '📖', name: 'read 2 pages' }, // TODO-VOICE
+      { icon: 'water', name: 'a glass of water' }, // TODO-VOICE
+      { icon: 'pushups', name: '10 push-ups' }, // TODO-VOICE
+      { icon: 'read', name: 'read 2 pages' }, // TODO-VOICE
     ],
+  },
+  /** A thing's picture, in its bubble: the add sheet's and the thing's sheet's field. */
+  icon: {
+    label: 'its picture', // TODO-VOICE
+    /** Under the label while the picture still follows the name. */
+    picked: 'picked from the name', // TODO-VOICE
+    letter: 'first letter', // TODO-VOICE
+    more: 'more', // TODO-VOICE
   },
   /** How a thing is done: the one question in the add sheet and the thing's sheet. */
   kind: {

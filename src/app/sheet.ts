@@ -104,6 +104,12 @@ export function openSheet(options: SheetOptions): SheetHandle {
     if (closed) return
     closed = true
     openHandle = null
+    // Leaving: out of reach and out of the accessibility tree at once, not when the slide ends,
+    sheet.inert = true
+    sheet.setAttribute('aria-hidden', 'true')
+    // and the fading scrim no longer catches a tap meant for the scene.
+    scrim.style.pointerEvents = 'none'
+    sheet.style.pointerEvents = 'none'
     document.removeEventListener('keydown', onKey)
     app?.removeAttribute('inert')
     scrim.classList.remove('is-open')

@@ -3,6 +3,7 @@ import { INK, CREAM, inside, monogram } from '../../src/brand/bubble'
 import { COMMON, GLYPHS, GROUPS, LETTER } from '../../src/brand/glyphs'
 import { fold, glyphFor } from '../../src/brand/match'
 import { LANTERN_COLORS } from '../../src/app/sceneData'
+import { migrate } from '../../src/store/migrate'
 
 /**
  * The brand's own sign language: the glyphs, the names they are picked
@@ -110,4 +111,49 @@ test('a glyph stands out in its bubble at 3:1 or more, empty and done, in every 
     expect(contrast(CREAM, inside(color)), `cream on ${color} tint`).toBeGreaterThanOrEqual(3)
     expect(contrast(INK, color), `ink on ${color}`).toBeGreaterThanOrEqual(3)
   }
+})
+
+test('things from before 0.12 trade their emoji for its glyph, or their name for one, or a monogram', () => {
+  const thing = (id: string, name: string, emoji: string, order: number) => ({
+    id,
+    name,
+    emoji,
+    kind: 'tap',
+    line: 'a',
+    minutes: 15,
+    world: 'sea',
+    createdAt: '2026-09-01',
+    order,
+  })
+  const data = migrate({
+    version: 6,
+    things: [
+      thing('a', 'practice', '🎻', 0),
+      thing('b', 'smuikas', '•', 1),
+      thing('c', 'kintsugi', '🏺', 2),
+      thing('d', 'x', '🏃‍♀️', 3),
+      thing('e', 'run', '🎹', 4),
+    ],
+    days: {},
+    cracked: {},
+    settings: { sound: true },
+  })
+  expect(data.version).toBe(7)
+  // What a person chose (the emoji) wins over a guess at their words.
+  expect(data.things.map((t) => t.icon)).toEqual(['violin', 'violin', LETTER, 'run', 'piano'])
+  // The emoji is kept for the record.
+  expect(data.things[0]?.emoji).toBe('🎻')
+
+  // A glyph already chosen is kept; one that does not exist falls back to the name.
+  const later = migrate({
+    version: 7,
+    things: [
+      { ...thing('a', 'read', '•', 0), icon: 'violin' },
+      { ...thing('b', 'read', '•', 1), icon: 'no-such-glyph' },
+    ],
+    days: {},
+    cracked: {},
+    settings: { sound: true },
+  })
+  expect(later.things.map((t) => t.icon)).toEqual(['violin', 'read'])
 })

@@ -1,8 +1,10 @@
+import { bubbleSvg, RING } from '../brand/bubble'
 import { icon } from '../brand/icons'
 import { creatureSvg } from '../scene/creatures'
 import type { Dot, Line, Stage } from '../store/derive'
 import type { Thing } from '../store/types'
 import { voice } from '../voice'
+import { lanternColor } from './sceneData'
 
 /** What a card shows: all of it derived, none of it stored. */
 export interface CardView {
@@ -19,14 +21,16 @@ export interface CardView {
 }
 
 /**
- * A card is one target: the whole card. Its kind shows at a glance: a tap
- * thing has an empty ring for its check; a lock-in thing shows its length
- * and a small timer ring that fills with the minutes seen today ("12/25 ·
- * finish" when it was started and not finished). The three dots open the
- * thing's sheet; in edit mode, and after a swipe to the left, a red
- * "delete" shows on the card.
+ * A card is one target: the whole card. Its bubble, at the corner, is the
+ * thing's mark (src/brand/bubble.ts): its picture in its colour, filled
+ * when it is done today. A lock-in's bubble has a timer ring for a rim that
+ * fills with the minutes seen today, and its length shows under the name
+ * ("12/25 · finish" when it was started and not finished). The three dots
+ * open the thing's sheet; in edit mode, and after a swipe to the left, a
+ * red "delete" shows on the card.
  */
-const RING = 2 * Math.PI * 9
+/** How long the signature's pop takes (bubble.css), so its class comes off when it is over. */
+const POP_MS = 320
 
 export function createCard(thing: Thing): HTMLElement {
   const card = document.createElement('div')
@@ -36,15 +40,7 @@ export function createCard(thing: Thing): HTMLElement {
   card.innerHTML = `
     <button type="button" class="card-main" data-world="${thing.world}">
       <span class="card-stone" hidden aria-hidden="true"></span>
-      <span class="card-mark" aria-hidden="true">
-        <svg class="mark-ring" viewBox="0 0 24 24">
-          <circle class="mark-track" cx="12" cy="12" r="9"/>
-          <circle class="mark-fill" cx="12" cy="12" r="9" stroke-dasharray="${RING.toFixed(2)}" stroke-dashoffset="${RING.toFixed(2)}"/>
-          <path class="mark-clock" d="M12 8v4.4l2.8 1.7"/>
-          <path class="mark-check" d="M7.5 12.5l3 3 6-6.5"/>
-          <path class="mark-hand" d="M9 16.5v-5.5a1 1 0 0 1 2 0v3m0-4.5a1 1 0 0 1 2 0v4.5m0-3.5a1 1 0 0 1 2 0v3.5m0-2a1 1 0 0 1 2 0v2.5c0 2.2-1.6 3.5-3.6 3.5h-1.2c-1.3 0-2.3-.6-3-1.6"/>
-        </svg>
-      </span>
+      <span class="card-mark" aria-hidden="true"></span>
       <span class="creature"></span>
       <span class="card-name"></span>
       <span class="card-length"></span>
@@ -79,13 +75,10 @@ export function remove(card: HTMLElement): HTMLButtonElement {
 export function updateCard(card: HTMLElement, thing: Thing, view: CardView): void {
   const button = main(card)
   const name = card.querySelector('.card-name')
-  if (name) {
-    name.innerHTML = '<span class="card-emoji"></span><span class="card-word"></span>'
-    const emoji = name.querySelector('.card-emoji')
-    const word = name.querySelector('.card-word')
-    if (emoji) emoji.textContent = `${thing.emoji} `
-    if (word) word.textContent = thing.name
-  }
+  if (name) name.textContent = thing.name
+  const color = lanternColor(thing)
+  // One colour for a thing everywhere: its bubble, its lanterns, its log, and its card's glow.
+  card.style.setProperty('--thing', color)
 
   card.dataset.kind = thing.kind
   card.dataset.done = String(view.done)
@@ -109,9 +102,30 @@ export function updateCard(card: HTMLElement, thing: Thing, view: CardView): voi
           ? voice.card.finish(Math.min(view.seen, thing.minutes), thing.minutes)
           : voice.card.length(thing.minutes)
   }
-  const fill = card.querySelector('.mark-fill')
   const progress = thing.kind === 'tap' ? 0 : view.done ? 1 : Math.min(1, view.seen / thing.minutes)
-  fill?.setAttribute('stroke-dashoffset', (RING * (1 - progress)).toFixed(2))
+  const mark = card.querySelector<HTMLElement>('.card-mark')
+  if (mark) {
+    // Drawn again only when what it shows changes; its state moves by the stylesheet.
+    const key = [thing.icon, thing.name, color, thing.kind].join('|')
+    const fresh = mark.dataset.key !== key
+    if (fresh) {
+      mark.innerHTML = bubbleSvg(
+        { icon: thing.icon, name: thing.name, color, kind: thing.kind },
+        { done: view.done, progress, manual: view.manual },
+      )
+      mark.dataset.key = key
+    }
+    const bubble = mark.querySelector<SVGElement>('.bubble')
+    if (bubble) {
+      const was = bubble.dataset.done === 'true'
+      bubble.dataset.done = String(view.done)
+      bubble.dataset.manual = String(view.manual)
+      bubble
+        .querySelector('.bubble-progress')
+        ?.setAttribute('stroke-dashoffset', (RING * (1 - progress)).toFixed(2))
+      if (!fresh && !was && view.done) pop(card)
+    }
+  }
 
   const stone = card.querySelector<HTMLElement>('.card-stone')
   if (stone) {
@@ -156,11 +170,30 @@ export function updateCard(card: HTMLElement, thing: Thing, view: CardView): voi
   }
 }
 
-/** Runs a one-shot CSS animation class, restartable mid-flight. */
+/**
+ * Runs a one-shot CSS animation class, restartable mid-flight. The bubble's
+ * own pop ends sooner and on its own clock, so its endings are not this
+ * animation's end.
+ */
 export function animate(card: HTMLElement, className: string): void {
   card.classList.remove(className)
   // Reading layout restarts the animation when the class comes straight back.
   card.getBoundingClientRect()
   card.classList.add(className)
-  card.addEventListener('animationend', () => card.classList.remove(className), { once: true })
+  const ended = (event: AnimationEvent): void => {
+    if (event.animationName.startsWith('bubble-')) return
+    card.classList.remove(className)
+    card.removeEventListener('animationend', ended)
+  }
+  card.addEventListener('animationend', ended)
+}
+
+/** Done: the bubble's signature pops into three (bubble.css). */
+function pop(card: HTMLElement): void {
+  card.classList.remove('is-popping')
+  card.getBoundingClientRect()
+  card.classList.add('is-popping')
+  window.setTimeout(() => {
+    card.classList.remove('is-popping')
+  }, POP_MS)
 }

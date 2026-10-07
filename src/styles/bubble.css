@@ -6,6 +6,16 @@
   overflow: visible;
 }
 
+/* A thing's small bubble before its name, sized by the text around it. */
+.thing-mark {
+  display: inline-block;
+  flex: none;
+  width: 1.6em;
+  height: 1.6em;
+  margin-right: 0.3em;
+  vertical-align: -0.5em;
+}
+
 /* Filling swells the colour in from the middle; emptying again is quicker. */
 .bubble .bubble-fill {
   opacity: 0;

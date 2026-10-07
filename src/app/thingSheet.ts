@@ -1,10 +1,13 @@
+import { glyphFor } from '../brand/match'
 import { todayKey } from '../store/dates'
 import { weekday, withoutTimerLeft } from '../store/derive'
 import type { Store } from '../store/store'
 import type { Thing } from '../store/types'
 import { voice } from '../voice'
 import { daysField } from './daysField'
+import { iconField } from './iconField'
 import { kindField } from './kindField'
+import { lanternColor } from './sceneData'
 import { openSheet } from './sheet'
 
 export interface ThingSheetHandlers {
@@ -15,7 +18,7 @@ export interface ThingSheetHandlers {
 
 /**
  * A thing's own sheet, from its three dots or from a tap in edit mode:
- * its name and emoji, how it is done, its days, and today's exception
+ * its name and picture, how it is done, its days, and today's exception
  * ("not today" for a planned day, "also today" for one that is off). A
  * lock-in thing also has "did it without the timer" (twice a week at
  * most) and, once done today, the way to take that back, since its card
@@ -23,7 +26,7 @@ export interface ThingSheetHandlers {
  */
 export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandlers): void {
   openSheet({
-    title: `${thing.emoji} ${thing.name}`,
+    title: thing.name,
     build(body, close) {
       const today = todayKey()
       const data = store.get()
@@ -42,10 +45,7 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
             <span class="field-label">${voice.add.name}</span>
             <input class="input" name="name" type="text" maxlength="24" autocomplete="off" enterkeyhint="done" />
           </label>
-          <label class="field">
-            <span class="field-label">${voice.add.emoji}</span>
-            <input class="input input-emoji" name="emoji" type="text" maxlength="4" autocomplete="off" />
-          </label>
+          <div class="icon-slot"></div>
           <div class="kind-slot"></div>
           <div class="days-slot"></div>
           <div class="field">
@@ -79,11 +79,21 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
 
       const form = body.querySelector<HTMLFormElement>('form')
       const name = body.querySelector<HTMLInputElement>('input[name=name]')
-      const emoji = body.querySelector<HTMLInputElement>('input[name=emoji]')
       const todayChip = body.querySelector<HTMLButtonElement>('.today-chip')
-      if (!form || !name || !emoji || !todayChip) return
+      if (!form || !name || !todayChip) return
       name.value = thing.name
-      emoji.value = thing.emoji
+      // Its picture keeps following the name only if it still is the name's own.
+      const picture = iconField({
+        icon: thing.icon,
+        name: thing.name,
+        color: lanternColor(thing),
+        kind: thing.kind,
+        auto: thing.icon === glyphFor(thing.name),
+      })
+      body.querySelector('.icon-slot')?.replaceWith(picture.element)
+      name.addEventListener('input', () => {
+        picture.follow(name.value)
+      })
       const kind = kindField({ kind: thing.kind, minutes: thing.minutes })
       body.querySelector('.kind-slot')?.replaceWith(kind.element)
       const days = daysField(thing.days)
@@ -122,7 +132,7 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
         event.preventDefault()
         store.updateThing(thing.id, {
           name: name.value,
-          emoji: emoji.value.trim() || thing.emoji,
+          icon: picture.icon(),
           kind: kind.kind(),
           minutes: kind.minutes(),
           days: days.value(),

@@ -1,3 +1,6 @@
+import { glyphForEmoji } from '../brand/emoji'
+import { glyph, LETTER } from '../brand/glyphs'
+import { glyphFor } from '../brand/match'
 import { earnedTier } from './derive'
 import type { AppData, DayRecord, Settings, Thing } from './types'
 import { DEFAULT_MINUTES, emptyData, EVERY_DAY, MAX_MINUTES, MIN_MINUTES } from './types'
@@ -28,6 +31,8 @@ export function migrate(raw: unknown): AppData {
       // Before version 6 every thing could be tapped or locked in; each gets a kind.
       return withKinds(validateV2(raw))
     case 6:
+    case 7:
+      // Before version 7 things wore emoji; validateThing gives each its glyph.
       return validateV2(raw)
     default:
       throw new Error(`unknown version ${String(raw.version)}`)
@@ -127,10 +132,10 @@ function validateCommon(raw: Record<string, unknown>): AppData {
 
 function validateThing(raw: unknown): Thing {
   if (!isRecord(raw)) throw new Error('thing is not an object')
-  const { id, name, emoji, kind, line, minutes, world, createdAt, order, days } = raw
+  const { id, name, icon, emoji, kind, line, minutes, world, createdAt, order, days } = raw
   if (typeof id !== 'string' || !id) throw new Error('thing without id')
   if (typeof name !== 'string') throw new Error('thing without name')
-  if (typeof emoji !== 'string') throw new Error('thing without emoji')
+  if (emoji !== undefined && typeof emoji !== 'string') throw new Error('bad emoji')
   if (world !== 'sea' && world !== 'sky' && world !== 'garden') throw new Error('bad world')
   if (typeof createdAt !== 'string') throw new Error('thing without createdAt')
   if (typeof order !== 'number') throw new Error('thing without order')
@@ -145,7 +150,8 @@ function validateThing(raw: unknown): Thing {
   return {
     id,
     name,
-    emoji,
+    icon: iconFor(icon, emoji, name),
+    ...(typeof emoji === 'string' ? { emoji } : {}),
     // Before version 6 there was no kind and no line; withKinds decides both.
     kind: kind === 'lockIn' ? 'lockIn' : 'tap',
     line: line === 'b' ? 'b' : 'a',
@@ -155,6 +161,18 @@ function validateThing(raw: unknown): Thing {
     createdAt,
     order,
   }
+}
+
+/**
+ * A thing's glyph: the one it has, if it is real; before 0.12, the glyph
+ * its emoji meant; failing that, one picked from its name; failing that,
+ * its monogram. Reading the emoji first keeps what a person chose over
+ * what a guess at their words would give.
+ */
+function iconFor(icon: unknown, emoji: unknown, name: string): string {
+  if (typeof icon === 'string' && (icon === LETTER || glyph(icon))) return icon
+  const meant = typeof emoji === 'string' ? glyphForEmoji(emoji) : undefined
+  return meant ?? glyphFor(name)
 }
 
 function validateDay(raw: unknown): DayRecord {

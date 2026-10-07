@@ -27,7 +27,14 @@ export type Kind = 'tap' | 'lockIn'
 export interface Thing {
   id: string
   name: string
-  emoji: string
+  /**
+   * Its sign in its bubble: a glyph id (src/brand/glyphs.ts), or "letter"
+   * for a monogram of its name's first letter. Picked from the name when it
+   * is added, and changed in its sheet.
+   */
+  icon: string
+  /** What it wore before 0.12. Kept for the record; only migration reads it. */
+  emoji?: string
   kind: Kind
   /**
    * The lock-in length, in minutes: what the timer must see in a day for a
@@ -108,7 +115,7 @@ export interface Settings {
 }
 
 export interface AppData {
-  version: 6
+  version: 7
   things: Thing[]
   days: Record<DateKey, DayRecord>
   /**
@@ -158,5 +165,5 @@ export const WORLD_ORDER: readonly World[] = ['sea', 'sky', 'garden']
 export const EVERY_DAY: readonly boolean[] = [true, true, true, true, true, true, true]
 
 export function emptyData(): AppData {
-  return { version: 6, things: [], days: {}, cracked: {}, settings: { sound: true } }
+  return { version: 7, things: [], days: {}, cracked: {}, settings: { sound: true } }
 }

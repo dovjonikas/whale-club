@@ -238,11 +238,6 @@ button.log-cell {
   box-shadow: 0 0 6px var(--lantern, var(--star));
 }
 
-.log-check {
-  color: var(--star);
-  font-weight: 700;
-}
-
 /* The legend: always under the calendar, in the scene's own words. */
 .log-legend {
   display: grid;
@@ -300,10 +295,6 @@ button.log-cell {
   gap: var(--s1);
 }
 
-.legend-thing i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--lantern);
-  box-shadow: 0 0 5px var(--lantern);
+.legend-thing .thing-mark {
+  margin-right: 0;
 }

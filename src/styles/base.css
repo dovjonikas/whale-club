@@ -171,6 +171,7 @@ input {
    uses for its own place or entrance. */
 :is(
   .chip,
+  .icon-chip,
   .day-chip,
   .button-quiet,
   .undo-button,
@@ -196,6 +197,7 @@ input {
 
 :is(
     .chip,
+    .icon-chip,
     .day-chip,
     .button-quiet,
     .undo-button,

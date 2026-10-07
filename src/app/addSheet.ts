@@ -1,17 +1,20 @@
+import { glyph, LETTER } from '../brand/glyphs'
+import { LINE } from '../brand/icons'
 import type { Store } from '../store/store'
 import { DEFAULT_MINUTES, EVERY_DAY, type Thing } from '../store/types'
 import { voice } from '../voice'
 import { daysField } from './daysField'
+import { iconField } from './iconField'
 import { kindField } from './kindField'
+import { colorAt } from './sceneData'
 import { openSheet } from './sheet'
 
-const EMOJI = ['🏃', '📚', '🧘', '💧', '✍️', '🎹', '🚴', '🧹', '🥦', '💻', '🌱', '🎨']
-
 /**
- * The add sheet: a name, an emoji, how it is done (tap when done, or lock
- * in, and then how long), and the days. Everything but the name is already
- * answered when it opens. From the first open's "start light" it also
- * offers three small things to begin with, one tap each.
+ * The add sheet: a name, its picture (picked from the name as it is typed,
+ * or chosen), how it is done (tap when done, or lock in, and then how
+ * long), and the days. Everything but the name is already answered when it
+ * opens. From the first open's "start light" it also offers three small
+ * things to begin with, one tap each.
  */
 export function openAddSheet(
   store: Store,
@@ -21,7 +24,8 @@ export function openAddSheet(
   openSheet({
     title: voice.add.title,
     build(body, close) {
-      let emoji = EMOJI[0] ?? '•'
+      const things = store.get().things
+      const order = things.reduce((max, t) => Math.max(max, t.order + 1), 0)
 
       body.innerHTML = `
         <form class="add-form" novalidate>
@@ -30,7 +34,12 @@ export function openAddSheet(
               ? `<div class="field">
                   <span class="field-label" id="add-starters-label">${voice.add.starters}</span>
                   <div class="chips" role="group" aria-labelledby="add-starters-label">
-                    ${voice.add.starterThings.map((s, i) => `<button type="button" class="chip starter" data-starter="${String(i)}">${s.emoji} ${s.name}</button>`).join('')}
+                    ${voice.add.starterThings
+                      .map(
+                        (s, i) =>
+                          `<button type="button" class="chip starter" data-starter="${String(i)}"><svg class="starter-glyph" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="${String(LINE)}" stroke-linecap="round" stroke-linejoin="round">${glyph(s.icon)?.svg ?? ''}</svg>${s.name}</button>`,
+                      )
+                      .join('')}
                   </div>
                 </div>`
               : ''
@@ -39,13 +48,7 @@ export function openAddSheet(
             <span class="field-label">${voice.add.name}</span>
             <input class="input" name="name" type="text" maxlength="24" autocomplete="off" enterkeyhint="done" placeholder="${voice.add.placeholder}" required />
           </label>
-          <div class="field">
-            <span class="field-label" id="add-emoji-label">${voice.add.emoji}</span>
-            <div class="chips" role="group" aria-labelledby="add-emoji-label">
-              ${EMOJI.map((e) => `<button type="button" class="chip chip-emoji" data-emoji="${e}" aria-pressed="${String(e === emoji)}">${e}</button>`).join('')}
-              <input class="input chip-emoji-input" name="emoji" type="text" maxlength="4" aria-label="${voice.add.ownEmoji}" placeholder="…" />
-            </div>
-          </div>
+          <div class="icon-slot"></div>
           <div class="kind-slot"></div>
           <div class="days-slot"></div>
           <button type="submit" class="button-primary">${voice.add.button}</button>
@@ -53,40 +56,29 @@ export function openAddSheet(
 
       const form = body.querySelector<HTMLFormElement>('form')
       const nameInput = body.querySelector<HTMLInputElement>('input[name=name]')
-      const emojiInput = body.querySelector<HTMLInputElement>('input[name=emoji]')
       const kind = kindField({ kind: 'tap', minutes: DEFAULT_MINUTES })
+      const picture = iconField({
+        icon: LETTER,
+        name: '',
+        color: colorAt(order),
+        kind: 'tap',
+        auto: true,
+      })
+      body.querySelector('.icon-slot')?.replaceWith(picture.element)
       body.querySelector('.kind-slot')?.replaceWith(kind.element)
       const days = daysField([...EVERY_DAY])
       body.querySelector('.days-slot')?.replaceWith(days.element)
-      if (!form || !nameInput || !emojiInput) return
+      if (!form || !nameInput) return
 
-      const pickEmoji = (value: string): void => {
-        emoji = value
-        const chips = [...body.querySelectorAll<HTMLButtonElement>('[data-emoji]')]
-        for (const chip of chips)
-          chip.setAttribute('aria-pressed', String(chip.dataset.emoji === value))
-        emojiInput.value = chips.some((chip) => chip.dataset.emoji === value) ? '' : value
-      }
-
-      body.querySelectorAll<HTMLButtonElement>('[data-emoji]').forEach((chip) => {
-        chip.addEventListener('click', () => {
-          pickEmoji(chip.dataset.emoji ?? emoji)
-        })
-      })
-      emojiInput.addEventListener('input', () => {
-        const own = emojiInput.value.trim()
-        if (!own) return
-        emoji = own
-        body.querySelectorAll<HTMLButtonElement>('[data-emoji]').forEach((chip) => {
-          chip.setAttribute('aria-pressed', 'false')
-        })
+      nameInput.addEventListener('input', () => {
+        picture.follow(nameInput.value)
       })
       body.querySelectorAll<HTMLButtonElement>('[data-starter]').forEach((chip) => {
         chip.addEventListener('click', () => {
           const starter = voice.add.starterThings[Number(chip.dataset.starter)]
           if (!starter) return
           nameInput.value = starter.name
-          pickEmoji(starter.emoji)
+          picture.set(starter.icon, starter.name)
           body.querySelectorAll<HTMLButtonElement>('[data-starter]').forEach((c) => {
             c.setAttribute('aria-pressed', String(c === chip))
           })
@@ -102,7 +94,7 @@ export function openAddSheet(
         }
         const thing = store.addThing({
           name,
-          emoji,
+          icon: picture.icon(),
           kind: kind.kind(),
           minutes: kind.minutes(),
           days: days.value(),

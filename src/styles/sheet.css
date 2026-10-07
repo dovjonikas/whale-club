@@ -138,12 +138,6 @@
   color: var(--star-pale);
 }
 
-.chip-emoji {
-  font-size: 22px;
-  padding: 0;
-  width: var(--touch);
-}
-
 .button-primary {
   width: 100%;
   height: 48px;
@@ -650,11 +644,6 @@
   background: rgba(232, 240, 245, 0.22);
 }
 
-/* The add sheet's own-emoji field sits in the chip row, the width of a chip and a half. */
-.chip-emoji-input {
-  width: 64px;
-}
-
 /* How a thing is done: two big answers, a line under each. */
 .kind-choices {
   display: grid;
@@ -704,10 +693,6 @@
 
 .kind-length[hidden] {
   display: none;
-}
-
-.input-emoji {
-  width: 88px;
 }
 
 /* Delete in a thing's sheet: red, at the bottom, one tap, undo after. */
@@ -813,4 +798,98 @@
   width: 76px;
   text-align: center;
   font-variant-numeric: tabular-nums;
+}
+
+/* A thing's picture: a bubble showing how its card will look, by the label,
+   then round chips, seven to a row on a phone, and "more" by group. */
+.icon-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-bottom: var(--s2);
+}
+
+.icon-head .field-label {
+  margin: 0;
+}
+
+.icon-preview {
+  flex: none;
+  width: 36px;
+  height: 36px;
+}
+
+.icon-preview .bubble {
+  width: 100%;
+  height: 100%;
+}
+
+.icon-auto {
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+}
+
+.icon-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s1);
+}
+
+.icon-extra {
+  display: contents;
+}
+
+.icon-chip {
+  display: grid;
+  place-items: center;
+  width: var(--touch);
+  height: var(--touch);
+  border-radius: 50%;
+  border: 1px solid var(--card-edge);
+  background: rgba(2, 4, 9, 0.4);
+  color: var(--star-pale);
+  transition:
+    background var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    scale var(--dur-press) var(--ease-out);
+}
+
+.icon-chip svg {
+  width: 22px;
+  height: 22px;
+}
+
+.icon-chip[aria-pressed='true'] {
+  background: rgba(62, 242, 224, 0.16);
+  border-color: var(--glow);
+}
+
+.icon-letter {
+  font-size: var(--t-md);
+  font-weight: 700;
+}
+
+.icon-more {
+  display: grid;
+  gap: var(--s3);
+  margin-top: var(--s3);
+}
+
+.icon-more[hidden] {
+  display: none;
+}
+
+.icon-group-label {
+  display: block;
+  margin-bottom: var(--s1);
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+}
+
+/* A starter wears its picture before its name. */
+.starter-glyph {
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+  vertical-align: -4px;
 }
