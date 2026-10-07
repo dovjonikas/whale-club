@@ -28,6 +28,14 @@ all that happens.
 </p>
 
 <p align="center">
+  <img src="docs/screenshots/iphone-not-today.png" alt="The first screen on a day one thing is off: two cards and the not today strip opened" width="240">
+  &nbsp;
+  <img src="docs/screenshots/iphone-days.png" alt="A thing's sheet with the seven day chips" width="240">
+  &nbsp;
+  <img src="docs/screenshots/iphone-rest.png" alt="A rest day: nothing planned, one quiet line" width="240">
+</p>
+
+<p align="center">
   <img src="docs/screenshots/postcard-story.png" alt="A postcard in the story size: the night sky, the whale over the horizon, all of it. all the smoke., day 35 of whale club" width="280">
   &nbsp;&nbsp;
   <img src="docs/screenshots/postcard-square.png" alt="The same postcard in the square size" width="420">
@@ -49,6 +57,12 @@ And underneath all three: nothing dies. You just missed a day.
   sea, sky. You do not pick; every scene gets all three layers.
 - **Tap = done today.** The creature jumps, the world answers (bubbles,
   star dust, petals), one short line. Tap again to undo.
+- **Days, if you want them.** Every thing is planned every day unless
+  you say otherwise: its sheet has one line of seven day chips. The first
+  screen shows only today's things; the rest wait in a thin "not today"
+  strip, and any of them can be added for today only. A day off is never a
+  missed day: the dots show it as a dash, the streak walks past it, and a
+  thing done three times a week still grows into a whale.
 - **Lock in.** Under every card. Turn the dial (10 to 120 minutes), and
   the screen goes quiet: the sky turns, the time counts down, and the
   thing's creature starts as an egg, a spark or a seed and grows while you

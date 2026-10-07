@@ -6,6 +6,7 @@ import { fromKey, todayKey } from '../store/dates'
 import {
   allDoneToday,
   foundFor,
+  isRestDay,
   last7,
   lineFor,
   missedYesterday,
@@ -35,6 +36,7 @@ import { recapNotice } from './recap'
 import { Row } from './row'
 import { elapsedMs, SessionService, totalMs, type Session } from './session'
 import { openSessionScreen, type SessionScreen } from './sessionScreen'
+import { openThingSheet } from './thingSheet'
 import { Sound } from './sound'
 import { surpriseFor } from './surprise'
 import { showToast } from './toast'
@@ -63,6 +65,7 @@ export function startApp(root: HTMLElement): void {
       <div class="offer-slot"></div>
       <p class="line"></p>
       <div class="row" role="group" aria-label="your homework"></div>
+      <div class="not-today" hidden></div>
     </div>`
 
   const line = new Line(query(root, '.line'))
@@ -110,7 +113,7 @@ export function startApp(root: HTMLElement): void {
   // A find on its way out of its stone: where the stone was, for the arrival.
   const arrivals = new Map<string, { x: number; y: number }>()
 
-  const row = new Row(query(root, '.row'), {
+  const row = new Row(query(root, '.row'), query(root, '.not-today'), {
     onTap(thing, card) {
       const before = stageFor(last7(store.get(), thing.id, todayKey()))
       const done = store.toggleDone(thing.id)
@@ -133,6 +136,13 @@ export function startApp(root: HTMLElement): void {
           openSession(thing)
         },
       )
+    },
+    onEdit(thing) {
+      openThingSheet(store, thing)
+    },
+    onAlsoToday(thing) {
+      store.setToday(thing.id, 'extra')
+      line.say(`${thing.emoji} ${thing.name}: ${voice.days.alsoToday}.`, { quiet: true })
     },
     onAdd() {
       openAddSheet(store, (thing) => {
@@ -337,6 +347,7 @@ export function startApp(root: HTMLElement): void {
 
     const nothingToday = (data.days[today]?.done.length ?? 0) === 0
     scene.setQuiet(nothingToday && missedYesterday(data, today))
+    root.dataset.rest = String(isRestDay(data, today))
     notices.offer([
       installNotice(store),
       recapNotice(store, (moment) => {
@@ -359,7 +370,9 @@ export function startApp(root: HTMLElement): void {
     else sessions.stop()
   }
 
-  if (missedYesterday(store.get(), todayKey())) line.say(voice.missedDay, { quiet: true })
+  const opening = store.get()
+  if (isRestDay(opening, todayKey())) line.say(voice.restDay, { quiet: true })
+  else if (missedYesterday(opening, todayKey())) line.say(voice.missedDay, { quiet: true })
 }
 
 function shownCollectibles(data: AppData): ShownCollectible[] {

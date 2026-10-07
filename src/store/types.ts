@@ -23,6 +23,11 @@ export interface Thing {
   mode: Mode
   /** The last lock-in length for this thing, in minutes; the dial opens on it. */
   minutes?: number
+  /**
+   * The weekdays it is planned on, Monday first. All seven by default: the
+   * same things every day, as before there were days at all.
+   */
+  days: boolean[]
   /** Assigned from the thing's position when it was added, then fixed. */
   world: World
   createdAt: DateKey
@@ -40,6 +45,10 @@ export interface DayRecord {
    * star and do not bring a stone closer.
    */
   waited?: string[]
+  /** Things added to this day only ("also today"), though their weekday is off. */
+  extra?: string[]
+  /** Things taken off this day only ("not today"), though their weekday is on. */
+  skip?: string[]
   /** The daily check-in was answered. */
   checkin?: boolean
 }
@@ -59,7 +68,7 @@ export interface Settings {
 }
 
 export interface AppData {
-  version: 2
+  version: 3
   things: Thing[]
   days: Record<DateKey, DayRecord>
   /**
@@ -75,6 +84,9 @@ export const MAX_THINGS = 5
 
 export const WORLD_ORDER: readonly World[] = ['sea', 'sky', 'garden']
 
+/** Every day of the week on: what a new thing, and every thing from before days, gets. */
+export const EVERY_DAY: readonly boolean[] = [true, true, true, true, true, true, true]
+
 export function emptyData(): AppData {
-  return { version: 2, things: [], days: {}, cracked: {}, settings: { sound: true } }
+  return { version: 3, things: [], days: {}, cracked: {}, settings: { sound: true } }
 }

@@ -1,4 +1,4 @@
-import { addDays, lastKeys } from './dates'
+import { addDays, fromKey, lastKeys } from './dates'
 import type { AppData, DateKey, DayRecord, Thing, World } from './types'
 
 /**
@@ -13,14 +13,68 @@ export type Stage = 0 | 1 | 2 | 3
 
 export const UNLOCK_DAYS: readonly number[] = [3, 7, 14, 21, 30, 45, 60, 90, 120, 180]
 
-/** How many of the last seven days (today included) the thing was done. */
-export function last7(data: AppData, thingId: string, today: DateKey): number {
-  return lastKeys(today, 7).filter((key) => data.days[key]?.done.includes(thingId)).length
+/** Monday is 0, Sunday 6. */
+export function weekday(date: DateKey): number {
+  return (fromKey(date).getDay() + 6) % 7
 }
 
-/** Which of the last seven days were done, oldest first. The week dots. */
-export function weekDots(data: AppData, thingId: string, today: DateKey): boolean[] {
-  return lastKeys(today, 7).map((key) => data.days[key]?.done.includes(thingId) ?? false)
+/**
+ * Whether a thing is planned on a date: its weekday, unless that one day
+ * was changed by "also today" or "not today". A day it is not planned on
+ * is never a missed day.
+ */
+export function plannedOn(data: AppData, thing: Thing, date: DateKey): boolean {
+  const day = data.days[date]
+  if (day?.skip?.includes(thing.id)) return false
+  if (day?.extra?.includes(thing.id)) return true
+  return thing.days[weekday(date)] ?? true
+}
+
+/** The things planned for a date, in their order. */
+export function plannedThings(data: AppData, date: DateKey): Thing[] {
+  return [...data.things].sort((a, b) => a.order - b.order).filter((t) => plannedOn(data, t, date))
+}
+
+/** A day with things, none of them planned: rest. */
+export function isRestDay(data: AppData, date: DateKey): boolean {
+  return data.things.length > 0 && plannedThings(data, date).length === 0
+}
+
+/** How far back to look for seven planned days: a thing planned once a week reaches back seven weeks. */
+const PLANNED_LOOKBACK = 7 * 8
+
+/**
+ * How many of the thing's last seven planned days (today included, if
+ * planned) it was done. Only planned days count, so a thing done three
+ * times a week can grow into a whale.
+ */
+export function last7(data: AppData, thingId: string, today: DateKey): number {
+  const thing = data.things.find((t) => t.id === thingId)
+  if (!thing) return 0
+  let seen = 0
+  let done = 0
+  for (let i = 0; i < PLANNED_LOOKBACK && seen < 7; i++) {
+    const date = addDays(today, -i)
+    if (!plannedOn(data, thing, date)) continue
+    seen++
+    if (data.days[date]?.done.includes(thingId)) done++
+  }
+  return done
+}
+
+export type Dot = 'done' | 'open' | 'rest'
+
+/**
+ * The last seven calendar days, oldest first: planned and done, planned
+ * and not done, or not planned (a rest day, never a miss). The week dots.
+ */
+export function weekDots(data: AppData, thingId: string, today: DateKey): Dot[] {
+  const thing = data.things.find((t) => t.id === thingId)
+  return lastKeys(today, 7).map((date) => {
+    if (data.days[date]?.done.includes(thingId)) return 'done'
+    if (thing && !plannedOn(data, thing, date)) return 'rest'
+    return 'open'
+  })
 }
 
 export function stageFor(count: number): Stage {
@@ -86,29 +140,47 @@ export function starDays(data: AppData): DateKey[] {
     .sort()
 }
 
-/** Consecutive star days ending today, or yesterday if today has none yet. */
+/**
+ * Days in a row: planned days with something done, counted back from
+ * today (or yesterday, while today is still open). A rest day, with
+ * nothing planned, neither counts nor breaks it.
+ */
 export function streak(data: AppData, today: DateKey): number {
-  const stars = new Set(starDays(data))
-  let day = stars.has(today) ? today : addDays(today, -1)
   let n = 0
-  while (stars.has(day)) {
-    n++
-    day = addDays(day, -1)
+  for (let i = 0; i < 3660; i++) {
+    const date = addDays(today, -i)
+    const planned = plannedThings(data, date)
+    const done = data.days[date]?.done ?? []
+    const any = done.some((id) => counted(data.days[date], id))
+    if (any) {
+      n++
+      continue
+    }
+    if (planned.length === 0) {
+      // A rest day, or a day before the first thing: skip, unless it is before everything.
+      const first = data.things.map((t) => t.createdAt).sort()[0]
+      if (first === undefined || date < first) break
+      continue
+    }
+    if (i === 0) continue
+    break
   }
   return n
 }
 
+/** Every thing planned today is done, and something was planned. */
 export function allDoneToday(data: AppData, today: DateKey): boolean {
-  if (data.things.length === 0) return false
+  const planned = plannedThings(data, today)
+  if (planned.length === 0) return false
   const done = data.days[today]?.done ?? []
-  return data.things.every((t) => done.includes(t.id))
+  return planned.every((t) => done.includes(t.id))
 }
 
-/** Yesterday had things to do and none of them was done. */
+/** Yesterday had things planned and none of them was done. A rest day is never missed. */
 export function missedYesterday(data: AppData, today: DateKey): boolean {
   const yesterday = addDays(today, -1)
-  const existed = data.things.some((t) => t.createdAt < yesterday)
-  if (!existed) return false
+  const planned = plannedThings(data, yesterday).filter((t) => t.createdAt < yesterday)
+  if (planned.length === 0) return false
   return (data.days[yesterday]?.done.length ?? 0) === 0
 }
 

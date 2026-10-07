@@ -227,3 +227,33 @@ The install leaf, the recap and the check-in sat above the row, which on
 a phone is exactly the water line where stones float. They now sit under
 the header, over the sky. They are temporary; while one shows, it can
 cover the first row of day-stars.
+
+## 2026-10-07 Days are one line in a thing's sheet
+
+Planning had to add nothing to the first screen, so it lives where the
+name and the minutes are edited: seven day chips, all on. Nothing else:
+no calendar, no repeats every other week, no times of day, no reminders.
+"Also today" and "not today" change a single date, which covers the week
+that is different without a calendar. If dated planning is ever needed,
+it is its own piece of work.
+
+## 2026-10-07 Only planned days count
+
+The consistency arithmetic looks at planned days only. The creature's
+stage is the last seven planned days, so three times a week, kept, is a
+whale. The streak walks back over planned days and steps over a day with
+nothing planned. The recap is "3/3.", not "3/7.". A day off is a dash on
+the card, never an empty dot, and never a missed day. The total days (and
+so the stones) count every day the thing was done, planned or not.
+
+## 2026-10-07 A rest day is calm, not quiet
+
+A missed day dims the scene. A day with nothing planned does not: it says
+one line and leaves the sky as it is, with no star because nothing was
+done, and the check-in is still there for anyone who opens the app anyway.
+
+## 2026-10-07 The thing's sheet opens from three dots on its card
+
+Tap is done and lock in has its own button, so the sheet needed a third,
+quiet way in: three dots in the card's top corner, a full touch target.
+The strip's names open the same sheet.

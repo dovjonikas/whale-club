@@ -1,5 +1,5 @@
 import { addDays, isSunday, lastKeys, todayKey, weekStart } from '../store/dates'
-import { starDays } from '../store/derive'
+import { plannedThings, starDays } from '../store/derive'
 import type { Store } from '../store/store'
 import type { AppData, DateKey } from '../store/types'
 import { voice } from '../voice'
@@ -7,7 +7,8 @@ import type { NoticeBuilder } from './notices'
 import type { Moment } from './postcard'
 
 /**
- * The weekly recap: "5/7." and one line, no graph. On a Sunday it is the
+ * The weekly recap: "5/7." and one line, no graph. The days are the
+ * planned ones, so a thing done three days a week is "3/3.", not "3/7.". On a Sunday it is the
  * week so far; on any other day it is last week, the first time the app
  * opens in the new one. It never says what was missed. A week that
  * started before the first thing existed is not recapped: "2/7" for a
@@ -15,7 +16,10 @@ import type { Moment } from './postcard'
  */
 export interface Recap {
   week: DateKey
+  /** Planned days in the week that had a star. */
   count: number
+  /** Days in the week with anything planned. A rest day is in neither number. */
+  planned: number
 }
 
 export function recapFor(data: AppData, today: DateKey = todayKey()): Recap | null {
@@ -25,21 +29,23 @@ export function recapFor(data: AppData, today: DateKey = todayKey()): Recap | nu
   const first = data.things.map((t) => t.createdAt).sort()[0]
   if (first === undefined || first > week) return null
   const stars = new Set(starDays(data))
-  const count = lastKeys(addDays(week, 6), 7).filter((d) => stars.has(d)).length
-  return { week, count }
+  const days = lastKeys(addDays(week, 6), 7).filter((d) => plannedThings(data, d).length > 0)
+  if (days.length === 0) return null
+  const count = days.filter((d) => stars.has(d)).length
+  return { week, count, planned: days.length }
 }
 
 export function recapNotice(store: Store, onSend: (moment: Moment) => void): NoticeBuilder {
   return (dismiss) => {
     const recap = recapFor(store.get())
     if (!recap) return null
-    const weekLine = recap.count >= 5 ? voice.weekGood : voice.weekBad
+    const weekLine = recap.count / recap.planned >= 0.7 ? voice.weekGood : voice.weekBad
     const card = document.createElement('aside')
     card.className = 'leaf recap'
     card.setAttribute('aria-label', 'weekly recap')
     card.innerHTML = `
       <div>
-        <span class="leaf-title recap-count">${recap.count}/7.</span>
+        <span class="leaf-title recap-count">${recap.count}/${recap.planned}.</span>
         <span class="recap-line">${weekLine}</span>
       </div>
       <div class="leaf-actions">
@@ -47,7 +53,7 @@ export function recapNotice(store: Store, onSend: (moment: Moment) => void): Not
         <button type="button" class="button-quiet recap-ok">ok</button>
       </div>`
     card.querySelector('.recap-send')?.addEventListener('click', () => {
-      onSend({ kind: 'recap', line: `${recap.count}/7. ${weekLine}` })
+      onSend({ kind: 'recap', line: `${recap.count}/${recap.planned}. ${weekLine}` })
     })
     card.querySelector('.recap-ok')?.addEventListener('click', () => {
       store.setSettings({ lastRecapWeek: recap.week })

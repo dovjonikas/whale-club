@@ -17,13 +17,22 @@ export interface SeedThing {
   world: 'sea' | 'sky' | 'garden'
   createdAt: string
   order: number
+  /** Monday first; absent means every day. */
+  days?: boolean[]
 }
 
 export interface SeedData {
   things: SeedThing[]
   days: Record<
     string,
-    { done: string[]; minutes?: Record<string, number>; checkin?: boolean; waited?: string[] }
+    {
+      done: string[]
+      minutes?: Record<string, number>
+      checkin?: boolean
+      waited?: string[]
+      extra?: string[]
+      skip?: string[]
+    }
   >
   /** Per thing, the highest tier already cracked. Absent: every earned stone is still waiting. */
   cracked?: Record<string, number>
@@ -32,7 +41,7 @@ export interface SeedData {
 
 export async function seed(page: Page, data: SeedData): Promise<void> {
   const payload = {
-    version: 2,
+    version: 3,
     things: data.things.map((t) => ({ emoji: '•', mode: 'tap', ...t })),
     days: Object.fromEntries(Object.entries(data.days).map(([k, v]) => [k, { minutes: {}, ...v }])),
     cracked: data.cracked ?? {},

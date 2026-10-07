@@ -2,6 +2,30 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.6.0 - 2026-10-07
+
+Days: optional planning that adds nothing to the first screen.
+
+- A thing's own sheet (the three dots on its card) holds its name, emoji
+  and lock-in length, and one line of seven day chips, Monday first, all
+  on by default. The add sheet has the same line.
+- The first screen shows only what is planned today. The rest fold into
+  one thin strip, "not today"; opened, they are dimmed and cannot be
+  marked done there, but each can be added for today only ("also today").
+  A planned thing can be taken off today only ("not today") in its sheet.
+- The week dots: a full dot for a planned day done, an empty one for a
+  planned day not done, a small dash for a day off, which is never a miss.
+- Consistency counts planned days only: the creature grows with the last
+  seven planned days, so a thing done three times a week can become a
+  whale; the streak runs over planned days and a rest day does not break
+  it; all done means everything planned today; the weekly recap is days
+  with a star out of days with anything planned.
+- A day with nothing planned is a rest day: one quiet line, no star, no
+  dim, nothing missed, and the check-in still there.
+- The third rule is now "you never give up on yourself".
+- Data is version 3: every thing gets its weekdays, all on for anything
+  made before; a day can carry "also today" and "not today".
+
 ## 0.5.0 - 2026-10-07
 
 The crack, the sky, and lock in.

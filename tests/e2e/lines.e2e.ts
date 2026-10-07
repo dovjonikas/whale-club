@@ -32,6 +32,7 @@ const LINES: string[] = [
   voice.lockIn.left,
   voice.lockIn.broken,
   voice.lockIn.stopped(120),
+  voice.restDay,
 ]
 
 test.use({ viewport: { width: 320, height: 640 } })

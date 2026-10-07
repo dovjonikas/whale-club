@@ -1,6 +1,6 @@
 import { earnedTier } from './derive'
 import type { AppData, DayRecord, Settings, Thing } from './types'
-import { emptyData } from './types'
+import { emptyData, EVERY_DAY } from './types'
 
 /**
  * Turns whatever was in storage into a valid AppData, or throws.
@@ -17,6 +17,8 @@ export function migrate(raw: unknown): AppData {
     case 1:
       return fromV1(raw)
     case 2:
+    case 3:
+      // Version 2 had no days; validateThing gives a thing without them every day.
       return validateV2(raw)
     default:
       throw new Error(`unknown version ${String(raw.version)}`)
@@ -62,7 +64,7 @@ function validateCommon(raw: Record<string, unknown>): AppData {
 
 function validateThing(raw: unknown): Thing {
   if (!isRecord(raw)) throw new Error('thing is not an object')
-  const { id, name, emoji, mode, minutes, world, createdAt, order } = raw
+  const { id, name, emoji, mode, minutes, world, createdAt, order, days } = raw
   if (typeof id !== 'string' || !id) throw new Error('thing without id')
   if (typeof name !== 'string') throw new Error('thing without name')
   if (typeof emoji !== 'string') throw new Error('thing without emoji')
@@ -70,7 +72,11 @@ function validateThing(raw: unknown): Thing {
   if (world !== 'sea' && world !== 'sky' && world !== 'garden') throw new Error('bad world')
   if (typeof createdAt !== 'string') throw new Error('thing without createdAt')
   if (typeof order !== 'number') throw new Error('thing without order')
-  const thing: Thing = { id, name, emoji, mode, world, createdAt, order }
+  const planned =
+    Array.isArray(days) && days.length === 7 && days.every((d) => typeof d === 'boolean')
+      ? days
+      : [...EVERY_DAY]
+  const thing: Thing = { id, name, emoji, mode, days: planned, world, createdAt, order }
   if (typeof minutes === 'number' && minutes > 0) thing.minutes = minutes
   return thing
 }
@@ -88,6 +94,13 @@ function validateDay(raw: unknown): DayRecord {
   if (Array.isArray(raw.waited)) {
     const waited = raw.waited.filter(isString).filter((id) => day.done.includes(id))
     if (waited.length > 0) day.waited = [...new Set(waited)]
+  }
+  for (const key of ['extra', 'skip'] as const) {
+    const list = raw[key]
+    if (Array.isArray(list)) {
+      const ids = [...new Set(list.filter(isString))]
+      if (ids.length > 0) day[key] = ids
+    }
   }
   if (raw.checkin === true) day.checkin = true
   return day

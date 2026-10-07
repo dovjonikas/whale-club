@@ -1,7 +1,7 @@
 import { migrate } from './migrate'
 import { todayKey } from './dates'
 import type { AppData, DateKey, DayRecord, Mode, Settings, Thing, World } from './types'
-import { emptyData, MAX_THINGS, WORLD_ORDER } from './types'
+import { emptyData, EVERY_DAY, MAX_THINGS, WORLD_ORDER } from './types'
 
 export const STORAGE_KEY = 'whaleclub:data'
 /** Where an unreadable record is parked rather than thrown away. */
@@ -33,7 +33,13 @@ export class Store {
     return () => this.listeners.delete(listener)
   }
 
-  addThing(input: { name: string; emoji: string; mode: Mode; minutes?: number }): Thing | null {
+  addThing(input: {
+    name: string
+    emoji: string
+    mode: Mode
+    minutes?: number
+    days?: readonly boolean[]
+  }): Thing | null {
     if (this.data.things.length >= MAX_THINGS) return null
     const name = input.name.trim()
     if (!name) return null
@@ -43,6 +49,7 @@ export class Store {
       name,
       emoji: input.emoji.trim() || '•',
       mode: input.mode,
+      days: [...(input.days ?? EVERY_DAY)],
       world: worldForOrder(order),
       createdAt: todayKey(),
       order,
@@ -114,6 +121,41 @@ export class Store {
         [date]: { ...day, minutes: { ...day.minutes, [thingId]: total } },
       },
     })
+  }
+
+  /** The thing's sheet: its name, emoji, lock-in length and weekdays. */
+  updateThing(
+    thingId: string,
+    patch: Partial<Pick<Thing, 'name' | 'emoji' | 'minutes' | 'days'>>,
+  ): void {
+    this.commit({
+      ...this.data,
+      things: this.data.things.map((t) => {
+        if (t.id !== thingId) return t
+        const next = { ...t, ...patch }
+        if (patch.name !== undefined) next.name = patch.name.trim() || t.name
+        if (patch.days) next.days = [...patch.days]
+        return next
+      }),
+    })
+  }
+
+  /**
+   * Changes one day only: "also today" puts a thing that is off on the day,
+   * "not today" takes a planned one off it, and `null` undoes either.
+   */
+  setToday(thingId: string, change: 'extra' | 'skip' | null, date: DateKey = todayKey()): void {
+    const day = this.day(date)
+    const extra = (day.extra ?? []).filter((id) => id !== thingId)
+    const skip = (day.skip ?? []).filter((id) => id !== thingId)
+    if (change === 'extra') extra.push(thingId)
+    if (change === 'skip') skip.push(thingId)
+    const next: DayRecord = { ...day }
+    delete next.extra
+    delete next.skip
+    if (extra.length > 0) next.extra = extra
+    if (skip.length > 0) next.skip = skip
+    this.commit({ ...this.data, days: { ...this.data.days, [date]: next } })
   }
 
   /** The dial opens on the last length chosen for a thing. */
