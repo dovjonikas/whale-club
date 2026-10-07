@@ -1,3 +1,4 @@
+import { icon } from '../brand/icons'
 import { host } from './host'
 
 /**
@@ -90,7 +91,7 @@ export function openSheet(options: SheetOptions): SheetHandle {
     <div class="sheet-grabber" aria-hidden="true"></div>
     <h2 class="sheet-title" id="${titleId}"></h2>
     <button class="icon-button sheet-close" type="button" aria-label="Close">
-      <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      ${icon('close')}
     </button>
     <div class="sheet-body"></div>`
   const title = sheet.querySelector('.sheet-title')

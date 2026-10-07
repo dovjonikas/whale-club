@@ -1,3 +1,4 @@
+import { icon } from '../brand/icons'
 import { fromKey, todayKey } from '../store/dates'
 import {
   addMonths,
@@ -233,8 +234,8 @@ export function openLogSheet(store: Store, at?: DateKey): void {
   })
 }
 
-const CHEVRON_LEFT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>'
-const CHEVRON_RIGHT = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>'
+const CHEVRON_LEFT = icon('back')
+const CHEVRON_RIGHT = icon('forward')
 
 function monthName(month: MonthKey): string {
   return fromKey(`${month}-01`).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })

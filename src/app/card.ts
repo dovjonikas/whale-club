@@ -1,3 +1,4 @@
+import { icon } from '../brand/icons'
 import { creatureSvg } from '../scene/creatures'
 import type { Dot, Line, Stage } from '../store/derive'
 import type { Thing } from '../store/types'
@@ -51,7 +52,7 @@ export function createCard(thing: Thing): HTMLElement {
       <span class="visually-hidden card-days"></span>
     </button>
     <button type="button" class="card-edit">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="18" cy="12" r="1.6"/></svg>
+      ${icon('more')}
     </button>
     <button type="button" class="card-delete">${voice.edit.delete}</button>`
   return card
