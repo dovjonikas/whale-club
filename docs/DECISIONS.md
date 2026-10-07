@@ -744,3 +744,75 @@ stayed 0) and every text block stayed centred to the pixel. What was real:
 
 The probe (frame intervals per beat, and the browser's long-animation-frame
 entries naming the script) is the way to check this again.
+
+## 2026-10-08 The bubble sits at the card's corner
+
+Cards are about 62 px wide with five in a row, and the corner already held
+the done ring and a waiting stone (which hid the ring). The bubble takes
+the ring's place at 34 px, its glyph about 16 px, and the stone badge now
+rests on the bubble's lower edge, so a thing's mark is never hidden. The
+card's done glow and its "12/25 · finish" take the thing's own colour, not
+its world's: one colour per thing everywhere, as BRAND.md says (bubble,
+lanterns, log, card). In the log the legend shows each thing's bubble; the
+dots in the days stay lanterns in the thing's colour, because they count
+lock-ins finished, and turning them into bubbles would blur what they mean.
+
+## 2026-10-08 A picture picked from the name, and what before 0.12 wore
+
+The brief asked for a glyph picked by keywords in English and Lithuanian.
+The name is folded (lower case, diacritics off, so "bėgimas" is "begimas"),
+then three kinds of hit are tried, strongest first: a phrase ("walk the
+dog"), a whole word ("violin"), a stem of four letters or more starting a
+word ("smuik" in "smuikas"). Shorter keywords never match as stems, so "su"
+("with") is never the dog. Words that only qualify another ("morning",
+"early", "groti", "drink", "make") are weak: "morning run" is a run and
+"groti smuiku" a violin. Among equal hits the longer keyword wins
+("spanish" over "study"). Tests hold the traps found while writing it.
+
+Migration goes further than the brief (which said emoji by a table, else a
+monogram): emoji by the table first, because that is what the person chose;
+then the name, because a person's words usually say what the thing is; only
+then the first letter. The emoji is kept on the thing for the record.
+
+## 2026-10-08 One picture field, following the name until a pick
+
+The add sheet and the thing's sheet share one field: a live bubble in the
+thing's colour, the twelve most common pictures, the first letter, and
+"more" by group. Until the person picks, the picture follows the name as it
+is typed and a quiet line says "picked from the name"; a picture from the
+name that is not among the twelve shows first, so the choice is always in
+sight. A thing being changed keeps following its name only if its picture
+still is the name's own.
+
+## 2026-10-08 The app icon: a tail, not a sprout
+
+The first drawing of a whale's tail, two leaf-like flukes on a stem, read
+as a seedling at every size. Redrawn as one outline: wide swept flukes with
+the notch at the middle, the stalk thickening into a wave. The favicon is
+its own simpler drawing with thicker strokes, because the full icon's lines
+fall under half a pixel at 16 px. Apple and maskable icons are full-bleed
+squares (the phone cuts its own shape); the maskable one draws the mark at
+80 %, inside the circle a launcher may crop to.
+
+## 2026-10-08 brand.html is drawn by the app's own code
+
+The look on one page (every bubble state, the colours, the glyphs at 20 px
+and in bubbles, the icons, the type, the app icon) is a second build entry
+that imports the same modules the app draws with, so it cannot drift from
+the app. It is kept out of the service worker's app fallback so it opens as
+itself offline.
+
+## 2026-10-08 The audit, by three reviewers at once
+
+web-design-guidelines (the Web Interface Guidelines, fetched fresh) was run
+over every file of the interface by three read-only reviewers in parallel,
+one on the HTML and styles and two on the app's markup, so each could read
+its files whole. The important findings were fixed at once, the rest are
+listed in docs/QUALITY.md for the polish stage or for the author (copy is
+the author's, and existing lines are not touched). The two that mattered
+most: a thing's typed name reached two `aria-label` attributes unescaped,
+so a crafted 24-letter name could run a script when the log opened; and
+the session screen, several redraws and the intro dropped the keyboard
+focus to the page. A closing sheet now leaves the accessibility tree and
+stops taking taps at once, and on a phone a sheet opens on its title rather
+than springing the keyboard over itself.

@@ -153,6 +153,12 @@ in the same hand. All of it on one page, drawn by the app's own code:
 [the icon set](https://dovjonikas.github.io/whale-club/brand.html). The
 plan and its critique are in [docs/brand/BRAND.md](docs/brand/BRAND.md).
 
+<p align="center">
+  <img src="docs/screenshots/brand-states.webp" alt="brand.html: a bubble empty, done, a lock-in at none, half and done, done without the timer, and a monogram" width="440">
+  &nbsp;
+  <img src="docs/screenshots/brand-glyphs.webp" alt="brand.html: the glyphs by group, each in its bubble and at 20 px" width="440">
+</p>
+
 ## Tech
 
 Vite, TypeScript (strict, no `any`), vanilla DOM, SVG creatures, two small

@@ -10,6 +10,7 @@ import { dayNumber, last7, lineFor, stageFor, starDays, streakDays } from '../st
 import type { AppData, PostcardFormat } from '../store/types'
 import { voice } from '../voice'
 import { BRAND } from './brand'
+import { dayBubble } from './thingMark'
 
 /**
  * The postcard: the scene redrawn from the data at a fixed size, with the
@@ -198,6 +199,9 @@ function hasJacket(items: readonly Collectible[]): boolean {
   return items.some((c) => c.id === 'sea-a-jacket')
 }
 
+/** A thing's bubble on the postcard, as large as this share of its creature. */
+const BUBBLE_SHARE = 0.36
+
 async function drawCreatures(
   ctx: CanvasRenderingContext2D,
   data: AppData,
@@ -222,6 +226,16 @@ async function drawCreatures(
       stageFor(last7(data, thing.id, today)),
     )
     await drawSvg(ctx, svg, x, top, size, size)
+    // Its bubble at the corner, as on its card: filled if it was done that day.
+    const bubble = size * BUBBLE_SHARE
+    await drawSvg(
+      ctx,
+      dayBubble(data, thing, today),
+      x + size - bubble * 0.8,
+      top - bubble * 0.2,
+      bubble,
+      bubble,
+    )
     ctx.fillText(
       fit(ctx, thing.name, size + gap * 0.8),
       x + size / 2,

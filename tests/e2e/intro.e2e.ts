@@ -9,6 +9,17 @@ import { dateKey, seed } from './helpers'
  */
 const intro = (page: Page) => page.getByRole('dialog', { name: 'whale club' })
 const beat = (page: Page) => intro(page)
+/**
+ * A tap on the intro at a point, at once, as a finger would: a locator click
+ * first waits for the page to hold still, and under load that wait can last
+ * past the beat the tap was meant for.
+ */
+const tapAt = async (page: Page, x: number, y: number) => {
+  // Inside the intro: on a desktop the app is a phone-wide frame in the middle of the window.
+  const box = await intro(page).boundingBox()
+  if (!box) throw new Error('no intro')
+  await page.mouse.click(box.x + x, box.y + y)
+}
 const begin = async (page: Page) => {
   await intro(page)
     .getByRole('button', { name: /tap to begin/ })
@@ -57,16 +68,16 @@ test('one tap to begin, by touch or by key, so the music may play', async ({ pag
 test('a tap anywhere goes on to the next beat', async ({ page }) => {
   await page.goto('')
   await expect(beat(page)).toHaveAttribute('data-beat', 'gate')
-  await intro(page).click({ position: { x: 100, y: 120 } })
+  await tapAt(page, 100, 120)
   await expect(beat(page)).toHaveAttribute('data-beat', 'promise')
-  await intro(page).click({ position: { x: 100, y: 300 } })
+  await tapAt(page, 100, 300)
   await expect(beat(page)).toHaveAttribute('data-beat', 'truth')
   // The author's sentence, a phrase at a time, not a word changed.
   await expect(intro(page)).toContainText(
     'the thing is, sometimes doing such small things seems unremarkable,',
   )
   await expect(intro(page)).toContainText("because you can't see the results yet.")
-  await intro(page).click({ position: { x: 100, y: 300 } })
+  await tapAt(page, 100, 300)
   await expect(beat(page)).toHaveAttribute('data-beat', 'start')
 })
 
@@ -87,16 +98,20 @@ test('four taps from a first open to the first card: skip, start light, a small 
 test('the truth climbs: the doubt gives way to the hope, the stars double, the light turns gold', async ({
   page,
 }) => {
+  // The order is the test, not the pace (the thirty-second test is the pace): a busy machine
+  // runs the timers late, so each step gets room.
+  test.setTimeout(90_000)
+  const step = { timeout: 20_000 }
   await page.goto('')
   await begin(page)
-  await intro(page).click({ position: { x: 100, y: 300 } })
+  await tapAt(page, 100, 300)
   const truth = intro(page).locator('.intro-truth')
   await expect(truth).toHaveAttribute('data-half', '1')
-  await expect(truth).toHaveAttribute('data-half', '2', { timeout: 9000 })
+  await expect(truth).toHaveAttribute('data-half', '2', step)
   // One, two, four, eight, sixteen.
-  await expect(intro(page).locator('.intro-sky i.is-on')).toHaveCount(31, { timeout: 6000 })
-  await expect(intro(page)).toHaveAttribute('data-light', 'gold', { timeout: 6000 })
-  await expect(page.getByRole('button', { name: 'start light' })).toBeVisible({ timeout: 6000 })
+  await expect(intro(page).locator('.intro-sky i.is-on')).toHaveCount(31, step)
+  await expect(intro(page)).toHaveAttribute('data-light', 'gold', step)
+  await expect(page.getByRole('button', { name: 'start light' })).toBeVisible(step)
 })
 
 test('the whole intro reaches the first step within thirty seconds', async ({ page }) => {

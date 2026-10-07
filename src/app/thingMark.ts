@@ -1,6 +1,6 @@
 import { bubbleSvg, type BubbleState } from '../brand/bubble'
-import type { Kind } from '../store/types'
-import { colorAt } from './sceneData'
+import type { AppData, DateKey, Kind, Thing } from '../store/types'
+import { colorAt, lanternColor } from './sceneData'
 
 /** What a thing's small bubble needs: its picture, its name (for a monogram), its kind and its place. */
 export interface Marked {
@@ -20,6 +20,20 @@ export function thingMark(thing: Marked, state: BubbleState = {}): string {
     { icon: thing.icon, name: thing.name, color: colorAt(thing.order), kind: thing.kind },
     state,
     { className: 'bubble thing-mark' },
+  )
+}
+
+/** A thing's bubble as it stood on a day: filled if done, its timer ring for the minutes seen. The postcard paints it. */
+export function dayBubble(data: AppData, thing: Thing, date: DateKey): string {
+  const day = data.days[date]
+  const seen = day?.minutes[thing.id] ?? 0
+  return bubbleSvg(
+    { icon: thing.icon, name: thing.name, color: lanternColor(thing), kind: thing.kind },
+    {
+      done: day?.done.includes(thing.id) ?? false,
+      progress: thing.kind === 'lockIn' ? seen / thing.minutes : 0,
+      manual: day?.manual?.includes(thing.id) ?? false,
+    },
   )
 }
 
