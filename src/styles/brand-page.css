@@ -1,0 +1,242 @@
+/* brand.html: the look on one page. Its own small layout over the app's
+   tokens; nothing here is used by the app. */
+.brand-page {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(120% 60% at 50% 0%, #0d2550, var(--deep) 45%, var(--abyss));
+  background-attachment: fixed;
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t-md);
+  line-height: 1.5;
+}
+
+#brand {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--s8) var(--s4) 96px;
+}
+
+.brand-page h1,
+.brand-page h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--star-pale);
+}
+
+.brand-page h1 {
+  font-size: var(--t-xl);
+  line-height: 1.1;
+}
+
+.brand-page h2 {
+  margin-top: 64px;
+  font-size: var(--t-lg);
+}
+
+.brand-page h3 {
+  margin: var(--s6) 0 var(--s3);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--ink-dim);
+  text-transform: lowercase;
+}
+
+.brand-page a {
+  color: var(--glow);
+}
+
+.brand-page :focus-visible {
+  outline: 2px solid var(--glow);
+  outline-offset: 3px;
+}
+
+.brand-head {
+  display: flex;
+  gap: var(--s4);
+  align-items: flex-start;
+}
+
+.brand-head p,
+.note {
+  max-width: 62ch;
+  margin: var(--s2) 0 0;
+  color: var(--ink-dim);
+}
+
+.brand-page figure {
+  margin: 0;
+}
+
+.brand-page figcaption {
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+}
+
+.states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s6);
+  margin-top: var(--s4);
+}
+
+.state {
+  display: grid;
+  justify-items: center;
+  gap: var(--s2);
+  width: 96px;
+  text-align: center;
+}
+
+.try {
+  width: 80px;
+  height: 80px;
+  padding: 0;
+  border: 0;
+  background: none;
+  border-radius: 50%;
+}
+
+button.try {
+  cursor: pointer;
+  transition: scale var(--dur-press) var(--ease-out);
+}
+
+button.try:active {
+  scale: var(--press-scale);
+}
+
+.try .bubble {
+  width: 100%;
+  height: 100%;
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--s4);
+}
+
+.swatch {
+  display: flex;
+  gap: var(--s3);
+  align-items: center;
+}
+
+.swatch .chip {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.swatch b {
+  color: var(--ink);
+}
+
+.glyphs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: var(--s4) var(--s2);
+}
+
+.glyph {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  align-items: end;
+  gap: var(--s2) var(--s2);
+  text-align: center;
+}
+
+.glyph-bubble {
+  width: 48px;
+  height: 48px;
+}
+
+.glyph-bubble .bubble {
+  width: 100%;
+  height: 100%;
+}
+
+.glyph-small {
+  color: var(--star-pale);
+}
+
+.glyph figcaption {
+  grid-column: 1 / -1;
+}
+
+.ui-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
+  gap: var(--s4);
+  margin-top: var(--s4);
+}
+
+.ui-icon {
+  display: grid;
+  justify-items: center;
+  gap: var(--s1);
+  color: var(--star-pale);
+}
+
+.ui-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.type-row {
+  display: grid;
+  gap: var(--s1);
+  margin: var(--s4) 0 0;
+}
+
+.type-meta {
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+}
+
+.type-sample {
+  color: var(--star-pale);
+  line-height: 1.2;
+}
+
+.type-sample.is-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.app-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s6);
+  align-items: flex-end;
+  margin-top: var(--s4);
+}
+
+.app-icons figure {
+  display: grid;
+  justify-items: center;
+  gap: var(--s2);
+}
+
+.app-icons img {
+  display: block;
+}
+
+.app-icons img.masked {
+  border-radius: 50%;
+}
+
+@media (max-width: 480px) {
+  .brand-page h1 {
+    font-size: var(--t-lg);
+  }
+  .brand-head img {
+    width: 48px;
+    height: 48px;
+  }
+}
