@@ -15,6 +15,10 @@ export default defineConfig({
   build: {
     target: 'es2022',
     sourcemap: false,
+    // Two pages: the app, and brand.html, the look drawn by the app's own code.
+    rollupOptions: {
+      input: { main: 'index.html', brand: 'brand.html' },
+    },
   },
   plugins: [
     VitePWA({
@@ -50,6 +54,8 @@ export default defineConfig({
         clientsClaim: true,
         skipWaiting: false,
         navigateFallback: '/whale-club/index.html',
+        // brand.html is its own page, not the app.
+        navigateFallbackDenylist: [/brand\.html$/],
         cleanupOutdatedCaches: true,
       },
     }),

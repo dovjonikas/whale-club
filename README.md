@@ -139,6 +139,20 @@ And underneath all three: nothing dies. You just missed a day.
   whale to. No accounts, no codes: the picture is the only thing that
   leaves the phone.
 
+## The look
+
+Every thing wears a bubble: a glass float in its colour, its picture
+drawn in one cream line, a light arc where the glass catches the moon,
+and one tiny bubble rising off the rim, the signature. Done, the bubble
+fills with its colour and the small bubble pops into three; a lock-in's
+rim is its timer. The pictures are the app's own, 48 of them on a 24 grid,
+picked from a thing's name in English or Lithuanian ("violin",
+"smuikas", "run", "bėgimas"), or its first letter when nothing fits. The
+interface's icons and the app icon, a whale's tail in a bubble, are drawn
+in the same hand. All of it on one page, drawn by the app's own code:
+[the icon set](https://dovjonikas.github.io/whale-club/brand.html). The
+plan and its critique are in [docs/brand/BRAND.md](docs/brand/BRAND.md).
+
 ## Tech
 
 Vite, TypeScript (strict, no `any`), vanilla DOM, SVG creatures, two small
@@ -196,6 +210,8 @@ requests get the build and the tests but never deploy.
 ## Docs
 
 - [docs/DESIGN.md](docs/DESIGN.md): colours, type, layout, the signature moment.
+- [docs/brand/BRAND.md](docs/brand/BRAND.md): the bubble, the glyphs, the app icon; [the icon set](https://dovjonikas.github.io/whale-club/brand.html) shows them all.
+- [docs/QUALITY.md](docs/QUALITY.md): the motion and interface audits, with what changed.
 - [docs/COLLECTIBLES.md](docs/COLLECTIBLES.md): every collectible, by world, line and day.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): how it is put together and how to add to it.
 - [docs/DECISIONS.md](docs/DECISIONS.md): what was decided and why.
