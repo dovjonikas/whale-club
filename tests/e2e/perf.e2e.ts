@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './helpers'
 
 /**
  * Frame timing, measured alone (the perf project runs after the others):

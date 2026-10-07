@@ -9,9 +9,9 @@ import {
   type MonthKey,
 } from '../store/log'
 import type { Store } from '../store/store'
-import type { DateKey } from '../store/types'
+import type { AppData, DateKey } from '../store/types'
 import { voice } from '../voice'
-import { LANTERN_COLORS } from './sceneData'
+import { everyThing, lanternColor } from './sceneData'
 import { openSheet } from './sheet'
 
 /**
@@ -62,7 +62,12 @@ export function openLogSheet(store: Store, at?: DateKey): void {
       ): string => {
         const data = store.get()
         const summary = monthSummary(data, month)
-        const order = new Map(data.things.map((t) => [t.id, t.order]))
+        const things = everyThing(data)
+        const color = (id: string): string => lanternColor(things.get(id))
+        // What the month's dots are made of, for the legend under the calendar.
+        let soft = false
+        let faint = false
+        const lit = new Set<string>()
         const weeks = weeksOf(month)
           .map((week) =>
             week
@@ -72,15 +77,29 @@ export function openLogSheet(store: Store, at?: DateKey): void {
                 const n = Number(date.slice(8))
                 if (date > now)
                   return `<span class="log-cell is-future"><span class="log-num">${String(n)}</span></span>`
-                const dots = entry.sessions
+                // A day not over yet has no faint lanterns: its minutes may still finish.
+                const shown = [
+                  ...entry.sessions.map((s) => ({
+                    id: s.id,
+                    glow: s.left ? 'is-dim' : s.parts > 1 ? 'is-soft' : '',
+                  })),
+                  ...(date < now
+                    ? entry.unfinished.map((u) => ({ id: u.id, glow: 'is-dim' }))
+                    : []),
+                ]
+                for (const dot of shown) {
+                  lit.add(dot.id)
+                  if (dot.glow === 'is-soft') soft = true
+                  if (dot.glow === 'is-dim') faint = true
+                }
+                const dots = shown
                   .slice(0, DOTS_SHOWN)
-                  .map((s) => {
-                    const color =
-                      LANTERN_COLORS[(order.get(s.id) ?? 0) % LANTERN_COLORS.length] ?? '#ffd98a'
-                    return `<i style="--lantern:${color}"${s.left ? ' class="is-dim"' : ''}></i>`
-                  })
+                  .map(
+                    (d) =>
+                      `<i style="--lantern:${color(d.id)}"${d.glow ? ` class="${d.glow}"` : ''}></i>`,
+                  )
                   .join('')
-                const more = entry.sessions.length > DOTS_SHOWN ? '<b>+</b>' : ''
+                const more = shown.length > DOTS_SHOWN ? '<b>+</b>' : ''
                 return `<button type="button" class="log-cell" data-date="${date}" data-star="${String(entry.star)}"${date === now ? ' data-today="true"' : ''} aria-label="${dayAria(
                   date,
                   entry.done.map((d) => d.name),
@@ -102,7 +121,8 @@ export function openLogSheet(store: Store, at?: DateKey): void {
           </div>
           <p class="log-summary">${voice.log.summary(summary.stars, summary.lanterns, summary.minutes)}</p>
           <div class="log-weekdays" aria-hidden="true">${voice.days.short.map((d) => `<span>${d}</span>`).join('')}</div>
-          <div class="log-grid">${weeks}</div>`
+          <div class="log-grid">${weeks}</div>
+          ${legendHtml(data, month, { soft, faint, lit })}`
       }
 
       const yearHtml = (year: number, earliest: MonthKey, last: MonthKey): string => {
@@ -140,15 +160,22 @@ export function openLogSheet(store: Store, at?: DateKey): void {
       }
 
       const dayHtml = (date: DateKey): string => {
-        const entry = dayEntry(store.get(), date)
+        const data = store.get()
+        const entry = dayEntry(data, date)
+        const things = everyThing(data)
+        const color = (id: string): string => lanternColor(things.get(id))
         const items: string[] = []
         for (const d of entry.done)
           items.push(
-            `<li class="log-done"><span aria-hidden="true">${d.emoji}</span> ${d.name}</li>`,
+            `<li class="log-done"><span class="log-check" aria-hidden="true">✓</span>${d.emoji} ${d.name}${d.manual ? ` · ${voice.log.without}` : ''}</li>`,
           )
-        for (const s of entry.sessions)
+        for (const x of entry.sessions)
           items.push(
-            `<li class="log-session${s.left ? ' is-left' : ''}"><span class="log-lantern" aria-hidden="true"></span>${s.emoji} ${s.name} · ${voice.log.minutes(s.minutes)}${s.left ? ` · ${voice.log.left}` : ''}</li>`,
+            `<li class="log-session${x.left ? ' is-left' : x.parts > 1 ? ' is-soft' : ''}"><span class="log-lantern" style="--lantern:${color(x.id)}" aria-hidden="true"></span>${x.emoji} ${x.name} · ${voice.log.minutes(x.minutes)}${x.left ? ` · ${voice.log.left}` : x.parts > 1 ? ` · ${voice.log.inParts}` : ''}</li>`,
+          )
+        for (const u of entry.unfinished)
+          items.push(
+            `<li class="log-session is-left"><span class="log-lantern" style="--lantern:${color(u.id)}" aria-hidden="true"></span>${u.emoji} ${u.name} · ${voice.log.unfinished(u.minutes)}</li>`,
           )
         if (entry.checkin) items.push(`<li class="log-checkin">${voice.log.checkin}</li>`)
         return `
@@ -225,4 +252,35 @@ function dayAria(date: DateKey, names: string[], lanterns: number): string {
   const what = [...names]
   if (lanterns > 0) what.push(voice.log.lanterns(lanterns))
   return what.length > 0 ? `${dayName(date)}: ${what.join(', ')}` : dayName(date)
+}
+
+/**
+ * The log explains itself, always, in the scene's own words: a star is a
+ * day something was done, a lantern is a lock-in finished. Under that, a
+ * dot of each lock-in thing's colour with its name (only lock-ins make
+ * lanterns; a deleted thing only in a month that has its lanterns), and a
+ * line for soft and faint lanterns when the month has them.
+ */
+function legendHtml(
+  data: AppData,
+  month: MonthKey,
+  seen: { soft: boolean; faint: boolean; lit: ReadonlySet<string> },
+): string {
+  const things = [
+    ...data.things.filter((t) => t.kind === 'lockIn' || seen.lit.has(t.id)),
+    ...(data.retired ?? []).filter((t) => seen.lit.has(t.id)),
+  ].sort((a, b) => a.order - b.order)
+  const colors = things
+    .map(
+      (t) =>
+        `<span class="legend-thing"><i style="--lantern:${lanternColor(t)}"></i>${t.emoji} ${t.name}</span>`,
+    )
+    .join('')
+  return `<div class="log-legend" data-month="${month}">
+    <p><span class="legend-star" aria-hidden="true">★</span>${voice.log.legendStar}</p>
+    <p><span class="legend-lantern" aria-hidden="true"></span>${voice.log.legendLantern}</p>
+    ${seen.soft ? `<p><span class="legend-lantern is-soft" aria-hidden="true"></span>${voice.log.legendSoft}</p>` : ''}
+    ${seen.faint ? `<p><span class="legend-lantern is-dim" aria-hidden="true"></span>${voice.log.legendDim}</p>` : ''}
+    ${colors ? `<div class="legend-colors">${colors}</div>` : ''}
+  </div>`
 }

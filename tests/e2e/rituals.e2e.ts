@@ -1,7 +1,6 @@
-import { expect, test } from '@playwright/test'
 import { recapFor } from '../../src/app/recap'
 import { emptyData, EVERY_DAY } from '../../src/store/types'
-import { addThing, dateKey, dismissInstallLeaf, seed } from './helpers'
+import { expect, test, addThing, dateKey, dismissInstallLeaf, seed } from './helpers'
 
 /**
  * The check-in and the weekly recap: one notice at a time above the row,
@@ -33,7 +32,14 @@ test('the recap says N/7 for the week and never what was missed', async ({ page 
   // The same arithmetic the app runs, on the same seed, so the test knows
   // which week the app will recap whatever day it runs on.
   const data = emptyData()
-  data.things = things.map((t) => ({ ...t, emoji: '•', minutes: 30, days: [...EVERY_DAY] }))
+  data.things = things.map((t) => ({
+    ...t,
+    emoji: '•',
+    kind: 'tap' as const,
+    line: 'a' as const,
+    minutes: 30,
+    days: [...EVERY_DAY],
+  }))
   for (const [k, v] of Object.entries(days)) data.days[k] = { done: v.done, minutes: {} }
   const expected = recapFor(data)
   if (!expected) throw new Error('the seed should always produce a recap')

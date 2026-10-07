@@ -4,21 +4,31 @@ import { todayKey } from '../store/dates'
 import type { AppData, Thing } from '../store/types'
 import { MAX_THINGS } from '../store/types'
 import { voice } from '../voice'
-import { createCard, edit, lock, main, updateCard } from './card'
+import { createCard, edit, main, remove, updateCard } from './card'
 
 interface RowHandlers {
+  /** A tap on a card outside edit mode: done for a tap thing, the dial for a lock-in. */
   onTap: (thing: Thing, card: HTMLElement) => void
-  onLockIn: (thing: Thing) => void
+  /** The thing's sheet: from its three dots, or a tap on its card in edit mode. */
   onEdit: (thing: Thing) => void
+  onDelete: (thing: Thing, card: HTMLElement) => void
   onAlsoToday: (thing: Thing) => void
   onAdd: () => void
 }
+
+/** A swipe this far to the left, and mostly sideways, shows a card's delete. */
+const SWIPE_PX = 36
 
 /**
  * The row of cards at the bottom: only what is planned for today. Cards
  * share the width and shrink to fit a phone, so all of them and the add
  * button are on screen without a scroll. Cards are kept by id between
  * renders so a jump animation survives the redraw that the tap causes.
+ *
+ * Above it, a word: "edit". In edit mode every card shows a red "delete"
+ * and a tap on a card opens its sheet; nothing is marked done; "done"
+ * goes back. A swipe to the left on a card shows the same delete, as a
+ * shortcut for hands that expect it; it is never the only way.
  *
  * Under it, the things not planned today fold into one thin strip, "not
  * today". Opened, it shows them dimmed: they cannot be marked done there,
@@ -29,20 +39,41 @@ export class Row {
   /** The latest copy of each thing, so a handler never acts on the one from the first render. */
   private readonly latest = new Map<string, Thing>()
   private readonly addCard: HTMLButtonElement
+  private readonly editButton: HTMLButtonElement
   private open = false
+  private editing = false
 
   constructor(
     private readonly container: HTMLElement,
     private readonly strip: HTMLElement,
+    tools: HTMLElement,
     private readonly handlers: RowHandlers,
   ) {
     this.addCard = document.createElement('button')
     this.addCard.type = 'button'
     this.addCard.className = 'card-add'
-    this.addCard.setAttribute('aria-label', 'Add a thing')
+    this.addCard.setAttribute('aria-label', voice.edit.add)
     this.addCard.textContent = '+'
     this.addCard.addEventListener('click', () => {
       this.handlers.onAdd()
+    })
+
+    this.editButton = document.createElement('button')
+    this.editButton.type = 'button'
+    this.editButton.className = 'row-edit'
+    this.editButton.textContent = voice.edit.edit
+    this.editButton.addEventListener('click', () => {
+      this.setEditing(!this.editing)
+    })
+    tools.append(this.editButton)
+
+    // A tap anywhere else puts a swiped card back.
+    document.addEventListener('pointerdown', (event) => {
+      if (!(event.target instanceof Element)) return
+      for (const card of this.cards.values()) {
+        if (card.dataset.swiped === 'true' && !card.contains(event.target))
+          delete card.dataset.swiped
+      }
     })
   }
 
@@ -53,6 +84,7 @@ export class Row {
     const off = things.filter((t) => !plannedOn(data, t, today))
     const seen = new Set<string>()
     for (const thing of things) this.latest.set(thing.id, thing)
+    const day = data.days[today]
 
     for (const thing of planned) {
       seen.add(thing.id)
@@ -63,7 +95,9 @@ export class Row {
         this.cards.set(thing.id, card)
       }
       updateCard(card, thing, {
-        done: data.days[today]?.done.includes(thing.id) ?? false,
+        done: day?.done.includes(thing.id) ?? false,
+        manual: day?.manual?.includes(thing.id) ?? false,
+        seen: day?.minutes[thing.id] ?? 0,
         dots: weekDots(data, thing.id, today),
         stage: stageFor(last7(data, thing.id, today)),
         line: lineFor(data, thing),
@@ -85,6 +119,9 @@ export class Row {
     this.container.dataset.count = String(planned.length)
     if (things.length < MAX_THINGS) this.container.append(this.addCard)
     else this.addCard.remove()
+    // Nothing to edit: the word goes, and so does edit mode.
+    this.editButton.hidden = things.length === 0
+    if (things.length === 0 && this.editing) this.setEditing(false)
 
     this.renderStrip(data, off)
   }
@@ -93,19 +130,54 @@ export class Row {
     return this.cards.get(id)
   }
 
+  setEditing(on: boolean): void {
+    this.editing = on
+    this.container.dataset.editing = String(on)
+    this.editButton.textContent = on ? voice.edit.done : voice.edit.edit
+    this.editButton.setAttribute('aria-pressed', String(on))
+    for (const card of this.cards.values()) delete card.dataset.swiped
+  }
+
   private wire(card: HTMLElement, id: string): void {
     const current = (): Thing | undefined => this.latest.get(id)
-    main(card).addEventListener('click', () => {
-      const thing = current()
-      if (thing) this.handlers.onTap(thing, card)
+    const button = main(card)
+    let start: { x: number; y: number } | null = null
+    let swiped = false
+    button.addEventListener('pointerdown', (event) => {
+      start = { x: event.clientX, y: event.clientY }
+      swiped = false
     })
-    lock(card).addEventListener('click', () => {
+    button.addEventListener('pointermove', (event) => {
+      if (!start || this.editing) return
+      const dx = event.clientX - start.x
+      const dy = event.clientY - start.y
+      if (dx < -SWIPE_PX && Math.abs(dx) > 2 * Math.abs(dy)) {
+        card.dataset.swiped = 'true'
+        swiped = true
+        start = null
+      }
+    })
+    button.addEventListener('click', () => {
       const thing = current()
-      if (thing) this.handlers.onLockIn(thing)
+      // The click that ends a swipe is part of the swipe, not a tap.
+      if (swiped || !thing) {
+        swiped = false
+        return
+      }
+      if (card.dataset.swiped === 'true') {
+        delete card.dataset.swiped
+        return
+      }
+      if (this.editing) this.handlers.onEdit(thing)
+      else this.handlers.onTap(thing, card)
     })
     edit(card).addEventListener('click', () => {
       const thing = current()
       if (thing) this.handlers.onEdit(thing)
+    })
+    remove(card).addEventListener('click', () => {
+      const thing = current()
+      if (thing) this.handlers.onDelete(thing, card)
     })
   }
 

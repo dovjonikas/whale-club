@@ -15,10 +15,19 @@ export interface MonthSummary {
 
 export interface DayEntry {
   date: DateKey
-  /** Things done that day and counted (a star's worth). */
-  done: { id: string; name: string; emoji: string }[]
-  /** Lock-ins that ran to their end, in order. */
-  sessions: { id: string; name: string; emoji: string; minutes: number; left: boolean }[]
+  /** Things done that day and counted (a star's worth); `manual` when done without the timer. */
+  done: { id: string; name: string; emoji: string; manual: boolean }[]
+  /** Lock-ins that ran to their end, in order: bright, soft (in parts) or dim (left, before 0.11). */
+  sessions: {
+    id: string
+    name: string
+    emoji: string
+    minutes: number
+    left: boolean
+    parts: number
+  }[]
+  /** Lock-in minutes on a thing not done that day: a faint lantern once the day is over. */
+  unfinished: { id: string; name: string; emoji: string; minutes: number }[]
   /** All the minutes locked in that day, stopped ones included. */
   minutes: number
   checkin: boolean
@@ -64,21 +73,28 @@ export function weeksOf(month: MonthKey): (DateKey | null)[][] {
 export function dayEntry(data: AppData, date: DateKey): DayEntry {
   const day = data.days[date]
   const named = (id: string): { id: string; name: string; emoji: string } => {
-    const thing = data.things.find((t) => t.id === id)
+    const thing = [...data.things, ...(data.retired ?? [])].find((t) => t.id === id)
     // A thing deleted since keeps its days, without a name to show.
     return { id, name: thing?.name ?? '…', emoji: thing?.emoji ?? '•' }
   }
-  const done = (day?.done ?? []).filter((id) => counted(day, id)).map(named)
+  const done = (day?.done ?? [])
+    .filter((id) => counted(day, id))
+    .map((id) => ({ ...named(id), manual: day?.manual?.includes(id) ?? false }))
   const sessions = (day?.sessions ?? []).map((s) => ({
     ...named(s.thing),
     minutes: s.minutes,
     left: s.left === true,
+    parts: s.parts ?? 1,
   }))
+  const unfinished = Object.entries(day?.minutes ?? {})
+    .filter(([id, n]) => n > 0 && !(day?.done.includes(id) ?? false))
+    .map(([id, n]) => ({ ...named(id), minutes: n }))
   const minutes = Object.values(day?.minutes ?? {}).reduce((sum, n) => sum + n, 0)
   return {
     date,
     done,
     sessions,
+    unfinished,
     minutes,
     checkin: day?.checkin === true,
     star: done.length > 0,

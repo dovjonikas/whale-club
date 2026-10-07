@@ -19,6 +19,8 @@ export interface LabHooks {
   seed: (days: number) => void
   /** Empties the sandbox: a first open, in the lab. */
   clear: () => void
+  /** Empties the sandbox and plays the intro, as on a phone that never had the app. */
+  firstOpen: () => void
 }
 
 /** Survives the reload after entering, so the lab's sheet opens on the other side. */
@@ -111,6 +113,7 @@ function openLabSheet(hooks: LabHooks): void {
           <button type="button" class="chip" data-lab="seed90">${voice.lab.seed90}</button>
           <button type="button" class="chip" data-lab="seed365">${voice.lab.seed365}</button>
           <button type="button" class="chip" data-lab="clear">${voice.lab.clear}</button>
+          <button type="button" class="chip" data-lab="firstOpen">${voice.lab.firstOpen}</button>
         </div>
         <button type="button" class="button-quiet lab-exit">${voice.lab.exit}</button>`
 
@@ -146,6 +149,10 @@ function openLabSheet(hooks: LabHooks): void {
         clear: () => {
           close()
           hooks.clear()
+        },
+        firstOpen: () => {
+          close()
+          hooks.firstOpen()
         },
       }
       body.querySelectorAll<HTMLButtonElement>('[data-lab]').forEach((button) => {

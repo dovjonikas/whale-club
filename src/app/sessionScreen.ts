@@ -34,12 +34,13 @@ export interface SessionOptions {
 
 export interface SessionScreen {
   readonly element: HTMLElement
-  update(progress: number, remainingMs: number, waitedAt: number | null): void
-  left(): void
+  update(progress: number, remainingMs: number): void
+  /** Back after longer than the grace: the count stopped meanwhile and goes on now. */
+  away(): void
   paused(on: boolean, used: boolean): void
   undoable(on: boolean): void
   /** The session is over: the screen freezes in its last state, ready for the opening. */
-  ended(clean: boolean): void
+  ended(): void
   /** Where the creature is on screen, for its way home. */
   creature(): HTMLElement
   close(): void
@@ -54,7 +55,7 @@ export function openSessionScreen(
   screen.className = 'session'
   screen.dataset.world = thing.world
   screen.dataset.state = 'running'
-  screen.dataset.broken = 'false'
+  screen.dataset.away = 'false'
   screen.dataset.time = options.showTime ? 'shown' : 'hidden'
   screen.setAttribute('role', 'dialog')
   screen.setAttribute('aria-label', `${voice.lockIn.button}: ${thing.name}`)
@@ -149,14 +150,14 @@ export function openSessionScreen(
 
   return {
     element: screen,
-    update(progress, remainingMs, waitedAt) {
+    update(progress, remainingMs) {
       clock.textContent = formatClock(remainingMs)
-      // A session that was left keeps the creature the size it was when it waited.
-      grow(waitedAt ?? progress)
+      // The creature is the size of everything seen today: it waited, and grows on.
+      grow(progress)
       fill(progress)
     },
-    left() {
-      screen.dataset.broken = 'true'
+    away() {
+      screen.dataset.away = 'true'
       said.textContent = voice.lockIn.left
     },
     paused(on, used) {
@@ -171,13 +172,12 @@ export function openSessionScreen(
       undoButton.hidden = !on
       stopButton.hidden = on
     },
-    ended(clean) {
+    ended() {
       clearTimeout(timeTimer)
       screen.dataset.state = 'ended'
-      screen.dataset.clean = String(clean)
       creature.classList.remove('is-asleep')
       fill(1)
-      if (clean) grow(1)
+      grow(1)
     },
     creature() {
       return creature

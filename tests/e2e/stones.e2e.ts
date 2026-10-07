@@ -1,6 +1,5 @@
-import { expect, test } from '@playwright/test'
 import { rarityOf } from '../../src/scene/rarity'
-import { card, dateKey, seed, stored } from './helpers'
+import { expect, test, card, dateKey, seed, stored } from './helpers'
 
 /**
  * What a thing earns arrives as a stone. It waits in the scene until the
@@ -28,7 +27,8 @@ test('the third day brings a stone, with a mark on the card', async ({ page }) =
   await card(page, 'run').click()
   const stone = page.getByRole('button', { name: 'a stone from run. tap three times to crack it' })
   await expect(stone).toBeVisible()
-  await expect(page.locator('.line')).toHaveText('something fell. go and see.')
+  // The first stone says what it is, once.
+  await expect(page.locator('.line')).toHaveText('a stone fell in. tap it three times.')
   await expect(page.locator('.card-stone')).toBeVisible()
 })
 

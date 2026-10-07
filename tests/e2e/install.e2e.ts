@@ -1,5 +1,4 @@
-import { expect, test } from '@playwright/test'
-import { addThing } from './helpers'
+import { expect, test, addThing } from './helpers'
 
 /**
  * The install leaf: not on the empty first screen, which belongs to the

@@ -1,28 +1,25 @@
 import { now } from '../store/clock'
+import { todayKey } from '../store/dates'
 import { labOn, sessionKey } from '../store/lab'
+import type { DateKey } from '../store/types'
 
 /**
  * A lock-in session, kept in storage and measured by the clock, never by
- * counting ticks: a reload, a locked phone or an app closed for an hour
- * comes back to the right number.
+ * counting ticks.
  *
- * Nothing dies. If the app is hidden for more than GRACE_MS, the session
- * does not fail. The creature stops and waits; the time away is not
- * counted; the session goes on from where it was when the person comes
- * back. It is only marked as one that was left, which changes what its end
- * gives (see Store.finishSession).
- *
- * Time away is measured from timestamps written when the page hides
- * (visibilitychange and pagehide), so it works the same whether the phone
- * was locked, the app switched, or the page reloaded. A session that ran
- * out while away for less than the grace finishes clean, at the moment it
- * ran out.
+ * One rule: only the minutes the timer saw count. While the session's
+ * screen is on show they count; when the person leaves the app, the first
+ * GRACE_MS still count (a glance at a message is not leaving) and then the
+ * count stops, and it goes on when they come back. If the page goes away
+ * altogether (a reload, the app closed, a phone that died), the count
+ * stops at the last moment the screen was seen: \`seenUntil\`, written
+ * every SEEN_EVERY_MS. Nothing seen is ever lost: an interrupted session's
+ * minutes are kept for the day, and the next one goes on from them.
  *
  * Two kindnesses on top: the first UNDO_MS after starting can be undone
- * without a trace (a wrong thing, a wrong length), and each session has
- * one pause of up to PAUSE_MS for the interruption nobody planned. While
- * paused, being away is what the pause is for; when it runs out, the
- * session goes on by itself.
+ * without a trace, and each session has one pause of up to PAUSE_MS for
+ * the interruption nobody planned. While paused, being away is what the
+ * pause is for; when it runs out, the session goes on by itself.
  */
 /** Where v0.1 to v0.4 kept a running timer; picked up once and moved. */
 const OLD_KEY = 'whaleclub:timer'
@@ -30,40 +27,59 @@ export const GRACE_MS = 15_000
 export const PAUSE_MS = 5 * 60_000
 export const UNDO_MS = 10_000
 const TICK_MS = 1000
+const SEEN_EVERY_MS = 5000
 
 export interface Session {
   thingId: string
+  /** The length the timer must see today, in minutes. */
   minutes: number
+  /** The day the session belongs to; its minutes are kept there. */
+  date: DateKey
+  /** What the timer had already seen today before this session, in ms. */
+  baseMs: number
+  /** One more session on a day already done: its minutes are a lantern, not a count. */
+  extra?: boolean
   startedAt: number
-  /** Time away, and time paused, that is not counted. */
+  /** Time not counted: away past the grace, and paused. */
   pausedMs: number
+  /** The last moment the screen was seen, for a page that went away without a word. */
+  seenUntil: number
   /** Set while the page is hidden. */
   hiddenAt?: number
   /** Set while the one pause runs. */
   pausedAt?: number
   /** The one pause has been taken. */
   pauseUsed?: boolean
-  broken: boolean
-  /** How far the session had come when it was first left; the creature stays that size. */
-  brokenAtMs?: number
+  /** Times the person left for longer than the grace and came back. */
+  away?: number
 }
 
 export interface Listeners {
-  tick: (session: Session, elapsedMs: number) => void
-  left: (session: Session) => void
+  tick: (session: Session, seenMs: number) => void
+  /** Back after longer than the grace: the count stopped meanwhile and goes on now. */
+  back: (session: Session) => void
   /** The pause ran out and the session went on by itself. */
   pauseOver: (session: Session) => void
-  finish: (session: Session, clean: boolean) => void
+  finish: (session: Session) => void
 }
 
 export function totalMs(session: Session): number {
   return session.minutes * 60_000
 }
 
-/** Time counted so far: it stands still while the page is hidden or the session is paused. */
-export function elapsedMs(session: Session, at: number = now()): number {
-  const until = Math.min(at, session.hiddenAt ?? Infinity, session.pausedAt ?? Infinity)
-  return Math.max(0, until - session.startedAt - session.pausedMs)
+/** Everything the timer has seen today for this thing, this session included. */
+export function seenMs(session: Session, at: number = now()): number {
+  const until = Math.min(
+    at,
+    session.hiddenAt === undefined ? Infinity : session.hiddenAt + GRACE_MS,
+    session.pausedAt ?? Infinity,
+  )
+  return session.baseMs + Math.max(0, until - session.startedAt - session.pausedMs)
+}
+
+/** How many sittings this session's count took: a softer lantern when more than one. */
+export function partsOf(session: Session): number {
+  return 1 + (session.baseMs > 0 ? 1 : 0) + (session.away ?? 0)
 }
 
 export function canUndo(session: Session, at: number = now()): boolean {
@@ -72,6 +88,7 @@ export function canUndo(session: Session, at: number = now()): boolean {
 
 export class SessionService {
   private interval = 0
+  private lastSeenWrite = 0
 
   constructor(private readonly on: Listeners) {
     document.addEventListener('visibilitychange', () => {
@@ -94,14 +111,24 @@ export class SessionService {
     return old
   }
 
-  start(thingId: string, minutes: number): Session {
-    const session: Session = { thingId, minutes, startedAt: now(), pausedMs: 0, broken: false }
+  start(input: { thingId: string; minutes: number; baseMs: number; extra?: boolean }): Session {
+    const at = now()
+    const session: Session = {
+      thingId: input.thingId,
+      minutes: input.minutes,
+      date: todayKey(),
+      baseMs: input.baseMs,
+      startedAt: at,
+      pausedMs: 0,
+      seenUntil: at,
+    }
+    if (input.extra) session.extra = true
     write(sessionKey(), session)
     this.watch()
     return session
   }
 
-  /** Stops early; returns the session so its minutes can be written down. */
+  /** Stops early; returns the session so what it saw can be kept. */
   stop(): Session | null {
     const session = this.current()
     write(sessionKey(), null)
@@ -136,18 +163,27 @@ export class SessionService {
     return going
   }
 
-  /** Picks up a session left running by an earlier page: after a reload, or the next morning. */
-  resume(): Session | null {
-    if (!this.current()) return null
-    this.show()
-    const session = this.current()
-    if (session) this.watch()
-    return session
+  /**
+   * A session found on opening the app, from a page that went away: it is
+   * settled, never carried on. Returns it with everything the timer saw up
+   * to the last moment the screen was seen (or the grace after the page
+   * hid); the caller finishes it if that reached the length, or keeps the
+   * minutes so the card can go on from them.
+   */
+  settle(): Session | null {
+    const stored = this.current()
+    if (!stored) return null
+    write(sessionKey(), null)
+    const session = stored
+    // A page that died without a word hid, as far as anyone can tell, when it was last seen.
+    const hiddenAt = session.hiddenAt ?? session.seenUntil
+    // A paused session saw nothing after its pause began; seenMs stops there by itself.
+    return { ...session, hiddenAt }
   }
 
   private hide(): void {
     const session = this.current()
-    if (!session || session.hiddenAt) return
+    if (!session || session.hiddenAt !== undefined) return
     write(sessionKey(), { ...session, hiddenAt: now() })
   }
 
@@ -157,45 +193,33 @@ export class SessionService {
     const at = now()
     let session: Session = stored
     let pauseRanOut = false
+    let hiddenAt = stored.hiddenAt
     if (session.pausedAt !== undefined) {
       const pauseEnd = session.pausedAt + PAUSE_MS
       if (at < pauseEnd) {
         // Away within the pause: that is what the pause is for.
-        const back: Session = { ...session }
+        const back: Session = { ...session, seenUntil: at }
         delete back.hiddenAt
         write(sessionKey(), back)
         return
       }
       // The pause ran out while away: it ends at its limit, and only what came after is away.
-      session = { ...endPause(session, pauseEnd), hiddenAt: Math.max(stored.hiddenAt, pauseEnd) }
+      session = endPause(session, pauseEnd)
+      hiddenAt = Math.max(hiddenAt, pauseEnd)
       pauseRanOut = true
     }
-    const hiddenAt = session.hiddenAt ?? at
-    const away = at - hiddenAt
-    const doneAtHide = elapsedMs(session)
-    const leftAtHide = totalMs(session) - doneAtHide
-    const back: Session = { ...session }
+    // The grace still counted; the rest of the time away did not.
+    const lost = Math.max(0, at - hiddenAt - GRACE_MS)
+    const back: Session = { ...session, pausedMs: session.pausedMs + lost, seenUntil: at }
     delete back.hiddenAt
-    if (leftAtHide <= Math.min(away, GRACE_MS)) {
-      // It ran out while the person was only briefly away: a clean end, at the moment it ran out.
-      write(sessionKey(), back)
+    if (lost > 0) back.away = (back.away ?? 0) + 1
+    write(sessionKey(), back)
+    if (pauseRanOut) this.on.pauseOver(back)
+    if (seenMs(back, at) >= totalMs(back)) {
       this.finish(back)
       return
     }
-    if (away > GRACE_MS) {
-      const left: Session = {
-        ...back,
-        pausedMs: back.pausedMs + away,
-        broken: true,
-        brokenAtMs: back.brokenAtMs ?? doneAtHide,
-      }
-      write(sessionKey(), left)
-      if (pauseRanOut) this.on.pauseOver(left)
-      this.on.left(left)
-      return
-    }
-    write(sessionKey(), back)
-    if (pauseRanOut) this.on.pauseOver(back)
+    if (lost > 0) this.on.back(back)
   }
 
   private watch(): void {
@@ -207,18 +231,20 @@ export class SessionService {
         this.unwatch()
         return
       }
-      if (session.pausedAt !== undefined) {
-        if (now() - session.pausedAt < PAUSE_MS) {
-          this.on.tick(session, elapsedMs(session))
-          return
-        }
+      const at = now()
+      if (session.pausedAt !== undefined && at - session.pausedAt >= PAUSE_MS) {
         session = endPause(session, session.pausedAt + PAUSE_MS)
         write(sessionKey(), session)
         this.on.pauseOver(session)
       }
-      const done = elapsedMs(session)
-      if (done >= totalMs(session)) this.finish(session)
-      else this.on.tick(session, done)
+      if (at - this.lastSeenWrite >= SEEN_EVERY_MS) {
+        this.lastSeenWrite = at
+        session = { ...session, seenUntil: at }
+        write(sessionKey(), session)
+      }
+      const seen = seenMs(session, at)
+      if (seen >= totalMs(session)) this.finish(session)
+      else this.on.tick(session, seen)
     }, TICK_MS)
   }
 
@@ -230,7 +256,7 @@ export class SessionService {
   private finish(session: Session): void {
     write(sessionKey(), null)
     this.unwatch()
-    this.on.finish(session, !session.broken)
+    this.on.finish(session)
   }
 }
 
@@ -260,14 +286,18 @@ function read(key: string): Session | null {
     const session: Session = {
       thingId: r.thingId,
       minutes: r.minutes,
+      // Sessions from before 0.11 had no day or base: they belong to the day they started.
+      date: typeof r.date === 'string' ? r.date : todayKey(new Date(r.startedAt)),
+      baseMs: typeof r.baseMs === 'number' ? r.baseMs : 0,
       startedAt: r.startedAt,
       pausedMs: typeof r.pausedMs === 'number' ? r.pausedMs : 0,
-      broken: r.broken === true,
+      seenUntil: typeof r.seenUntil === 'number' ? r.seenUntil : r.startedAt,
     }
+    if (r.extra === true) session.extra = true
     if (typeof r.hiddenAt === 'number') session.hiddenAt = r.hiddenAt
     if (typeof r.pausedAt === 'number') session.pausedAt = r.pausedAt
     if (r.pauseUsed === true) session.pauseUsed = true
-    if (typeof r.brokenAtMs === 'number') session.brokenAtMs = r.brokenAtMs
+    if (typeof r.away === 'number') session.away = r.away
     return session
   } catch {
     return null

@@ -16,39 +16,45 @@ import { EVERY_DAY } from '../store/types'
  * the same history. Today itself is left alone.
  */
 const DONE_SHARE = 0.8
-/** Of the things done, the share that were a lock-in run to its end: a lantern each. */
-const LOCKED_SHARE = 0.55
-/** Of the planned things not done, the share with a session left along the way: a dim lantern. */
-const LEFT_SHARE = 0.12
+/** Of the lock-ins finished, the share that took more than one sitting: a softer lantern. */
+const IN_PARTS_SHARE = 0.15
+/** Of the lock-ins not finished, the share with some minutes all the same: a dim lantern. */
+const UNFINISHED_SHARE = 0.4
 
-/** What the lab adds when the sandbox has nothing to seed: three plain things. */
+/** What the lab adds when the sandbox has nothing to seed: three plain things, both kinds. */
 const STARTERS: readonly Omit<Thing, 'createdAt'>[] = [
   {
     id: 'lab-run',
     name: 'run',
     emoji: '🏃',
-    minutes: 30,
+    kind: 'tap',
+    minutes: 15,
     days: [...EVERY_DAY],
     world: 'sea',
+    line: 'a',
     order: 0,
   },
   {
     id: 'lab-read',
     name: 'read',
     emoji: '📚',
+    kind: 'lockIn',
     minutes: 20,
     days: [...EVERY_DAY],
     world: 'sky',
+    line: 'a',
     order: 1,
   },
   {
     id: 'lab-practice',
     name: 'practice',
     emoji: '🌱',
+    kind: 'lockIn',
     minutes: 30,
     // Weekdays and Saturday: Sunday off, so a rest dash shows in the dots.
     days: [true, true, true, true, true, true, false],
     world: 'garden',
+    line: 'a',
     order: 2,
   },
 ]
@@ -72,22 +78,26 @@ export function seedHistory(data: AppData, today: DateKey, days: number): AppDat
     if (!isGap(back)) {
       for (const thing of things) {
         if (!plannedOn(next, thing, date)) continue
-        const sessions = (day.sessions ??= [])
-        if (random() >= DONE_SHARE) {
-          if (random() < LEFT_SHARE) {
-            const minutes = Math.round(thing.minutes / 2)
-            day.minutes[thing.id] = minutes
-            sessions.push({ thing: thing.id, minutes, left: true })
-          }
+        const done = random() < DONE_SHARE
+        if (thing.kind === 'tap') {
+          if (done) day.done.push(thing.id)
           continue
         }
-        day.done.push(thing.id)
-        if (random() < LOCKED_SHARE) {
+        if (done) {
+          // A lock-in is done when the timer saw its whole length: a lantern for it.
+          day.done.push(thing.id)
           day.minutes[thing.id] = thing.minutes
-          sessions.push({ thing: thing.id, minutes: thing.minutes })
+          const parts = random() < IN_PARTS_SHARE ? 2 : 1
+          const record =
+            parts > 1
+              ? { thing: thing.id, minutes: thing.minutes, parts }
+              : { thing: thing.id, minutes: thing.minutes }
+          ;(day.sessions ??= []).push(record)
+        } else if (random() < UNFINISHED_SHARE) {
+          // Some minutes, not the length: the day keeps them as a dim lantern.
+          day.minutes[thing.id] = Math.max(1, Math.round(thing.minutes * (0.2 + random() * 0.6)))
         }
       }
-      if (day.sessions?.length === 0) delete day.sessions
     }
     next.days[date] = day
   }

@@ -1,12 +1,12 @@
-import { addDays, fromKey, lastKeys } from './dates'
-import type { AppData, DateKey, DayRecord, Thing, World } from './types'
+import { addDays, fromKey, lastKeys, weekStart } from './dates'
+import type { AppData, DateKey, DayRecord, Line, Thing, World } from './types'
 
 /**
  * Everything the scene needs that is not stored: it is all arithmetic over
  * `days`, cheap enough to run on every redraw.
  */
 
-export type Line = 'a' | 'b'
+export type { Line } from './types'
 
 /** Creature stage from the last seven days: 0-1, 2-3, 4-5, 6-7 days done. */
 export type Stage = 0 | 1 | 2 | 3
@@ -123,13 +123,9 @@ export function reachedOn(data: AppData, thingId: string, tier: number): DateKey
   return dates[tier - 1]
 }
 
-/** The first thing in a world takes line A, the second line B. */
-export function lineFor(data: AppData, thing: Thing): Line {
-  const sameWorld = data.things
-    .filter((t) => t.world === thing.world)
-    .sort((a, b) => a.order - b.order)
-  // By id, not by reference: a thing edited since (its minutes, say) is a new object.
-  return sameWorld[0]?.id === thing.id ? 'a' : 'b'
+/** The thing's line: stored on it since 0.11, so it never shifts when another thing goes. */
+export function lineFor(_data: AppData, thing: Thing): Line {
+  return thing.line
 }
 
 /** Days with at least one thing counted: one star each. Oldest first. */
@@ -227,4 +223,15 @@ export function streakDays(stars: readonly DateKey[]): Set<DateKey> {
   }
   flush()
   return linked
+}
+
+/** "Did it without the timer", for all things together, in one week. */
+export const WITHOUT_TIMER_PER_WEEK = 2
+
+/** How many times are left this week (Monday to Sunday) to mark a lock-in done without the timer. */
+export function withoutTimerLeft(data: AppData, today: DateKey): number {
+  const monday = weekStart(today)
+  let used = 0
+  for (let i = 0; i < 7; i++) used += data.days[addDays(monday, i)]?.manual?.length ?? 0
+  return Math.max(0, WITHOUT_TIMER_PER_WEEK - used)
 }

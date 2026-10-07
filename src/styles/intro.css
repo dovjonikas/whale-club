@@ -1,0 +1,148 @@
+/* The first minute: an overlay over the real scene, three beats. */
+#app.is-behind-intro {
+  opacity: 0;
+}
+
+.intro {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  justify-items: center;
+  padding: calc(var(--safe-top) + var(--s4)) var(--s4) calc(var(--safe-bottom) + var(--s8));
+  cursor: pointer;
+}
+
+.intro-skip {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--s2));
+  right: var(--s2);
+  min-width: var(--touch);
+  height: var(--touch);
+  padding: 0 var(--s4);
+  border-radius: var(--r-pill);
+  color: var(--ink-dim);
+  font-size: var(--t-sm);
+  font-weight: 700;
+}
+
+.intro-day {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--s4));
+  left: var(--s4);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-lg);
+  font-variant-numeric: tabular-nums;
+  color: var(--star-pale);
+  text-shadow: 0 0 12px rgba(2, 4, 9, 0.9);
+  transition: opacity var(--dur) var(--ease);
+}
+
+.intro:not([data-beat='promise']) .intro-day,
+.intro:not([data-beat='promise']) .intro-creatures {
+  opacity: 0;
+}
+
+/* The creatures as they grow through the year: dark shapes, a rim of light. */
+.intro-creatures {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 47%;
+  height: 72px;
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.intro-creature {
+  position: absolute;
+  top: 0;
+  width: 64px;
+  height: 64px;
+  margin-left: -32px;
+}
+
+.intro-creature svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: brightness(0) drop-shadow(0 0 1.5px rgba(201, 251, 245, 0.85));
+}
+
+.intro-line {
+  grid-row: 3;
+  margin: 0 0 var(--s6);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-lg);
+  text-align: center;
+  text-wrap: balance;
+  color: var(--star-pale);
+  text-shadow: 0 0 14px rgba(2, 4, 9, 0.95);
+}
+
+/* The truth: the author's words, over the empty sea. */
+.intro-truth {
+  grid-row: 2;
+  align-self: center;
+  display: grid;
+  gap: var(--s4);
+  max-width: 340px;
+  font-family: var(--font-display);
+  font-size: var(--t-md);
+  line-height: 1.45;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--ink);
+  text-shadow: 0 0 14px rgba(2, 4, 9, 0.95);
+}
+
+.intro-truth p {
+  margin: 0;
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  transition:
+    opacity 900ms var(--ease),
+    transform 900ms var(--ease);
+}
+
+.intro:not([data-beat='promise']) .intro-truth p:first-child,
+.intro[data-part='2'] .intro-truth p:nth-child(2) {
+  opacity: 1;
+  transform: none;
+}
+
+.intro-start {
+  grid-row: 4;
+  width: min(320px, 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dur) var(--ease);
+}
+
+.intro[data-beat='start'] .intro-start {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Under reduced motion the year is three still frames, faded into each other. */
+.intro-veil {
+  position: absolute;
+  inset: 0;
+  background: var(--abyss);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 250ms linear;
+}
+
+.intro-veil.is-on {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-truth p {
+    transform: none;
+  }
+}

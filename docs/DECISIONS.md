@@ -474,3 +474,115 @@ would be a second picture of the same thing, and a number to fall short of.
 The canvases over the sky take the taps, so the scene listens for a tap
 above the horizon that is not on a star, a stone or a button, and opens the
 log. A star opens its own day instead of a toast.
+
+## 2026-10-07 The product principle (the author's words)
+
+> the app has to be a system-building start for people, the first easy step to go towards the life they desire, and this has to help them as much as it can. it's like being a beginner in the gym: you can start light, but you stay consistent and results show.
+
+It is at the top of the README, and it decides between options when nothing
+else does.
+
+## 2026-10-07 Clarity is a rule, and a test
+
+Nobody should have to wonder where to delete or how to do anything. A tired
+person opening the app for the first time finds everything without being
+told. If something needs explaining, it is too complicated: simplify it,
+do not explain it. Every action has a visible place with a word; gestures
+(a hold, a swipe, taps in a row) are only a faster way to something that
+already has a visible button. The lab is the one exception. The clarity
+test does fifteen everyday jobs through visible words only and counts the
+taps: each job's control is in sight within two taps of the first screen.
+When it fails, the app changes, not the test.
+
+## 2026-10-07 Two kinds of thing again (the author's decision after 0.9.0)
+
+0.9.0 made every thing one kind, tappable and lockable. In use that made a
+tap on a lock-in thing a free count, and the card said nothing about how a
+thing is done. Now there are two: a tap thing is a list; a lock-in counts
+only when its timer has seen its whole length that day. A tap on a lock-in
+card opens the dial and never marks it. Everything that counts (all done,
+stars, stages, stones, streaks, krill later) goes through "done" only.
+Data version 6 adds the kind; a thing from before is a lock-in when more
+than half of its done days had minutes. Past days are not rewritten: an
+old "left and waited" day stays done.
+
+## 2026-10-07 Only the minutes the timer saw count
+
+A lock-in's session counts while its screen is on show. Leaving the app,
+the first fifteen seconds still count, then the count stops, and coming
+back carries on. A page that goes away altogether (a reload, the app
+closed, a phone that died) counts to the last moment the screen was seen,
+which the screen writes every five seconds. Nothing seen is lost: the
+minutes are kept for the day, the card offers "12/25 · finish", and a tap
+goes straight on. Nothing is given away either: "left" no longer counts as
+done. A day that ends short keeps its minutes in the log and as a faint
+lantern; they do not carry over. One done in one go is a bright lantern,
+one done in parts a softer one.
+
+## 2026-10-07 Did it without the timer: twice a week, a hand, no lantern
+
+Sometimes the thing happens without the phone: a lesson, a forgotten
+start, a dead battery. Its sheet (never the card) asks once, "the full 15
+min, for real?". Yes counts the day for streaks and stages, with a small
+hand on the card instead of a check, and no lantern, no krill, no
+ceremony. Not really changes nothing and says one line. Twice a week for
+all things together keeps it an exception.
+
+## 2026-10-07 Delete without "are you sure"
+
+A confirm dialog makes every delete slower and protects nothing that undo
+does not protect better. The card swims off, the line says the days stay,
+and "undo" waits ten seconds at the bottom. A deleted thing is kept among
+the retired: its stars stay in the sky, its finds in the scene, its
+lanterns in the cove, its name in the log. Because of that, a thing's line
+is stored on it (it used to be worked out from the order, and a delete
+would have changed the other thing's line), and a new thing takes the
+world the row's pattern is missing.
+
+## 2026-10-07 The first minute is a promise in silhouette
+
+A new person saw "add a thing" and did not know what any of it was for.
+The intro shows where it goes before asking for anything: a year of the
+real scene, seeded (the lab's year, not a forecast of this person), with a
+day counter running to 365, and everything in silhouette: creatures as dark
+shapes with a rim of light, finds only flashes. It shows that the sea fills
+and keeps what it fills with a surprise; because it is the real scene, the
+promise grows with the content. Then the truth, the author's words over the
+empty sea of day one:
+
+> the thing is, sometimes doing such small things seems unremarkable, because you can't see the results yet. but results come, after you compound these days, that you stay consistent, even when it seems small.
+
+Then one button, "start light", with three small things to begin with. It
+plays on a first open only (nothing stored, never seen), skip is always
+there, a tap goes on, and under reduced motion the year is three still
+frames. Existing users never get it forced on them; "how it works" and the
+lab can play it again.
+
+## 2026-10-07 Each mechanic explains itself once
+
+No tutorial and no wall of rules. A stone, a lantern, kept minutes and the
+first thing each say what they are in one line the first time they appear,
+and never again (`settings.explained`). The next find is always in sight
+above the row, with the same count as the Collection, so the near goal is
+always a few days away.
+
+## 2026-10-07 The log explains itself
+
+The author opened the log and did not know what stars and lanterns were or
+why the dots had colours. So under the calendar there is always a two-line
+legend in the scene's own words, a dot of each lock-in thing's colour with
+its name (a deleted one only in a month with its lanterns), and a line for
+soft and faint lanterns when the month has them. A day lists the things
+done, the sessions with their minutes, and the minutes that did not finish.
+
+## 2026-10-07 The tests skip the intro by a fixture
+
+Every test file imports `test` from the helpers, whose page has seen the
+intro, so a test about anything else starts on the first screen. The
+intro's own tests use Playwright's `test` and get a true first open.
+
+## 2026-10-07 The lab never plays the intro by itself
+
+Opening `?lab=1` on a device with nothing stored is a first open, and the
+intro would have played over the lab's own sheet. In the lab the intro
+plays only when asked for, with "first open again".

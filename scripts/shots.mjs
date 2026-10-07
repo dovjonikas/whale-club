@@ -23,14 +23,27 @@ function key(offset) {
 }
 
 const things = [
-  { id: 'run', name: 'run', emoji: '🏃', mode: 'tap', world: 'sea', createdAt: key(-34), order: 0 },
+  {
+    id: 'run',
+    name: 'run',
+    emoji: '🏃',
+    kind: 'tap',
+    minutes: 15,
+    days: [true, true, true, true, true, true, true],
+    world: 'sea',
+    line: 'a',
+    createdAt: key(-34),
+    order: 0,
+  },
   {
     id: 'read',
     name: 'read',
     emoji: '📚',
-    mode: 'timer',
+    kind: 'lockIn',
     minutes: 30,
+    days: [true, true, true, true, true, true, true],
     world: 'sky',
+    line: 'a',
     createdAt: key(-34),
     order: 1,
   },
@@ -38,9 +51,11 @@ const things = [
     id: 'practice',
     name: 'practice',
     emoji: '🎹',
-    mode: 'timer',
+    kind: 'tap',
     minutes: 20,
+    days: [true, true, true, true, true, true, true],
     world: 'garden',
+    line: 'a',
     createdAt: key(-30),
     order: 2,
   },
@@ -56,12 +71,25 @@ for (let i = -34; i <= 0; i++) {
     if (i % 3 !== 0 || i > -7) done.push('read')
     if (i >= -30 && (i % 4 !== 2 || i > -7)) done.push('practice')
   }
-  // Some of the reading and practice were lock-ins: a lantern each in the cove.
+  // Reading is a lock-in: every day it was done, its timer ran thirty minutes, a lantern each;
+  // now and then it took two sittings, a softer lantern.
   const minutes = {}
-  if (done.includes('read') && i % 2 === 0) minutes.read = 30
-  if (done.includes('practice') && i % 3 === 0) minutes.practice = 20
-  if (i === 0) days[key(i)] = { done: ['run', 'read'], minutes: { read: 30 }, checkin: true }
-  else if (done.length) days[key(i)] = { done, minutes }
+  const sessions = []
+  if (done.includes('read')) {
+    minutes.read = 30
+    sessions.push(
+      i % 5 === 0 ? { thing: 'read', minutes: 30, parts: 2 } : { thing: 'read', minutes: 30 },
+    )
+  }
+  if (i === 0)
+    days[key(i)] = {
+      done: ['run', 'read'],
+      minutes: { read: 30 },
+      sessions: [{ thing: 'read', minutes: 30 }],
+      checkin: true,
+    }
+  else if (done.length)
+    days[key(i)] = sessions.length ? { done, minutes, sessions } : { done, minutes }
 }
 
 // Every tier earned is cracked, except run's newest, which waits as a stone.
@@ -75,7 +103,7 @@ for (const thing of things) {
 }
 
 const data = {
-  version: 3,
+  version: 6,
   things,
   days,
   cracked,
@@ -85,6 +113,8 @@ const data = {
     // Last week's Monday, so the recap has already been seen.
     lastRecapWeek: key(-9),
     postcardFormat: 'story',
+    // The things have explained themselves already: the pictures show the usual lines.
+    explained: ['yours', 'firstStar', 'stone', 'lantern', 'kept'],
   },
 }
 
@@ -181,7 +211,7 @@ for (const { name, options } of targets) {
   await page.clock.runFor(1100)
   await shot(page, 'iphone-find.png')
   await page.clock.runFor(3000)
-  await page.getByRole('button', { name: 'lock in: read' }).click()
+  await page.getByRole('button', { name: 'read', exact: true }).click()
   await page.clock.runFor(500)
   await shot(page, 'iphone-dial.png')
   await page.getByRole('button', { name: 'lock in', exact: true }).click()
@@ -237,11 +267,49 @@ for (const [file, off] of [
   }
   await context.close()
 }
-// The very first screen: nothing added yet, the whale asleep under the surface.
+// The first minute: the promise half way through its year, then the truth.
+{
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.goto(base)
+  await page.getByRole('dialog', { name: 'whale club' }).waitFor()
+  await page.waitForTimeout(4300)
+  await page.screenshot({ path: resolve(out, 'iphone-promise.png') })
+  await page.getByRole('dialog', { name: 'whale club' }).click({ position: { x: 60, y: 300 } })
+  await page.waitForTimeout(4500)
+  await page.screenshot({ path: resolve(out, 'iphone-truth.png') })
+  await context.close()
+}
+
+// The add sheet with its two kinds, and edit mode, on the five weeks.
+{
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.setFixedTime(NOW)
+  await page.addInitScript(
+    (json) => localStorage.setItem('whaleclub:data', json),
+    JSON.stringify(data),
+  )
+  await page.goto(base)
+  await page.waitForTimeout(1200)
+  await page.getByRole('button', { name: 'edit', exact: true }).click()
+  await page.waitForTimeout(400)
+  await shot(page, 'iphone-edit.png')
+  await page.getByRole('button', { name: 'done', exact: true }).click()
+  await page.getByRole('button', { name: 'Add a thing' }).click()
+  await page.getByRole('textbox', { name: 'name' }).fill('study')
+  await page.getByRole('dialog').getByRole('button', { name: 'lock in', exact: true }).click()
+  await page.waitForTimeout(500)
+  await shot(page, 'iphone-add.png')
+  await context.close()
+}
+
+// The very first screen after the intro: nothing added yet, the whale asleep under the surface.
 {
   const context = await browser.newContext({ ...devices['iPhone 13'] })
   const page = await context.newPage()
   await page.clock.install({ time: NOW })
+  await page.addInitScript(() => localStorage.setItem('whaleclub:intro', 'seen'))
   await page.goto(base)
   await page.waitForTimeout(1800)
   await page.screenshot({ path: resolve(out, 'iphone-first.png') })

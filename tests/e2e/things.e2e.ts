@@ -1,5 +1,4 @@
-import { expect, test } from '@playwright/test'
-import { addThing, card, dateKey, seed, stored } from './helpers'
+import { expect, test, addThing, card, dateKey, seed, stored } from './helpers'
 
 /**
  * The first screen and the row: one sentence, an example, and up to five
@@ -24,23 +23,30 @@ test('things get sea, sky, garden, sea, sky in that order, and the fifth closes 
   await expect(page.getByRole('button', { name: 'Add a thing' })).toBeHidden()
 })
 
-test('the add sheet asks for a name, an emoji, the days and a lock-in length, nothing more', async ({
+test('the add sheet asks one question, tap when done or lock in, and a length only for a lock-in', async ({
   page,
 }) => {
   await page.goto('')
   await page.getByRole('button', { name: 'Add a thing' }).click()
   const sheet = page.getByRole('dialog')
-  await expect(sheet.getByRole('button', { name: 'timer' })).toHaveCount(0)
-  await expect(sheet.getByText('tap when done')).toHaveCount(0)
+  await expect(sheet.getByText('how is it done?')).toBeVisible()
+  await expect(sheet.getByRole('button', { name: 'tap when done' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  await expect(sheet.getByText('how long')).toBeHidden()
   await expect(sheet.getByText('hold it for a timer', { exact: false })).toHaveCount(0)
-  await expect(sheet.getByRole('button', { name: '30 min' })).toHaveAttribute(
+  await sheet.getByRole('button', { name: 'lock in', exact: true }).click()
+  await expect(sheet.getByText('how long')).toBeVisible()
+  // Start light: fifteen minutes unless asked otherwise.
+  await expect(sheet.getByRole('button', { name: '15 min' })).toHaveAttribute(
     'aria-pressed',
     'true',
   )
   await page.keyboard.press('Escape')
-  await addThing(page, 'practice', { emoji: '🎹', minutes: 45 })
-  await expect(card(page, 'practice')).toContainText('🎹')
-  await page.getByRole('button', { name: 'lock in: practice' }).click()
+  await addThing(page, 'practice', { emoji: '🎹', lockIn: true, minutes: 45 })
+  await expect(page.locator('.card', { has: card(page, 'practice') })).toContainText('45 min')
+  await card(page, 'practice').click()
   await expect(page.getByRole('slider', { name: 'minutes' })).toHaveAttribute('aria-valuenow', '45')
 })
 
@@ -54,7 +60,7 @@ test('data from before 0.9 loses its mode and every thing gets a lock-in length'
         id: 't2',
         name: 'read',
         mode: 'timer',
-        minutes: 15,
+        minutes: 25,
         world: 'sky',
         createdAt: dateKey(-3),
         order: 1,
@@ -68,9 +74,9 @@ test('data from before 0.9 loses its mode and every thing gets a lock-in length'
     version: number
     things: Record<string, unknown>[]
   }
-  expect(data.version).toBe(5)
+  expect(data.version).toBe(6)
   expect(data.things.map((t) => t.mode)).toEqual([undefined, undefined])
-  expect(data.things.map((t) => t.minutes)).toEqual([30, 15])
+  expect(data.things.map((t) => t.minutes)).toEqual([15, 25])
 })
 
 test('an empty name is not added', async ({ page }) => {

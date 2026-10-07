@@ -17,7 +17,10 @@ src/
   voice.ts           every line the app says, by moment (TODO-VOICE placeholders)
   app/               the UI: cards, sheets, the line, lock in, toasts
     app.ts           wires store, scene and row together; the only place that knows all three
-    row.ts, card.ts  the row of things and one card
+    row.ts, card.ts  the row of things and one card; edit mode, the swipe, the two kinds
+    kindField.ts     tap when done or lock in, and how long: the add sheet's and the sheet's question
+    intro.ts         the first minute: the promise, the truth, the first step
+    howItWorks.ts    the idea in a few lines, the rules, the intro again
     addSheet.ts, sheet.ts, toast.ts, line.ts
     session.ts       a lock-in, measured by timestamps; leaving it waits, never fails; undo, one pause
     sessionScreen.ts the deep-water screen, the growing creature, the hidden time
@@ -290,3 +293,34 @@ screen, outside the phone frame, with the offset ("lab · +3 days", a tap
 opens the lab's sheet) and "exit". The frame moves down by the bar's
 height, so the bar never covers the header, a sheet or a session, and
 nothing covers it.
+
+## 11. Two kinds, kept minutes, and the first minute
+
+`Thing.kind` is `tap` or `lockIn`. A tap card toggles `done`; a lock-in
+card calls `LockIn.tap`: with minutes kept today and not the length, it
+starts a session straight from them (`baseMs`), otherwise it opens the
+dial, and on a day already done the session is an extra one (a lantern,
+nothing more).
+
+`SessionService` counts what the timer saw: `seenMs = baseMs + (until -
+startedAt - pausedMs)`, where `until` stops at a pause and fifteen seconds
+after the page hid. On return, the time away past the grace joins
+`pausedMs` and `away` grows. While the screen shows, `seenUntil` is
+written every five seconds. On the next open `settle()` takes a session
+left by a page that went away: hidden at `hiddenAt` if the page said so,
+otherwise at `seenUntil`; `LockIn.settle` finishes it if that reached the
+length, or keeps the minutes (`Store.keepMinutes`) for the card to finish.
+`Store.finishLockIn` writes the end: done, the day's minutes, and a session
+record with `parts` (more than one: a softer lantern). `sceneData.lanternsFor`
+adds a faint lantern for each past day with minutes and no done.
+
+`Store.removeThing` moves a thing to `retired`; `restoreThing` brings it
+back. `everyThing(data)` (things and retired) is what the scene's finds, the
+lantern colours and the log's names read. A new thing takes `nextWorld` (the
+world the row's pattern is missing) and `nextLine`.
+
+`app/intro.ts` drives the real scene: `Scene.preview` draws a seeded year's
+stars and lanterns without storing them or making them tappable,
+`setSilhouette` darkens the whale, `flash` marks a find. The intro is due
+when nothing is stored and `whaleclub:intro` is unset; the lab asks for it
+through session storage across its reload.

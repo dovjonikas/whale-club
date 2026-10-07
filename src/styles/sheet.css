@@ -618,3 +618,139 @@
 .chip-emoji-input {
   width: 64px;
 }
+
+/* How a thing is done: two big answers, a line under each. */
+.kind-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s2);
+}
+
+.kind-choice {
+  display: grid;
+  gap: var(--s1);
+  align-content: start;
+  min-height: 84px;
+  padding: var(--s3);
+  border-radius: var(--r);
+  border: 1px solid var(--card-edge);
+  background: rgba(2, 4, 9, 0.4);
+  text-align: left;
+  transition:
+    border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.kind-choice:active {
+  transform: scale(0.97);
+}
+
+.kind-choice[aria-pressed='true'] {
+  border-color: var(--glow);
+  background: rgba(62, 242, 224, 0.1);
+  box-shadow: 0 0 0 1px var(--glow);
+}
+
+.kind-title {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.kind-line {
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+}
+
+.kind-length {
+  margin-top: var(--s3);
+}
+
+.kind-length[hidden] {
+  display: none;
+}
+
+.input-emoji {
+  width: 88px;
+}
+
+/* Delete in a thing's sheet: red, at the bottom, one tap, undo after. */
+.button-danger {
+  width: 100%;
+  height: var(--touch);
+  margin-top: var(--s4);
+  border-radius: var(--r-pill);
+  color: #ff7a72;
+  font-weight: 700;
+  font-size: var(--t-sm);
+}
+
+.button-danger:active {
+  transform: scale(0.97);
+}
+
+.without-field .button-quiet:disabled {
+  opacity: 0.4;
+}
+
+.without-question {
+  margin: var(--s2) 0;
+  color: var(--ink);
+}
+
+.without-ask[hidden] {
+  display: none;
+}
+
+/* An undo at the bottom, for ten seconds. */
+.undo-toast {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--safe-bottom) + var(--s4));
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+  width: max-content;
+  max-width: calc(100% - 2 * var(--s4));
+  padding: var(--s2) var(--s2) var(--s2) var(--s4);
+  border-radius: var(--r-pill);
+  background: var(--star-pale);
+  color: var(--abyss);
+  font-size: var(--t-sm);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  transform: translate3d(-50%, 160%, 0);
+  transition: transform var(--dur) var(--ease);
+}
+
+.undo-toast.is-open {
+  transform: translate3d(-50%, 0, 0);
+}
+
+.undo-button {
+  min-width: var(--touch);
+  height: 36px;
+  padding: 0 var(--s3);
+  border-radius: var(--r-pill);
+  background: var(--abyss);
+  color: var(--star-pale);
+  font-weight: 700;
+}
+
+/* How it works: the idea in a few lines, the rules, the intro again. */
+.how-lines {
+  margin: 0 0 var(--s6);
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--s2);
+  color: var(--ink);
+}
+
+.how-rules {
+  margin-bottom: var(--s6);
+}
+
+.how-rules li {
+  font-size: var(--t-md);
+}

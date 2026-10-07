@@ -1,9 +1,8 @@
-import { expect, test } from '@playwright/test'
 import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { createServer, type Server } from 'node:http'
 import { tmpdir } from 'node:os'
 import { extname, join, resolve } from 'node:path'
-import { waitForServiceWorker } from './helpers'
+import { expect, test, waitForServiceWorker } from './helpers'
 
 /**
  * An installed app gets new versions by itself: a changed service worker

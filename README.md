@@ -2,10 +2,14 @@
 
 A habit game where nothing dies.
 
-Pick a few simple things. Tap them when done, or run a timer. Every day you
-show up, the scene fills: a star in the sky, a creature that grows, a
-collectible unlocked. Miss a day and the sea goes quiet for a day. That is
-all that happens.
+> the app has to be a system-building start for people, the first easy step to go towards the life they desire, and this has to help them as much as it can. it's like being a beginner in the gym: you can start light, but you stay consistent and results show.
+>
+> (the author's principle for the app)
+
+Pick a few simple things. Tap them when done, or lock in with a timer.
+Every day you show up, the scene fills: a star in the sky, a creature that
+grows, a collectible unlocked. Miss a day and the sea goes quiet for a day.
+That is all that happens.
 
 **Live:** https://dovjonikas.github.io/whale-club/
 
@@ -32,6 +36,14 @@ all that happens.
 </p>
 
 <p align="center">
+  <img src="docs/screenshots/iphone-promise.webp" alt="The first minute: a year drawn in silhouette, the day counter running, the sky filling with stars" width="240">
+  &nbsp;
+  <img src="docs/screenshots/iphone-truth.webp" alt="The first minute: the author's sentence over the empty sea and the sleeping whale" width="240">
+  &nbsp;
+  <img src="docs/screenshots/iphone-add.webp" alt="The add sheet: tap when done, or lock in with a length" width="240">
+  &nbsp;
+  <img src="docs/screenshots/iphone-edit.webp" alt="Edit mode: a red delete on every card, done to go back" width="240">
+  &nbsp;
   <img src="docs/screenshots/iphone-first.webp" alt="The first screen: one sentence, an empty card, and a small whale asleep under the surface" width="240">
   &nbsp;
   <img src="docs/screenshots/iphone-not-today.webp" alt="The first screen on a day one thing is off: two cards and the not today strip opened" width="240">
@@ -61,19 +73,37 @@ And underneath all three: nothing dies. You just missed a day.
   horizon. The row of your things at the bottom. Nothing else.
 - **Up to five things**, each assigned a world in turn: sea, sky, garden,
   sea, sky. You do not pick; every scene gets all three layers.
+- **Two kinds of thing.** "Tap when done" is a list: tap the card, done;
+  tap again, not done. "Lock in" counts only when its timer has seen the
+  whole length that day (fifteen minutes to start: start light). Only the
+  minutes the timer saw count, and parts of a day add up: a phone that
+  died, a call, a closed app lose nothing, and the card offers "12/25 ·
+  finish". Did it without the phone? Its sheet has "did it without the
+  timer", twice a week, honestly asked.
 - **Tap = done today.** The creature jumps, the world answers (bubbles,
   star dust, petals), one short line. Tap again to undo.
+- **Every change has a word.** "edit" over the row puts a red "delete" on
+  every card and makes a tap open the card's sheet. Delete never asks "are
+  you sure": the card swims off and "undo" waits ten seconds; the stars and
+  finds it earned stay.
+- **The first minute.** A first open shows a year in silhouette (a day
+  counter running to 365, the sky filling, creatures growing, stones
+  opening, the whale rising before the moon), then the author's sentence
+  over the empty sea, then one button: "start light". Skip is always there.
+  After that, every mechanic explains itself in one line the first time it
+  shows, and the next find is always in sight above the row.
 - **Days, if you want them.** Every thing is planned every day unless
   you say otherwise: its sheet has one line of seven day chips. The first
   screen shows only today's things; the rest wait in a thin "not today"
   strip, and any of them can be added for today only. A day off is never a
   missed day: the dots show it as a dash, the streak walks past it, and a
   thing done three times a week still grows into a whale.
-- **Lock in.** Under every card. Turn the dial (10 to 120 minutes), and
-  the screen goes quiet: the sky turns, the time counts down, and the
-  thing's creature starts as an egg, a spark or a seed and grows while you
-  stay. Leave for more than fifteen seconds and it does not die: it waits
-  for you. It just stays small that time.
+- **Lock in.** Tap a lock-in card, turn the dial (10 to 120 minutes),
+  and the world sinks into deep water: only the creature, a slow ring and
+  the name, the time hidden until a tap. Undo in the first ten seconds, one
+  pause of five minutes. Leave for more than fifteen seconds and the count
+  stops until you come back. The end opens the world again in order, and
+  leaves a lantern in the cove.
   total, so they can shrink and grow back. Nothing is ever lost.
 - **Stars are days.** Every day with at least one thing done puts a star
   in the sky, laid out week by week. A streak draws a constellation. After
