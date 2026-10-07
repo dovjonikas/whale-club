@@ -2,7 +2,7 @@
 
 ## Done
 
-v0.10.0, live at https://dovjonikas.github.io/whale-club/ after the push.
+v0.11.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
 - **v0.1.0 to v0.3.0**: the row, the scene, the sky as a calendar, creatures, PWA, collectibles, the whale, rituals, sound, share; a buddy slot (since removed).
 - **v0.4.0**: postcards instead of a buddy; the phone-wide frame; the install leaf after the first thing; Lighthouse through Edge.
@@ -17,14 +17,16 @@ v0.10.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 - **v0.8.0**: the lab (five taps on the version in the menu, or `?lab=1`): a sandbox copy of the sea with a clock that moves by days, a striped bar on every screen with exit, one-tap controls (+1 day, +7 days, -1 day, back to real time, do everything today, seed 30 / 90 days, clear sandbox); one clock module for every "today" and "now", held by a lint rule; screenshots as WebP under 300 KB; the startup no longer forces a layout or encodes the textures synchronously (Lighthouse performance back from 70).
 - **v0.9.0**: tidying (no other app's name, one kind of thing, leftovers cleared, big modules split).
 - **v0.10.0**: lock in in deep water with the time hidden, undo, one pause; the opening; lanterns in the cove; the log; data v5.
+- **v0.11.0**: two kinds of thing (tap when done, lock in); only the minutes the timer saw count, parts add up, "12/25 · finish"; did it without the timer; "edit" with delete and undo, retired things keep their history; the first minute (promise, truth, start light); the next find in sight; one-line explanations; the log's legend; how it works; data v6; the clarity test.
 
 ## The road to 1.0 (the author's briefs of 2026-10-07)
 
 The first brief is in the author's journal (consistency-game/prompt-6-product.md),
 with two additions sent the same day: a settings sheet (trust) and art
-slots for collectibles (the first year). An evening addition put a new
-stage straight after 0.10.0 and moved every later stage up one version;
-1.0.0 stays last. Product principles win over any item; where the evening
+slots for collectibles (the first year). Two evening additions put new
+stages straight after 0.10.0 (two kinds and the first minute) and after
+0.11.0 (the brand and the UI) and moved every later stage up; 1.0.0 stays
+last. Product principles win over any item; where the evening
 addition and the first brief disagree, the evening addition wins.
 
 - [x] **0.9.0 tidying**: no other app's name; one kind of thing (data v4,
@@ -35,56 +37,90 @@ addition and the first brief disagree, the evening addition wins.
       one pause up to 5 min; the end is an opening in order, a tap skips;
       lanterns in the cove (dim when left), 490 from "seed 365" at one frame
       per redraw; the log (month, year, day); data v5 with sessions.
-- [ ] **0.11.0 two kinds, clear editing, the first minute** (the evening
-      addition, and its addendum on interruptions):
-  - the author's principle at the top of the README and in DECISIONS;
-  - two kinds of thing: "tap when done" (a checkbox ring, tap and tap
-    again) and "lock in" (the card shows "25 min" and a timer ring; a tap
-    opens the dial; it counts only when the timer has seen the full length
-    that day; default 15 min); one question in the add sheet and the
-    thing's sheet; data v6 with `kind` (migration: lock in if more than half
-    of a thing's done days had minutes);
-  - only the minutes the timer saw count: parts of a day add up ("12/25 ·
-    finish" on the card); "seen until" written every 5 s, so a dead phone
-    counts to the last one; leaving stops the count after 15 s and coming
-    back carries on; a lantern bright in one go, softer in parts, dim if
-    the day ended short; "did it without the timer" in the thing's sheet
-    ("the full 15 min, for real?"), at most twice a week, a hand on the card,
-    no lantern, no krill, no ceremony;
-  - editing: a visible "edit" by the add card; in edit mode every card shows
-    a red "delete" and a tap opens its sheet; the sheet ends with a red
-    "delete this thing"; no "are you sure": the card swims off and "undo"
-    waits 10 s; swipe left as a shortcut only; every action has a visible
-    word, gestures are only shortcuts (the lab is the one exception);
-  - the first minute: a three-beat intro on a first open only (the promise:
-    a seeded year in silhouettes with a day counter running to 365; the
-    truth: the author's sentence over the empty sea; the first step: "start
-    light"), "skip" always there, reduced-motion stills, "watch the intro"
-    in "how it works" and "first open again" in the lab; the next find's
-    silhouette and days left in a small bar on the first screen; each
-    mechanic explains itself in one line the first time it appears;
-  - tests, including the clarity test: fourteen jobs done through visible
-    words only, each within two taps of the first screen.
-- [ ] **0.12.0 krill and the dock**: krill derived from history, purchases
+- [x] **0.11.0 two kinds, clear editing, the first minute** (the evening
+      addition, its addendum on interruptions, and the log's legend): done.
+- [ ] **0.12.0 the brand and the UI** (the second evening addition), with
+      the skills in order (frontend-design, ui-ux-pro-max, emil-design-eng,
+      review-animations, web-design-guidelines) and what came from each in
+      DECISIONS:
+  - docs/brand/BRAND.md first (colour tokens, type, the mark, glyph rules),
+    then its critique against the brief;
+  - the bubble: every thing gets a round glass badge in its lantern colour,
+    a cream line glyph inside, a light arc top left, and the signature: one
+    tiny bubble rising from the top right edge (on every badge, the app
+    icon and the favicon); done fills it with colour, darkens the glyph and
+    pops the small bubble into three (under 300 ms; reduced motion: only the
+    fill); a lock-in's rim is its timer ring ("12/25") and fills during a
+    session; the log's legend and dots use the same bubbles and colours;
+  - about 48 glyphs of our own (body, mind, craft, home, people, care), one
+    SVG sprite, 24 grid, 1.75 line, round caps, one cream colour, readable
+    at 20 px; the UI icons redrawn in the same hand (add, edit, close,
+    arrows, menu, settings, share, lock in, star, lantern, krill, stone,
+    hand, undo, sound); the app icon, maskable icons and favicon: a whale's
+    tail in the same line inside a bubble with the signature;
+  - the add sheet loses the emoji: the glyph is picked from the name by
+    keywords in English and Lithuanian, 12 common ones and "more" with the
+    groups, a monogram when nothing fits; starters with glyphs;
+    `Thing.icon` (glyph id or "letter"), the emoji kept for migration (a
+    table from emoji to glyph, unknown to a monogram); no emoji left in the
+    UI;
+  - brand.html in the build: every glyph, the bubbles in every state, the
+    colours, the type, the app icon; README "the look" and a link to the
+    icon set;
+  - the important audit findings fixed now (contrast, focus, tap targets,
+    curves, press states, the type scale, spacing from tokens); the rest to
+    polish;
+  - tests: every glyph at 20 and 40 px, keywords (en and lt), the emoji
+    migration, the monogram, the done animation and reduced motion, glyph
+    contrast in the bubble at least 3:1, the clarity test, the postcard
+    shows bubbles; screenshots of the first screen with bubbles, the add
+    sheet with glyphs, the log with its legend, brand.html.
+- [ ] **0.13.0 krill and the dock, and arranging your sea** (the third
+      evening addition joins it): krill derived from history, purchases
       stored as {itemId, date}; docs/ECONOMY.md; the chip, "+10"; about 30
-      cosmetic items in four tiers, "save for this", "who wears it?".
-- [ ] **0.13.0 the first year**: tiers to 365 (240, 300, 365) with new
+      cosmetic items in four tiers, "save for this", "who wears it?". And:
+  - principle: what you earn you may arrange as you like, but nobody has
+    to; who never arranges still has a beautiful scene;
+  - spots, not free dragging: shore 6, sea 8, sky 8; finds and dock items
+    stand in spots; a new one takes a good free spot by itself;
+  - "arrange" (a visible word in the Collection sheet): the scene stops,
+    the spots show as soft rings, drag a thing to another spot and it
+    snaps, an occupied spot swaps; only within its own world; "done" and
+    "tidy up" (back to the automatic layout) at the top; nothing is marked
+    or bought in arrange mode;
+  - the chest: "put away" and "put out" (a word and an icon); when the spots
+    are full a new find goes to the chest with one line (TODO-VOICE);
+  - three extensions in the dock: "a longer shore" (+4 shore spots), "a
+    reef" (+6 sea spots, a new layer of depth), "an island on the whale"
+    (the big whale carries a small island with 6 spots; the dearest, a few
+    months of krill); after buying an item or an extension, arrange opens
+    with it in hand;
+  - not: rotating, resizing, recolouring, free coordinates, layers; the
+    creatures and the lanterns never move;
+  - the postcard shows the arrangement; data `placement {itemId: spotId}`,
+    "chest" as a spot, extensions add spot sets, no records means automatic;
+  - tests: new items take a spot, drag and swap, own world only, put away
+    and put out, full spots go to the chest, tidy up, an extension adds
+    spots, arrange opens after a purchase, reduced motion, the clarity
+    test's new job "move a find"; screenshots of arrange mode and the island
+    on the whale.
+- [ ] **0.14.0 the first year**: tiers to 365 (240, 300, 365) with new
       finds; the first-week set; seasons, sky events, special days; days 100,
       200, 365; art slots (public/art/<id>.webp, silhouettes from alpha,
       docs/ART.md, npm run art:check). Also: the day-star calendar packs a
       year into 52 thin rows; older weeks should become a quieter band.
-- [ ] **0.14.0 gentle mechanics**: quiet days (moons in the dots and in the
+- [ ] **0.15.0 gentle mechanics**: quiet days (moons in the dots and in the
       log), welcome back +20, sleeping creatures that wave, new chapter,
       "after...", the evening line (shown in the log's day), the Android badge.
-- [ ] **0.15.0 trust**: back up and restore with a checksum and undo, the
+- [ ] **0.16.0 trust**: back up and restore with a checksum and undo, the
       monthly backup dot, storage.persist; the settings sheet (sound, a day
       ends at, week start, seasons, show the time, default length, postcards,
       your sea, about).
-- [ ] **0.16.0 polish**: docs/QUALITY.md from the checklist, iOS startup
+- [ ] **0.17.0 polish**: docs/QUALITY.md from the checklist, iOS startup
       images, sheet physics, press states, tokens, 60 fps with 400 lanterns,
       Lighthouse.
-- [ ] **1.0.0**: README rewritten for strangers, "how it works" sheet,
-      tag and GitHub release, a senior review pass.
+- [ ] **1.0.0**: README rewritten for strangers, "how it works" filled with
+      the FAQ, tag and GitHub release, a senior review pass.
 
 ## How the timer worked before v0.5 (the audit asked for)
 
@@ -97,7 +133,7 @@ addition and the first brief disagree, the evening addition wins.
 ## Verified
 
 - `npm run lint`, `tsc --noEmit`, `npm run build`: clean.
-- `npm test`: 200 passed, 14 skipped (device-specific), on iPhone 13, Pixel 5 and desktop, then the perf project alone: a year of lanterns (490) at a median of one frame. New in v0.8: the lab (the real record unchanged byte for byte after a full round of lab actions and an exit, +1 day turning today into a star, seed 30 giving stages, stones and a quiet morning, exit, `?lab=1`, five taps on the version, the bar above a sheet and a session). In v0.6: days (the strip on a Saturday, also today for one day, not today, the seven chips, a new thing's days, three a week reaching the whale, the dots, a streak across a weekend, all done with a thing off, a rest day, the migration from version 2).
+- `npm test`: 282 passed, 14 skipped (device-specific), on iPhone 13, Pixel 5 and desktop, then the perf project alone. New in v0.11: the clarity test (fifteen jobs by visible words, two taps each), the two kinds, kept minutes and a dead phone, editing and deleting, the intro.
 - Screenshots regenerated for v0.8 and squeezed to WebP (20 to 60 KB each), with a new one of the lab; earlier: the empty first screen, the not-today strip, the thing's sheet with the day chips, a rest day.
 - Known: on a 320px phone the day chips are 37px wide (44px tall); everything from 375px up is 44px both ways.
 

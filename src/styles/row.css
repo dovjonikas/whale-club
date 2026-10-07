@@ -40,43 +40,13 @@
   justify-content: flex-end;
   gap: var(--s2);
   padding: var(--s3) var(--s1) var(--s2);
-  border-radius: var(--r) var(--r) 0 0;
+  border-radius: var(--r);
+  touch-action: pan-y;
   transition: transform var(--dur-fast) var(--ease);
 }
 
 .card-main:active {
-  transform: scale(0.96);
-}
-
-/* Lock in: the second way to do a thing, always visible, under the card. */
-.card-lock {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--s1);
-  height: var(--touch);
-  border-top: 1px solid var(--card-edge);
-  border-radius: 0 0 var(--r) var(--r);
-  color: var(--ink-dim);
-  font-size: var(--t-xs);
-  font-weight: 700;
-  white-space: nowrap;
-  transition: color var(--dur-fast) var(--ease);
-}
-
-.card-lock:hover,
-.card-lock:focus-visible {
-  color: var(--world-color);
-}
-
-.card-lock svg {
-  width: 15px;
-  height: 15px;
-  flex: none;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
+  transform: scale(0.97);
 }
 
 /* A stone waiting: a small dark pebble with a warm crack, at the card's corner. */
@@ -274,12 +244,6 @@
   }
 }
 
-@container (max-width: 72px) {
-  .card-lock svg {
-    display: none;
-  }
-}
-
 /* A day the thing is not planned on: a small dash, never an empty dot. */
 .dot.is-rest {
   height: 2px;
@@ -428,8 +392,262 @@
   position: relative;
 }
 
-/* Done: the lock-in edge takes on the world's light too. */
-.card[data-done='true'] .card-lock {
-  background: linear-gradient(180deg, transparent, var(--world-glow));
-  color: var(--ink);
+/* The mark at the card's corner says what kind of thing it is: an empty
+   ring for a tap thing's check, a timer ring that fills for a lock-in. */
+.card-mark {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  color: var(--world-color);
+}
+
+.card-stone:not([hidden]) ~ .card-mark {
+  display: none;
+}
+
+.mark-ring {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform: rotate(-90deg);
+}
+
+.mark-track {
+  fill: none;
+  stroke: rgba(232, 240, 245, 0.32);
+  stroke-width: 1.6;
+}
+
+.mark-fill {
+  fill: none;
+  stroke: var(--world-color);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--dur) var(--ease);
+}
+
+.mark-check,
+.mark-hand,
+.mark-clock {
+  fill: none;
+  stroke: var(--abyss);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transform: rotate(90deg);
+  transform-origin: 12px 12px;
+  opacity: 0;
+}
+
+.mark-hand {
+  stroke-width: 1.4;
+}
+
+/* A lock-in's ring is a timer: a hand inside it until it is done. */
+.mark-clock {
+  stroke: rgba(232, 240, 245, 0.7);
+  stroke-width: 1.8;
+}
+
+.card[data-kind='lockIn'][data-done='false'] .mark-clock {
+  opacity: 1;
+}
+
+/* A tap thing has no timer: its ring is a checkbox. */
+.card[data-kind='tap'] .mark-fill {
+  display: none;
+}
+
+.card[data-done='true'] .mark-track {
+  fill: var(--world-color);
+  stroke: var(--world-color);
+}
+
+.card[data-done='true'][data-manual='false'] .mark-check,
+.card[data-done='true'][data-manual='true'] .mark-hand {
+  opacity: 1;
+}
+
+/* A lock-in's length under its name; "12/25 · finish" once it is started. */
+.card-length {
+  min-height: 1.2em;
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.card[data-kind='tap'] .card-length {
+  display: none;
+}
+
+.card[data-started='true'] .card-length {
+  color: var(--world-color);
+  font-weight: 700;
+}
+
+/* Delete: red, on the card, in edit mode or after a swipe to the left. */
+.card-delete {
+  display: none;
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 2;
+  min-width: var(--touch);
+  height: 32px;
+  padding: 0 var(--s3);
+  border-radius: var(--r-pill);
+  background: #d9423c;
+  color: #fff;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+}
+
+.card-delete:active {
+  transform: scale(0.97);
+}
+
+.row[data-editing='true'] .card-mark,
+.row[data-editing='true'] .card-stone,
+.card[data-swiped='true'] .card-mark,
+.card[data-swiped='true'] .card-stone {
+  visibility: hidden;
+}
+
+.row[data-editing='true'] .card-delete,
+.card[data-swiped='true'] .card-delete {
+  display: block;
+}
+
+.row[data-editing='true'] .card {
+  border-style: dashed;
+}
+
+.row[data-editing='true'] .card-main .dots {
+  visibility: hidden;
+}
+
+.card[data-swiped='true'] .card-main {
+  transform: translate3d(-6px, 0, 0);
+}
+
+/* A deleted card swims off. */
+.card.is-leaving {
+  transform: translate3d(0, 40px, 0) scale(0.9);
+  opacity: 0;
+  transition:
+    transform 380ms cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 380ms var(--ease);
+}
+
+/* Once, on the very first thing's card: how it is done. */
+.card-hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + var(--s2));
+  z-index: 3;
+  width: max-content;
+  max-width: 180px;
+  padding: var(--s1) var(--s3);
+  transform: translateX(-50%);
+  border-radius: var(--r-pill);
+  background: var(--star-pale);
+  color: var(--abyss);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  pointer-events: none;
+  animation: hint-in 1.6s var(--ease) both;
+}
+
+.card:has(.card-hint) {
+  animation: card-pulse 1.4s var(--ease) 1;
+}
+
+@keyframes hint-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 6px);
+  }
+  20%,
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes card-pulse {
+  40% {
+    box-shadow:
+      0 0 0 2px var(--world-color),
+      0 0 32px var(--world-glow);
+  }
+}
+
+/* Above the row: the next find on the left, "edit" on the right. Words, not icons. */
+.row-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  min-height: 32px;
+  padding: 0 calc(var(--safe-right) + var(--s4)) 0 calc(var(--safe-left) + var(--s4));
+}
+
+.row-edit {
+  min-width: var(--touch);
+  height: 32px;
+  padding: 0 var(--s3);
+  border-radius: var(--r-pill);
+  color: var(--ink-dim);
+  font-size: var(--t-xs);
+  font-weight: 700;
+}
+
+.row-edit[aria-pressed='true'] {
+  background: var(--star-pale);
+  color: var(--abyss);
+}
+
+.row-edit[hidden] {
+  display: none;
+}
+
+.next-find {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  height: 32px;
+  padding: 0 var(--s3) 0 var(--s1);
+  border-radius: var(--r-pill);
+  background: rgba(6, 18, 43, 0.55);
+  border: 1px solid var(--card-edge);
+  color: var(--ink-dim);
+  font-size: var(--t-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The find itself stays a secret: its shape, dark, with a thin rim of light. */
+.next-art {
+  width: 26px;
+  height: 26px;
+  filter: brightness(0) invert(0.9) drop-shadow(0 0 3px rgba(201, 251, 245, 0.6));
+  opacity: 0.55;
+}
+
+.next-art svg {
+  width: 100%;
+  height: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card-hint,
+  .card:has(.card-hint) {
+    animation: none;
+  }
+  .card.is-leaving {
+    transform: none;
+  }
 }

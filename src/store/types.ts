@@ -4,24 +4,35 @@
  * Everything on screen is a function of this: creature stages, what has
  * been earned, stars and streaks are all derived from `days` at draw time
  * and never stored, so there is no second copy that can disagree with the
- * first. The two things that are facts rather than arithmetic are stored:
- * which earned stones have been cracked open, and which days were shown up
- * for with a session that was left and waited.
+ * first. The facts that are not arithmetic are stored: which earned stones have
+ * been cracked open, the minutes a lock-in's timer saw, the lock-ins that
+ * ran to their end, and the days done without the timer.
  */
 
 export type World = 'sea' | 'sky' | 'garden'
 
+/** Each world has two lines of creatures and finds; a thing keeps the one it was given. */
+export type Line = 'a' | 'b'
+
 /** A date on the person's own clock, `YYYY-MM-DD`. Sorts as a string. */
 export type DateKey = string
+
+/**
+ * How a thing is done. "tap": a tap on its card, like a list. "lockIn": it
+ * counts only when its timer has seen the whole length that day; a tap on
+ * its card opens the dial.
+ */
+export type Kind = 'tap' | 'lockIn'
 
 export interface Thing {
   id: string
   name: string
   emoji: string
+  kind: Kind
   /**
-   * The lock-in length for this thing, in minutes; the dial opens on it and
-   * remembers the last one chosen. Every thing can be tapped done or locked
-   * in, so every thing has one.
+   * The lock-in length, in minutes: what the timer must see in a day for a
+   * lock-in thing to be done. The dial opens on it and remembers the last
+   * one chosen. A tap thing keeps one too, for the day it becomes a lock-in.
    */
   minutes: number
   /**
@@ -29,27 +40,33 @@ export interface Thing {
    * same things every day, as before there were days at all.
    */
   days: boolean[]
-  /** Assigned from the thing's position when it was added, then fixed. */
+  /** Assigned when it was added, to keep the row's pattern of worlds, then fixed. */
   world: World
+  /** Its world's line, given when it was added and never changed by another thing's going. */
+  line: Line
   createdAt: DateKey
   order: number
 }
 
 /**
  * One lock-in that ran to its end. Each is a lantern in the cove for good:
- * a clean one lit, a left one dim. Undone and stopped sessions leave none.
+ * bright when it was done in one go, softer when it took several. Minutes
+ * the timer saw on a day that never reached the length are a dim lantern,
+ * worked out from `minutes`, not stored here.
  */
 export interface SessionRecord {
   thing: string
   minutes: number
-  /** The person left for longer than the grace and came back: a dim lantern. */
+  /** How many sittings it took; more than one makes a softer lantern. */
+  parts?: number
+  /** Before 0.11 a session that was left still ended: its lantern is dim. */
   left?: true
 }
 
 export interface DayRecord {
   /** Ids of the things done that day. A thing appears at most once. */
   done: string[]
-  /** Minutes spent locked in, per thing. Absent means none. */
+  /** Minutes the timer saw, per thing, finished or not. Absent means none. */
   minutes: Record<string, number>
   /**
    * Things whose only showing up that day was a lock-in session that was
@@ -65,6 +82,11 @@ export interface DayRecord {
   checkin?: boolean
   /** Lock-ins that ran to their end that day, in order. */
   sessions?: SessionRecord[]
+  /**
+   * Lock-in things done that day without the timer (a lesson, a phone that
+   * was dead). They count, with a hand on the card, but leave no lantern.
+   */
+  manual?: string[]
 }
 
 export type PostcardFormat = 'story' | 'square'
@@ -81,10 +103,12 @@ export interface Settings {
   sessionSound?: boolean
   /** Show the time left during a lock-in. Off: a tap shows it for a moment. */
   showTime?: boolean
+  /** Mechanics that have explained themselves once, in one line, and need not again. */
+  explained?: string[]
 }
 
 export interface AppData {
-  version: 5
+  version: 6
   things: Thing[]
   days: Record<DateKey, DayRecord>
   /**
@@ -94,12 +118,17 @@ export interface AppData {
    */
   cracked: Record<string, number>
   settings: Settings
+  /**
+   * Things that were deleted. Their days, stars, finds and lanterns stay,
+   * so they are kept here for their names, worlds and colours.
+   */
+  retired?: Thing[]
 }
 
 export const MAX_THINGS = 5
 
-/** A new thing's lock-in length, and what a thing from before lengths gets. */
-export const DEFAULT_MINUTES = 30
+/** A new lock-in's length: start light. Also what a thing from before lengths gets. */
+export const DEFAULT_MINUTES = 15
 /** The dial's range; a stored length is kept inside it. */
 export const MIN_MINUTES = 10
 export const MAX_MINUTES = 120
@@ -110,5 +139,5 @@ export const WORLD_ORDER: readonly World[] = ['sea', 'sky', 'garden']
 export const EVERY_DAY: readonly boolean[] = [true, true, true, true, true, true, true]
 
 export function emptyData(): AppData {
-  return { version: 5, things: [], days: {}, cracked: {}, settings: { sound: true } }
+  return { version: 6, things: [], days: {}, cracked: {}, settings: { sound: true } }
 }

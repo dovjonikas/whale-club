@@ -312,9 +312,9 @@
   opacity: 0.35;
 }
 
-/* Left and come back: it waited, dimmer, still breathing. */
-.session[data-broken='true'] .session-creature {
-  opacity: 0.8;
+/* Back after a while away: it waited, still breathing, and grows on. */
+.session[data-away='true'] .session-creature {
+  opacity: 0.9;
 }
 
 .session-ring {

@@ -13,7 +13,10 @@ import { openSheet } from './sheet'
 const LAB_TAPS = 5
 const LAB_TAP_GAP_MS = 2500
 
-export function openMenuSheet(store: Store, on: { onLab: () => void; onLog: () => void }): void {
+export function openMenuSheet(
+  store: Store,
+  on: { onLab: () => void; onLog: () => void; onHow: () => void },
+): void {
   openSheet({
     title: 'the club',
     build(body) {
@@ -24,6 +27,7 @@ export function openMenuSheet(store: Store, on: { onLab: () => void; onLog: () =
       const format = data.settings.postcardFormat ?? 'story'
       body.innerHTML = `
         <button type="button" class="menu-row menu-log">${voice.log.title}</button>
+        <button type="button" class="menu-row menu-how">${voice.howItWorks.title}</button>
         <ol class="rules">${voice.rules.map((rule) => `<li>${rule}</li>`).join('')}</ol>
         <p class="club-line">${voice.clubLine}</p>
         <p class="sheet-note">${
@@ -50,6 +54,7 @@ export function openMenuSheet(store: Store, on: { onLab: () => void; onLog: () =
         if (taps >= LAB_TAPS) on.onLab()
       })
       body.querySelector('.menu-log')?.addEventListener('click', on.onLog)
+      body.querySelector('.menu-how')?.addEventListener('click', on.onHow)
       const chips = body.querySelectorAll<HTMLButtonElement>('[data-format]')
       chips.forEach((chip) => {
         chip.addEventListener('click', () => {

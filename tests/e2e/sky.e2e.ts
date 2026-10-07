@@ -1,6 +1,6 @@
-import { expect, test, type Page } from '@playwright/test'
+import { type Page } from '@playwright/test'
 import { litPath, moonPhase } from '../../src/scene/moon'
-import { setHidden } from './helpers'
+import { expect, test, setHidden } from './helpers'
 
 /**
  * The sky moves on one animation loop for the whole app, and that loop

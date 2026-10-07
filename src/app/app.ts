@@ -1,4 +1,4 @@
-import { collectiblesFor } from '../scene/collectibles'
+import { collectibleSvg, collectiblesFor } from '../scene/collectibles'
 import { Scene } from '../scene/scene'
 import { todayKey } from '../store/dates'
 import {
@@ -12,6 +12,7 @@ import {
   starDays,
   streakDays,
 } from '../store/derive'
+import { labOn } from '../store/lab'
 import { Store } from '../store/store'
 import { emptyData } from '../store/types'
 import { seedHistory } from '../lab/seed'
@@ -23,11 +24,12 @@ import { openAddSheet } from './addSheet'
 import { animate } from './card'
 import { checkinNotice } from './checkin'
 import { openCollectionSheet } from './collectionSheet'
-import { openDial } from './dial'
 import { renderHeader } from './header'
 import { host } from './host'
 import { Line } from './line'
 import { LockIn } from './lockIn'
+import { openHowItWorks } from './howItWorks'
+import { introDue, playIntro } from './intro'
 import { openLogSheet } from './logSheet'
 import { openMenuSheet } from './menuSheet'
 import { Notices } from './notices'
@@ -38,12 +40,14 @@ import {
   dayLabel,
   hasJacket,
   lanternsFor,
+  nextFind,
   shownCollectibles,
   stonesFor,
   warmthOf,
 } from './sceneData'
 import { openThingSheet } from './thingSheet'
 import { Sound } from './sound'
+import { showUndo } from './toast'
 import { surpriseFor } from './surprise'
 
 const SURPRISE_DELAY_MS = 4000
@@ -51,6 +55,8 @@ const SURPRISE_DELAY_MS = 4000
 const OFFER_AFTER_WHALE_MS = 2200
 const OFFER_AFTER_FIND_MS = 2800
 const OFFER_AFTER_GROW_MS = 900
+/** How long a deleted card takes to swim off. */
+const LEAVE_MS = 380
 
 /** Wires the store, the scene, the row and the sheets together. One per page. */
 export function startApp(root: HTMLElement, labEntered = false): void {
@@ -67,6 +73,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     <div class="bottom">
       <div class="offer-slot"></div>
       <p class="line"></p>
+      <div class="row-tools"><div class="next-slot"></div></div>
       <div class="row" role="group" aria-label="your homework"></div>
       <div class="not-today" hidden></div>
     </div>`
@@ -109,6 +116,9 @@ export function startApp(root: HTMLElement, labEntered = false): void {
           onLog: () => {
             openLogSheet(store)
           },
+          onHow: () => {
+            openHowItWorks(intro)
+          },
         })
       },
     },
@@ -121,8 +131,54 @@ export function startApp(root: HTMLElement, labEntered = false): void {
   // A find on its way out of its stone: where the stone was, for the arrival.
   const arrivals = new Map<string, { x: number; y: number }>()
 
-  const row = new Row(query(root, '.row'), query(root, '.not-today'), {
+  /** Says a mechanic's one line the first time it shows, and never again. */
+  function explainOnce(key: string, text: string): boolean {
+    const explained = store.get().settings.explained ?? []
+    if (explained.includes(key)) return false
+    store.setSettings({ explained: [...explained, key] })
+    line.say(text)
+    return true
+  }
+
+  /**
+   * Delete without "are you sure": the card swims off, the line says the
+   * days stay, and "undo" waits ten seconds at the bottom.
+   */
+  function deleteThing(thing: Thing, card?: HTMLElement): void {
+    const go = (): void => {
+      const removed = store.removeThing(thing.id)
+      if (!removed) return
+      line.say(voice.edit.deleted, { quiet: true })
+      showUndo(voice.edit.deleted, voice.edit.undo, () => {
+        store.restoreThing(removed)
+      })
+    }
+    if (!card) {
+      go()
+      return
+    }
+    card.classList.add('is-leaving')
+    setTimeout(go, LEAVE_MS)
+  }
+
+  function openThing(thing: Thing): void {
+    openThingSheet(store, thing, {
+      onDelete: (t) => {
+        deleteThing(t, row.card(t.id))
+      },
+      onSay: (said) => {
+        line.say(said, { quiet: true })
+      },
+    })
+  }
+
+  const row = new Row(query(root, '.row'), query(root, '.not-today'), query(root, '.row-tools'), {
     onTap(thing, card) {
+      card.querySelector('.card-hint')?.remove()
+      if (thing.kind === 'lockIn') {
+        lockIn.tap(thing)
+        return
+      }
       const before = stageFor(last7(store.get(), thing.id, todayKey()))
       const done = store.toggleDone(thing.id)
       if (!done) {
@@ -133,31 +189,49 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       }
       celebrate(thing, card, before)
     },
-    onLockIn(thing) {
-      const data = store.get()
-      openDial(
-        thing,
-        { line: lineFor(data, thing), stage: stageFor(last7(data, thing.id, todayKey())) },
-        (minutes) => {
-          lockIn.start(thing, minutes)
-        },
-      )
-    },
     onEdit(thing) {
-      openThingSheet(store, thing)
+      openThing(thing)
+    },
+    onDelete(thing, card) {
+      deleteThing(thing, card)
     },
     onAlsoToday(thing) {
       store.setToday(thing.id, 'extra')
       line.say(`${thing.emoji} ${thing.name}: ${voice.days.alsoToday}.`, { quiet: true })
     },
     onAdd() {
-      openAddSheet(store, (thing) => {
-        line.say(pick(voice.thingAdded, thing.id))
-      })
+      openAddSheet(store, added)
     },
   })
 
-  const lockIn = new LockIn({ store, scene, sound, line, row, postcards })
+  /**
+   * A thing was added. The very first one is welcomed with one line, and
+   * its card says once how it is done.
+   */
+  function added(thing: Thing): void {
+    if (!explainOnce('yours', voice.explain.yours)) {
+      line.say(pick(voice.thingAdded, thing.id))
+      return
+    }
+    const card = row.card(thing.id)
+    if (!card) return
+    const hint = document.createElement('span')
+    hint.className = 'card-hint'
+    hint.textContent = thing.kind === 'lockIn' ? voice.card.hintLockIn : voice.card.hintTap
+    card.append(hint)
+  }
+
+  const lockIn = new LockIn({
+    store,
+    scene,
+    sound,
+    line,
+    row,
+    postcards,
+    onKept: () => {
+      explainOnce('kept', voice.explain.kept)
+    },
+  })
   // The open sky is the way into the log, as the stars are into their days.
   scene.onSky(() => {
     openLogSheet(store)
@@ -185,11 +259,19 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       sound.play('whale')
     }
     let said: string
+    const explained = data.settings.explained ?? []
     if (fell.length > 0) {
       sound.play('unlock')
-      said = voice.stones.fell
+      said = explained.includes('stone') ? voice.stones.fell : voice.explain.stone
+      if (!explained.includes('stone')) store.setSettings({ explained: [...explained, 'stone'] })
     } else if (done) {
       said = voice.allDone
+    } else if (starDays(data).length === 1 && !explained.includes('firstStar')) {
+      // The very first star: a little more light, once.
+      sound.play('grow')
+      said = voice.explain.firstStar
+      store.setSettings({ explained: [...explained, 'firstStar'] })
+      scene.glow()
     } else if (grew) {
       sound.play('grow')
       said = voice.stageUp
@@ -262,6 +344,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     )
 
     scene.setLanterns(lanternsFor(data))
+    renderNext(data)
     scene.setCollectibles(shownCollectibles(data), arrivals)
     arrivals.clear()
     const fell = scene.setStones(stonesFor(data))
@@ -280,13 +363,54 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     ])
   }
 
+  /** The next find's silhouette and the days to it, always in sight; a tap opens the Collection. */
+  const nextSlot = query(root, '.next-slot')
+  function renderNext(data: AppData): void {
+    const next = nextFind(data)
+    if (!next) {
+      nextSlot.replaceChildren()
+      return
+    }
+    const text = voice.nextFind(next.days)
+    const button =
+      nextSlot.querySelector<HTMLButtonElement>('.next-find') ?? document.createElement('button')
+    if (!button.isConnected) {
+      button.type = 'button'
+      button.className = 'next-find'
+      button.addEventListener('click', () => {
+        openCollectionSheet(store)
+      })
+      nextSlot.append(button)
+    }
+    if (button.dataset.item !== next.item.id || button.dataset.days !== String(next.days)) {
+      button.dataset.item = next.item.id
+      button.dataset.days = String(next.days)
+      button.innerHTML = `<span class="next-art" aria-hidden="true">${collectibleSvg(next.item)}</span><span class="next-text"></span>`
+      const label = button.querySelector('.next-text')
+      if (label) label.textContent = text
+    }
+  }
+
   store.subscribe(render)
   render(store.get())
   listenForInstallPrompt(() => {
     notices.render()
   })
 
-  lockIn.resume()
+  lockIn.settle()
+
+  /** The first minute: on a first open, from "how it works", or from the lab. */
+  function intro(): void {
+    playIntro(scene, {
+      hasThings: store.get().things.length > 0,
+      onEnd: (end) => {
+        if (end === 'start' && store.get().things.length === 0)
+          openAddSheet(store, added, { starters: true })
+      },
+    })
+  }
+  // In the lab the intro plays only when asked for ("first open again"), never over its sheet.
+  if ((introDue(store.get()) && !labOn()) || takeIntroRequest()) intro()
 
   const opening = store.get()
   if (isRestDay(opening, todayKey())) line.say(voice.restDay, { quiet: true })
@@ -302,7 +426,12 @@ export function startApp(root: HTMLElement, labEntered = false): void {
         const open = plannedThings(data, today).filter(
           (t) => !data.days[today]?.done.includes(t.id),
         )
-        for (const thing of open) store.toggleDone(thing.id)
+        for (const thing of open) {
+          // A lock-in counts as a full session that ran to its end.
+          if (thing.kind === 'lockIn')
+            store.finishLockIn(thing.id, { seen: thing.minutes, minutes: thing.minutes, parts: 1 })
+          else store.toggleDone(thing.id)
+        }
         pendingFalls.length = 0
         if (open.length > 0 && allDoneToday(store.get(), today)) {
           scene.surfaceWhale(hasJacket(store.get()))
@@ -317,9 +446,33 @@ export function startApp(root: HTMLElement, labEntered = false): void {
         store.replace(emptyData())
         pendingFalls.length = 0
       },
+      firstOpen() {
+        store.replace(emptyData())
+        try {
+          sessionStorage.setItem(INTRO_REQUEST, '1')
+        } catch {
+          // Without session storage the intro plays now instead, without the reload.
+          intro()
+          return
+        }
+        location.reload()
+      },
     },
     labEntered,
   )
+}
+
+/** The lab's "first open again" asks for the intro across its reload. */
+const INTRO_REQUEST = 'whaleclub:intro.now'
+
+function takeIntroRequest(): boolean {
+  try {
+    const asked = sessionStorage.getItem(INTRO_REQUEST) !== null
+    sessionStorage.removeItem(INTRO_REQUEST)
+    return asked
+  } catch {
+    return false
+  }
 }
 
 function query(parent: ParentNode, selector: string): HTMLElement {

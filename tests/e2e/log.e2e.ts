@@ -1,5 +1,5 @@
-import { expect, test, type Page } from '@playwright/test'
-import { clearNotices, dateKey, seed, stored } from './helpers'
+import { type Page } from '@playwright/test'
+import { expect, test, clearNotices, dateKey, seed, stored } from './helpers'
 
 /**
  * The log, the one view of what has been done, and the lanterns a session
@@ -74,7 +74,7 @@ test('a star opens its day in the log, and the open sky opens the month', async 
   await expect(log(page).locator('.log-grid')).toBeVisible()
 })
 
-test('data from before 0.10 turns finished lock-ins into lanterns, dim where left', async ({
+test('data from before 0.10 turns finished lock-ins into lanterns, dim where left or short', async ({
   page,
 }) => {
   await seed(page, {
@@ -93,10 +93,11 @@ test('data from before 0.10 turns finished lock-ins into lanterns, dim where lef
     version: number
     days: Record<string, { sessions?: unknown[] }>
   }
-  expect(data.version).toBe(5)
+  expect(data.version).toBe(6)
   expect(data.days[dateKey(-3)]?.sessions).toEqual([{ thing: 't1', minutes: 25 }])
   expect(data.days[dateKey(-2)]?.sessions).toEqual([{ thing: 't1', minutes: 10, left: true }])
   expect(data.days[dateKey(-1)]?.sessions).toBeUndefined()
-  await expect(page.locator('canvas.lanterns')).toHaveAttribute('data-count', '2')
-  await expect(page.locator('canvas.lanterns')).toHaveAttribute('data-dim', '1')
+  // The stopped session's minutes, on a day that is over, are a faint lantern since 0.11.
+  await expect(page.locator('canvas.lanterns')).toHaveAttribute('data-count', '3')
+  await expect(page.locator('canvas.lanterns')).toHaveAttribute('data-dim', '2')
 })

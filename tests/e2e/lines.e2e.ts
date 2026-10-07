@@ -1,7 +1,6 @@
-import { expect, test } from '@playwright/test'
 import { COLLECTIBLES } from '../../src/scene/collectibles'
 import { voice } from '../../src/voice'
-import { dateKey, seed } from './helpers'
+import { expect, test, dateKey, seed } from './helpers'
 
 /**
  * Every line the app says after a tap fits on one row of a 320px phone,
@@ -33,6 +32,15 @@ const LINES: string[] = [
   voice.lockIn.broken,
   voice.lockIn.stopped(120),
   voice.restDay,
+  voice.explain.stone,
+  voice.explain.lantern,
+  voice.explain.kept,
+  voice.explain.firstStar,
+  voice.explain.yours,
+  voice.edit.deleted,
+  voice.without.noLine,
+  voice.lockIn.paused,
+  voice.lockIn.goingOn,
 ]
 
 test.use({ viewport: { width: 320, height: 640 } })

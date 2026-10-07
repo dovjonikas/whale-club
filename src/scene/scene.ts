@@ -55,6 +55,10 @@ export class Scene {
   private readonly lanternCanvas: HTMLCanvasElement
   /** Today's new star, kept back until the opening shows it. */
   private heldStar: DateKey | null = null
+  /** The real lanterns, put back after a preview. */
+  private lanternSpecs: readonly LanternSpec[] = []
+  /** While the intro shows a year that is not the person's, the real sky waits. */
+  private previewing = false
   private readonly skyLayer: HTMLElement
   private readonly starHits: HTMLElement
   private readonly thingsLayer: HTMLElement
@@ -171,7 +175,53 @@ export class Scene {
 
   /** Every lantern in the cove. */
   setLanterns(specs: readonly LanternSpec[]): void {
-    this.lanterns.set(specs)
+    this.lanternSpecs = specs
+    if (!this.previewing) this.lanterns.set(specs)
+  }
+
+  /**
+   * The intro's year: stars and lanterns that are not stored and cannot be
+   * tapped, drawn in place of the real ones; `null` puts the real ones back.
+   */
+  preview(
+    year: {
+      dates: readonly DateKey[]
+      streak: ReadonlySet<DateKey>
+      today: DateKey
+      lanterns: readonly LanternSpec[]
+    } | null,
+  ): void {
+    if (year === null) {
+      this.previewing = false
+      this.lanterns.set(this.lanternSpecs)
+      this.applyDays()
+      if (!this.days) this.stars.setDays([], new Set(), '')
+      return
+    }
+    this.previewing = true
+    this.starHits.replaceChildren()
+    this.stars.setDays(year.dates, year.streak, year.today)
+    this.lanterns.set(year.lanterns)
+  }
+
+  /** The intro keeps every find a secret: the creatures and the whale are dark shapes with a rim of light. */
+  setSilhouette(on: boolean): void {
+    this.root.dataset.silhouette = String(on)
+    // A silhouette whale still surfacing would turn into the real one: it goes with the promise.
+    if (!on) this.thingsLayer.querySelector('.whale')?.remove()
+  }
+
+  /** A find, as the intro shows it: only a flash of light where it would be. */
+  flash(x: number, y: number, world: World): void {
+    const flash = document.createElement('div')
+    flash.className = 'scene-flash'
+    flash.dataset.world = world
+    flash.style.left = `${(x * 100).toFixed(1)}%`
+    flash.style.top = `${(y * 100).toFixed(1)}%`
+    this.thingsLayer.append(flash)
+    flash.addEventListener('animationend', () => flash.remove(), { once: true })
+    const rect = this.root.getBoundingClientRect()
+    this.particles.burst(world, x * rect.width, y * rect.height, 10)
   }
 
   holdLantern(key: string): void {
@@ -193,7 +243,7 @@ export class Scene {
 
   private applyDays(): void {
     const days = this.days
-    if (!days) return
+    if (!days || this.previewing) return
     const held = this.heldStar
     const dates = held === null ? days.dates : days.dates.filter((d) => d !== held)
     this.stars.setDays(dates, days.streak, days.today)

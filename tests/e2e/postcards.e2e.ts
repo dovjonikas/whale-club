@@ -1,5 +1,5 @@
-import { expect, test, type Page } from '@playwright/test'
-import { addThing, card, dateKey, dismissInstallLeaf, seed } from './helpers'
+import { type Page } from '@playwright/test'
+import { expect, test, addThing, card, dateKey, dismissInstallLeaf, seed } from './helpers'
 
 /**
  * Postcards are the club: after a moment worth showing, one button paints

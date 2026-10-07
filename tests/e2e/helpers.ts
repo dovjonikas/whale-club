@@ -1,4 +1,24 @@
-import { expect, type Locator, type Page } from '@playwright/test'
+import { test as base, expect, type Locator, type Page } from '@playwright/test'
+
+export { expect }
+
+/**
+ * The tests' own `test`: a page that has seen the intro already, so a
+ * test about anything else starts on the first screen. The intro's own
+ * tests use Playwright's `test` directly.
+ */
+export const test = base.extend({
+  page: async ({ page }, use) => {
+    await page.addInitScript(() => {
+      try {
+        localStorage.setItem('whaleclub:intro', 'seen')
+      } catch {
+        // No storage: the intro would show; nothing here can help that.
+      }
+    })
+    await use(page)
+  },
+})
 
 /**
  * Shared steps for the browser tests. Everything goes through the real UI
@@ -20,6 +40,7 @@ export interface SeedThing {
   order: number
   /** Monday first; absent means every day. */
   days?: boolean[]
+  kind?: 'tap' | 'lockIn'
 }
 
 export interface SeedData {
@@ -33,7 +54,8 @@ export interface SeedData {
       waited?: string[]
       extra?: string[]
       skip?: string[]
-      sessions?: { thing: string; minutes: number; left?: true }[]
+      sessions?: { thing: string; minutes: number; left?: true; parts?: number }[]
+      manual?: string[]
     }
   >
   /** Per thing, the highest tier already cracked. Absent: every earned stone is still waiting. */
@@ -48,9 +70,16 @@ export interface SeedData {
 }
 
 export async function seed(page: Page, data: SeedData): Promise<void> {
+  // A seed that names a kind is the current shape; one that does not runs every migration.
+  const current = data.things.some((t) => t.kind !== undefined)
+  const lines = new Map<string, number>()
   const payload = {
-    version: data.version ?? 3,
-    things: data.things.map((t) => ({ emoji: '•', ...t })),
+    version: data.version ?? (current ? 6 : 3),
+    things: data.things.map((t) => {
+      const n = lines.get(t.world) ?? 0
+      lines.set(t.world, n + 1)
+      return { emoji: '•', kind: 'tap', minutes: 15, line: n === 0 ? 'a' : 'b', ...t }
+    }),
     days: Object.fromEntries(Object.entries(data.days).map(([k, v]) => [k, { minutes: {}, ...v }])),
     cracked: data.cracked ?? {},
     settings: { sound: true, ...data.settings },
@@ -67,13 +96,17 @@ export async function seed(page: Page, data: SeedData): Promise<void> {
 export async function addThing(
   page: Page,
   name: string,
-  options: { emoji?: string; minutes?: number } = {},
+  options: { emoji?: string; lockIn?: boolean; minutes?: number } = {},
 ): Promise<void> {
   await page.getByRole('button', { name: 'Add a thing' }).click()
   await page.getByRole('textbox', { name: 'name' }).fill(name)
   if (options.emoji) await page.getByRole('button', { name: options.emoji }).click()
-  if (options.minutes) {
-    await page.getByRole('button', { name: `${String(options.minutes)} min`, exact: true }).click()
+  if (options.lockIn) {
+    await page.getByRole('button', { name: 'lock in', exact: true }).click()
+    if (options.minutes)
+      await page
+        .getByRole('button', { name: `${String(options.minutes)} min`, exact: true })
+        .click()
   }
   await page.getByRole('button', { name: 'add', exact: true }).click()
   await page.getByRole('dialog').waitFor({ state: 'hidden' })

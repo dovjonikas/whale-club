@@ -532,3 +532,55 @@ canvas.lanterns {
   height: 31%;
   pointer-events: none;
 }
+
+/* The intro's silhouettes: the whale a dark shape with a thin rim of light. */
+.scene[data-silhouette='true'] .whale svg {
+  filter: brightness(0) drop-shadow(0 0 1.5px rgba(201, 251, 245, 0.85));
+}
+
+.scene[data-silhouette='true'] .collectible {
+  display: none;
+}
+
+/* A find in the intro: only a flash of light where it would be. */
+.scene-flash {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  margin: -23px 0 0 -23px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 248, 225, 0.95),
+    rgba(255, 217, 138, 0.35) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  animation: scene-flash 900ms var(--ease) forwards;
+}
+
+.scene-flash[data-world='sea'] {
+  background: radial-gradient(
+    circle,
+    rgba(225, 255, 250, 0.95),
+    rgba(62, 242, 224, 0.35) 40%,
+    transparent 70%
+  );
+}
+
+@keyframes scene-flash {
+  from {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  to {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-flash {
+    animation-duration: 1ms;
+  }
+}

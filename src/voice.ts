@@ -64,11 +64,91 @@ export const voice = {
   add: {
     title: 'new homework',
     name: 'name',
+    placeholder: 'run',
     emoji: 'emoji',
     ownEmoji: 'your own emoji',
-    length: 'lock in',
-    minutes: (m: number) => `${String(m)} min`,
     button: 'add',
+    /** From the first open's "start light": three small things to begin with. */
+    starters: 'start with something small',
+    starterThings: [
+      { emoji: '💧', name: 'a glass of water' }, // TODO-VOICE
+      { emoji: '💪', name: '10 push-ups' }, // TODO-VOICE
+      { emoji: '📖', name: 'read 2 pages' }, // TODO-VOICE
+    ],
+  },
+  /** How a thing is done: the one question in the add sheet and the thing's sheet. */
+  kind: {
+    question: 'how is it done?',
+    tap: 'tap when done',
+    tapLine: 'e.g. vitamins, 10 push-ups', // TODO-VOICE
+    lockIn: 'lock in',
+    lockInLine: 'e.g. study, practice an instrument. counts when the timer runs to the end.', // TODO-VOICE
+    length: 'how long',
+  },
+  /** What a card says under its name. */
+  card: {
+    length: (m: number) => `${String(m)} min`,
+    finish: (seen: number, total: number) => `${String(seen)}/${String(total)} · finish`,
+    doneToday: 'done today',
+    /** Once, on a new thing's card. */
+    hintTap: "tap it when it's done.", // TODO-VOICE
+    hintLockIn: 'tap to lock in.', // TODO-VOICE
+  },
+  /** Editing: a visible word for every change, and delete without "are you sure". */
+  edit: {
+    edit: 'edit',
+    done: 'done',
+    add: 'Add a thing',
+    delete: 'delete',
+    deleteThing: (name: string) => `delete ${name}`,
+    deleteForGood: 'delete this thing',
+    deleted: 'it swam off. the days you did stay.', // TODO-VOICE
+    undo: 'undo',
+  },
+  /** Done without the timer, from a lock-in thing's sheet. */
+  without: {
+    button: 'did it without the timer',
+    question: (m: number) => `the full ${String(m)} min, for real?`,
+    yes: 'yes',
+    no: 'not really',
+    noLine: 'okay. the timer is waiting.', // TODO-VOICE
+    used: 'used both this week.', // TODO-VOICE
+    undoToday: 'not done today after all',
+  },
+  /** Each mechanic says what it is, once, the first time it shows. */
+  explain: {
+    stone: 'a stone fell in. tap it three times.', // TODO-VOICE
+    lantern: 'a lantern for every lock-in you finish.', // TODO-VOICE
+    kept: 'the minutes are kept. tap the card to finish.', // TODO-VOICE
+    firstStar: 'your first star.', // TODO-VOICE
+    yours: 'yours. it grows on the days you show up.', // TODO-VOICE
+  },
+  /** The first open: three beats, never again unless asked. */
+  intro: {
+    skip: 'skip',
+    next: 'tap to go on',
+    day: (n: number) => `day ${String(n)}`,
+    promise: 'a year of small things.', // TODO-VOICE
+    /** The author's own words. Not to be changed. */
+    truth: [
+      "the thing is, sometimes doing such small things seems unremarkable, because you can't see the results yet.",
+      'but results come, after you compound these days, that you stay consistent, even when it seems small.',
+    ],
+    start: 'start light',
+    back: 'back to the sea',
+    watch: 'watch the intro',
+  },
+  /** The goal always in sight: the next find, under the sky. */
+  nextFind: (days: number) =>
+    days === 1 ? 'next find: tomorrow' : `next find: in ${String(days)} days`,
+  howItWorks: {
+    title: 'how it works',
+    lines: [
+      'add your few things.', // TODO-VOICE
+      'tap when done, or lock in.', // TODO-VOICE
+      'the scene grows with the days you show up.', // TODO-VOICE
+      'nothing dies.', // TODO-VOICE
+    ],
   },
   lockIn: {
     button: 'lock in',
@@ -143,6 +223,14 @@ export const voice = {
     checkin: 'checked in',
     left: 'left, it waited',
     nothing: 'nothing that day. that is allowed.', // TODO-VOICE
+    unfinished: (seen: number) => `${String(seen)} min, not finished`,
+    without: 'without the timer',
+    inParts: 'in parts',
+    /** The log explains itself: the same words as the scene. */
+    legendStar: 'star: a day you did something',
+    legendLantern: 'lantern: a lock in you finished',
+    legendSoft: 'soft: finished in parts',
+    legendDim: 'faint: started, not finished',
   },
   /** The lab: a tool for trying the app across days, not part of the game's voice. */
   lab: {
@@ -160,6 +248,7 @@ export const voice = {
     seed30: 'seed 30 days',
     seed90: 'seed 90 days',
     seed365: 'seed 365 days',
+    firstOpen: 'first open again',
     clear: 'clear sandbox',
     time: 'time',
     sea: 'the sandbox',

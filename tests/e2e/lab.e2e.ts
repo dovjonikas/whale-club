@@ -1,5 +1,14 @@
-import { expect, test, type Page } from '@playwright/test'
-import { card, clearNotices, dateKey, dismissInstallLeaf, seed, STORAGE_KEY } from './helpers'
+import { type Page } from '@playwright/test'
+import {
+  expect,
+  test,
+  card,
+  clearNotices,
+  dateKey,
+  dismissInstallLeaf,
+  seed,
+  STORAGE_KEY,
+} from './helpers'
 
 /**
  * The lab: a sandbox copy of the sea with a clock that moves by days. The
@@ -9,7 +18,14 @@ import { card, clearNotices, dateKey, dismissInstallLeaf, seed, STORAGE_KEY } fr
 const REAL = {
   things: [
     { id: 't1', name: 'run', world: 'sea' as const, createdAt: dateKey(-5), order: 0 },
-    { id: 't2', name: 'read', world: 'sky' as const, createdAt: dateKey(-5), order: 1 },
+    {
+      id: 't2',
+      name: 'read',
+      kind: 'lockIn' as const,
+      world: 'sky' as const,
+      createdAt: dateKey(-5),
+      order: 1,
+    },
   ],
   days: { [dateKey(-2)]: { done: ['t1'] }, [dateKey(-1)]: { done: ['t1', 't2'] } },
 }
@@ -159,15 +175,15 @@ test('the lab bar is on every screen, a sheet and a session too, and nothing cov
   expect(await barIsOnTop()).toBe(true)
   await page.getByRole('dialog').getByRole('button', { name: 'Close' }).click()
 
-  await page.getByRole('button', { name: 'lock in: run' }).click()
+  await card(page, 'read').click()
   await page.getByRole('button', { name: 'lock in', exact: true }).click()
-  await expect(page.getByRole('dialog', { name: 'lock in: run' })).toBeVisible()
+  await expect(page.getByRole('dialog', { name: 'lock in: read' })).toBeVisible()
   await expect(labBar(page)).toBeVisible()
   expect(await barIsOnTop()).toBe(true)
   // The header of the session is below the bar, not under it.
   const barBottom = await labBar(page).evaluate((el) => el.getBoundingClientRect().bottom)
   const sessionTop = await page
-    .getByRole('dialog', { name: 'lock in: run' })
+    .getByRole('dialog', { name: 'lock in: read' })
     .evaluate((el) => el.getBoundingClientRect().top)
   expect(sessionTop).toBeGreaterThanOrEqual(barBottom - 1)
 })

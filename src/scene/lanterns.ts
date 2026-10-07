@@ -21,8 +21,14 @@ export interface LanternSpec {
   color: string
   /** 0 short, 1 middling, 2 long. */
   size: 0 | 1 | 2
-  dim: boolean
+  /**
+   * bright: done in one go; soft: done in parts; dim: minutes on a day that
+   * never reached the length (and, from before 0.11, a session that was left).
+   */
+  glow: LanternGlow
 }
+
+export type LanternGlow = 'bright' | 'soft' | 'dim'
 
 const FLICKER_FPS = 12
 const ARRIVE_FPS = 60
@@ -31,7 +37,7 @@ const ARRIVE_MS = 900
 const RADIUS = [1.5, 2.1, 2.8] as const
 /** The glow reaches this many core radii out. */
 const GLOW = 3
-const DIM_ALPHA = 0.32
+const ALPHA: Record<LanternGlow, number> = { bright: 1, soft: 0.62, dim: 0.3 }
 /** Where the cove sits inside the canvas, as fractions of its height (see .lanterns in scene.css). */
 const COVE_TOP = 0.73
 const COVE_DEPTH = 0.23
@@ -129,7 +135,8 @@ export class LanternLayer {
     // Far ones first, so the near ones glow over them.
     this.placed.sort((a, b) => a.y - b.y)
     this.canvas.dataset.count = String(this.specs.length)
-    this.canvas.dataset.dim = String(this.specs.filter((s) => s.dim).length)
+    this.canvas.dataset.dim = String(this.specs.filter((s) => s.glow === 'dim').length)
+    this.canvas.dataset.soft = String(this.specs.filter((s) => s.glow === 'soft').length)
     this.canvas.dataset.held = String(this.held.size)
     this.draw(performance.now())
     this.run()
@@ -169,7 +176,7 @@ export class LanternLayer {
       const sprite = this.sprite(spec)
       const w = sprite.width / this.dpr
       const size = w * lantern.scale
-      ctx.globalAlpha = (spec.dim ? DIM_ALPHA : alpha) * lantern.fade
+      ctx.globalAlpha = (spec.glow === 'dim' ? ALPHA.dim : alpha * ALPHA[spec.glow]) * lantern.fade
       ctx.drawImage(sprite, lantern.x - size / 2, y - size / 2, size, size)
     }
     ctx.globalAlpha = 1
@@ -177,7 +184,8 @@ export class LanternLayer {
 
   /** A lantern drawn once per colour, size and dimness, at the canvas's own pixel density. */
   private sprite(spec: LanternSpec): HTMLCanvasElement {
-    const id = `${spec.color}|${String(spec.size)}|${String(spec.dim)}`
+    const dim = spec.glow === 'dim'
+    const id = `${spec.color}|${String(spec.size)}|${String(dim)}`
     const cached = this.sprites.get(id)
     if (cached) return cached
     const r = RADIUS[spec.size]
@@ -188,7 +196,7 @@ export class LanternLayer {
     if (!ctx) return canvas
     ctx.scale(this.dpr, this.dpr)
     const c = half
-    if (!spec.dim) {
+    if (!dim) {
       const glow = ctx.createRadialGradient(c, c, 0, c, c, half)
       glow.addColorStop(0, withAlpha(spec.color, 0.42))
       glow.addColorStop(0.35, withAlpha(spec.color, 0.12))
@@ -206,7 +214,7 @@ export class LanternLayer {
     ctx.ellipse(c, c, r, r * 1.2, 0, 0, Math.PI * 2)
     ctx.fill()
     // Its light on the water, a short streak underneath.
-    ctx.fillStyle = withAlpha(spec.color, spec.dim ? 0.25 : 0.35)
+    ctx.fillStyle = withAlpha(spec.color, dim ? 0.25 : 0.35)
     ctx.fillRect(c - r * 0.9, c + r * 1.6, r * 1.8, Math.max(0.6, r * 0.28))
     this.sprites.set(id, canvas)
     return canvas

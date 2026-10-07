@@ -2,6 +2,46 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.11.0 - 2026-10-07
+
+Two kinds of thing, clear editing, and the first minute.
+
+- The author's principle at the top of the README.
+- Two kinds of thing, chosen with one question in the add sheet and the
+  thing's sheet: "tap when done" (a checkbox ring; tap and tap again) and
+  "lock in" (its length and a small timer ring on the card; a tap opens
+  the dial; 15 minutes to start). A finished lock-in is not undone by a
+  stray tap; its sheet can take it back.
+- Only the minutes the timer saw count: the screen writes "seen until"
+  every five seconds, leaving the app stops the count after fifteen seconds
+  and coming back carries on, a reload or a dead phone keeps everything
+  seen, and the card offers "12/25 · finish". A lantern is bright in one
+  go, softer in parts, faint for a day that ended short.
+- "Did it without the timer", in a lock-in's sheet: "the full 15 min, for
+  real?", twice a week at most, a small hand on the card, no lantern.
+- "edit" over the row: a red "delete" on every card, a tap opens the
+  card's sheet; "delete this thing" at the bottom of the sheet; no "are you
+  sure", the card swims off and "undo" waits ten seconds; a swipe to the
+  left as a shortcut. A deleted thing's stars, finds and lanterns stay.
+- The first minute: the promise (a seeded year in silhouette, a day counter
+  to 365), the truth (the author's sentence over the empty sea), the first
+  step ("start light", with three small things to begin with). Skip always,
+  a tap goes on, still frames under reduced motion, "watch the intro" in
+  "how it works", "first open again" in the lab.
+- The next find always in sight above the row; each mechanic says what it
+  is once, the first time it shows; the very first star has a moment.
+- The log explains itself: under the calendar, what a star and a lantern
+  are, a colour dot and name for each lock-in thing, and what soft and
+  faint lanterns mean when the month has them; a day lists what was done,
+  the sessions with their minutes and the minutes that did not finish.
+- "how it works" in the menu.
+- Data version 6: a kind and a line on every thing, deleted things kept as
+  retired, sessions with parts, days done without the timer. Things from
+  before become lock-ins where most of their done days had minutes.
+- Tests: the clarity test (fifteen everyday jobs done through visible
+  words only, each within two taps), the two kinds, editing and deleting,
+  the intro.
+
 ## 0.10.0 - 2026-10-07
 
 Lock in, the opening, the lanterns and the log.

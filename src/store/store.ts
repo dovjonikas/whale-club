@@ -2,7 +2,7 @@ import { now } from './clock'
 import { dataKey } from './lab'
 import { migrate } from './migrate'
 import { todayKey } from './dates'
-import type { AppData, DateKey, DayRecord, Settings, Thing, World } from './types'
+import type { AppData, DateKey, DayRecord, Kind, Line, Settings, Thing, World } from './types'
 import { DEFAULT_MINUTES, emptyData, EVERY_DAY, MAX_THINGS, WORLD_ORDER } from './types'
 
 /** Where an unreadable record is parked rather than thrown away, next to its own key. */
@@ -37,24 +37,28 @@ export class Store {
   addThing(input: {
     name: string
     emoji: string
+    kind?: Kind
     minutes?: number
     days?: readonly boolean[]
   }): Thing | null {
-    if (this.data.things.length >= MAX_THINGS) return null
+    const things = this.data.things
+    if (things.length >= MAX_THINGS) return null
     const name = input.name.trim()
     if (!name) return null
-    const order = this.data.things.length
+    const world = nextWorld(things)
     const thing: Thing = {
       id: newId(),
       name,
       emoji: input.emoji.trim() || '•',
+      kind: input.kind ?? 'tap',
       minutes: input.minutes ?? DEFAULT_MINUTES,
       days: [...(input.days ?? EVERY_DAY)],
-      world: worldForOrder(order),
+      world,
+      line: nextLine(things, world),
       createdAt: todayKey(),
-      order,
+      order: things.reduce((max, t) => Math.max(max, t.order + 1), 0),
     }
-    this.commit({ ...this.data, things: [...this.data.things, thing] })
+    this.commit({ ...this.data, things: [...things, thing] })
     return thing
   }
 
@@ -63,13 +67,34 @@ export class Store {
     this.commit(data)
   }
 
-  removeThing(id: string): void {
-    // The days keep their record of the thing: deleting a thing never
-    // rewrites history, and the stars it earned stay in the sky.
-    this.commit({ ...this.data, things: this.data.things.filter((t) => t.id !== id) })
+  /**
+   * Deletes a thing from the row. Its days keep their record of it and it is
+   * kept among the retired, so the stars it earned stay in the sky, its finds
+   * in the scene and its lanterns in the cove. Returns it, for undo.
+   */
+  removeThing(id: string): Thing | null {
+    const thing = this.data.things.find((t) => t.id === id)
+    if (!thing) return null
+    this.commit({
+      ...this.data,
+      things: this.data.things.filter((t) => t.id !== id),
+      retired: [...(this.data.retired ?? []).filter((t) => t.id !== id), thing],
+    })
+    return thing
   }
 
-  /** Marks or unmarks a thing for a day. Returns the new state. A tap is always a full count. */
+  /** Undo of a delete: the thing comes back exactly as it was, in its place. */
+  restoreThing(thing: Thing): void {
+    if (this.data.things.length >= MAX_THINGS) return
+    if (this.data.things.some((t) => t.id === thing.id)) return
+    const retired = (this.data.retired ?? []).filter((t) => t.id !== thing.id)
+    const next: AppData = { ...this.data, things: [...this.data.things, thing] }
+    if (retired.length > 0) next.retired = retired
+    else delete next.retired
+    this.commit(next)
+  }
+
+  /** Marks or unmarks a tap thing for a day. Returns the new state. A tap is always a full count. */
   toggleDone(thingId: string, date: DateKey = todayKey()): boolean {
     const day = this.day(date)
     const isDone = day.done.includes(thingId)
@@ -86,55 +111,94 @@ export class Store {
   }
 
   /**
-   * A lock-in that ran to its end. It counts as done either way. A clean
-   * one is a full count; one that was left and waited is marked so, and
-   * earns no star and no step towards a stone, unless the thing was
-   * already fully counted today.
+   * The minutes a lock-in's timer has seen today, so far: kept when a
+   * session stops or is interrupted, so the next one goes on from them.
+   * Only ever goes up within a day.
    */
-  finishSession(
+  keepMinutes(thingId: string, minutes: number, date: DateKey = todayKey()): void {
+    const day = this.day(date)
+    const kept = Math.max(day.minutes[thingId] ?? 0, Math.floor(minutes))
+    if (kept <= 0 || kept === day.minutes[thingId]) return
+    this.commit({
+      ...this.data,
+      days: { ...this.data.days, [date]: { ...day, minutes: { ...day.minutes, [thingId]: kept } } },
+    })
+  }
+
+  /**
+   * A lock-in session ran to its end. `seen` is all the minutes the timer
+   * saw today, this session included. When they reach the thing's length
+   * the thing is done; the session is a lantern either way it ended, so a
+   * second session on a done day is one more lantern and nothing else.
+   */
+  finishLockIn(
     thingId: string,
-    minutes: number,
-    clean: boolean,
+    session: { seen: number; minutes: number; parts: number },
     date: DateKey = todayKey(),
   ): void {
     const day = this.day(date)
-    const already = day.done.includes(thingId) && !(day.waited?.includes(thingId) ?? false)
-    const done = day.done.includes(thingId) ? day.done : [...day.done, thingId]
-    const waited = !clean && !already
-    const session = clean
-      ? { thing: thingId, minutes }
-      : { thing: thingId, minutes, left: true as const }
-    const next = withWaited(
-      {
-        ...day,
-        done,
-        minutes: { ...day.minutes, [thingId]: (day.minutes[thingId] ?? 0) + minutes },
-        sessions: [...(day.sessions ?? []), session],
+    const record =
+      session.parts > 1
+        ? { thing: thingId, minutes: session.minutes, parts: session.parts }
+        : { thing: thingId, minutes: session.minutes }
+    const next: DayRecord = {
+      ...day,
+      done: day.done.includes(thingId) ? day.done : [...day.done, thingId],
+      minutes: {
+        ...day.minutes,
+        [thingId]: Math.max(day.minutes[thingId] ?? 0, Math.floor(session.seen)),
       },
-      thingId,
-      waited,
-    )
+      sessions: [...(day.sessions ?? []), record],
+    }
     this.commit({ ...this.data, days: { ...this.data.days, [date]: next } })
   }
 
-  /** A lock-in stopped early: the minutes are written down, nothing else. */
-  addMinutes(thingId: string, minutes: number, date: DateKey = todayKey()): void {
-    if (minutes <= 0) return
+  /**
+   * Done without the timer: a lesson, a phone that was dead. It counts, with
+   * a hand on the card, and leaves no lantern. The weekly limit is the
+   * sheet's to keep (see derive.withoutTimerLeft).
+   */
+  doneWithoutTimer(thingId: string, date: DateKey = todayKey()): void {
     const day = this.day(date)
-    const total = (day.minutes[thingId] ?? 0) + minutes
+    if (day.done.includes(thingId)) return
     this.commit({
       ...this.data,
       days: {
         ...this.data.days,
-        [date]: { ...day, minutes: { ...day.minutes, [thingId]: total } },
+        [date]: { ...day, done: [...day.done, thingId], manual: [...(day.manual ?? []), thingId] },
       },
     })
+  }
+
+  /**
+   * Takes back a lock-in thing's done for the day, from its sheet: the
+   * mark, the minutes and the sessions of the day go, as if it had not
+   * started. A tap thing is taken back by its card.
+   */
+  undoToday(thingId: string, date: DateKey = todayKey()): void {
+    const day = this.day(date)
+    const minutes = Object.fromEntries(Object.entries(day.minutes).filter(([id]) => id !== thingId))
+    const next: DayRecord = { ...day, done: day.done.filter((id) => id !== thingId), minutes }
+    const drop = (list: string[] | undefined): string[] | undefined => {
+      const kept = list?.filter((id) => id !== thingId)
+      return kept && kept.length > 0 ? kept : undefined
+    }
+    const waited = drop(day.waited)
+    const manual = drop(day.manual)
+    const sessions = day.sessions?.filter((s) => s.thing !== thingId)
+    delete next.waited
+    delete next.manual
+    delete next.sessions
+    if (waited) next.waited = waited
+    if (manual) next.manual = manual
+    if (sessions && sessions.length > 0) next.sessions = sessions
+    this.commit({ ...this.data, days: { ...this.data.days, [date]: next } })
   }
 
   /** The thing's sheet: its name, emoji, lock-in length and weekdays. */
   updateThing(
     thingId: string,
-    patch: Partial<Pick<Thing, 'name' | 'emoji' | 'minutes' | 'days'>>,
+    patch: Partial<Pick<Thing, 'name' | 'emoji' | 'kind' | 'minutes' | 'days'>>,
   ): void {
     this.commit({
       ...this.data,
@@ -212,6 +276,26 @@ function withWaited(day: DayRecord, thingId: string, waited: boolean): DayRecord
 /** Worlds go round in a fixed order, so the 4th thing is a sea thing again. */
 export function worldForOrder(order: number): World {
   return WORLD_ORDER[order % WORLD_ORDER.length] ?? 'sea'
+}
+
+/**
+ * The world a new thing gets: the first one the row's pattern (sea, sky,
+ * garden, sea, sky) is missing. With nothing deleted that is simply the
+ * next in the pattern; after a delete it fills the gap left behind.
+ */
+export function nextWorld(things: readonly Thing[]): World {
+  const slots = things.length + 1
+  for (const world of WORLD_ORDER) {
+    let wanted = 0
+    for (let i = 0; i < slots; i++) if (worldForOrder(i) === world) wanted++
+    if (things.filter((t) => t.world === world).length < wanted) return world
+  }
+  return worldForOrder(things.length)
+}
+
+/** A new thing's line: a, unless a thing of its world already has it. */
+export function nextLine(things: readonly Thing[], world: World): Line {
+  return things.some((t) => t.world === world && t.line === 'a') ? 'b' : 'a'
 }
 
 function load(): AppData {

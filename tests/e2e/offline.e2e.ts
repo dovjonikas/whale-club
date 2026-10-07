@@ -1,5 +1,4 @@
-import { expect, test } from '@playwright/test'
-import { addThing, card, waitForServiceWorker } from './helpers'
+import { expect, test, addThing, card, waitForServiceWorker } from './helpers'
 
 /**
  * The app is a PWA: once the service worker has the files, the page opens
