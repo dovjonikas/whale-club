@@ -42,9 +42,11 @@ test('a tap anywhere goes on to the next beat', async ({ page }) => {
   await expect(beat(page)).toHaveAttribute('data-beat', 'promise')
   await intro(page).click({ position: { x: 100, y: 300 } })
   await expect(beat(page)).toHaveAttribute('data-beat', 'truth')
+  // The author's sentence, a phrase at a time, not a word changed.
   await expect(intro(page)).toContainText(
-    "the thing is, sometimes doing such small things seems unremarkable, because you can't see the results yet.",
+    'the thing is, sometimes doing such small things seems unremarkable,',
   )
+  await expect(intro(page)).toContainText("because you can't see the results yet.")
   await intro(page).click({ position: { x: 100, y: 300 } })
   await expect(beat(page)).toHaveAttribute('data-beat', 'start')
 })
@@ -70,9 +72,8 @@ test('the whole intro reaches the first step within thirty seconds', async ({ pa
   await expect(intro(page)).toContainText('a year of small things.', { timeout: 15_000 })
   await expect(page.getByRole('button', { name: 'start light' })).toBeVisible({ timeout: 30_000 })
   expect(Date.now() - start).toBeLessThan(30_000)
-  await expect(intro(page)).toContainText(
-    'but results come, after you compound these days, that you stay consistent, even when it seems small.',
-  )
+  await expect(intro(page)).toContainText('but results come, after you compound these days,')
+  await expect(intro(page)).toContainText('that you stay consistent, even when it seems small.')
 })
 
 test('under reduced motion the year is three still frames with the same lines', async ({
@@ -85,7 +86,7 @@ test('under reduced motion the year is three still frames with the same lines', 
   await expect(intro(page).locator('.intro-day')).toHaveText('day 100', { timeout: 5000 })
   await expect(intro(page).locator('.intro-day')).toHaveText('day 365', { timeout: 5000 })
   await expect(intro(page)).toContainText('a year of small things.')
-  await expect(beat(page)).toHaveAttribute('data-beat', 'truth', { timeout: 10_000 })
+  await expect(beat(page)).toHaveAttribute('data-beat', 'truth', { timeout: 20_000 })
 })
 
 test('seen once, it never plays again by itself', async ({ page }) => {

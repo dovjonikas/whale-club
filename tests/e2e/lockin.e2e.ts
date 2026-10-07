@@ -30,7 +30,8 @@ async function startLockIn(page: Page, name: string, minutes: number): Promise<v
   const slider = page.getByRole('slider', { name: 'minutes' })
   await slider.focus()
   await page.keyboard.press('Home')
-  for (let m = 10; m < minutes; m += 5) await page.keyboard.press('ArrowRight')
+  // Home is five minutes; up to an hour each stop is five more.
+  for (let m = 5; m < minutes; m += 5) await page.keyboard.press('ArrowRight')
   await expect(slider).toHaveAttribute('aria-valuenow', String(minutes))
   await page.getByRole('button', { name: 'lock in', exact: true }).click()
 }
@@ -249,7 +250,7 @@ test('a reload keeps the minutes the timer saw, and the card offers to finish', 
   await page.reload()
   await expect(session(page, 'run')).toHaveCount(0)
   await expect(cardOf(page, 'run')).toContainText('6/15 · finish')
-  await expect(page.locator('.line')).toHaveText('the minutes are kept. tap the card to finish.')
+  await expect(page.locator('.line')).toHaveText('minutes kept. tap the card to finish.')
 })
 
 test('a phone that died: the count stops at the last moment the screen was seen', async ({

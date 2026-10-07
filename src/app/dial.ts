@@ -1,16 +1,16 @@
 import { creatureSvg } from '../scene/creatures'
 import type { Line, Stage } from '../store/derive'
-import { MAX_MINUTES, MIN_MINUTES, type Thing } from '../store/types'
+import { LENGTH_STOPS, MAX_MINUTES, MIN_MINUTES, nearestStop, type Thing } from '../store/types'
 import { voice } from '../voice'
 import { openSheet } from './sheet'
 
 /**
  * The lock-in dial: how long, chosen by turning a ring with a finger (or
- * dragging round it, or the arrow keys, or a mouse wheel), from 10 to 120
- * minutes in steps of 5, and one big button. It opens on the last length
- * chosen for this thing.
+ * dragging round it, or the arrow keys, or a mouse wheel), from five
+ * minutes to ten hours, and one big button. The ring is spread over the
+ * stops (LENGTH_STOPS), not the minutes, so the short lengths people pick
+ * most have the most room. It opens on the last length chosen.
  */
-const STEP = 5
 /** The ring leaves a gap at the top so the ends do not meet. */
 const SWEEP_DEG = 330
 const R = 96
@@ -24,7 +24,7 @@ export function openDial(
   openSheet({
     title: `${thing.emoji} ${thing.name}`,
     build(body, close) {
-      let minutes = clamp(thing.minutes)
+      let minutes = nearestStop(thing.minutes)
       body.innerHTML = `
         <div class="dial" role="slider" tabindex="0" aria-label="${voice.lockIn.minutes}"
           aria-valuemin="${String(MIN_MINUTES)}" aria-valuemax="${String(MAX_MINUTES)}">
@@ -51,21 +51,28 @@ export function openDial(
       const fill = body.querySelector('.dial-fill')
       const knob = body.querySelector('.dial-knob')
       const label = body.querySelector('.dial-minutes')
-      if (!dial || !fill || !knob || !label) return
+      const unit = body.querySelector<HTMLElement>('.dial-unit')
+      if (!dial || !fill || !knob || !label || !unit) return
 
       const show = (): void => {
-        const deg = ((minutes - MIN_MINUTES) / (MAX_MINUTES - MIN_MINUTES)) * SWEEP_DEG
+        const deg = (LENGTH_STOPS.indexOf(minutes) / (LENGTH_STOPS.length - 1)) * SWEEP_DEG
         fill.setAttribute('d', arc(Math.max(deg, 0.01)))
         const [x, y] = point(deg)
         knob.setAttribute('cx', x.toFixed(1))
         knob.setAttribute('cy', y.toFixed(1))
-        label.textContent = String(minutes)
+        label.textContent = minutes < 60 ? String(minutes) : voice.card.length(minutes)
+        unit.hidden = minutes >= 60
         dial.setAttribute('aria-valuenow', String(minutes))
-        dial.setAttribute('aria-valuetext', `${String(minutes)} minutes`)
+        dial.setAttribute('aria-valuetext', voice.card.length(minutes))
       }
       const set = (next: number): void => {
-        minutes = clamp(next)
+        minutes = nearestStop(next)
         show()
+      }
+      /** Moves along the stops, not the minutes: one key press is one stop. */
+      const step = (by: number): void => {
+        const i = LENGTH_STOPS.indexOf(minutes) + by
+        set(LENGTH_STOPS[Math.max(0, Math.min(LENGTH_STOPS.length - 1, i))] ?? minutes)
       }
 
       const fromPointer = (event: PointerEvent): void => {
@@ -78,7 +85,7 @@ export function openDial(
         const start = (360 - SWEEP_DEG) / 2
         const along = deg - start
         const fraction = along < 0 ? 0 : along > SWEEP_DEG ? (deg > 180 ? 1 : 0) : along / SWEEP_DEG
-        set(MIN_MINUTES + fraction * (MAX_MINUTES - MIN_MINUTES))
+        set(LENGTH_STOPS[Math.round(fraction * (LENGTH_STOPS.length - 1))] ?? minutes)
       }
       dial.addEventListener('pointerdown', (event) => {
         dial.setPointerCapture(event.pointerId)
@@ -91,22 +98,22 @@ export function openDial(
         'wheel',
         (event) => {
           event.preventDefault()
-          set(minutes + (event.deltaY < 0 ? STEP : -STEP))
+          step(event.deltaY < 0 ? 1 : -1)
         },
         { passive: false },
       )
       dial.addEventListener('keydown', (event) => {
         const moves: Record<string, number> = {
-          ArrowUp: STEP,
-          ArrowRight: STEP,
-          ArrowDown: -STEP,
-          ArrowLeft: -STEP,
-          PageUp: 15,
-          PageDown: -15,
+          ArrowUp: 1,
+          ArrowRight: 1,
+          ArrowDown: -1,
+          ArrowLeft: -1,
+          PageUp: 3,
+          PageDown: -3,
         }
         if (event.key === 'Home') set(MIN_MINUTES)
         else if (event.key === 'End') set(MAX_MINUTES)
-        else if (moves[event.key] !== undefined) set(minutes + (moves[event.key] ?? 0))
+        else if (moves[event.key] !== undefined) step(moves[event.key] ?? 0)
         else return
         event.preventDefault()
       })
@@ -119,11 +126,13 @@ export function openDial(
   })
 }
 
-/** A small mark at every quarter of an hour, so the ring can be read without the number. */
+/** Landmarks on the ring (a quarter, half and three quarters of an hour, then hours), so it reads without the number. */
+const TICKS = [15, 30, 45, 60, 120, 180, 300, 480]
+
 function ticks(): string {
   const marks: string[] = []
-  for (let m = 15; m < MAX_MINUTES; m += 15) {
-    const deg = ((m - MIN_MINUTES) / (MAX_MINUTES - MIN_MINUTES)) * SWEEP_DEG
+  for (const m of TICKS) {
+    const deg = (LENGTH_STOPS.indexOf(m) / (LENGTH_STOPS.length - 1)) * SWEEP_DEG
     const start = (360 - SWEEP_DEG) / 2
     const a = ((start + deg - 90) * Math.PI) / 180
     const inner = R - 16
@@ -136,11 +145,6 @@ function ticks(): string {
     )
   }
   return marks.join('')
-}
-
-function clamp(minutes: number): number {
-  const stepped = Math.round(minutes / STEP) * STEP
-  return Math.min(MAX_MINUTES, Math.max(MIN_MINUTES, stepped))
 }
 
 /** A point on the ring, `deg` degrees along the sweep from its start. */

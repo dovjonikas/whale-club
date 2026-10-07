@@ -12,6 +12,11 @@ import type { World } from '../store/types'
 export type SoundKind =
   'tap' | 'untap' | 'whale' | 'unlock' | 'left' | 'resume' | 'checkin' | 'grow'
 
+/** C major pentatonic over two octaves: C D E G A, C D E G A, C. */
+const PENTATONIC = [
+  523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51, 1567.98, 1760, 2093,
+]
+
 export class Sound {
   private ctx: AudioContext | null = null
   private sea: { source: AudioBufferSourceNode; lfo: OscillatorNode; gain: GainNode } | null = null
@@ -133,6 +138,18 @@ export class Sound {
         this.tone(392, 0, 0.5, 0.025, 'sine')
         return
     }
+  }
+
+  /**
+   * One note of a pentatonic scale, soft and short, for the intro's melody:
+   * whatever order they come in, they never clash.
+   */
+  note(step: number): void {
+    if (this.muted || !this.ctx) return
+    const freq =
+      PENTATONIC[((step % PENTATONIC.length) + PENTATONIC.length) % PENTATONIC.length] ?? 523
+    this.tone(freq, 0, 0.9, 0.022, 'sine')
+    this.tone(freq * 2, 0.02, 0.5, 0.006, 'sine')
   }
 
   private tone(

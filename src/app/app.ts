@@ -403,6 +403,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
   function intro(): void {
     playIntro(scene, {
       hasThings: store.get().things.length > 0,
+      sound,
       onEnd: (end) => {
         if (end === 'start' && store.get().things.length === 0)
           openAddSheet(store, added, { starters: true })

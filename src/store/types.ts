@@ -129,9 +129,28 @@ export const MAX_THINGS = 5
 
 /** A new lock-in's length: start light. Also what a thing from before lengths gets. */
 export const DEFAULT_MINUTES = 15
-/** The dial's range; a stored length is kept inside it. */
-export const MIN_MINUTES = 10
-export const MAX_MINUTES = 120
+/** The lengths a lock-in can have; a stored length is kept inside them. */
+export const MIN_MINUTES = 5
+export const MAX_MINUTES = 600
+
+/**
+ * Every length the dial stops at: five-minute steps up to an hour, a
+ * quarter of an hour up to three, half an hour up to ten. Short lengths
+ * get the room on the ring, where the choice is finest.
+ */
+export const LENGTH_STOPS: readonly number[] = [
+  ...Array.from({ length: 12 }, (_, i) => 5 + i * 5),
+  ...Array.from({ length: 8 }, (_, i) => 75 + i * 15),
+  ...Array.from({ length: 14 }, (_, i) => 210 + i * 30),
+]
+
+/** The stop nearest to a length. */
+export function nearestStop(minutes: number): number {
+  let best = LENGTH_STOPS[0] ?? MIN_MINUTES
+  for (const stop of LENGTH_STOPS)
+    if (Math.abs(stop - minutes) < Math.abs(best - minutes)) best = stop
+  return best
+}
 
 export const WORLD_ORDER: readonly World[] = ['sea', 'sky', 'garden']
 
