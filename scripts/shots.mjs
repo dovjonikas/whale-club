@@ -59,10 +59,21 @@ for (let i = -34; i <= 0; i++) {
   else if (done.length) days[key(i)] = { done, minutes: {} }
 }
 
+// Every tier earned is cracked, except run's newest, which waits as a stone.
+const TIERS = [3, 7, 14, 21, 30, 45, 60, 90, 120, 180]
+const cracked = {}
+for (const thing of things) {
+  const total = Object.values(days).filter((d) => d.done.includes(thing.id)).length
+  const earned = TIERS.filter((t) => t <= total)
+  const keep = thing.id === 'run' ? earned.slice(0, -1) : earned
+  if (keep.length) cracked[thing.id] = keep[keep.length - 1]
+}
+
 const data = {
-  version: 1,
+  version: 2,
   things,
   days,
+  cracked,
   settings: {
     sound: true,
     installDismissedAt: key(-1),
@@ -140,6 +151,40 @@ for (const { name, options } of targets) {
   await page.getByRole('button', { name: 'Collection' }).click()
   await page.waitForTimeout(500)
   await shot(page, `${name}-collection.png`)
+  await context.close()
+}
+
+// The moments of v0.5 on the iPhone: the stone, its crack, the dial, a session.
+{
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.install({ time: NOW })
+  await page.addInitScript(
+    (json) => localStorage.setItem('whaleclub:data', json),
+    JSON.stringify(data),
+  )
+  await page.goto(base)
+  await page.clock.runFor(1500)
+  await shot(page, 'iphone-stone.png')
+  const stone = page.locator('.stone').first()
+  await stone.click()
+  await page.clock.runFor(300)
+  await stone.click()
+  await page.clock.runFor(300)
+  await shot(page, 'iphone-crack.png')
+  await stone.click()
+  await page.clock.runFor(1100)
+  await shot(page, 'iphone-find.png')
+  await page.clock.runFor(3000)
+  await page.getByRole('button', { name: 'lock in: read' }).click()
+  await page.clock.runFor(500)
+  await shot(page, 'iphone-dial.png')
+  await page.getByRole('button', { name: 'lock in', exact: true }).click()
+  await page.clock.runFor(1500)
+  await shot(page, 'iphone-session-start.png')
+  await page.clock.fastForward('18:00')
+  await page.clock.runFor(3000)
+  await shot(page, 'iphone-session.png')
   await context.close()
 }
 await browser.close()

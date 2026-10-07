@@ -170,3 +170,60 @@ chrome-launcher cannot start Playwright's Chromium on the development
 machine, but it can start Edge. CHROME_PATH pointed at msedge.exe and
 --chrome-flags="--headless=new" against the live URL gives the numbers in
 the README.
+
+## 2026-10-07 Finds arrive as stones
+
+An unlock used to appear by itself. Now it falls in as a stone that waits
+until it is cracked: a reason to come back that is not a notification,
+and a moment (three taps, a burst, a find coming out of the light) that
+belongs to the person. What is found still follows only from the total
+days. The one stored fact is the highest tier cracked per thing; if it
+were lost, stones would come back, and nothing found would be taken away.
+
+## 2026-10-07 Rarity is a shine, picked from a date
+
+Rare and legendary finds glow differently and carry a small mark in the
+Collection. Nothing else reads it. It is a hash of the find's id and the
+date its tier was reached, so it is the same on every device, survives an
+import, and never needs storing.
+
+## 2026-10-07 One animation loop
+
+The star field, the particles and the parallax each ran their own
+requestAnimationFrame. They now ask one ticker for frames at their own
+rate. It stops while the page is hidden (visibilitychange) or the scene is
+off screen (IntersectionObserver), and nothing subscribes under reduced
+motion. A test counts the frames.
+
+## 2026-10-07 The moon is real, so the moon collectibles changed
+
+Every sky now has the moon in its phase for the date. A collectible
+crescent and a collectible full moon would have put two or three moons in
+one sky, so they became what a moon makes: a ring around it, and its light
+on the water.
+
+## 2026-10-07 Lock in, and nothing dies
+
+The timer was behind a long press and nobody could tell whether it was
+running. It is now a visible "lock in" under every card, a dial, and a
+whole-screen session with the creature growing as company. Forest kills
+the tree when you leave; here, leaving for more than fifteen seconds marks
+the session and the creature waits. The difference is honest rather than
+punishing: a clean session is a full day; a left one counts as showing up
+but earns no star and no step towards a stone, and the line says so in
+plain words. Fifteen seconds is long enough to answer a message and short
+enough that leaving means leaving.
+
+## 2026-10-07 The time away is measured, not assumed
+
+A phone suspends a hidden web page, so nothing can be counted while it is
+away. The session writes the moment it hid and measures the gap on return.
+The same path covers a locked screen, another app, a reload and a closed
+app: a reload comes back within the grace and is not leaving.
+
+## 2026-10-07 Notices moved under the header
+
+The install leaf, the recap and the check-in sat above the row, which on
+a phone is exactly the water line where stones float. They now sit under
+the header, over the sky. They are temporary; while one shows, it can
+cover the first row of day-stars.

@@ -1,5 +1,5 @@
 import { addDays, lastKeys } from './dates'
-import type { AppData, DateKey, Thing, World } from './types'
+import type { AppData, DateKey, DayRecord, Thing, World } from './types'
 
 /**
  * Everything the scene needs that is not stored: it is all arithmetic over
@@ -30,11 +30,43 @@ export function stageFor(count: number): Stage {
   return 0
 }
 
-/** Every day the thing was ever done. The collectibles count this. */
+/**
+ * Whether a day counts towards stars and stones for a thing: done, and not
+ * only through a session that was left and waited.
+ */
+export function counted(day: DayRecord | undefined, thingId: string): boolean {
+  if (!day?.done.includes(thingId)) return false
+  return !(day.waited?.includes(thingId) ?? false)
+}
+
+/** Every day the thing was counted. The stones count this. */
 export function totalDone(data: AppData, thingId: string): number {
   let n = 0
-  for (const day of Object.values(data.days)) if (day.done.includes(thingId)) n++
+  for (const day of Object.values(data.days)) if (counted(day, thingId)) n++
   return n
+}
+
+/** The highest unlock tier a thing has earned, or 0. */
+export function earnedTier(data: AppData, thingId: string): number {
+  const total = totalDone(data, thingId)
+  let tier = 0
+  for (const days of UNLOCK_DAYS) if (days <= total) tier = days
+  return tier
+}
+
+/** Tiers earned but not cracked yet, lowest first: the stones waiting in the scene. */
+export function waitingTiers(data: AppData, thingId: string): number[] {
+  const total = totalDone(data, thingId)
+  const cracked = data.cracked[thingId] ?? 0
+  return UNLOCK_DAYS.filter((days) => days <= total && days > cracked)
+}
+
+/** The date a thing reached `tier` counted days: the shine of that find is picked from it. */
+export function reachedOn(data: AppData, thingId: string, tier: number): DateKey | undefined {
+  const dates = Object.keys(data.days)
+    .filter((key) => counted(data.days[key], thingId))
+    .sort()
+  return dates[tier - 1]
 }
 
 /** The first thing in a world takes line A, the second line B. */
@@ -42,13 +74,14 @@ export function lineFor(data: AppData, thing: Thing): Line {
   const sameWorld = data.things
     .filter((t) => t.world === thing.world)
     .sort((a, b) => a.order - b.order)
-  return sameWorld.indexOf(thing) === 0 ? 'a' : 'b'
+  // By id, not by reference: a thing edited since (its minutes, say) is a new object.
+  return sameWorld[0]?.id === thing.id ? 'a' : 'b'
 }
 
-/** Days with at least one thing done: one star each. Oldest first. */
+/** Days with at least one thing counted: one star each. Oldest first. */
 export function starDays(data: AppData): DateKey[] {
   return Object.entries(data.days)
-    .filter(([, day]) => day.done.length > 0)
+    .filter(([, day]) => day.done.some((id) => counted(day, id)))
     .map(([key]) => key)
     .sort()
 }
@@ -91,16 +124,19 @@ export function worldOf(data: AppData, thingId: string): World | undefined {
   return data.things.find((t) => t.id === thingId)?.world
 }
 
-/** Everything a thing has unlocked so far, by its days done. */
-export function unlockedFor(
+/**
+ * Everything a thing has found: earned by its days, and cracked open. An
+ * earned tier whose stone is still waiting is not in the scene yet.
+ */
+export function foundFor(
   data: AppData,
   thing: Thing,
   list: readonly { id: string; world: World; line: Line; days: number }[],
 ): string[] {
   const line = lineFor(data, thing)
-  const total = totalDone(data, thing.id)
+  const reach = Math.min(totalDone(data, thing.id), data.cracked[thing.id] ?? 0)
   return list
-    .filter((c) => c.world === thing.world && c.line === line && c.days <= total)
+    .filter((c) => c.world === thing.world && c.line === line && c.days <= reach)
     .map((c) => c.id)
 }
 

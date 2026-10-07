@@ -2,6 +2,48 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.5.0 - 2026-10-07
+
+The crack, the sky, and lock in.
+
+- **The crack.** What a thing earns arrives as a meteor stone: it falls
+  into the sea and floats, hangs in the sky as a dark speck with a glow,
+  or lies on the shore. It waits, with a small mark on the card, for as
+  long as it takes. Three taps (or a one-second hold) crack it: it shakes,
+  the glowing cracks open, it bursts, and the find comes out of the light,
+  is polished and settles into its place. What is found still follows from
+  the total days; its shine (common, rare, legendary) is picked from the
+  date it was earned and is cosmetic only.
+- **The sky.** A nebula of slow colour behind a deeper star field with
+  tinted stars, bright four-point ones and a shooting star now and then;
+  the moon in its real phase for the date; the shore glowing warmer as the
+  garden fills. The day-stars and constellations are unchanged.
+- **One loop.** The star field, the particles and the parallax share one
+  requestAnimationFrame loop, which stops while the page is hidden or the
+  scene is off screen; under reduced motion it never starts.
+- **Lock in.** Every card has a visible "lock in" under it (the long
+  press is gone). A dial picks 10 to 120 minutes in fives and remembers
+  the last length per thing. The session is the whole screen: the scene
+  quiet, the sky turning, the time large and calm, and the thing's
+  creature starting as an egg, a spark or a seed and growing as the
+  minutes pass, breathing and blinking. The screen is kept awake where the
+  browser allows it. A quiet generated sea sound can be switched on.
+- **Nothing dies.** Hidden for more than fifteen seconds, the session does
+  not fail: the creature waits and the session goes on from where it was.
+  A clean session is a full day (a star, a step towards the next stone); a
+  session that was left counts as done but earns neither, and the line
+  says so plainly. Stop writes the minutes down and nothing else.
+- The notices (install, recap, check-in) moved under the header, so the
+  water line stays clear for the stones.
+- Data is version 2: the stones cracked per thing, and the days shown up
+  for with a session that waited. Version 1 migrates with everything it
+  had already found kept.
+- The moon collectibles became a ring around the real moon and its light
+  on the water.
+- Fixed: a thing edited since the first render (its lock-in length) could
+  be drawn with the other line's creature; bursts were offset on a
+  desktop, where the scene sits in a centred frame.
+
 ## 0.4.0 - 2026-10-07
 
 Postcards: the club is you and whoever you send your whale to.

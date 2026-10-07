@@ -1,9 +1,12 @@
 /**
  * The whole of what the app remembers, as one object under one key.
  *
- * Everything on screen is a function of this: creature stages, collectibles,
- * stars and streaks are all derived from `days` at draw time and never
- * stored, so there is no second copy that can disagree with the first.
+ * Everything on screen is a function of this: creature stages, what has
+ * been earned, stars and streaks are all derived from `days` at draw time
+ * and never stored, so there is no second copy that can disagree with the
+ * first. The two things that are facts rather than arithmetic are stored:
+ * which earned stones have been cracked open, and which days were shown up
+ * for with a session that was left and waited.
  */
 
 export type World = 'sea' | 'sky' | 'garden'
@@ -18,7 +21,7 @@ export interface Thing {
   name: string
   emoji: string
   mode: Mode
-  /** Only for a timer thing: how long one session runs. */
+  /** The last lock-in length for this thing, in minutes; the dial opens on it. */
   minutes?: number
   /** Assigned from the thing's position when it was added, then fixed. */
   world: World
@@ -29,8 +32,14 @@ export interface Thing {
 export interface DayRecord {
   /** Ids of the things done that day. A thing appears at most once. */
   done: string[]
-  /** Minutes recorded by timers, per thing. Absent means none ran. */
+  /** Minutes spent locked in, per thing. Absent means none. */
   minutes: Record<string, number>
+  /**
+   * Things whose only showing up that day was a lock-in session that was
+   * left and waited. They count as done (showing up counts) but earn no
+   * star and do not bring a stone closer.
+   */
+  waited?: string[]
   /** The daily check-in was answered. */
   checkin?: boolean
 }
@@ -45,12 +54,20 @@ export interface Settings {
   lastRecapWeek?: DateKey
   /** Chosen the first time a postcard is sent; changed in the menu. */
   postcardFormat?: PostcardFormat
+  /** The quiet sea sound during a lock-in. Off unless switched on. */
+  sessionSound?: boolean
 }
 
 export interface AppData {
-  version: 1
+  version: 2
   things: Thing[]
   days: Record<DateKey, DayRecord>
+  /**
+   * Per thing, the highest unlock tier (in total days) whose stone has been
+   * cracked. A tier earned but above this is a stone waiting in the scene.
+   * Losing this would only bring stones back, never take a find away.
+   */
+  cracked: Record<string, number>
   settings: Settings
 }
 
@@ -59,5 +76,5 @@ export const MAX_THINGS = 5
 export const WORLD_ORDER: readonly World[] = ['sea', 'sky', 'garden']
 
 export function emptyData(): AppData {
-  return { version: 1, things: [], days: {}, settings: { sound: true } }
+  return { version: 2, things: [], days: {}, cracked: {}, settings: { sound: true } }
 }

@@ -486,14 +486,14 @@ export const COLLECTIBLES: readonly Collectible[] = [
     'a',
     14,
     'sky-a-moon',
-    'the moon',
-    'a crescent',
-    0.86,
-    0.2,
-    40,
-    'none',
+    'a moon ring',
+    'a halo around the moon, ice high up',
+    0.843,
+    0.123,
+    100,
+    'twinkle',
     () =>
-      `<circle cx="50" cy="50" r="30" fill="var(--star-pale)"/><circle cx="62" cy="44" r="28" fill="var(--night)"/>`,
+      `<circle cx="50" cy="50" r="40" fill="none" stroke="var(--star-pale)" stroke-width="2.5" opacity="0.35"/><circle cx="50" cy="50" r="44" fill="none" stroke="var(--glow)" stroke-width="1" opacity="0.2"/>`,
   ),
   sky(
     'a',
@@ -675,14 +675,19 @@ export const COLLECTIBLES: readonly Collectible[] = [
     'b',
     30,
     'sky-b-fullmoon',
-    'a full moon',
-    'follows the real moon',
-    0.62,
-    0.1,
-    36,
-    'none',
+    'moonlight on the water',
+    'a path of light under the moon',
+    0.843,
+    0.64,
+    60,
+    'twinkle',
     () =>
-      `<circle cx="50" cy="50" r="30" fill="var(--star-pale)"/><circle cx="40" cy="40" r="6" fill="#e8dcc0"/><circle cx="60" cy="56" r="8" fill="#e8dcc0"/><circle cx="46" cy="64" r="4" fill="#e8dcc0"/>`,
+      [8, 22, 36, 50, 64, 78]
+        .map(
+          (y, i) =>
+            `<rect x="${String(50 - (6 + i * 4))}" y="${String(y)}" width="${String(12 + i * 8)}" height="3" rx="1.5" fill="var(--star-pale)" opacity="${(0.55 - i * 0.07).toFixed(2)}"/>`,
+        )
+        .join(''),
   ),
   sky(
     'b',

@@ -1,49 +1,104 @@
-/* The row of things: horizontal, one card each, the add card at the end. */
+/* The row of things: the cards share the width and shrink to fit, so all
+   five and the add button are on a 320px screen without a scroll. */
 .row {
   display: flex;
-  gap: var(--s3);
+  gap: var(--s2);
   padding: var(--s2) calc(var(--safe-right) + var(--s4)) var(--s2)
     calc(var(--safe-left) + var(--s4));
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x proximity;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.row::-webkit-scrollbar {
-  display: none;
 }
 
 .card {
-  flex: 0 0 auto;
-  width: 108px;
-  min-height: 132px;
+  container-type: inline-size;
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 132px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--s2);
-  padding: var(--s3) var(--s2) var(--s3);
   border-radius: var(--r);
   background: var(--card);
   border: 1px solid var(--card-edge);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  scroll-snap-align: start;
   text-align: center;
   -webkit-touch-callout: none;
   transition:
-    transform var(--dur-fast) var(--ease),
     border-color var(--dur) var(--ease),
     box-shadow var(--dur) var(--ease);
 }
 
-.card:active {
+.card-main {
+  flex: 1;
+  min-height: 124px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--s2);
+  padding: var(--s3) var(--s1) var(--s2);
+  border-radius: var(--r) var(--r) 0 0;
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.card-main:active {
   transform: scale(0.96);
 }
 
-.card[aria-pressed='true'] {
+/* Lock in: the second way to do a thing, always visible, under the card. */
+.card-lock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s1);
+  height: var(--touch);
+  border-top: 1px solid var(--card-edge);
+  border-radius: 0 0 var(--r) var(--r);
+  color: var(--ink-dim);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.card-lock:hover,
+.card-lock:focus-visible {
+  color: var(--world-color);
+}
+
+.card-lock svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* A stone waiting: a small dark pebble with a warm crack, at the card's corner. */
+.card-stone {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 16px;
+  height: 14px;
+  padding: 0 3px;
+  border-radius: 50% 45% 50% 40%;
+  background: #2d2a33;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 180, 110, 0.6),
+    0 0 10px rgba(255, 180, 110, 0.45);
+  color: #ffd9a8;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 14px;
+}
+
+.card-stone[hidden] {
+  display: none;
+}
+
+.card[data-done='true'] {
   border-color: var(--world-color);
   box-shadow:
     0 0 0 1px var(--world-color),
@@ -66,8 +121,8 @@
 }
 
 .creature {
-  width: 56px;
-  height: 56px;
+  width: min(56px, 92%);
+  aspect-ratio: 1;
   display: grid;
   place-items: center;
   transform-origin: 50% 80%;
@@ -129,6 +184,9 @@
 }
 
 .card-name {
+  display: block;
+  width: 100%;
+  padding: 0 var(--s1);
   font-size: var(--t-sm);
   font-weight: 700;
   color: var(--ink);
@@ -144,14 +202,21 @@
 }
 
 /* Seven dots, the last seven days, today last. The only counting in the app. */
+/* Seven dots that share the card's width, so a narrow card keeps all of them inside. */
 .dots {
-  display: flex;
-  gap: 4px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  width: 100%;
+  max-width: 72px;
+  padding: 0 var(--s1);
+  justify-items: center;
 }
 
 .dot {
-  width: 7px;
-  height: 7px;
+  width: 100%;
+  max-width: 7px;
+  aspect-ratio: 1;
   border-radius: 50%;
   background: rgba(232, 240, 245, 0.18);
   transition: background var(--dur) var(--ease);
@@ -167,13 +232,26 @@
   outline-offset: 1px;
 }
 
+/* The add button: a narrow column at the end, so it never pushes a card off screen. */
 .card-add {
-  justify-content: center;
+  flex: 0 0 44px;
+  min-height: 168px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--r);
+  border: 1px dashed var(--card-edge);
+  background: rgba(6, 18, 43, 0.4);
   color: var(--ink-dim);
-  border-style: dashed;
   font-size: var(--t-lg);
 }
 
 .card-add:hover {
   color: var(--ink);
+}
+
+/* On the narrowest cards the clock icon goes and the words stay. */
+@container (max-width: 72px) {
+  .card-lock svg {
+    display: none;
+  }
 }

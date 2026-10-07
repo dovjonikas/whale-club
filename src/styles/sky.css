@@ -1,0 +1,127 @@
+/* The sky's depth: a nebula of slow colour behind the stars, the moon, and
+   the warm light the sunflowers throw up from the shore. Motion here is
+   CSS transforms and opacity only; under reduced motion it holds still. */
+
+.nebula {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.nebula i {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform;
+  animation: nebula-drift 44s ease-in-out infinite alternate;
+}
+
+.nebula i:nth-child(1) {
+  left: -35%;
+  top: 4%;
+  width: 115%;
+  height: 52%;
+  background: radial-gradient(
+    closest-side,
+    rgba(15, 181, 168, 0.22),
+    rgba(15, 181, 168, 0.07) 55%,
+    transparent
+  );
+}
+
+.nebula i:nth-child(2) {
+  left: 28%;
+  top: 26%;
+  width: 105%;
+  height: 58%;
+  background: radial-gradient(
+    closest-side,
+    rgba(118, 84, 196, 0.2),
+    rgba(118, 84, 196, 0.06) 55%,
+    transparent
+  );
+  animation-duration: 56s;
+  animation-delay: -14s;
+}
+
+.nebula i:nth-child(3) {
+  left: -6%;
+  top: -24%;
+  width: 92%;
+  height: 62%;
+  background: radial-gradient(
+    closest-side,
+    rgba(52, 96, 210, 0.22),
+    rgba(52, 96, 210, 0.07) 55%,
+    transparent
+  );
+  animation-duration: 64s;
+  animation-delay: -32s;
+}
+
+@keyframes nebula-drift {
+  from {
+    transform: translate3d(-3%, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(4%, 2%, 0) scale(1.06);
+  }
+}
+
+/* The moon sits high on the right, clear of the title. */
+.moon {
+  position: absolute;
+  right: 10%;
+  top: 18%;
+  width: 64px;
+  height: 64px;
+  pointer-events: none;
+}
+
+.moon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* The shore's warm light: stronger as the garden fills (--warmth, 0 to 1). */
+.shore-warmth {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 30%;
+  height: 420%;
+  background: radial-gradient(
+    60% 50% at 30% 100%,
+    rgba(255, 210, 130, 0.42),
+    rgba(255, 180, 110, 0.14) 45%,
+    transparent 75%
+  );
+  opacity: var(--warmth, 0.25);
+  pointer-events: none;
+  transition: opacity 2s var(--ease);
+}
+
+/* During a lock-in the sky turns, slowly; scaled up so its edges stay off screen. */
+.scene[data-session='true'] canvas.stars,
+.scene[data-session='true'] .nebula {
+  transform-origin: 50% 40%;
+  animation: sky-turn 240s linear infinite alternate;
+}
+
+@keyframes sky-turn {
+  from {
+    transform: scale(1.35) rotate(-4deg);
+  }
+  to {
+    transform: scale(1.35) rotate(4deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nebula i,
+  .scene[data-session='true'] canvas.stars,
+  .scene[data-session='true'] .nebula {
+    animation: none;
+  }
+}

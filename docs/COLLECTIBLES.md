@@ -35,9 +35,9 @@ the author writes it).
 | ---- | -------------------------------------------------------------------------- | ------------------------------------------------------------ |
 | 3    | The first star next to the thing's creature, brighter than a day-star      | A satellite crossing once a minute                           |
 | 7    | A constellation: the thing's own seven stars joined by lines               | A planet, low near the horizon                               |
-| 14   | The moon, a crescent                                                       | A second moon, smaller, because this sky allows it           |
+| 14   | A moon ring: a halo around the real moon                                   | A second moon, smaller, because this sky allows it           |
 | 21   | A shooting star once per session                                           | The Milky Way band, faint                                    |
-| 30   | A comet with a tail that stays all month                                   | A full moon that follows the real lunar phase                |
+| 30   | A comet with a tail that stays all month                                   | Moonlight on the water: a path of light under the moon       |
 | 45   | The aurora, a slow green and teal curtain near the horizon                 | A meteor shower on the day it unlocks, then one meteor a day |
 | 60   | A paper airplane crossing the sky, a bit silly on purpose                  | An owl on the horizon's edge, blinking                       |
 | 90   | An astronaut floating by, wearing the red jacket over the suit             | A hot air balloon with the red jacket as its basket          |
@@ -76,4 +76,4 @@ stays, the scene stays, only the creature is smaller for a while.
 2. Add its entry to `src/scene/collectibles.ts` (world, line, days, id, draw function).
 3. Add a `voice.ts` line under `unlock.<id>` (placeholder allowed).
 4. The Collection screen and the silhouettes read that one list; nothing else to register.
-5. Add an e2e case in `tests/e2e/collectibles.e2e.ts` that seeds the days and expects the item.
+5. Add an e2e case in `tests/e2e/stones.e2e.ts` that seeds the days and expects the item.

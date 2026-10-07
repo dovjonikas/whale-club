@@ -2,30 +2,34 @@
 
 ## Done
 
-v0.4.0, live at https://dovjonikas.github.io/whale-club/ after the push.
+v0.5.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
-- **Docs**: DESIGN, COLLECTIBLES, DECISIONS, ARCHITECTURE, RESEARCH-SEA, RESEARCH-DOPAMINE.
-- **Scaffold**: Vite + strict TypeScript, type-checked ESLint + Prettier, MIT, CHANGELOG, GitHub Actions (lint + build + e2e, deploy only on push to main), Playwright on iPhone 13 / Pixel 5 / 1366x768. GitHub Pages enabled with the Actions source.
-- **v0.1.0**: things, tap, timer, week dots, the scene, the sky as a calendar, creatures, PWA, update toast.
-- **v0.2.0**: 60 collectibles, Collection, the whale on all done, tappable stars, daily surprise, check-in, recap, sound, share.
-- **v0.3.0**: a buddy slot with share codes (removed in v0.4.0).
-- **v0.4.0**:
-  - postcards replace the buddy: "send the whale" / "send this" after all done, unlock, stage up and the recap; "send the sea" in the header; story 1080x1920 or square 1080x1080, chosen on the first send, changed in the menu; share sheet or download;
-  - four header buttons; the menu is the club (three rules, one sentence, postcard size);
-  - the app lives in a phone-wide frame, black sides on a desktop;
-  - the install leaf waits for the first thing; iPhone gets three big steps;
-  - every line after a tap fits one row at 320px (tested); sea facts may wrap (DECISIONS);
-  - Lighthouse through Edge on the live URL: mobile 99 / 93 / 100 / 100, desktop 100 / 93 / 100 / 100; the one accessibility finding (a list without items) is fixed.
+- **v0.1.0 to v0.3.0**: the row, the scene, the sky as a calendar, creatures, PWA, collectibles, the whale, rituals, sound, share; a buddy slot (since removed).
+- **v0.4.0**: postcards instead of a buddy; the phone-wide frame; the install leaf after the first thing; Lighthouse through Edge.
+- **v0.5.0**:
+  - **the crack**: earned tiers fall in as stones (sea floats, sky hangs, garden lies on the shore), a mark on the card, three taps or a one-second hold, shake, cracks, burst, the find polished and settling; rarity (common, rare, legendary) from the date, cosmetic only;
+  - **the sky**: nebula, tinted star field with sparkles and a shooting star, the moon in its real phase, the shore's warm light; one requestAnimationFrame loop for the whole app, stopped while hidden or off screen, never started under reduced motion;
+  - **lock in**: a visible button on every card, the dial (10 to 120, step 5, remembered per thing), the whole-screen session with the creature growing from an egg, spark or seed, breathing and blinking, the sky turning, wake lock, an optional generated sea sound; leaving for more than 15 s marks the session and the creature waits; a clean end is a full day, a left one counts as done without a star or a step towards a stone; stop writes the minutes only;
+  - notices moved under the header; data version 2 with a migration from 1;
+  - the third rule is now the author's: "you never give up on yourself".
+
+## How the timer worked before v0.5 (the audit asked for)
+
+- It counted from a timestamp: `{ thingId, startedAt, minutes }` in `whaleclub:timer`; the time left was always `startedAt + minutes - now`, never a count of ticks.
+- A reload or reopening resumed it from that key; if the time had already run out, it finished at once and counted as done.
+- Closing the app did nothing at the time; nothing ran in the background. Coming back worked the end out from the timestamp.
+- If the time ran out in the background, the tick (a 1 s interval, throttled or suspended while hidden) noticed on return and finished it then; no sound, no notification.
+- There was no wake lock, and nothing noticed leaving. The only way in was a long press on the card, which is why it was hard to tell whether it worked.
 
 ## Verified
 
 - `npm run lint`, `tsc --noEmit`, `npm run build`: clean.
-- `npm test`: 92 passed, 10 skipped (device-specific), on three projects.
-- Screenshots regenerated: scene, whale, all done with the postcard button, collection, menu, and both postcards.
+- `npm test`: 121 passed, 14 skipped (device-specific), on iPhone 13, Pixel 5 and desktop. The Android "leaving for more than 15 seconds" test failed once under full load because Playwright's clock keeps running after a fast-forward; it now checks the time set aside directly and passes on every run since.
+- Screenshots regenerated: scene, stone, crack, find, dial, session start, session grown, all done, collection, menu, postcards.
 
 ## Next
 
-v0.5.0 (the author's brief of 2026-10-07): the crack (collectibles arrive as stones to break), the deeper sky, and lock in as the heart of the app.
+v0.6.0 (the author's brief of 2026-10-07): days. Seven day toggles per thing in its sheet, "not today" and "also today", consistency counted over planned days only, rest days.
 
 ## How to run
 
@@ -48,5 +52,5 @@ npx lighthouse https://dovjonikas.github.io/whale-club/ --chrome-flags="--headle
 
 ## For the author to do by hand
 
-1. **Voice**: replace every line marked `TODO-VOICE` in `src/voice.ts`. Keep each under about 40 characters so it fits one row on a 320px phone; `tests/e2e/lines.e2e.ts` checks that. Tests assert a few of the current strings (untap, allDone, timerEnd, missedDay, unlock, shareDone, the first rule, the check-in answers, the club sentence); change those tests in the same commit.
-2. **On the phone**: open the live URL in Safari, add a thing, tap "show me how" and follow the three steps.
+1. **Voice**: replace every line marked `TODO-VOICE` in `src/voice.ts`. New in v0.5: `lockIn.broken`, `lockIn.stopped`, `stones.fell`, `stones.waiting`. Keep each under about 40 characters so it fits one row on a 320px phone; `tests/e2e/lines.e2e.ts` checks that. A few tests assert the current strings; change them in the same commit.
+2. **On the phone**: add it to the home screen, start a lock-in and lock the phone for a minute, to see "you left. it waited." with your own eyes.
