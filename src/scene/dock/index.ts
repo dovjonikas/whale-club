@@ -1,4 +1,4 @@
-import type { Motion } from '../collectibles'
+import type { Collectible, Motion } from '../collectibles'
 import * as art from './art'
 
 /**
@@ -275,4 +275,25 @@ export function dockItem(id: string): DockItem | undefined {
 
 export function dockSvg(item: DockItem): string {
   return `<svg viewBox="0 0 100 100" aria-hidden="true">${item.draw()}</svg>`
+}
+
+/**
+ * A placed dock thing in the finds' shape, so the scene, the arrangement
+ * and the postcard draw both the same way. Null for the other kinds.
+ */
+export function dockCollectible(item: DockItem): Collectible | null {
+  if (item.kind !== 'place' || !item.world || item.size === undefined || !item.motion) return null
+  return {
+    id: item.id,
+    world: item.world,
+    line: 'a',
+    days: 0,
+    name: item.name,
+    hint: item.line,
+    x: 0,
+    y: 0,
+    size: item.size,
+    motion: item.motion,
+    draw: item.draw,
+  }
 }

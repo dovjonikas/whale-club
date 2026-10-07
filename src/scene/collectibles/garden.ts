@@ -88,11 +88,12 @@ export const GARDEN: readonly Collectible[] = [
     'garden-a-island',
     'an island',
     'a second shore across the water',
-    0.5,
-    120,
+    0.72,
+    96,
     'none',
+    // A low mound that thins to nothing at both ends, so it sits in the water, not on a box.
     () =>
-      `<path d="M0 70 Q 50 40, 100 70 V 80 H 0 Z" fill="var(--sand)" opacity="0.8"/><path d="M50 55 V 30 M50 32 q -16 -4 -22 -14 M50 32 q 16 -4 22 -14 M50 34 q -8 -14 -2 -24" stroke="var(--leaf)" stroke-width="3" stroke-linecap="round" fill="none"/>`,
+      `<path d="M0 80 Q 22 78, 34 64 Q 50 50, 66 64 Q 78 78, 100 80 Z" fill="var(--sand)" opacity="0.85"/><path d="M49 60 Q 46 46, 52 32" stroke="#8a6a44" stroke-width="2.6" fill="none" stroke-linecap="round"/><g fill="var(--leaf)"><path d="M52 32 Q 40 22, 27 31 Q 40 27, 52 32 Z"/><path d="M52 32 Q 64 22, 77 31 Q 64 27, 52 32 Z"/><path d="M52 32 Q 44 18, 36 18 Q 45 23, 52 32 Z"/><path d="M52 32 Q 60 18, 68 19 Q 59 23, 52 32 Z"/></g>`,
   ),
   // GARDEN, line B
   garden(

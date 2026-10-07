@@ -41,9 +41,22 @@ export interface SceneDays {
   label: (date: DateKey) => string
 }
 
+/** Where a shown thing stands: its place, or its own spot for the scene's weather. */
+export interface Standing {
+  x: number
+  y: number
+  /** Feet on y (the shore's things) rather than centred on it. */
+  stand: boolean
+  /** Drawn smaller, far away. */
+  depth: number
+}
+
 export interface ShownCollectible {
   item: Collectible
   rarity: Rarity
+  at: Standing
+  /** The scene's weather (an aurora, the deep): drawn behind the things that stand in places. */
+  weather?: boolean
 }
 
 export class Scene {
@@ -266,7 +279,7 @@ export class Scene {
     const hour = now.getHours()
     const dark = hour >= NIGHT_FROM || hour < NIGHT_TO
     const keep = new Set<string>()
-    for (const { item, rarity } of shown) {
+    for (const { item, rarity, at, weather } of shown) {
       if (item.night && !dark) continue
       keep.add(item.id)
       let element = this.thingsLayer.querySelector<HTMLElement>(`[data-id="${item.id}"]`)
@@ -277,16 +290,15 @@ export class Scene {
         element.dataset.motion = item.motion
         element.dataset.world = item.world
         element.dataset.rarity = rarity
-        element.style.left = `${(item.x * 100).toFixed(2)}%`
-        element.style.top = `${(item.y * 100).toFixed(2)}%`
-        // Scaled with the scene by a CSS variable the resize sets, so nothing reads layout here.
-        element.style.width = `calc(${String(item.size)}px * var(--scene-scale, 1))`
-        element.innerHTML = collectibleSvg(item)
+        element.dataset.weather = String(weather === true)
+        // The wrapper stands in its place; the art inside moves, so a drift never shifts the place.
+        element.innerHTML = `<div class="collectible-art">${collectibleSvg(item)}</div>`
         this.thingsLayer.append(element)
+        this.standAt(element, item.size, at)
         const from = arrivals.get(item.id)
         if (from) this.arrive(element, from)
         else if (!firstRender && !this.shown.has(item.id)) element.classList.add('is-new')
-      }
+      } else this.standAt(element, item.size, at)
       this.shown.add(item.id)
     }
     for (const element of this.thingsLayer.querySelectorAll<HTMLElement>('.collectible')) {
@@ -296,6 +308,21 @@ export class Scene {
         this.shown.delete(id)
       }
     }
+  }
+
+  /**
+   * Puts a shown thing in its place. Positions are percentages of the
+   * scene and the width follows a CSS variable the resize sets, so nothing
+   * here reads layout; an unchanged place writes nothing.
+   */
+  private standAt(element: HTMLElement, size: number, at: Standing): void {
+    const left = `${(at.x * 100).toFixed(2)}%`
+    const top = `${(at.y * 100).toFixed(2)}%`
+    const width = `calc(${String(Math.round(size * at.depth * 100) / 100)}px * var(--scene-scale, 1))`
+    if (element.style.left !== left) element.style.left = left
+    if (element.style.top !== top) element.style.top = top
+    if (element.style.width !== width) element.style.width = width
+    element.dataset.stand = String(at.stand)
   }
 
   /** The stones waiting; returns the keys of ones that just fell in. */

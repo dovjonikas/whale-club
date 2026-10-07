@@ -143,10 +143,26 @@ canvas.particles {
   outline: 2px solid var(--star);
 }
 
-/* Collectibles: placed by their centre, sized for the phone and scaled. */
+/* Collectibles: each stands in its place (src/scene/spots.ts), centred on
+   it or, for the shore's things, standing on it. The wrapper holds the
+   place; the art inside moves, so a drift or a sway never shifts where a
+   thing stands, and an arrangement can move the wrapper alone. */
 .collectible {
+  --anchor-y: -50%;
   position: absolute;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, var(--anchor-y));
+}
+
+.collectible[data-stand='true'] {
+  --anchor-y: -100%;
+}
+
+/* Things stand in front of the scene's weather, whichever came first. */
+.collectible[data-weather='false'] {
+  z-index: 1;
+}
+
+.collectible-art {
   will-change: transform;
 }
 
@@ -158,28 +174,24 @@ canvas.particles {
   overflow: visible;
 }
 
-.collectible[data-world='garden'] {
-  transform: translate(-50%, -100%);
-}
-
-.collectible[data-motion='drift'] {
+.collectible[data-motion='drift'] .collectible-art {
   animation: drift 14s ease-in-out infinite alternate;
 }
 
-.collectible[data-motion='swim'] {
+.collectible[data-motion='swim'] .collectible-art {
   animation: swim-slow 9s ease-in-out infinite alternate;
 }
 
-.collectible[data-motion='sway'] {
+.collectible[data-motion='sway'] .collectible-art {
   transform-origin: 50% 100%;
   animation: sway 5s ease-in-out infinite alternate;
 }
 
-.collectible[data-motion='twinkle'] {
+.collectible[data-motion='twinkle'] .collectible-art {
   animation: twinkle 4s ease-in-out infinite alternate;
 }
 
-.collectible[data-motion='sweep'] {
+.collectible[data-motion='sweep'] .collectible-art {
   animation: twinkle 6s ease-in-out infinite alternate;
 }
 
@@ -187,25 +199,21 @@ canvas.particles {
   animation: unlock 1.4s var(--ease-bounce) both;
 }
 
-.collectible[data-world='garden'].is-new {
-  animation-name: unlock-garden;
-}
-
 @keyframes swim-slow {
   from {
-    transform: translate(-50%, -50%) translate3d(-24px, 0, 0);
+    transform: translate3d(-24px, 0, 0);
   }
   to {
-    transform: translate(-50%, -50%) translate3d(24px, -8px, 0);
+    transform: translate3d(24px, -8px, 0);
   }
 }
 
 @keyframes sway {
   from {
-    transform: translate(-50%, -100%) rotate(-3deg);
+    transform: rotate(-3deg);
   }
   to {
-    transform: translate(-50%, -100%) rotate(3deg);
+    transform: rotate(3deg);
   }
 }
 
@@ -220,29 +228,15 @@ canvas.particles {
 
 @keyframes unlock {
   0% {
-    transform: translate(-50%, -50%) scale(0.5);
+    transform: translate(-50%, var(--anchor-y)) scale(0.5);
     opacity: 0;
   }
   60% {
-    transform: translate(-50%, -50%) scale(1.25);
+    transform: translate(-50%, var(--anchor-y)) scale(1.25);
     opacity: 1;
   }
   100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-@keyframes unlock-garden {
-  0% {
-    transform: translate(-50%, -100%) scale(0.5);
-    opacity: 0;
-  }
-  60% {
-    transform: translate(-50%, -100%) scale(1.25);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -100%) scale(1);
+    transform: translate(-50%, var(--anchor-y)) scale(1);
   }
 }
 

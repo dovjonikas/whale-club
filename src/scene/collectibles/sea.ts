@@ -1,5 +1,5 @@
 import * as art from '../art'
-import { dots, fish, jacket, jelly } from '../draw'
+import { dots, fish, jacket, jelly, pool } from '../draw'
 import { sea, type Collectible } from './build'
 
 /** The sea's twenty finds, line A then line B. */
@@ -266,8 +266,10 @@ export const SEA: readonly Collectible[] = [
     0.686,
     200,
     'twinkle',
-    () =>
-      `<path d="M0 40 Q 50 10, 100 40 V 100 H 0 Z" fill="#010205"/>${dots(
+    () => {
+      // A darkness with no rim: the deep opens under the sea, its own lights in it.
+      const [shade, fill] = pool('#010205', 0.85)
+      return `${shade}<ellipse cx="50" cy="66" rx="50" ry="34" fill="${fill}"/>${dots(
         [
           [10, 70, 1.5],
           [25, 85, 1],
@@ -277,6 +279,7 @@ export const SEA: readonly Collectible[] = [
           [90, 80, 2],
         ],
         'var(--jacket)',
-      )}`,
+      )}`
+    },
   ),
 ]

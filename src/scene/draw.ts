@@ -33,6 +33,29 @@ export const lit = (color: string, light = 0.35, dark = -0.35): [string, string]
   ]
 }
 
+/**
+ * A colour that fades in and out again from top to bottom: for light that
+ * has no edge, like an aurora's curtain. Returns the defs and the fill.
+ */
+export const veil = (color: string, peak: number): [string, string] => {
+  const id = `g${String(++gradients)}`
+  const c = hex(color)
+  return [
+    `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c}" stop-opacity="0"/><stop offset="0.45" stop-color="${c}" stop-opacity="${String(peak)}"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></linearGradient></defs>`,
+    `url(#${id})`,
+  ]
+}
+
+/** A colour strongest at the centre and gone at the edge: a shadow or a glow with no rim. */
+export const pool = (color: string, peak: number): [string, string] => {
+  const id = `g${String(++gradients)}`
+  const c = hex(color)
+  return [
+    `<defs><radialGradient id="${id}"><stop offset="0" stop-color="${c}" stop-opacity="${String(peak)}"/><stop offset="1" stop-color="${c}" stop-opacity="0"/></radialGradient></defs>`,
+    `url(#${id})`,
+  ]
+}
+
 export const face = (cx: number, cy: number, s = 1, ink = '#061020'): string =>
   `<g class="eyes"><ellipse cx="${cx - 3 * s}" cy="${cy}" rx="${1.6 * s}" ry="${1.8 * s}" fill="${ink}"/><ellipse cx="${cx + 3 * s}" cy="${cy}" rx="${1.6 * s}" ry="${1.8 * s}" fill="${ink}"/><circle cx="${cx - 2.4 * s}" cy="${cy - 0.7 * s}" r="${0.6 * s}" fill="#fff"/><circle cx="${cx + 3.6 * s}" cy="${cy - 0.7 * s}" r="${0.6 * s}" fill="#fff"/></g><ellipse cx="${cx - 5 * s}" cy="${cy + 2.6 * s}" rx="${1.5 * s}" ry="${0.9 * s}" fill="#ff8fa3" opacity="0.5"/><ellipse cx="${cx + 5 * s}" cy="${cy + 2.6 * s}" rx="${1.5 * s}" ry="${0.9 * s}" fill="#ff8fa3" opacity="0.5"/><path d="M${cx - 2.4 * s} ${cy + 3.6 * s} q ${2.4 * s} ${2.4 * s} ${4.8 * s} 0" stroke="${ink}" stroke-width="${1.1 * s}" fill="none" stroke-linecap="round"/>`
 
