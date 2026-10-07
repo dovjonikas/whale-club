@@ -16,6 +16,7 @@
 
 .intro-skip {
   position: absolute;
+  z-index: 3;
   top: calc(var(--safe-top) + var(--s2));
   right: var(--s2);
   min-width: var(--touch);
@@ -72,6 +73,13 @@
   filter: brightness(0) drop-shadow(0 0 1.5px rgba(201, 251, 245, 0.85));
 }
 
+.intro-line,
+.intro-truth,
+.intro-start {
+  position: relative;
+  z-index: 1;
+}
+
 .intro-line {
   grid-row: 3;
   margin: 0 0 var(--s8);
@@ -84,12 +92,12 @@
   text-shadow: 0 0 14px rgba(2, 4, 9, 0.95);
 }
 
-/* The truth: the author's words, over the empty sea. */
+/* The truth: the author's words, over the empty sea. The two halves share
+   one place; the second takes the first one's place at the blink. */
 .intro-truth {
   grid-row: 2;
   align-self: center;
   display: grid;
-  gap: var(--s4);
   max-width: 340px;
   font-family: var(--font-display);
   font-size: var(--t-md);
@@ -100,25 +108,33 @@
   text-shadow: 0 0 14px rgba(2, 4, 9, 0.95);
 }
 
-.intro-truth {
+.intro-half {
+  grid-area: 1 / 1;
+  display: grid;
   gap: var(--s2);
+  align-content: center;
+}
+
+.intro-truth[data-half='2'] .intro-half:first-child {
+  opacity: 0;
 }
 
 .intro-truth p {
   margin: 0;
+}
+
+/* Each phrase comes word by word, like a line of a tune. */
+.intro-truth span {
+  display: inline-block;
   opacity: 0;
-  transform: translate3d(0, 10px, 0);
+  transform: translate3d(0, 8px, 0);
   transition:
-    opacity 1400ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1400ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 900ms var(--ease-out),
+    transform 900ms var(--ease-out);
+  transition-delay: calc(var(--i) * 110ms);
 }
 
-/* A breath between the two sentences. */
-.intro-truth p:nth-child(3) {
-  margin-top: var(--s4);
-}
-
-.intro-truth p.is-on {
+.intro-truth p.is-on span {
   opacity: 1;
   transform: none;
 }
@@ -128,16 +144,20 @@
   width: min(320px, 100%);
   opacity: 0;
   visibility: hidden;
+  transform: translate3d(0, 12px, 0);
   transition:
-    opacity 900ms var(--ease),
+    opacity 900ms var(--ease-out),
+    transform 900ms var(--ease-out),
     visibility 0s linear 900ms;
 }
 
 .intro[data-beat='start'] .intro-start {
   opacity: 1;
   visibility: visible;
+  transform: none;
   transition:
-    opacity 900ms var(--ease),
+    opacity 900ms var(--ease-out),
+    transform 900ms var(--ease-out),
     visibility 0s;
 }
 
@@ -309,6 +329,29 @@
   animation: star-breathe 3.6s ease-in-out 1.6s infinite;
 }
 
+.intro-star i {
+  position: absolute;
+  inset: -6px;
+  border: 1.5px solid rgba(255, 217, 138, 0.85);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.intro[data-star='on'] .intro-star i {
+  animation: star-ring 1400ms var(--ease-out) 1;
+}
+
+@keyframes star-ring {
+  0% {
+    opacity: 0.9;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.2);
+  }
+}
+
 @keyframes star-breathe {
   50% {
     transform: scale(1.12);
@@ -333,5 +376,209 @@
   }
   .intro-star {
     transform: none;
+  }
+}
+
+/* --- The truth as a song that climbs ------------------------------------------------
+   Everything below only ever adds: the lids, the light that warms in steps,
+   the stars that double, the slow push-in, the little whale's joy. */
+
+/* The stage: what the camera leans into, under the words. */
+.intro-stage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: transform 1.2s var(--ease-out);
+}
+
+.intro[data-push='true'] .intro-stage,
+.scene[data-push='true'] {
+  transform: scale(1.045);
+  transition: transform 9s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* The light, in four layers that only ever add up. */
+.intro-light {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1600ms var(--ease-out);
+}
+
+.intro-light[data-light='cold'] {
+  background: rgba(2, 6, 18, 0.4);
+}
+
+.intro-light[data-light='dawn'] {
+  background: radial-gradient(
+    130% 50% at 50% var(--horizon),
+    rgba(255, 190, 120, 0.26),
+    rgba(255, 190, 120, 0) 70%
+  );
+}
+
+.intro-light[data-light='warm'] {
+  background: radial-gradient(
+    100% 55% at 50% 12%,
+    rgba(255, 217, 138, 0.16),
+    rgba(255, 217, 138, 0) 72%
+  );
+}
+
+.intro-light[data-light='gold'] {
+  background: radial-gradient(
+    60% 34% at 50% 15%,
+    rgba(255, 236, 190, 0.3),
+    rgba(255, 236, 190, 0) 75%
+  );
+}
+
+.intro[data-light='cold'] .intro-light[data-light='cold'],
+.intro[data-light='warm'] .intro-light[data-light='dawn'],
+.intro[data-light='warm'] .intro-light[data-light='warm'],
+.intro[data-light='gold'] .intro-light[data-light='dawn'],
+.intro[data-light='gold'] .intro-light[data-light='warm'],
+.intro[data-light='gold'] .intro-light[data-light='gold'] {
+  opacity: 1;
+}
+
+.intro[data-light='dawn'] .intro-light[data-light='dawn'] {
+  opacity: 0.65;
+}
+
+/* The stars that double as "compound" is read. */
+.intro-sky i {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  border-radius: 50%;
+  background: var(--star-pale);
+  box-shadow: 0 0 6px 1px rgba(255, 244, 214, 0.7);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 500ms var(--ease-out) var(--d),
+    transform 700ms var(--ease-out) var(--d);
+}
+
+.intro-sky i.is-on {
+  opacity: 0.9;
+  transform: none;
+}
+
+/* On the last word every star flares once, a ripple rather than a flash. */
+.intro[data-light='gold'] .intro-sky i.is-on {
+  animation: sky-flare 900ms var(--ease-out) calc(var(--d) * 2) 1;
+}
+
+@keyframes sky-flare {
+  40% {
+    opacity: 1;
+    transform: scale(1.8);
+  }
+}
+
+/* The little whale's joy on the last word: a hop, then breathing again. */
+.intro[data-calf='blow'] .intro-calf-body {
+  animation:
+    calf-joy 900ms var(--ease-out) 1,
+    calf-breathe 5s ease-in-out 900ms infinite;
+}
+
+@keyframes calf-joy {
+  35% {
+    transform: translate3d(0, -12px, 0) rotate(-8deg);
+  }
+  70% {
+    transform: translate3d(0, 2px, 0) rotate(2deg);
+  }
+}
+
+/* The eyes: two lids with a soft curved edge. They close slowly on the
+   year, flutter open on day one, and blink at the turn. */
+.intro-lids {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.intro-lids i {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  height: 58%;
+  background: var(--abyss);
+  box-shadow: 0 0 36px 18px var(--abyss);
+  transition: transform 520ms var(--ease-in-out);
+}
+
+.intro-lids i:first-child {
+  top: 0;
+  border-radius: 0 0 50% 50% / 0 0 18% 18%;
+  transform: translate3d(0, calc(-100% - 64px), 0);
+}
+
+.intro-lids i:last-child {
+  bottom: 0;
+  border-radius: 50% 50% 0 0 / 18% 18% 0 0;
+  transform: translate3d(0, calc(100% + 64px), 0);
+}
+
+.intro[data-lids='shut'] .intro-lids i {
+  transform: none;
+  transition-duration: 260ms;
+}
+
+.intro[data-lids='sleep'] .intro-lids i {
+  transform: none;
+  transition-duration: 700ms;
+}
+
+.intro[data-lids='peek'] .intro-lids i:first-child {
+  transform: translate3d(0, -42%, 0);
+  transition-duration: 300ms;
+}
+
+.intro[data-lids='peek'] .intro-lids i:last-child {
+  transform: translate3d(0, 42%, 0);
+  transition-duration: 300ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* The lids fade instead of moving, nothing pushes or hops, and the stars
+     only fade in. */
+  .intro-lids i,
+  .intro-lids i:first-child,
+  .intro-lids i:last-child,
+  .intro[data-lids] .intro-lids i {
+    transform: none;
+    opacity: 0;
+    transition: opacity 400ms linear;
+  }
+  .intro[data-lids='shut'] .intro-lids i,
+  .intro[data-lids='sleep'] .intro-lids i {
+    opacity: 1;
+  }
+  .intro[data-lids='peek'] .intro-lids i {
+    opacity: 0.6;
+  }
+  .intro-truth span,
+  .intro-start,
+  .intro-sky i {
+    transform: none;
+    transition-property: opacity;
+  }
+  .intro[data-push='true'] .intro-stage,
+  .scene[data-push='true'] {
+    transform: none;
+    transition: none;
+  }
+  .intro[data-light='gold'] .intro-sky i.is-on,
+  .intro[data-star='on'] .intro-star i,
+  .intro[data-calf='blow'] .intro-calf-body {
+    animation: none;
   }
 }

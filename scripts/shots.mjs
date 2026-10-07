@@ -267,7 +267,7 @@ for (const [file, off] of [
   }
   await context.close()
 }
-// The first minute: the promise half way through its year, then the truth.
+// The first minute: the promise half way through its year, then the truth at its peak.
 {
   const context = await browser.newContext({ ...devices['iPhone 13'] })
   const page = await context.newPage()
@@ -276,7 +276,7 @@ for (const [file, off] of [
   await page.waitForTimeout(4300)
   await page.screenshot({ path: resolve(out, 'iphone-promise.png') })
   await page.getByRole('dialog', { name: 'whale club' }).click({ position: { x: 60, y: 300 } })
-  await page.waitForTimeout(4500)
+  await page.waitForTimeout(11800)
   await page.screenshot({ path: resolve(out, 'iphone-truth.png') })
   await context.close()
 }

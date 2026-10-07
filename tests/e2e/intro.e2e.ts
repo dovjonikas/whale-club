@@ -65,6 +65,20 @@ test('four taps from a first open to the first card: skip, start light, a small 
   await expect(page.locator('.card-hint')).toHaveText("tap it when it's done.")
 })
 
+test('the truth climbs: the doubt gives way to the hope, the stars double, the light turns gold', async ({
+  page,
+}) => {
+  await page.goto('')
+  await intro(page).click({ position: { x: 100, y: 300 } })
+  const truth = intro(page).locator('.intro-truth')
+  await expect(truth).toHaveAttribute('data-half', '1')
+  await expect(truth).toHaveAttribute('data-half', '2', { timeout: 9000 })
+  // One, two, four, eight, sixteen.
+  await expect(intro(page).locator('.intro-sky i.is-on')).toHaveCount(31, { timeout: 6000 })
+  await expect(intro(page)).toHaveAttribute('data-light', 'gold', { timeout: 6000 })
+  await expect(page.getByRole('button', { name: 'start light' })).toBeVisible({ timeout: 6000 })
+})
+
 test('the whole intro reaches the first step within thirty seconds', async ({ page }) => {
   test.setTimeout(60_000)
   const start = Date.now()

@@ -625,3 +625,24 @@ minutes (five-minute steps to an hour, quarters to three hours, half hours
 to ten), so the short lengths most people pick keep the most room and one
 key press is always one stop. Ten hours is the ceiling: longer is a day,
 not a session.
+
+## 2026-10-07 The truth is a song that climbs
+
+The author wanted the truth beat to land like a melody, the kind that makes
+a person think "we got this". The method came from how a moving sequence
+in another of the author's pages is built (the method only; nothing of that
+page was copied): every line moves the scene one step on, the steps only
+ever add up, the eyes blink between lines, the camera pushes slowly in, and
+the mood climbs from hushed to gold before a held, still end.
+
+Here that becomes a score in `src/app/intro.ts` (`TRUTH`). The two halves of
+the sentence are the two halves of the song: the doubt is dim and cold, the
+hope arrives through a blink, the one moment the screen goes dark on
+purpose, and the little whale opens its eyes as ours do. "Compound" is shown,
+not told: the stars double in waves that come sooner each time (an
+accelerando), each with the next note up the scale, and the last word lands
+on a four-note chord played as a quick arpeggio. The stars sit on the R2
+sequence, which spreads points evenly with no grid and no line (a first
+golden-ratio try fell on a diagonal). Nothing steps back once it has
+arrived, so the climb never stalls. The whole intro still reaches "start
+light" in about twenty-seven seconds.

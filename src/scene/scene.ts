@@ -211,6 +211,11 @@ export class Scene {
     if (!on) this.thingsLayer.querySelector('.whale')?.remove()
   }
 
+  /** The intro's slow push-in: the camera leans in while the truth lands. */
+  setPush(on: boolean): void {
+    this.root.dataset.push = String(on)
+  }
+
   /** A find, as the intro shows it: only a flash of light where it would be. */
   flash(x: number, y: number, world: World): void {
     const flash = document.createElement('div')

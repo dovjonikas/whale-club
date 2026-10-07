@@ -2,6 +2,25 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.11.2 - 2026-10-07
+
+The truth beat, played like a song that climbs.
+
+- The eyes close slowly on the year and flutter open on the empty sea of
+  day one, dim and cold, with the little whale asleep. The first half of the
+  author's sentence (the doubt) comes word by word.
+- Then the eyes blink. Under the closed lids the doubt goes and the light
+  warms, and they open on the second half (the hope) as the little whale
+  opens its eyes too.
+- At "compound" the stars double, one, two, four, eight, sixteen, each wave
+  sooner than the last, while the camera leans slowly in. The whale swims up,
+  the light warms again, and on the last word it hops and blows, the first
+  star blooms with a ring, every star flares once, and the notes climb to a
+  bright chord.
+- Every cue only adds to the ones before it. Transform and opacity only; under
+  reduced motion the lids fade and nothing moves. Still under thirty seconds
+  to "start light".
+
 ## 0.11.1 - 2026-10-07
 
 The author's first look at 0.11, answered.

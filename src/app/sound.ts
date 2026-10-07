@@ -142,14 +142,15 @@ export class Sound {
 
   /**
    * One note of a pentatonic scale, soft and short, for the intro's melody:
-   * whatever order they come in, they never clash.
+   * whatever order they come in, they never clash. `at` delays it, in
+   * seconds, so a chord can be played as a quick arpeggio.
    */
-  note(step: number): void {
+  note(step: number, at = 0): void {
     if (this.muted || !this.ctx) return
     const freq =
       PENTATONIC[((step % PENTATONIC.length) + PENTATONIC.length) % PENTATONIC.length] ?? 523
-    this.tone(freq, 0, 0.9, 0.022, 'sine')
-    this.tone(freq * 2, 0.02, 0.5, 0.006, 'sine')
+    this.tone(freq, at, 0.9, 0.022, 'sine')
+    this.tone(freq * 2, at + 0.02, 0.5, 0.006, 'sine')
   }
 
   private tone(

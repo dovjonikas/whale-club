@@ -38,7 +38,7 @@ That is all that happens.
 <p align="center">
   <img src="docs/screenshots/iphone-promise.webp" alt="The first minute: a year drawn in silhouette, the day counter running, the sky filling with stars" width="240">
   &nbsp;
-  <img src="docs/screenshots/iphone-truth.webp" alt="The first minute: the author's sentence over the empty sea and the sleeping whale" width="240">
+  <img src="docs/screenshots/iphone-truth.webp" alt="The first minute at its peak: the second half of the author's sentence under a sky of doubled stars, the first star blooming, the little whale at the surface" width="240">
   &nbsp;
   <img src="docs/screenshots/iphone-add.webp" alt="The add sheet: tap when done, or lock in with a length" width="240">
   &nbsp;
@@ -89,7 +89,10 @@ And underneath all three: nothing dies. You just missed a day.
 - **The first minute.** A first open shows a year in silhouette (a day
   counter running to 365, the sky filling, creatures growing, stones
   opening, the whale rising before the moon), then the author's sentence
-  over the empty sea, then one button: "start light". Skip is always there.
+  played like a song that climbs: the eyes open on the empty sea of day
+  one, blink at the turn, the stars double as "compound" is read, and the
+  first star blooms on the last word. Then one button: "start light". Skip
+  is always there.
   After that, every mechanic explains itself in one line the first time it
   shows, and the next find is always in sight above the row.
 - **Days, if you want them.** Every thing is planned every day unless
