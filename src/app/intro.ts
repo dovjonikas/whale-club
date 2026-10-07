@@ -26,10 +26,17 @@ import type { Sound } from './sound'
  * gathering, and at the end the whale rising before the moon. All of it in
  * silhouette: it shows that the sea fills, not what with.
  *
- * The truth: the empty sea of day one and the author's sentence, a phrase
- * at a time, while a small story plays under it: a little whale asleep
- * under the surface wakes, swims up and blows, and the first star lights
- * above it on the last word.
+ * The truth is built like a song that climbs. Every cue only adds to the
+ * ones before it, so the scene keeps getting warmer and never steps back.
+ * The eyes close on the year and flutter open on the empty sea of day
+ * one, dim and cold, with a little whale asleep under the surface. The
+ * first half of the sentence (the doubt) comes word by word. Then the eyes
+ * blink: under the closed lids the doubt goes and the light warms, and they
+ * open on the second half (the hope) as the little whale opens its eyes too.
+ * At "compound" the stars double, one, two, four, eight, sixteen, faster
+ * each time, and the camera leans in. The little whale swims up, the light
+ * warms again, and on the last word it blows, the first star blooms, and
+ * the notes land on a bright chord.
  *
  * The first step: one button, "start light".
  *
@@ -53,18 +60,42 @@ const WORD_MS = 240
 /** The line stays long enough to be read twice, and then some. */
 const LINE_HOLD_MS = 3000
 const FADE_MS = 700
-/** The truth: when each phrase, and each moment of the little story, comes. */
-const TRUTH_CUES = {
-  phrase1: 400,
-  phrase2: 2500,
-  wake: 4300,
-  phrase3: 5300,
-  rise: 5900,
-  blow: 7400,
-  phrase4: 7600,
-  star: 9800,
-  start: 11600,
+/**
+ * The truth's score: when each phrase and each moment of the little story
+ * comes, in ms from the start of the beat.
+ */
+const TRUTH = {
+  /** Under the lids the year gives way to day one. */
+  dayOne: 300,
+  /** The lids part a little, close again, and open: waking up. */
+  peek: 450,
+  flutter: 750,
+  open: 1000,
+  phrase1: 1200,
+  phrase2: 3600,
+  /** The turn: the lids close on the doubt, the light warms under them, and they open on the hope. */
+  blink: 6100,
+  turn: 6450,
+  reopen: 6600,
+  wake: 6900,
+  phrase3: 6950,
+  /** The stars double as "compound" is read. */
+  stars: 7300,
+  rise: 8100,
+  phrase4: 9400,
+  /** The last word: the whale blows, the first star blooms, the chord. */
+  peak: 11000,
+  start: 12300,
 } as const
+/** The stars of the truth come in doubling waves, each sooner than the last: an accelerando. */
+const WAVES = [1, 2, 4, 8, 16]
+const WAVE_AT = [0, 560, 980, 1280, 1480]
+/** A wave's stars sparkle in over this much, not all at once. */
+const WAVE_SPREAD_MS = 160
+/** The melody: one note per wave rising up the scale, then the chord, played as a quick arpeggio. */
+const WAVE_NOTE = 0
+const CHORD = [5, 7, 8, 10]
+const CHORD_GAP_S = 0.07
 const STILL_MS = 2200
 const STILL_DAYS = [1, 100, 365]
 const FPS = 30
@@ -97,10 +128,42 @@ function easeInOut(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
 }
 
-/** The author's sentence, split into phrases at its own commas; not a word changed. */
-function phrases(): string[] {
-  return voice.intro.truth.flatMap((paragraph) =>
+/** The author's sentence, each half split into phrases at its own commas; not a word changed. */
+function halves(): string[][] {
+  return voice.intro.truth.map((paragraph) =>
     paragraph.split(/(?<=,) (?=because |that )/).map((p) => p.trim()),
+  )
+}
+
+/** Words as spans, so a phrase arrives word by word like a line of a tune. */
+function wordsOf(text: string): string {
+  return text
+    .split(' ')
+    .map((w, i) => `<span style="--i:${String(i)}">${w}</span>`)
+    .join(' ')
+}
+
+/**
+ * Where the truth's stars sit: the R2 sequence (steps of the plastic
+ * number's powers), which spreads points evenly over a plane without a
+ * grid's order or a line's, and lands the same every time.
+ */
+const R2 = [0.7548776662, 0.569840291]
+const SKY = { left: 6, width: 88, top: 5, height: 46 }
+
+function skyStars(): { x: number; y: number; wave: number; delay: number }[] {
+  const [ax = 0, ay = 0] = R2
+  let n = 0
+  return WAVES.flatMap((count, wave) =>
+    Array.from({ length: count }, () => {
+      n++
+      return {
+        x: SKY.left + ((0.5 + n * ax) % 1) * SKY.width,
+        y: SKY.top + ((0.5 + n * ay) % 1) * SKY.height,
+        wave,
+        delay: Math.round(((n * ax * ay * 7) % 1) * WAVE_SPREAD_MS),
+      }
+    }),
   )
 }
 
@@ -139,30 +202,47 @@ export function playIntro(
   options: { hasThings: boolean; sound: Sound; onEnd: (end: IntroEnd) => void },
 ): void {
   const year = seededYear()
-  const lines = phrases()
+  const sentence = halves()
+  const stars = skyStars()
   const app = document.getElementById('app')
   const overlay = document.createElement('section')
   overlay.className = 'intro'
   overlay.setAttribute('role', 'dialog')
   overlay.setAttribute('aria-label', 'whale club')
   overlay.dataset.calf = 'asleep'
+  overlay.dataset.lids = 'open'
   overlay.innerHTML = `
     <button type="button" class="intro-skip">${voice.intro.skip}</button>
     <div class="intro-day" aria-hidden="true"></div>
     <div class="intro-creatures" aria-hidden="true">
       ${year.data.things.map((t) => `<span class="intro-creature" data-world="${t.world}" style="left:${String(CREATURE_X[t.world] * 100)}%"></span>`).join('')}
     </div>
-    <p class="intro-line" aria-live="polite">${voice.intro.promise
-      .split(' ')
-      .map((w, i) => `<span style="--i:${String(i)}">${w}</span>`)
-      .join(' ')}</p>
-    <div class="intro-truth">${lines.map((p) => `<p>${p}</p>`).join('')}</div>
-    <div class="intro-star" aria-hidden="true"></div>
-    <div class="intro-calf" aria-hidden="true">
-      <span class="intro-calf-body">${sleeperSvg(false)}</span>
-      <span class="intro-spout"><i></i><i></i><i></i></span>
+    <div class="intro-stage" aria-hidden="true">
+      <i class="intro-light" data-light="cold"></i>
+      <i class="intro-light" data-light="dawn"></i>
+      <i class="intro-light" data-light="warm"></i>
+      <i class="intro-light" data-light="gold"></i>
+      <div class="intro-sky">${stars
+        .map(
+          (s) =>
+            `<i data-wave="${String(s.wave)}" style="left:${s.x.toFixed(1)}%;top:${s.y.toFixed(1)}%;--d:${String(s.delay)}ms"></i>`,
+        )
+        .join('')}</div>
+      <div class="intro-star"><i></i></div>
+      <div class="intro-calf">
+        <span class="intro-calf-body">${sleeperSvg(false)}</span>
+        <span class="intro-spout"><i></i><i></i><i></i></span>
+      </div>
     </div>
+    <p class="intro-line" aria-live="polite">${wordsOf(voice.intro.promise)}</p>
+    <div class="intro-truth" data-half="1">${sentence
+      .map(
+        (half) =>
+          `<div class="intro-half">${half.map((p) => `<p>${wordsOf(p)}</p>`).join('')}</div>`,
+      )
+      .join('')}</div>
     <button type="button" class="button-primary intro-start">${options.hasThings ? voice.intro.back : voice.intro.start}</button>
+    <div class="intro-lids" aria-hidden="true"><i></i><i></i></div>
     <div class="intro-veil" aria-hidden="true"></div>`
   const q = (selector: string): HTMLElement => {
     const element = overlay.querySelector<HTMLElement>(selector)
@@ -174,6 +254,10 @@ export function playIntro(
   const calfBody = q('.intro-calf-body')
   const creatures = [...overlay.querySelectorAll<HTMLElement>('.intro-creature')]
   const truthLines = [...overlay.querySelectorAll<HTMLElement>('.intro-truth p')]
+  const truthBox = q('.intro-truth')
+  const skyDots = [...overlay.querySelectorAll<HTMLElement>('.intro-sky i')]
+  /** The phrases of the first half; the second half's come after them. */
+  const firstHalf = sentence[0]?.length ?? 0
 
   let beat: Beat = 'promise'
   let handle: FrameHandle | null = null
@@ -271,7 +355,9 @@ export function playIntro(
       overlay.dataset.line = 'on'
       const words = voice.intro.promise.split(' ').length
       later(words * WORD_MS + LINE_HOLD_MS, () => {
+        // The line goes as the eyes close slowly on the year.
         overlay.dataset.line = 'off'
+        overlay.dataset.lids = 'sleep'
         later(FADE_MS, () => {
           go('truth')
         })
@@ -280,53 +366,105 @@ export function playIntro(
   }
 
   // --- the truth, and the little story under it ---------------------------------------------
+  /** The year gives way to the empty sea of day one. */
+  const dayOne = (): void => {
+    scene.preview(null)
+    scene.setSilhouette(false)
+    scene.setEmpty(false)
+    overlay.dataset.line = 'off'
+  }
   const showPhrase = (i: number): void => {
     truthLines[i]?.classList.add('is-on')
+  }
+  /** The eyes: open, shut, a peek between, or closing slowly on the year. */
+  const lids = (state: 'open' | 'peek' | 'shut' | 'sleep') => (): void => {
+    overlay.dataset.lids = state
+  }
+  /** The light only ever warms: cold, dawn, warm, gold. */
+  const light = (step: 'cold' | 'dawn' | 'warm' | 'gold'): void => {
+    overlay.dataset.light = step
+  }
+  /** The second half takes the first one's place. */
+  const turn = (): void => {
+    truthBox.dataset.half = '2'
+    light('dawn')
   }
   const wake = (): void => {
     if (overlay.dataset.calf !== 'asleep') return
     overlay.dataset.calf = 'awake'
     calfBody.innerHTML = sleeperSvg(true)
   }
+  const lightWave = (wave: number): void => {
+    for (const dot of skyDots) if (dot.dataset.wave === String(wave)) dot.classList.add('is-on')
+  }
+  const peak = (): void => {
+    light('gold')
+    overlay.dataset.calf = 'blow'
+    overlay.dataset.star = 'on'
+    CHORD.forEach((step, i) => {
+      options.sound.note(step, i * CHORD_GAP_S)
+    })
+  }
+
   const truth = (): void => {
     overlay.dataset.beat = 'truth'
-    scene.preview(null)
-    scene.setSilhouette(false)
-    scene.setEmpty(false)
-    later(TRUTH_CUES.phrase1, () => {
+    overlay.dataset.lids = 'shut'
+    light('cold')
+    later(TRUTH.dayOne, dayOne)
+    later(TRUTH.peek, lids('peek'))
+    later(TRUTH.flutter, lids('shut'))
+    later(TRUTH.open, lids('open'))
+    later(TRUTH.phrase1, () => {
       showPhrase(0)
     })
-    later(TRUTH_CUES.phrase2, () => {
+    later(TRUTH.phrase2, () => {
       showPhrase(1)
     })
-    later(TRUTH_CUES.wake, wake)
-    later(TRUTH_CUES.phrase3, () => {
-      showPhrase(2)
+    later(TRUTH.blink, lids('shut'))
+    later(TRUTH.turn, turn)
+    later(TRUTH.reopen, lids('open'))
+    later(TRUTH.wake, wake)
+    later(TRUTH.phrase3, () => {
+      showPhrase(firstHalf)
     })
-    later(TRUTH_CUES.rise, () => {
+    later(TRUTH.stars, () => {
+      scene.setPush(true)
+      overlay.dataset.push = 'true'
+    })
+    WAVES.forEach((_, wave) => {
+      later(TRUTH.stars + (WAVE_AT[wave] ?? 0), () => {
+        lightWave(wave)
+        options.sound.note(WAVE_NOTE + wave)
+      })
+    })
+    later(TRUTH.rise, () => {
       overlay.dataset.calf = 'up'
     })
-    later(TRUTH_CUES.blow, () => {
-      overlay.dataset.calf = 'blow'
+    later(TRUTH.phrase4, () => {
+      showPhrase(firstHalf + 1)
+      light('warm')
     })
-    later(TRUTH_CUES.phrase4, () => {
-      showPhrase(3)
-    })
-    later(TRUTH_CUES.star, () => {
-      overlay.dataset.star = 'on'
-      options.sound.note(7)
-    })
-    later(TRUTH_CUES.start, () => {
+    later(TRUTH.peak, peak)
+    later(TRUTH.start, () => {
       go('start')
     })
   }
 
-  /** The end of the truth, all at once: every phrase, the whale up, the star lit. */
+  /** The end of the truth, all at once: the second half, every star, the whale up, the light gold. */
   const truthAtItsEnd = (): void => {
+    dayOne()
+    overlay.dataset.lids = 'open'
     truthLines.forEach((_, i) => {
       showPhrase(i)
     })
+    truthBox.dataset.half = '2'
+    WAVES.forEach((_, wave) => {
+      lightWave(wave)
+    })
     wake()
+    scene.setPush(true)
+    overlay.dataset.push = 'true'
+    light('gold')
     overlay.dataset.calf = 'blow'
     overlay.dataset.star = 'on'
   }
@@ -339,12 +477,6 @@ export function playIntro(
 
   const go = (next: Beat): void => {
     stopTimers()
-    if (beat === 'promise') {
-      scene.preview(null)
-      scene.setSilhouette(false)
-      scene.setEmpty(false)
-      overlay.dataset.line = 'off'
-    }
     beat = next
     if (next === 'truth') truth()
     else start()
@@ -352,6 +484,7 @@ export function playIntro(
 
   const end = (how: IntroEnd): void => {
     stopTimers()
+    scene.setPush(false)
     scene.preview(null)
     scene.setSilhouette(false)
     scene.setEmpty(!options.hasThings)
