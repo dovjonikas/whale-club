@@ -1,3 +1,4 @@
+import { icon } from '../brand/icons'
 import type { Scene } from '../scene/scene'
 import { todayKey } from '../store/dates'
 import { dayNumber } from '../store/derive'
@@ -39,7 +40,7 @@ export class Postcards {
       const button = document.createElement('button')
       button.type = 'button'
       button.className = 'offer'
-      button.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l18-8-8 18-2-8z"/></svg><span></span>`
+      button.innerHTML = `${icon('send')}<span></span>`
       const text = button.querySelector('span')
       if (text) text.textContent = label
       button.addEventListener('click', () => {
