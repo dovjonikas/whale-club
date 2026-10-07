@@ -1,5 +1,6 @@
 import { escapeHtml, thingMark } from './thingMark'
-import { beginningSvg, creatureSvg } from '../scene/creatures'
+import { dressedSvg } from '../scene/dock/wear'
+import { beginningSvg } from '../scene/creatures'
 import type { Line, Stage } from '../store/derive'
 import type { Thing } from '../store/types'
 import { voice } from '../voice'
@@ -24,6 +25,8 @@ const STAGE_SPAN = 0.22
 const SHOW_TIME_MS = 3000
 
 export interface SessionOptions {
+  /** What the creature wears from the dock. */
+  worn?: readonly string[]
   sound: boolean
   showTime: boolean
   onSound: (on: boolean) => void
@@ -114,7 +117,7 @@ export function openSessionScreen(
       breathe.innerHTML =
         next === 'beginning'
           ? beginningSvg(thing.world)
-          : creatureSvg(thing.world, line, Number(next) as Stage)
+          : dressedSvg(thing.world, line, Number(next) as Stage, options.worn ?? [])
     }
     creature.style.setProperty('--grow', (0.55 + 0.6 * progress).toFixed(3))
   }

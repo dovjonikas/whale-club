@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test'
-import { dateKey, expect, STORAGE_KEY, test } from './helpers'
+import { expect, seedPerson, STORAGE_KEY, test } from './helpers'
 
 /**
  * Arranging the scene: places as rings, a thing moved by a tap and a tap
@@ -7,64 +7,6 @@ import { dateKey, expect, STORAGE_KEY, test } from './helpers'
  * dock opening it with a thing in hand. Places and the chest themselves
  * are worked out in spots.e2e.ts; this is the person's side of them.
  */
-
-interface Person {
-  /** Sea line a, sky line a, garden line a; `swim` adds sea line b. */
-  swim?: boolean
-  /** The tier cracked per thing; sea line b's own, when there is one. */
-  cracked?: number
-  swimCracked?: number
-  days?: number
-  extra?: Record<string, unknown>
-}
-
-/** A person forty days in, every thing done every day, finds cracked to day 30. */
-async function seedPerson(page: Page, person: Person = {}): Promise<void> {
-  const days = person.days ?? 40
-  const lines: [string, string, string][] = [
-    ['run', 'sea', 'a'],
-    ['read', 'sky', 'a'],
-    ['draw', 'garden', 'a'],
-  ]
-  if (person.swim) lines.push(['swim', 'sea', 'b'])
-  const things = lines.map(([id, world, line], order) => ({
-    id,
-    name: id,
-    icon: 'letter',
-    kind: 'tap',
-    minutes: 15,
-    days: [true, true, true, true, true, true, true],
-    world,
-    line,
-    createdAt: dateKey(-days),
-    order,
-  }))
-  const history: Record<string, { done: string[]; minutes: Record<string, number> }> = {}
-  for (let i = -days; i < 0; i++)
-    history[dateKey(i)] = { done: lines.map(([id]) => id), minutes: {} }
-  const cracked = Object.fromEntries(
-    lines.map(([id]) => [id, id === 'swim' ? (person.swimCracked ?? 30) : (person.cracked ?? 30)]),
-  )
-  const data = {
-    version: 8,
-    things,
-    days: history,
-    cracked,
-    settings: {
-      sound: false,
-      installDismissedAt: dateKey(-1),
-      lastRecapWeek: dateKey(-1),
-      explained: ['yours', 'firstStar', 'stone', 'lantern', 'kept'],
-    },
-    ...person.extra,
-  }
-  await page.addInitScript(
-    ([key, json]) => {
-      if (localStorage.getItem(key) === null) localStorage.setItem(key, json)
-    },
-    [STORAGE_KEY, JSON.stringify(data)] as const,
-  )
-}
 
 async function placement(page: Page): Promise<Record<string, string> | undefined> {
   return page.evaluate((key) => {

@@ -353,12 +353,16 @@
   overflow: visible;
 }
 
-.scene[data-empty='true'] .dock-under {
+.scene[data-empty='true'] .dock-under,
+.scene[data-empty='true'] .pier {
   display: none;
 }
 
-/* The pier, in the middle of the shore: the dock's door. */
+/* The pier, in the middle of the shore: the dock's door. Above the
+   particles and the glow, with the stones, so a tap always reaches it. */
 .pier {
+  position: absolute;
+  z-index: 3;
   left: 50%;
   top: calc(59.2% - 10px * var(--scene-scale, 1));
   width: calc(60px * var(--scene-scale, 1));

@@ -137,11 +137,11 @@ export class Scene {
         <div class="dock-edge" hidden aria-hidden="true">${shoreEdgeSvg()}</div>
         <div class="dock-reef" hidden aria-hidden="true">${reefSvg()}</div>
         <div class="dock-small-whale" hidden aria-hidden="true">${smallWhaleSvg()}</div>
-        <button type="button" class="pier"></button>
       </div>
       <div class="scene-things" aria-hidden="true"></div>
       <div class="sleeper" aria-hidden="true">${sleeperSvg()}</div>
       <div class="stones" role="group" aria-label="stones"></div>
+      <button type="button" class="pier"></button>
       <canvas class="particles" aria-hidden="true"></canvas>
       <div class="scene-glow" aria-hidden="true"></div>
       <div class="grain" aria-hidden="true"></div>

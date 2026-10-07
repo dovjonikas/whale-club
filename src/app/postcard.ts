@@ -1,5 +1,4 @@
 import { collectibleSvg, type Collectible } from '../scene/collectibles'
-import { creatureSvg } from '../scene/creatures'
 import { resolveTokens } from '../scene/palette'
 import { shoreSvg } from '../scene/shore'
 import { StarField } from '../scene/stars'
@@ -11,6 +10,9 @@ import type { AppData, PostcardFormat } from '../store/types'
 import { voice } from '../voice'
 import { BRAND } from './brand'
 import { shownCollectibles } from './sceneData'
+import { islandWhaleSvg, pierSvg, reefSvg, shoreEdgeSvg } from '../scene/dock/scene'
+import { shownItems, wornBy } from './dockData'
+import { dressedSvg } from '../scene/dock/wear'
 import { dayBubble } from './thingMark'
 
 /**
@@ -35,6 +37,12 @@ const SIZE: Record<PostcardFormat, [number, number]> = {
 }
 
 /** The scene's collectible sizes are for a 390px phone; this is that phone's height for scaling. */
+/** Where the dock's layers are in the scene, as fractions of its height (dock.css). */
+const ISLAND_TOP = 0.486
+const ISLAND_WIDTH = 0.44
+const EDGE_TOP = 0.593
+const REEF_TOP = 0.686
+const SAND_LINE = 0.592
 const PHONE_W = 390
 const PHONE_H = 700
 const SCENE_HORIZON = 0.58
@@ -123,6 +131,7 @@ export async function renderPostcard(
   const shoreTop = horizon - H * 0.02
   await drawSvg(ctx, shoreSvg(), 0, shoreTop, W, H * (format === 'story' ? 0.06 : 0.07))
   const scale = Math.min(W / PHONE_W, H / PHONE_H)
+  await drawDock(ctx, data, W, H, horizon, scale)
   // Where each thing stands now, so the postcard shows the person's own arrangement.
   const visible = new Set(visibleIds)
   const placed = shownCollectibles(data).filter(({ item }) => visible.has(item.id))
@@ -222,10 +231,11 @@ async function drawCreatures(
   ctx.font = `700 ${layout.nameSize}px "Atkinson Hyperlegible", system-ui, sans-serif`
   ctx.fillStyle = '#e8f0f5'
   for (const thing of things) {
-    const svg = creatureSvg(
+    const svg = dressedSvg(
       thing.world,
       lineFor(data, thing),
       stageFor(last7(data, thing.id, today)),
+      wornBy(data, thing.id),
     )
     await drawSvg(ctx, svg, x, top, size, size)
     // Its bubble at the corner, as on its card: filled if it was done that day.
@@ -270,6 +280,42 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number): strin
   }
   if (current) lines.push(current)
   return lines.slice(0, 3)
+}
+
+/**
+ * The pier and the extensions things stand on (the island on its whale,
+ * the sand edge, the reef), so a thing placed on them is not left in the
+ * air. Drawn at the places the scene has them, through the same mapping.
+ */
+async function drawDock(
+  ctx: CanvasRenderingContext2D,
+  data: AppData,
+  W: number,
+  H: number,
+  horizon: number,
+  scale: number,
+): Promise<void> {
+  if (data.things.length === 0) return
+  const owned = new Set(shownItems(data).map((item) => item.id))
+  if (owned.has('island')) {
+    const width = W * ISLAND_WIDTH
+    await drawSvg(ctx, islandWhaleSvg(), 0, mapY(ISLAND_TOP, horizon, H), width, (width * 60) / 176)
+  }
+  if (owned.has('longer-shore'))
+    await drawSvg(ctx, shoreEdgeSvg(), 0, mapY(EDGE_TOP, horizon, H), W, (W * 28) / 1000)
+  if (owned.has('reef'))
+    await drawSvg(ctx, reefSvg(), 0, mapY(REEF_TOP, horizon, H), W, (W * 84) / 1000)
+  const long = owned.has('longer-dock')
+  const pierWidth = (long ? 72 : 60) * scale
+  const unit = pierWidth / 60
+  await drawSvg(
+    ctx,
+    pierSvg(long, owned.has('dock-lanterns')),
+    W / 2 - pierWidth / 2,
+    mapY(SAND_LINE, horizon, H) - 10 * unit,
+    pierWidth,
+    (long ? 64 : 44) * unit,
+  )
 }
 
 async function drawSvg(

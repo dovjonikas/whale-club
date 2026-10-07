@@ -1,4 +1,5 @@
 import { escapeHtml, thingMark } from './thingMark'
+import { wornBy } from './dockData'
 import { creatureSvg } from '../scene/creatures'
 import { last7, lineFor, plannedOn, stageFor, waitingTiers, weekDots } from '../store/derive'
 import { todayKey } from '../store/dates'
@@ -103,6 +104,7 @@ export class Row {
         stage: stageFor(last7(data, thing.id, today)),
         line: lineFor(data, thing),
         waiting: waitingTiers(data, thing.id).length,
+        worn: wornBy(data, thing.id),
       })
       this.container.append(card)
     }
