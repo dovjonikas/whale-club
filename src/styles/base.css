@@ -89,16 +89,24 @@ input {
   position: relative;
   height: 100%;
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: auto auto 1fr auto;
   pointer-events: none;
 }
 
 .header > *,
+.notice-slot > *,
 .bottom > * {
   pointer-events: auto;
 }
 
-/* The header: the title and three quiet buttons. */
+/* Notices (install, recap, check-in) sit under the header, over the sky, so
+   the water line stays clear for the stones floating on it. */
+.notice-slot {
+  position: relative;
+  z-index: 2;
+}
+
+/* The header: the title and four quiet buttons. */
 .header {
   position: relative;
   z-index: 2;
@@ -178,6 +186,8 @@ input {
 }
 
 .line {
+  /* Text only: taps go through it to a stone floating behind. */
+  pointer-events: none;
   min-height: 1.6em;
   margin: 0 calc(var(--safe-right) + var(--s4)) var(--s2) calc(var(--safe-left) + var(--s4));
   font-size: var(--t-sm);

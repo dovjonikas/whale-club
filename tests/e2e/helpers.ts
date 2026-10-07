@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test'
+import { expect, type Locator, type Page } from '@playwright/test'
 
 /**
  * Shared steps for the browser tests. Everything goes through the real UI
@@ -21,15 +21,21 @@ export interface SeedThing {
 
 export interface SeedData {
   things: SeedThing[]
-  days: Record<string, { done: string[]; minutes?: Record<string, number>; checkin?: boolean }>
+  days: Record<
+    string,
+    { done: string[]; minutes?: Record<string, number>; checkin?: boolean; waited?: string[] }
+  >
+  /** Per thing, the highest tier already cracked. Absent: every earned stone is still waiting. */
+  cracked?: Record<string, number>
   settings?: Record<string, unknown>
 }
 
 export async function seed(page: Page, data: SeedData): Promise<void> {
   const payload = {
-    version: 1,
+    version: 2,
     things: data.things.map((t) => ({ emoji: '•', mode: 'tap', ...t })),
     days: Object.fromEntries(Object.entries(data.days).map(([k, v]) => [k, { minutes: {}, ...v }])),
+    cracked: data.cracked ?? {},
     settings: { sound: true, ...data.settings },
   }
   await page.addInitScript(
@@ -61,15 +67,28 @@ export function card(page: Page, name: string): Locator {
   return page.getByRole('button', { name, exact: true })
 }
 
-/** Holds the pointer down for longer than the long-press threshold. */
-export async function longPress(page: Page, target: Locator): Promise<void> {
-  const box = await target.boundingBox()
-  if (!box) throw new Error('target has no box')
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2)
-  await page.mouse.down()
-  // Well past the 500 ms threshold: a busy runner has fired the press late before.
-  await page.waitForTimeout(900)
-  await page.mouse.up()
+/** Pretends the page went to the background (or came back), the way a locked phone does. */
+export async function setHidden(page: Page, hidden: boolean): Promise<void> {
+  await page.evaluate((h) => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => h })
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => (h ? 'hidden' : 'visible'),
+    })
+    document.dispatchEvent(new Event('visibilitychange'))
+  }, hidden)
+}
+
+/** What the app has stored, read back from the page. */
+export async function stored(page: Page): Promise<{
+  days: Record<string, { done: string[]; minutes: Record<string, number>; waited?: string[] }>
+  things: { id: string; name: string; minutes?: number }[]
+  cracked: Record<string, number>
+}> {
+  return page.evaluate(
+    (key) => JSON.parse(localStorage.getItem(key) ?? '{}') as Awaited<ReturnType<typeof stored>>,
+    STORAGE_KEY,
+  )
 }
 
 export function dateKey(offsetDays = 0, from = new Date()): string {
@@ -91,4 +110,17 @@ export async function waitForServiceWorker(page: Page): Promise<void> {
 export async function dismissInstallLeaf(page: Page): Promise<void> {
   const leaf = page.getByRole('complementary', { name: 'install' })
   if (await leaf.isVisible()) await leaf.getByRole('button', { name: 'not now' }).click()
+}
+
+/** Clears the notices over the sky (install, recap, check-in), so what is under them can be reached. */
+export async function clearNotices(page: Page): Promise<void> {
+  await dismissInstallLeaf(page)
+  const recap = page.getByRole('complementary', { name: 'weekly recap' })
+  if (await recap.isVisible()) await recap.getByRole('button', { name: 'ok' }).click()
+  const checkin = page.getByRole('complementary', { name: 'check-in' })
+  if (await checkin.isVisible()) {
+    await checkin.getByRole('button', { name: 'good!!!' }).click()
+    await checkin.getByRole('button', { name: 'happy!!!' }).click()
+    await expect(checkin).toBeHidden()
+  }
 }

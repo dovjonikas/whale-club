@@ -18,6 +18,16 @@ all that happens.
 </p>
 
 <p align="center">
+  <img src="docs/screenshots/iphone-stone.png" alt="A stone floating at the water line, waiting to be cracked" width="200">
+  &nbsp;
+  <img src="docs/screenshots/iphone-find.png" alt="The find out of its stone: a jellyfish at night" width="200">
+  &nbsp;
+  <img src="docs/screenshots/iphone-dial.png" alt="The lock-in dial: 30 minutes" width="200">
+  &nbsp;
+  <img src="docs/screenshots/iphone-session.png" alt="A lock-in session: the time, the quiet scene and the creature grown to a star" width="200">
+</p>
+
+<p align="center">
   <img src="docs/screenshots/postcard-story.png" alt="A postcard in the story size: the night sky, the whale over the horizon, all of it. all the smoke., day 35 of whale club" width="280">
   &nbsp;&nbsp;
   <img src="docs/screenshots/postcard-square.png" alt="The same postcard in the square size" width="420">
@@ -27,7 +37,9 @@ all that happens.
 
 1. the first rule of whale club is: you show up.
 2. the second rule of whale club is: you show up tomorrow.
-3. the third rule: nothing dies. you just missed a day.
+3. the third rule of whale club is: you never give up on yourself.
+
+And underneath all three: nothing dies. You just missed a day.
 
 ## Features
 
@@ -37,9 +49,11 @@ all that happens.
   sea, sky. You do not pick; every scene gets all three layers.
 - **Tap = done today.** The creature jumps, the world answers (bubbles,
   star dust, petals), one short line. Tap again to undo.
-- **Hold = timer.** 15, 30, 60 minutes or your own. The creature swims
-  while it runs, the screen goes calm, and finishing counts.
-- **Creatures grow** with the last seven days, not with your lifetime
+- **Lock in.** Under every card. Turn the dial (10 to 120 minutes), and
+  the screen goes quiet: the sky turns, the time counts down, and the
+  thing's creature starts as an egg, a spark or a seed and grows while you
+  stay. Leave for more than fifteen seconds and it does not die: it waits
+  for you. It just stays small that time.
   total, so they can shrink and grow back. Nothing is ever lost.
 - **Stars are days.** Every day with at least one thing done puts a star
   in the sky, laid out week by week. A streak draws a constellation. After
@@ -49,12 +63,13 @@ all that happens.
 - **Installable.** Works offline from the home screen on iPhone and
   Android, updates itself, no account, no server, no tracking. Everything
   stays in your browser.
-- **Collectibles.** Each thing unlocks its own path at 3, 7, 14, 21, 30,
-  45, 60, 90, 120 and 180 days: plankton glow, a fish, a jellyfish at
-  night, a lighthouse, the red jacket, the whale's song; a comet, the
-  aurora, an astronaut; a sunflower field, a scarecrow, fireflies. Sixty in
-  all, drawn into the scene as they come. The locked ones are silhouettes
-  with the real number of days to go.
+- **Stones.** What you earn falls in as a meteor stone: floating in the
+  sea, hanging in the sky, lying on the shore. It waits for you. Three taps
+  crack it, and the find comes out of the light and takes its place:
+  plankton glow, a fish, a jellyfish at night, the red jacket, the whale's
+  song; a comet, the aurora, an astronaut; a sunflower field, a scarecrow,
+  fireflies. Sixty in all, at 3, 7, 14, 21, 30, 45, 60, 90, 120 and 180
+  days. Some come out rare, a few legendary; that is only the shine.
 - **All done, the whale surfaces.** Over the horizon, with a sound. From
   day 90 it wears the red jacket.
 - **A daily surprise** after the first thing done: a sea fact, a visitor
@@ -69,6 +84,22 @@ all that happens.
   and opens the share sheet. The club is you and whoever you send your
   whale to. No accounts, no codes: the picture is the only thing that
   leaves the phone.
+
+## Why not Forest
+
+Forest is lovely and it got a lot of people to put their phones down. Whale
+Club starts from a different idea of what helps someone keep going: one
+living scene instead of a field of trees; the things done without a clock
+and the sessions in one place; no coins, no shop, no subscription, no ads,
+no account; offline from the home screen; collectibles instead of currency
+and postcards instead of a leaderboard. And nothing dies. A session you
+leave waits for you; a day you miss dims the sea for a day.
+
+One honest note: a phone does not let a web app play sound or show a
+notification in the background. If the session ends while the app is
+hidden, the end is worked out from the clock and shown when you come back.
+Lay the phone next to you with the screen on, the way Forest asks; Whale
+Club keeps the screen awake while a session runs.
 
 ## Tech
 

@@ -1,3 +1,4 @@
+import { earnedTier } from './derive'
 import type { AppData, DayRecord, Settings, Thing } from './types'
 import { emptyData } from './types'
 
@@ -14,13 +15,39 @@ export function migrate(raw: unknown): AppData {
   if (!isRecord(raw)) throw new Error('not an object')
   switch (raw.version) {
     case 1:
-      return validateV1(raw)
+      return fromV1(raw)
+    case 2:
+      return validateV2(raw)
     default:
       throw new Error(`unknown version ${String(raw.version)}`)
   }
 }
 
-function validateV1(raw: Record<string, unknown>): AppData {
+/**
+ * Version 1 had no stones: everything earned was already in the scene.
+ * So every tier a thing has earned counts as cracked, and nothing a person
+ * could already see turns back into a rock.
+ */
+function fromV1(raw: Record<string, unknown>): AppData {
+  const data = validateCommon(raw)
+  for (const thing of data.things) {
+    const tier = earnedTier(data, thing.id)
+    if (tier > 0) data.cracked[thing.id] = tier
+  }
+  return data
+}
+
+function validateV2(raw: Record<string, unknown>): AppData {
+  const data = validateCommon(raw)
+  if (isRecord(raw.cracked)) {
+    for (const [id, tier] of Object.entries(raw.cracked)) {
+      if (typeof tier === 'number' && tier > 0) data.cracked[id] = tier
+    }
+  }
+  return data
+}
+
+function validateCommon(raw: Record<string, unknown>): AppData {
   const data = emptyData()
   if (!Array.isArray(raw.things)) throw new Error('things is not a list')
   data.things = raw.things.map(validateThing)
@@ -58,6 +85,10 @@ function validateDay(raw: unknown): DayRecord {
     }
   }
   const day: DayRecord = { done: [...new Set(done)], minutes }
+  if (Array.isArray(raw.waited)) {
+    const waited = raw.waited.filter(isString).filter((id) => day.done.includes(id))
+    if (waited.length > 0) day.waited = [...new Set(waited)]
+  }
   if (raw.checkin === true) day.checkin = true
   return day
 }
@@ -72,6 +103,7 @@ function validateSettings(raw: unknown): Settings {
   // A buddy from v0.3 is dropped here on purpose: the club became postcards.
   if (raw.postcardFormat === 'story' || raw.postcardFormat === 'square')
     settings.postcardFormat = raw.postcardFormat
+  if (raw.sessionSound === true) settings.sessionSound = true
   return settings
 }
 

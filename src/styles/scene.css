@@ -120,9 +120,11 @@ canvas.particles {
   height: calc(var(--horizon) + 6%);
   bottom: auto;
   z-index: 3;
+  pointer-events: none;
 }
 
 .day-star {
+  pointer-events: auto;
   position: absolute;
   width: 28px;
   height: 28px;

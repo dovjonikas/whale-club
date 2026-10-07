@@ -9,6 +9,20 @@ import type { World } from '../store/types'
  * Colours come from the CSS tokens so the creature matches its world
  * wherever it is drawn: the card, the timer screen, the share image.
  */
+/**
+ * What a lock-in starts from, before the creature has a shape: an egg in
+ * the sea, a spark in the sky, a seed in the garden. It already has eyes.
+ */
+export function beginningSvg(world: World): string {
+  const body =
+    world === 'sea'
+      ? `${glow('var(--glow)', 16)}<ellipse cx="32" cy="34" rx="11" ry="13" fill="#d8f6f1"/><ellipse cx="28" cy="29" rx="3" ry="4" fill="#fff" opacity="0.7"/>${face(32, 35, 0.55, 0)}`
+      : world === 'sky'
+        ? `${glow('var(--star)', 16)}<path d="M32 18 l 4 10 l 10 4 l -10 4 l -4 10 l -4 -10 l -10 -4 l 10 -4 z" fill="var(--star-pale)"/>${face(32, 32, 0.5, 0)}`
+        : `${glow('var(--sun)', 14)}<ellipse cx="32" cy="36" rx="8" ry="10" fill="#a8743f" transform="rotate(-18 32 36)"/><path d="M30 28 q 2 -4 5 -5" stroke="#6b4a2b" stroke-width="1.4" fill="none"/>${face(32, 37, 0.5, 0)}`
+  return `<svg viewBox="0 0 64 64" aria-hidden="true">${body}</svg>`
+}
+
 export function creatureSvg(world: World, line: Line, stage: Stage): string {
   const body = DRAWINGS[world][line][stage]
   return `<svg viewBox="0 0 64 64" aria-hidden="true">${body}</svg>`
@@ -24,10 +38,11 @@ function face(cx: number, cy: number, scale: number, mood = 1, ink = '#061020'):
       : mood < 0
         ? `<circle cx="${String(cx)}" cy="${String(cy + 5 * scale)}" r="${String(1.5 * scale)}" fill="${ink}"/>`
         : `<path d="M${String(cx - 2.5 * scale)} ${String(cy + 4.5 * scale)} h ${String(5 * scale)}" stroke="${ink}" stroke-width="${String(1.2 * scale)}" stroke-linecap="round"/>`
-  return `<circle cx="${String(cx - gap / 2)}" cy="${String(cy)}" r="${String(eye)}" fill="${ink}"/>
+  // The eyes are one group, so a blink can close them both.
+  return `<g class="eyes"><circle cx="${String(cx - gap / 2)}" cy="${String(cy)}" r="${String(eye)}" fill="${ink}"/>
   <circle cx="${String(cx + gap / 2)}" cy="${String(cy)}" r="${String(eye)}" fill="${ink}"/>
   <circle cx="${String(cx - gap / 2 + 0.6 * scale)}" cy="${String(cy - 0.6 * scale)}" r="${String(0.6 * scale)}" fill="#fff"/>
-  <circle cx="${String(cx + gap / 2 + 0.6 * scale)}" cy="${String(cy - 0.6 * scale)}" r="${String(0.6 * scale)}" fill="#fff"/>
+  <circle cx="${String(cx + gap / 2 + 0.6 * scale)}" cy="${String(cy - 0.6 * scale)}" r="${String(0.6 * scale)}" fill="#fff"/></g>
   ${mouth}`
 }
 

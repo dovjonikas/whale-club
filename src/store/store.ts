@@ -1,6 +1,6 @@
 import { migrate } from './migrate'
 import { todayKey } from './dates'
-import type { AppData, DateKey, Mode, Settings, Thing, World } from './types'
+import type { AppData, DateKey, DayRecord, Mode, Settings, Thing, World } from './types'
 import { emptyData, MAX_THINGS, WORLD_ORDER } from './types'
 
 export const STORAGE_KEY = 'whaleclub:data'
@@ -58,12 +58,15 @@ export class Store {
     this.commit({ ...this.data, things: this.data.things.filter((t) => t.id !== id) })
   }
 
-  /** Marks or unmarks a thing for a day. Returns the new state. */
+  /** Marks or unmarks a thing for a day. Returns the new state. A tap is always a full count. */
   toggleDone(thingId: string, date: DateKey = todayKey()): boolean {
     const day = this.day(date)
     const isDone = day.done.includes(thingId)
     const done = isDone ? day.done.filter((id) => id !== thingId) : [...day.done, thingId]
-    this.commit({ ...this.data, days: { ...this.data.days, [date]: { ...day, done } } })
+    this.commit({
+      ...this.data,
+      days: { ...this.data.days, [date]: withWaited({ ...day, done }, thingId, false) },
+    })
     return !isDone
   }
 
@@ -71,18 +74,61 @@ export class Store {
     return this.data.days[date]?.done.includes(thingId) ?? false
   }
 
-  /** A finished timer counts as done and adds its minutes to the day. */
-  recordMinutes(thingId: string, minutes: number, date: DateKey = todayKey()): void {
+  /**
+   * A lock-in that ran to its end. It counts as done either way. A clean
+   * one is a full count; one that was left and waited is marked so, and
+   * earns no star and no step towards a stone, unless the thing was
+   * already fully counted today.
+   */
+  finishSession(
+    thingId: string,
+    minutes: number,
+    clean: boolean,
+    date: DateKey = todayKey(),
+  ): void {
     const day = this.day(date)
+    const already = day.done.includes(thingId) && !(day.waited?.includes(thingId) ?? false)
     const done = day.done.includes(thingId) ? day.done : [...day.done, thingId]
+    const waited = !clean && !already
+    const next = withWaited(
+      {
+        ...day,
+        done,
+        minutes: { ...day.minutes, [thingId]: (day.minutes[thingId] ?? 0) + minutes },
+      },
+      thingId,
+      waited,
+    )
+    this.commit({ ...this.data, days: { ...this.data.days, [date]: next } })
+  }
+
+  /** A lock-in stopped early: the minutes are written down, nothing else. */
+  addMinutes(thingId: string, minutes: number, date: DateKey = todayKey()): void {
+    if (minutes <= 0) return
+    const day = this.day(date)
     const total = (day.minutes[thingId] ?? 0) + minutes
     this.commit({
       ...this.data,
       days: {
         ...this.data.days,
-        [date]: { ...day, done, minutes: { ...day.minutes, [thingId]: total } },
+        [date]: { ...day, minutes: { ...day.minutes, [thingId]: total } },
       },
     })
+  }
+
+  /** The dial opens on the last length chosen for a thing. */
+  setThingMinutes(thingId: string, minutes: number): void {
+    this.commit({
+      ...this.data,
+      things: this.data.things.map((t) => (t.id === thingId ? { ...t, minutes } : t)),
+    })
+  }
+
+  /** A stone cracked open: everything up to this tier is found. */
+  crack(thingId: string, tier: number): void {
+    const current = this.data.cracked[thingId] ?? 0
+    if (tier <= current) return
+    this.commit({ ...this.data, cracked: { ...this.data.cracked, [thingId]: tier } })
   }
 
   setCheckin(date: DateKey = todayKey()): void {
@@ -103,6 +149,14 @@ export class Store {
     save(next)
     for (const listener of this.listeners) listener(next)
   }
+}
+
+function withWaited(day: DayRecord, thingId: string, waited: boolean): DayRecord {
+  const others = (day.waited ?? []).filter((id) => id !== thingId)
+  const list = waited ? [...others, thingId] : others
+  const next: DayRecord = { ...day }
+  delete next.waited
+  return list.length > 0 ? { ...next, waited: list } : next
 }
 
 /** Worlds go round in a fixed order, so the 4th thing is a sea thing again. */

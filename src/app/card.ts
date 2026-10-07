@@ -1,6 +1,7 @@
 import { creatureSvg } from '../scene/creatures'
 import type { Line, Stage } from '../store/derive'
 import type { Thing } from '../store/types'
+import { voice } from '../voice'
 
 /** What a card shows: all of it derived, none of it stored. */
 export interface CardView {
@@ -8,32 +9,66 @@ export interface CardView {
   dots: readonly boolean[]
   stage: Stage
   line: Line
+  /** Stones earned and waiting to be cracked. */
+  waiting: number
 }
 
-export function createCard(thing: Thing): HTMLButtonElement {
-  const card = document.createElement('button')
-  card.type = 'button'
+/**
+ * A card is two buttons: the card itself, which marks today done (a tap,
+ * as always), and "lock in" under it, which opens the dial. Nothing hides
+ * behind a long press any more.
+ */
+export function createCard(thing: Thing): HTMLElement {
+  const card = document.createElement('div')
   card.className = 'card'
   card.dataset.id = thing.id
   card.dataset.world = thing.world
   card.innerHTML = `
-    <span class="creature"></span>
-    <span class="card-name"></span>
-    <span class="card-mode"></span>
-    <span class="dots" aria-hidden="true">${'<span class="dot"></span>'.repeat(7)}</span>
-    <span class="visually-hidden card-days"></span>`
+    <button type="button" class="card-main" data-world="${thing.world}">
+      <span class="card-stone" hidden aria-hidden="true"></span>
+      <span class="creature"></span>
+      <span class="card-name"></span>
+      <span class="card-mode"></span>
+      <span class="dots" aria-hidden="true">${'<span class="dot"></span>'.repeat(7)}</span>
+      <span class="visually-hidden card-days"></span>
+    </button>
+    <button type="button" class="card-lock">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="7"/><path d="M12 9v4l2.5 1.5M10 3h4"/></svg>
+      <span>${voice.lockIn.button}</span>
+    </button>`
   return card
 }
 
-export function updateCard(card: HTMLButtonElement, thing: Thing, view: CardView): void {
+export function main(card: HTMLElement): HTMLButtonElement {
+  const button = card.querySelector<HTMLButtonElement>('.card-main')
+  if (!button) throw new Error('card without its button')
+  return button
+}
+
+export function lock(card: HTMLElement): HTMLButtonElement {
+  const button = card.querySelector<HTMLButtonElement>('.card-lock')
+  if (!button) throw new Error('card without lock in')
+  return button
+}
+
+export function updateCard(card: HTMLElement, thing: Thing, view: CardView): void {
+  const button = main(card)
   const name = card.querySelector('.card-name')
   if (name) name.textContent = `${thing.emoji} ${thing.name}`
   const mode = card.querySelector('.card-mode')
   if (mode) mode.textContent = thing.mode === 'timer' ? `${String(thing.minutes ?? 0)} min` : ''
 
-  card.setAttribute('aria-label', thing.name)
-  card.setAttribute('aria-pressed', String(view.done))
+  button.setAttribute('aria-label', thing.name)
+  button.setAttribute('aria-pressed', String(view.done))
+  card.dataset.done = String(view.done)
   card.dataset.stage = String(view.stage)
+  lock(card).setAttribute('aria-label', `${voice.lockIn.button}: ${thing.name}`)
+
+  const stone = card.querySelector<HTMLElement>('.card-stone')
+  if (stone) {
+    stone.hidden = view.waiting === 0
+    stone.textContent = view.waiting > 1 ? String(view.waiting) : ''
+  }
 
   const creature = card.querySelector('.creature')
   const key = `${thing.world}-${view.line}-${String(view.stage)}`
@@ -52,13 +87,15 @@ export function updateCard(card: HTMLButtonElement, thing: Thing, view: CardView
   })
   const days = card.querySelector('.card-days')
   const count = view.dots.filter(Boolean).length
-  if (days) days.textContent = `${String(count)} of the last 7 days`
+  if (days) {
+    days.textContent = `${String(count)} of the last 7 days${view.waiting > 0 ? `, ${voice.stones.onCard}` : ''}`
+  }
 }
 
 /** Runs a one-shot CSS animation class, restartable mid-flight. */
 export function animate(card: HTMLElement, className: string): void {
   card.classList.remove(className)
-  // Forcing a reflow restarts the animation when the class comes straight back.
+  // Reading layout restarts the animation when the class comes straight back.
   card.getBoundingClientRect()
   card.classList.add(className)
   card.addEventListener('animationend', () => card.classList.remove(className), { once: true })

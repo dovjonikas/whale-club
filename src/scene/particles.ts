@@ -1,19 +1,19 @@
 import type { World } from '../store/types'
+import { reducedMotion, ticker, type FrameHandle } from './ticker'
 
 /**
  * One canvas for everything that moves on its own: the bioluminescent drift
  * in the sea and the bursts a tap makes (bubbles, star dust, petals).
  *
  * Budget: at most LIVE_MAX particles, 30 frames a second while only the
- * ambient drift is on, 60 during a burst, nothing at all while the tab is
- * hidden or motion is reduced. The whole thing is a few hundred fills per
- * frame, which a 2019 phone does without warming up.
+ * ambient drift is on, 60 during a burst, nothing at all while the page is
+ * hidden (the ticker stops) or motion is reduced (nothing subscribes).
  */
-
 const LIVE_MAX = 90
 const AMBIENT_COUNT = 28
-const AMBIENT_INTERVAL = 1000 / 30
-const BURST_INTERVAL = 1000 / 60
+const AMBIENT_FPS = 30
+const BURST_FPS = 60
+const BURST_MS = 1800
 
 interface Particle {
   x: number
@@ -41,17 +41,14 @@ export class ParticleField {
   private width = 0
   private height = 0
   private horizon = 0.58
-  private raf = 0
   private last = 0
   private burstUntil = 0
-  private running = false
-  private readonly reduced: boolean
+  private handle: FrameHandle | null = null
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d')
     if (!ctx) throw new Error('canvas 2d unavailable')
     this.ctx = ctx
-    this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
   }
 
   resize(width: number, height: number, horizon: number): void {
@@ -66,25 +63,23 @@ export class ParticleField {
   }
 
   start(): void {
-    if (this.running || this.reduced) return
-    this.running = true
+    if (this.handle || reducedMotion()) return
     this.last = performance.now()
-    this.raf = requestAnimationFrame(this.frame)
+    this.handle = ticker.add(this.frame, AMBIENT_FPS)
   }
 
   stop(): void {
-    this.running = false
-    cancelAnimationFrame(this.raf)
+    this.handle?.remove()
+    this.handle = null
   }
 
   /** A tap's effect, in the world's own colours, from a point on screen. */
-  burst(world: World, x: number, y: number): void {
-    const count = this.reduced ? 0 : 18
+  burst(world: World, x: number, y: number, count = 18): void {
+    if (reducedMotion()) return
     const colors = COLORS[world]
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2
       const speed = 40 + Math.random() * 90
-      const color = colors[i % colors.length] ?? colors[0] ?? '#fff'
       this.push({
         x,
         y,
@@ -93,19 +88,20 @@ export class ParticleField {
         age: 0,
         life: 0.9 + Math.random() * 0.7,
         size: world === 'sea' ? 2 + Math.random() * 4 : 1.5 + Math.random() * 2.5,
-        color,
+        color: colors[i % colors.length] ?? colors[0] ?? '#fff',
         kind: world === 'sea' ? 'bubble' : world === 'sky' ? 'spark' : 'petal',
         ambient: false,
         phase: Math.random() * Math.PI * 2,
       })
     }
-    this.burstUntil = performance.now() + 1800
+    this.burstUntil = performance.now() + BURST_MS
     this.start()
+    this.handle?.setFps(BURST_FPS)
   }
 
   private seedAmbient(): void {
     this.particles = this.particles.filter((p) => !p.ambient)
-    if (this.reduced) return
+    if (reducedMotion()) return
     for (let i = 0; i < AMBIENT_COUNT; i++) this.push(this.ambientParticle(true))
   }
 
@@ -132,16 +128,14 @@ export class ParticleField {
   }
 
   private readonly frame = (now: number): void => {
-    if (!this.running) return
-    const bursting = now < this.burstUntil
-    const interval = bursting ? BURST_INTERVAL : AMBIENT_INTERVAL
-    if (now - this.last >= interval) {
-      const dt = Math.min((now - this.last) / 1000, 0.1)
-      this.last = now
-      this.tick(dt, now / 1000)
-      this.draw(now / 1000)
+    const dt = Math.min((now - this.last) / 1000, 0.1)
+    this.last = now
+    if (this.burstUntil && now > this.burstUntil) {
+      this.burstUntil = 0
+      this.handle?.setFps(AMBIENT_FPS)
     }
-    this.raf = requestAnimationFrame(this.frame)
+    this.tick(dt, now / 1000)
+    this.draw(now / 1000)
   }
 
   private tick(dt: number, t: number): void {
@@ -156,11 +150,8 @@ export class ParticleField {
         p.x += Math.sin(t * 3 + p.phase) * 25 * dt
       }
       if (p.kind === 'spark') p.vy += 20 * dt
-      if (p.age < p.life) {
-        next.push(p)
-      } else if (p.ambient) {
-        next.push(this.ambientParticle(false))
-      }
+      if (p.age < p.life) next.push(p)
+      else if (p.ambient) next.push(this.ambientParticle(false))
     }
     this.particles = next
   }
@@ -170,14 +161,10 @@ export class ParticleField {
     ctx.clearRect(0, 0, this.width, this.height)
     for (const p of this.particles) {
       const k = p.age / p.life
-      let alpha: number
-      if (p.ambient) {
-        // Fade in, drift, fade out, with a slow pulse so the sea looks alive.
-        const envelope = Math.min(1, k * 6, (1 - k) * 6)
-        alpha = envelope * (0.35 + 0.35 * Math.sin(t * 1.5 + p.phase))
-      } else {
-        alpha = 1 - k
-      }
+      // Ambient dots fade in, drift and fade out with a slow pulse; bursts just fade.
+      const alpha = p.ambient
+        ? Math.min(1, k * 6, (1 - k) * 6) * (0.35 + 0.35 * Math.sin(t * 1.5 + p.phase))
+        : 1 - k
       ctx.globalAlpha = Math.max(0, alpha)
       ctx.fillStyle = p.color
       ctx.beginPath()

@@ -15,12 +15,14 @@ localStorage.
 src/
   main.ts            fonts, styles, startApp, the update toast
   voice.ts           every line the app says, by moment (TODO-VOICE placeholders)
-  app/               the UI: cards, sheets, the line, the timer screen, toasts
+  app/               the UI: cards, sheets, the line, lock in, toasts
     app.ts           wires store, scene and row together; the only place that knows all three
     row.ts, card.ts  the row of things and one card
-    press.ts         tap vs long press from pointer events
-    addSheet.ts, timerSheet.ts, timerRun.ts, sheet.ts, toast.ts, line.ts
-    timer.ts         the running timer, kept in storage so a reload resumes it
+    addSheet.ts, sheet.ts, toast.ts, line.ts
+    session.ts       a lock-in, measured by timestamps; leaving it waits, never fails
+    sessionScreen.ts the quiet screen and the growing creature
+    dial.ts          the lock-in dial, 10 to 120 minutes
+    wakeLock.ts      the screen kept on during a session
     header.ts        the title and the four buttons
     notices.ts       one notice above the row at a time
     checkin.ts, recap.ts   the two rituals, as notice builders
@@ -33,7 +35,12 @@ src/
     surprise.ts, facts.ts  the daily surprise and the sea facts it draws from
   scene/             what is drawn behind the UI
     scene.ts         three parallax layers, the star canvas, the particle canvas
-    stars.ts         background stars and the day-stars (the calendar in the sky)
+    ticker.ts        the one animation loop; stops while hidden or off screen
+    stars.ts         the star field (tints, sparkles, a shooting star) and the day-stars
+    moon.ts          the moon in its real phase
+    stones.ts        the stones waiting to be cracked
+    rarity.ts        a find's shine, from the date it was earned
+    random.ts        the seeded generator and the string hash
     particles.ts     bioluminescent drift and the tap bursts
     creatures.ts     SVG for every world, line and stage
     collectibles.ts  the sixty collectibles: id, world, line, day, place, drawing
@@ -45,7 +52,7 @@ src/
     types.ts         AppData, Thing, DayRecord, Settings
     store.ts         load, save, actions, subscribe; the only localStorage reader for data
     migrate.ts       a strict guard from stored JSON to AppData, by version
-    derive.ts        last7, stage, totalDone, stars, streak, lines: all arithmetic, nothing stored
+    derive.ts        last7, stage, totalDone, stones waiting, found, stars, streak: all arithmetic
     dates.ts         local YYYY-MM-DD keys and week arithmetic
   pwa/
     register.ts      service worker registration, update checks, the reload
@@ -62,7 +69,7 @@ docs/                this folder
 ```
  pointer / keyboard
         |
-   app/press.ts  ->  app/app.ts handlers  ->  store actions (toggleDone, addThing, ...)
+   app/row.ts    ->  app/app.ts handlers  ->  store actions (toggleDone, addThing, ...)
                                                    |
                                              store.commit(): save to localStorage, notify
                                                    |
@@ -78,16 +85,18 @@ docs/                this folder
 - **Everything shown is derived.** Creature stage, week dots, collectibles,
   stars, streaks: `derive.ts` computes them from `days` on every render.
   Nothing about progress is stored twice.
-- **The timer is the one other key** (`whaleclub:timer`): a start time and
-  a length, so a reload or a locked phone resumes it from the clock.
+- **A running lock-in is the one other key** (`whaleclub:session`): its
+  start, its length and the time set aside, so a reload or a locked phone
+  resumes it from the clock. A timer left by v0.4 is picked up once and moved.
 - **The scene knows nothing about things.** `app.ts` tells it what to show;
   it draws. Adding a world does not touch the scene's layers.
 
 ## 3. A day
 
 A day key is `YYYY-MM-DD` on the person's own clock (`dates.ts`). A thing
-done today is its id in `days[today].done`. A finished timer adds its
-minutes to `days[today].minutes[thingId]` and counts as done. There is no
+done today is its id in `days[today].done`. A finished lock-in adds its
+minutes to `days[today].minutes[thingId]` and counts as done; one that was
+left is also listed in `days[today].waited`. There is no
 "missed" record anywhere: a missed day is the absence of a record, and the
 only thing the app does with it is dim the scene for a day and say one
 line.
@@ -120,6 +129,28 @@ entry, a `voice.ts` line under `unlock`, a row in `docs/COLLECTIBLES.md`,
 and a case in `tests/e2e/collectibles.e2e.ts` that seeds the days and
 expects it.
 
+## 6a. Stones
+
+A thing earns a tier when its counted days reach it (`UNLOCK_DAYS`).
+`AppData.cracked` keeps, per thing, the highest tier cracked open; every
+earned tier above it is a stone waiting in the scene (`waitingTiers`), and
+what is in the scene is what was earned and cracked (`foundFor`). Losing
+`cracked` would only bring stones back, never take a find away. A find's
+shine is `rarityOf(id, reachedOn(...))`: a hash of the id and the date the
+tier was reached, so it is never stored and never changes.
+
+## 6b. Lock in
+
+`app/session.ts` keeps the running session in its own key, by timestamps
+only. On `visibilitychange` and `pagehide` it writes when the page hid;
+on return it measures the time away. Under fifteen seconds nothing
+happens. Over, the time away is set aside (`pausedMs`), the session is
+marked as left, and the creature's size is held where it was. A session
+that ran out during a short absence ends clean at the moment it ran out.
+`Store.finishSession` writes the end: a clean one is a full count; a
+left one is done but listed in `days[date].waited`, which `counted()`
+leaves out of the stars and the stones.
+
 ## 7. Postcards
 
 `app/postcard.ts` paints a postcard from the data, not from the screen:
@@ -151,6 +182,6 @@ build and changes the worker under an open page.
 Playwright only, against `vite preview` of the production build, in three
 projects: iPhone 13, Pixel 5, desktop 1366x768. Tests go through the real
 UI by role and name; `helpers.seed()` writes a history into storage before
-load for anything that would otherwise take weeks. `page.clock` drives the
-timer. `npm test` runs them all; CI runs them beside the build and only a
+load for anything that would otherwise take weeks. `page.clock` drives
+lock-in sessions. `npm test` runs them all; CI runs them beside the build and only a
 push to `main` deploys.

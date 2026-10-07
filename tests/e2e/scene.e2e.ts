@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 import { todayKey } from '../../src/store/dates'
 import { surpriseFor } from '../../src/app/surprise'
-import { addThing, card, dateKey, seed } from './helpers'
+import { addThing, card, clearNotices, dateKey, seed } from './helpers'
 
 /**
  * The scene answers the day: the whale when everything is done, a star
@@ -27,6 +27,7 @@ test('every day with something done is a star that says what was done', async ({
     days: { [dateKey(-3)]: { done: ['t1', 't2'] }, [dateKey(-1)]: { done: ['t2'] } },
   })
   await page.goto('')
+  await clearNotices(page)
   const stars = page.getByRole('group', { name: 'your days' }).getByRole('button')
   await expect(stars).toHaveCount(2)
   const label = await stars.first().getAttribute('aria-label')

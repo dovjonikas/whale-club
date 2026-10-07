@@ -13,6 +13,7 @@ export type SoundKind = 'tap' | 'untap' | 'whale' | 'unlock' | 'timer' | 'checki
 
 export class Sound {
   private ctx: AudioContext | null = null
+  private sea: { source: AudioBufferSourceNode; lfo: OscillatorNode; gain: GainNode } | null = null
 
   constructor(private muted: boolean) {}
 
@@ -22,6 +23,57 @@ export class Sound {
 
   setMuted(muted: boolean): void {
     this.muted = muted
+    if (muted) this.stopSea()
+  }
+
+  /**
+   * The quiet sea under a lock-in: brown noise through a low-pass filter,
+   * its volume rising and falling every eleven seconds or so, like waves
+   * heard from a little way off. Generated, so there is nothing to load.
+   * Off unless the person switches it on; the mute button silences it too.
+   */
+  setSea(on: boolean): void {
+    if (!on || this.muted) {
+      this.stopSea()
+      return
+    }
+    const ctx = this.ctx
+    if (!ctx || this.sea) return
+    const seconds = 4
+    const buffer = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate)
+    const data = buffer.getChannelData(0)
+    let last = 0
+    for (let i = 0; i < data.length; i++) {
+      // Brown noise: each sample a small step from the last, which keeps the hiss low and soft.
+      last = (last + 0.02 * (Math.random() * 2 - 1)) / 1.02
+      data[i] = last * 3.5
+    }
+    const source = ctx.createBufferSource()
+    source.buffer = buffer
+    source.loop = true
+    const filter = ctx.createBiquadFilter()
+    filter.type = 'lowpass'
+    filter.frequency.value = 520
+    const gain = ctx.createGain()
+    gain.gain.value = 0.035
+    const lfo = ctx.createOscillator()
+    lfo.frequency.value = 0.09
+    const depth = ctx.createGain()
+    depth.gain.value = 0.025
+    lfo.connect(depth).connect(gain.gain)
+    source.connect(filter).connect(gain).connect(ctx.destination)
+    source.start()
+    lfo.start()
+    this.sea = { source, lfo, gain }
+  }
+
+  private stopSea(): void {
+    if (!this.sea || !this.ctx) return
+    const { source, lfo, gain } = this.sea
+    this.sea = null
+    gain.gain.setTargetAtTime(0, this.ctx.currentTime, 0.4)
+    source.stop(this.ctx.currentTime + 1.5)
+    lfo.stop(this.ctx.currentTime + 1.5)
   }
 
   /** Call from inside a user gesture. Safe to call many times. */

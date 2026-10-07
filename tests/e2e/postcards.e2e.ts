@@ -61,7 +61,7 @@ test('all done offers to send the whale; the first send asks story or square', a
   })
 })
 
-test('an unlock offers to send this, in the size chosen before', async ({ page }) => {
+test('a cracked stone offers to send this, in the size chosen before', async ({ page }) => {
   await mockShare(page)
   await seed(page, {
     things: [
@@ -73,6 +73,8 @@ test('an unlock offers to send this, in the size chosen before', async ({ page }
   })
   await page.goto('')
   await card(page, 'run').click()
+  const stone = page.getByRole('button', { name: /a stone from run/ })
+  for (let i = 0; i < 3; i++) await stone.click()
   const offer = page.getByRole('button', { name: 'send this' })
   await expect(offer).toBeVisible({ timeout: 6000 })
   await offer.click()

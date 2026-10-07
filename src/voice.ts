@@ -41,11 +41,10 @@ export const voice = {
     answer2: 'happy!!!',
     after: 'noted.', // TODO-VOICE
   },
-  // TODO-VOICE: the author may swap rule one for "you never give up on yourself".
   rules: [
     'the first rule of whale club is: you show up.',
     'the second rule of whale club is: you show up tomorrow.',
-    'the third rule: nothing dies. you just missed a day.',
+    'the third rule of whale club is: you never give up on yourself.',
   ],
   install: {
     ios: 'put it on your home screen', // TODO-VOICE
@@ -60,6 +59,26 @@ export const voice = {
     android: 'put it on your home screen', // TODO-VOICE
     button: 'Install',
     close: 'not now',
+  },
+  lockIn: {
+    button: 'lock in',
+    minutes: 'minutes',
+    stop: 'stop',
+    back: 'back to the sea',
+    seaSound: 'sea sound',
+    /** Said when the person comes back after leaving a session for more than 15 seconds. */
+    left: 'you left. it waited.',
+    /** The end of a session that was left: it counts, it stayed small. Plain, no shame. */
+    broken: 'it counts. it stayed small this time.', // TODO-VOICE
+    stopped: (minutes: number) => `stopped. ${String(minutes)} min noted.`, // TODO-VOICE
+  },
+  stones: {
+    fell: 'something fell. go and see.', // TODO-VOICE
+    label: (name: string) => `a stone from ${name}. tap three times to crack it`,
+    onCard: 'a stone is waiting',
+    waiting: 'a stone. crack it.', // TODO-VOICE
+    rare: 'rare',
+    legendary: 'legendary',
   },
   /** The menu's one screen: the rules and this. */
   clubLine: 'whale club is you and whoever you send your whale to.',

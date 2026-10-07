@@ -1,24 +1,29 @@
-import { COLLECTIBLES, type Collectible } from '../scene/collectibles'
-import { Scene } from '../scene/scene'
+import { COLLECTIBLES, collectiblesFor } from '../scene/collectibles'
+import { rarityOf } from '../scene/rarity'
+import { Scene, type ShownCollectible } from '../scene/scene'
+import type { StoneSpec } from '../scene/stones'
 import { fromKey, todayKey } from '../store/dates'
 import {
   allDoneToday,
+  foundFor,
   last7,
   lineFor,
   missedYesterday,
+  reachedOn,
   stageFor,
   starDays,
   streakDays,
-  unlockedFor,
+  waitingTiers,
 } from '../store/derive'
 import { Store } from '../store/store'
-import type { AppData, DateKey, Thing } from '../store/types'
+import type { AppData, DateKey, Thing, World } from '../store/types'
 import { pick, voice } from '../voice'
 import { installNotice, listenForInstallPrompt } from '../pwa/install'
 import { openAddSheet } from './addSheet'
 import { animate } from './card'
 import { checkinNotice } from './checkin'
 import { openCollectionSheet } from './collectionSheet'
+import { openDial } from './dial'
 import { renderHeader } from './header'
 import { host } from './host'
 import { Line } from './line'
@@ -28,34 +33,35 @@ import type { Moment } from './postcard'
 import { Postcards } from './postcards'
 import { recapNotice } from './recap'
 import { Row } from './row'
+import { elapsedMs, SessionService, totalMs, type Session } from './session'
+import { openSessionScreen, type SessionScreen } from './sessionScreen'
 import { Sound } from './sound'
 import { surpriseFor } from './surprise'
-import { TimerService } from './timer'
-import { showTimerRun, type TimerRunHandle } from './timerRun'
-import { openTimerSheet } from './timerSheet'
 import { showToast } from './toast'
+import { keepAwake, letSleep } from './wakeLock'
 
 const SURPRISE_DELAY_MS = 4000
 const JACKET_ID = 'sea-a-jacket'
 /** The postcard button waits for the moment's animation to finish. */
 const OFFER_AFTER_WHALE_MS = 2200
-const OFFER_AFTER_UNLOCK_MS = 1400
+const OFFER_AFTER_FIND_MS = 2800
 const OFFER_AFTER_GROW_MS = 900
 
 /** Wires the store, the scene, the row and the sheets together. One per page. */
 export function startApp(root: HTMLElement): void {
   const store = new Store()
-  const scene = new Scene(host())
-  const timers = new TimerService()
+  const scene = new Scene(host(), (key) => {
+    onCracked(key)
+  })
   const sound = new Sound(!store.get().settings.sound)
 
   root.innerHTML = `
     <header class="header"></header>
+    <div class="notice-slot"></div>
     <main class="stage"><div class="onboarding" hidden><p></p><small></small></div></main>
     <div class="bottom">
       <div class="offer-slot"></div>
       <p class="line"></p>
-      <div class="notice-slot"></div>
       <div class="row" role="group" aria-label="your homework"></div>
     </div>`
 
@@ -98,10 +104,11 @@ export function startApp(root: HTMLElement): void {
     sound.isMuted(),
   )
 
-  let running: TimerRunHandle | null = null
   let surprisedFor: DateKey | null = null
-  // Unlocks found by a render are held until the tap handler says the line.
-  const pendingUnlocks: Collectible[] = []
+  // Stones that fell in during a render, held until the tap handler says the line.
+  const pendingFalls: string[] = []
+  // A find on its way out of its stone: where the stone was, for the arrival.
+  const arrivals = new Map<string, { x: number; y: number }>()
 
   const row = new Row(query(root, '.row'), {
     onTap(thing, card) {
@@ -115,12 +122,17 @@ export function startApp(root: HTMLElement): void {
       }
       celebrate(thing, card, before)
     },
-    onLongPress(thing) {
-      openTimerSheet(thing, (minutes) => {
-        const timer = timers.start(thing.id, minutes)
-        line.say(voice.timerStart)
-        openRun(thing, timer.minutes * 60_000)
-      })
+    onLockIn(thing) {
+      const data = store.get()
+      openDial(
+        thing,
+        { line: lineFor(data, thing), stage: stageFor(last7(data, thing.id, todayKey())) },
+        (minutes) => {
+          store.setThingMinutes(thing.id, minutes)
+          sessions.start(thing.id, minutes)
+          openSession(thing)
+        },
+      )
     },
     onAdd() {
       openAddSheet(store, (thing) => {
@@ -131,16 +143,11 @@ export function startApp(root: HTMLElement): void {
 
   /**
    * Everything a done tap can set off. The scene shows all of it; the line
-   * says the rarest: a new collectible, else the whole day done, else the
-   * timer's end, else a creature that grew, else the tap itself. A moment
-   * worth showing gets the postcard button once its animation is over.
+   * says the rarest: a stone falling in, else the whole day done, else a
+   * creature that grew, else the tap itself. A moment worth showing gets
+   * the postcard button once its animation is over.
    */
-  function celebrate(
-    thing: Thing,
-    card: HTMLElement,
-    stageBefore: number,
-    source: 'tap' | 'timer' = 'tap',
-  ): void {
+  function celebrate(thing: Thing, card: HTMLElement, stageBefore: number): void {
     const data = store.get()
     const today = todayKey()
     postcards.clearOffer()
@@ -148,7 +155,7 @@ export function startApp(root: HTMLElement): void {
     const rect = card.getBoundingClientRect()
     scene.burst(thing.world, rect.left + rect.width / 2, rect.top + 8)
 
-    const fresh = pendingUnlocks.splice(0)
+    const fell = pendingFalls.splice(0)
     const grew = stageFor(last7(data, thing.id, today)) > stageBefore
     const done = allDoneToday(data, today)
     if (done) {
@@ -156,13 +163,11 @@ export function startApp(root: HTMLElement): void {
       sound.play('whale')
     }
     let said: string
-    if (fresh.length > 0) {
+    if (fell.length > 0) {
       sound.play('unlock')
-      said = voice.unlock(fresh.map((c) => c.name).join(', '))
+      said = voice.stones.fell
     } else if (done) {
       said = voice.allDone
-    } else if (source === 'timer') {
-      said = voice.timerEnd
     } else if (grew) {
       sound.play('grow')
       said = voice.stageUp
@@ -171,28 +176,38 @@ export function startApp(root: HTMLElement): void {
       said = pick(voice.tap[thing.world], today + thing.id)
     }
     line.say(said)
-    for (const item of fresh) {
-      const where = scene.collectibleRect(item.id)
-      if (where) scene.burst(item.world, where.left + where.width / 2, where.top + where.height / 2)
-    }
 
-    const moment: Moment | null = done
-      ? { kind: 'whale', line: said }
-      : fresh.length > 0
-        ? { kind: 'unlock', line: said }
-        : grew
-          ? { kind: 'stage', line: said }
-          : null
-    if (moment) {
-      const label = fresh.length > 0 ? voice.postcard.sendThis : voice.postcard.sendWhale
-      const delay = done
-        ? OFFER_AFTER_WHALE_MS
-        : fresh.length > 0
-          ? OFFER_AFTER_UNLOCK_MS
-          : OFFER_AFTER_GROW_MS
-      postcards.offer(moment, label, delay)
-    }
+    if (done)
+      postcards.offer({ kind: 'whale', line: said }, voice.postcard.sendWhale, OFFER_AFTER_WHALE_MS)
+    else if (grew && fell.length === 0)
+      postcards.offer({ kind: 'stage', line: said }, voice.postcard.sendWhale, OFFER_AFTER_GROW_MS)
     maybeSurprise(data, today)
+  }
+
+  /** A stone was cracked: the find comes out of the light, is polished, and settles. */
+  function onCracked(key: string): void {
+    const [thingId, tierText] = key.split(':')
+    const tier = Number(tierText)
+    const data = store.get()
+    const thing = data.things.find((t) => t.id === thingId)
+    if (!thing) return
+    const item = collectiblesFor(thing.world, lineFor(data, thing)).find((c) => c.days === tier)
+    const where = scene.stoneRect(key)
+    const sceneRect = scene.root.getBoundingClientRect()
+    if (item && where) {
+      arrivals.set(item.id, {
+        x: where.left - sceneRect.left + where.width / 2,
+        y: where.top - sceneRect.top + where.height / 2,
+      })
+      scene.burst(thing.world, where.left + where.width / 2, where.top + where.height / 2, 28)
+    }
+    store.crack(thing.id, tier)
+    sound.play('unlock')
+    if (item) {
+      const said = voice.unlock(item.name)
+      line.say(said)
+      postcards.offer({ kind: 'unlock', line: said }, voice.postcard.sendThis, OFFER_AFTER_FIND_MS)
+    }
   }
 
   /** Once a day, after the first thing done: something new in the scene. */
@@ -208,30 +223,98 @@ export function startApp(root: HTMLElement): void {
     }, SURPRISE_DELAY_MS)
   }
 
-  function openRun(thing: Thing, remainingMs: number): void {
-    const data = store.get()
-    const look = { line: lineFor(data, thing), stage: stageFor(last7(data, thing.id, todayKey())) }
-    running?.close()
-    running = showTimerRun(thing, look, remainingMs, () => {
-      timers.cancel()
-      running?.close()
-      running = null
-      line.clear()
-    })
+  // --- Lock in ---------------------------------------------------------------------------------
+
+  let screen: SessionScreen | null = null
+
+  const sessions = new SessionService({
+    tick(session, elapsed) {
+      screen?.update(elapsed / totalMs(session), totalMs(session) - elapsed, waitedAt(session))
+    },
+    left() {
+      screen?.left()
+    },
+    finish(session, clean) {
+      finishSession(session, clean)
+    },
+  })
+
+  function waitedAt(session: Session): number | null {
+    return session.brokenAtMs === undefined ? null : session.brokenAtMs / totalMs(session)
   }
 
-  timers.onTick((ms) => running?.update(ms))
-  timers.onFinish((timer) => {
-    running?.close()
-    running = null
-    const thing = store.get().things.find((t) => t.id === timer.thingId)
-    const before = thing ? stageFor(last7(store.get(), thing.id, todayKey())) : 0
-    store.recordMinutes(timer.thingId, timer.minutes)
-    sound.play('timer')
-    const card = row.card(timer.thingId)
-    if (thing && card) celebrate(thing, card, before, 'timer')
-    else line.say(voice.timerEnd)
-  })
+  function openSession(thing: Thing): void {
+    const data = store.get()
+    postcards.clearOffer()
+    screen?.close()
+    scene.setSession(true)
+    keepAwake()
+    sound.setSea(data.settings.sessionSound === true)
+    screen = openSessionScreen(thing, lineFor(data, thing), {
+      sound: data.settings.sessionSound === true,
+      onSound(on) {
+        store.setSettings({ sessionSound: on })
+        sound.setSea(on)
+      },
+      onStop() {
+        const stopped = sessions.stop()
+        const minutes = stopped ? Math.floor(elapsedMs(stopped) / 60_000) : 0
+        if (stopped) store.addMinutes(stopped.thingId, minutes)
+        closeSession()
+        line.say(voice.lockIn.stopped(minutes), { quiet: true })
+      },
+    })
+    const session = sessions.current()
+    if (session) {
+      const elapsed = elapsedMs(session)
+      screen.update(elapsed / totalMs(session), totalMs(session) - elapsed, waitedAt(session))
+      if (session.broken) screen.left()
+    }
+  }
+
+  function closeSession(): void {
+    screen?.close()
+    screen = null
+    scene.setSession(false)
+    sound.setSea(false)
+    letSleep()
+  }
+
+  function finishSession(session: Session, clean: boolean): void {
+    const thing = store.get().things.find((t) => t.id === session.thingId)
+    if (!thing) {
+      closeSession()
+      return
+    }
+    if (!screen) openSession(thing)
+    const before = stageFor(last7(store.get(), thing.id, todayKey()))
+    store.finishSession(thing.id, session.minutes, clean)
+    sound.setSea(false)
+    letSleep()
+    sound.play(clean ? 'whale' : 'timer')
+    const said = clean ? voice.timerEnd : voice.lockIn.broken
+    const moment: Moment = allDoneToday(store.get(), todayKey())
+      ? { kind: 'whale', line: said }
+      : { kind: 'stage', line: said }
+    screen?.end(
+      clean,
+      said,
+      () => {
+        postcards.sendNow(moment)
+      },
+      closeSession,
+    )
+    const card = row.card(thing.id)
+    if (card && clean) {
+      animate(card, 'is-jumping')
+      if (stageFor(last7(store.get(), thing.id, todayKey())) > before) animate(card, 'is-growing')
+    }
+    scene.setSession(false)
+    // The screen stays until the person goes back to the sea; the whale is already up behind it.
+    if (allDoneToday(store.get(), todayKey())) scene.surfaceWhale(hasJacket(store.get()))
+  }
+
+  // --- Render ----------------------------------------------------------------------------------
 
   function render(data: AppData): void {
     const today = todayKey()
@@ -246,12 +329,11 @@ export function startApp(root: HTMLElement): void {
       },
     )
 
-    const unlocked = new Set(data.things.flatMap((t) => unlockedFor(data, t, COLLECTIBLES)))
-    const fresh = scene.setCollectibles(COLLECTIBLES.filter((c) => unlocked.has(c.id)))
-    for (const id of fresh) {
-      const item = COLLECTIBLES.find((c) => c.id === id)
-      if (item) pendingUnlocks.push(item)
-    }
+    scene.setCollectibles(shownCollectibles(data), arrivals)
+    arrivals.clear()
+    const fell = scene.setStones(stonesFor(data))
+    pendingFalls.push(...fell)
+    scene.setWarmth(warmthOf(data))
 
     const nothingToday = (data.days[today]?.done.length ?? 0) === 0
     scene.setQuiet(nothingToday && missedYesterday(data, today))
@@ -270,18 +352,59 @@ export function startApp(root: HTMLElement): void {
     notices.render()
   })
 
-  const resumed = timers.resume()
+  const resumed = sessions.resume()
   if (resumed) {
     const thing = store.get().things.find((t) => t.id === resumed.thingId)
-    if (thing) openRun(thing, resumed.startedAt + resumed.minutes * 60_000 - Date.now())
-    else timers.cancel()
+    if (thing) openSession(thing)
+    else sessions.stop()
   }
 
   if (missedYesterday(store.get(), todayKey())) line.say(voice.missedDay, { quiet: true })
 }
 
+function shownCollectibles(data: AppData): ShownCollectible[] {
+  const shown: ShownCollectible[] = []
+  for (const thing of data.things) {
+    const found = new Set(foundFor(data, thing, COLLECTIBLES))
+    for (const item of COLLECTIBLES) {
+      if (!found.has(item.id)) continue
+      shown.push({ item, rarity: rarityOf(item.id, reachedOn(data, thing.id, item.days)) })
+    }
+  }
+  return shown
+}
+
+/**
+ * Where each waiting stone lies: sea stones float at the water line, sky
+ * stones hang in the lower sky, garden stones lie on the sand. Spread by
+ * the thing's place in the row so two things' stones do not overlap.
+ */
+function stonesFor(data: AppData): StoneSpec[] {
+  const specs: StoneSpec[] = []
+  const Y: Record<World, number> = { sea: 0.605, sky: 0.4, garden: 0.585 }
+  for (const thing of data.things) {
+    waitingTiers(data, thing.id).forEach((tier, i) => {
+      specs.push({
+        key: `${thing.id}:${String(tier)}`,
+        world: thing.world,
+        x: 0.12 + ((thing.order * 0.21 + i * 0.12) % 0.78),
+        y: Y[thing.world] - (thing.world === 'sky' ? i * 0.05 : 0),
+        label: voice.stones.label(thing.name),
+      })
+    })
+  }
+  return specs
+}
+
+/** The shore glows warmer the more of the garden has been found. */
+function warmthOf(data: AppData): number {
+  const garden = data.things.filter((t) => t.world === 'garden')
+  const found = garden.reduce((n, t) => n + foundFor(data, t, COLLECTIBLES).length, 0)
+  return 0.25 + Math.min(found, 6) * 0.125
+}
+
 function hasJacket(data: AppData): boolean {
-  return data.things.some((t) => unlockedFor(data, t, COLLECTIBLES).includes(JACKET_ID))
+  return data.things.some((t) => foundFor(data, t, COLLECTIBLES).includes(JACKET_ID))
 }
 
 /** "Tue 3 Nov: run, read" for a star's label and its tap. */

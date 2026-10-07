@@ -28,6 +28,10 @@ const LINES: string[] = [
   voice.starPlaced,
   voice.shareDone,
   voice.checkin.after,
+  voice.stones.fell,
+  voice.lockIn.left,
+  voice.lockIn.broken,
+  voice.lockIn.stopped(120),
 ]
 
 test.use({ viewport: { width: 320, height: 640 } })
