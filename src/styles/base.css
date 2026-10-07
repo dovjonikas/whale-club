@@ -150,13 +150,73 @@ input {
     transform var(--dur-fast) var(--ease);
 }
 
-.icon-button:hover,
 .icon-button[aria-pressed='true'] {
   color: var(--star);
 }
 
+/* Hover only where there is a real pointer: on a phone a tap would leave it stuck. */
+@media (hover: hover) and (pointer: fine) {
+  .icon-button:hover {
+    color: var(--star);
+  }
+}
+
 .icon-button:active {
   transform: scale(0.92);
+}
+
+/* Every pressable gives a little under a finger, quick in and back on
+   release, so the screen is heard before anything else happens. The
+   individual scale property composes with any transform a control already
+   uses for its own place or entrance. */
+:is(
+  .chip,
+  .day-chip,
+  .button-quiet,
+  .undo-button,
+  .not-today-toggle,
+  .not-today-name,
+  .menu-row,
+  .menu-version,
+  .log-month,
+  .log-cell,
+  .log-title,
+  .format,
+  .next-find,
+  .row-edit,
+  .card-edit,
+  .card-add,
+  .offer,
+  .intro-skip,
+  .lab-bar-open,
+  .lab-bar-exit
+) {
+  transition: scale var(--dur-press) var(--ease-out);
+}
+
+:is(
+    .chip,
+    .day-chip,
+    .button-quiet,
+    .undo-button,
+    .not-today-toggle,
+    .not-today-name,
+    .menu-row,
+    .menu-version,
+    .log-month,
+    .log-cell,
+    .log-title,
+    .format,
+    .next-find,
+    .row-edit,
+    .card-edit,
+    .card-add,
+    .offer,
+    .intro-skip,
+    .lab-bar-open,
+    .lab-bar-exit
+  ):active:not(:disabled) {
+  scale: var(--press-scale);
 }
 
 .icon-button svg {

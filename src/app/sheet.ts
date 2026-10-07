@@ -21,6 +21,52 @@ let openHandle: SheetHandle | null = null
 /** Each sheet title gets its own id, for aria-labelledby. */
 let sheetCount = 0
 
+/** How long a sheet takes to go down: --dur-sheet-out in tokens.css. */
+const SHEET_OUT_MS = 300
+/** A flick this fast, in px per ms, closes the sheet however short the pull. */
+const FLICK_SPEED = 0.11
+/** A pull past this share of the sheet's height closes it. */
+const CLOSE_SHARE = 0.3
+/** Pulled up past the top, the sheet gives a little, less and less: the square root of the pull, times this. */
+const OVERPULL = 2
+
+/**
+ * Pull the sheet down by its grabber to close it. It follows the finger
+ * exactly, closes on a flick or a long enough pull, and otherwise springs
+ * back from wherever it was let go. Caught while it is still moving, it is
+ * held where it is, not where it was going. A second finger is ignored.
+ */
+function pullToClose(sheet: HTMLElement, grabber: HTMLElement, close: () => void): void {
+  let pull: { id: number; y: number; at: number } | null = null
+  let dy = 0
+  grabber.addEventListener('pointerdown', (event) => {
+    if (pull || event.button !== 0) return
+    // Where the sheet is right now, even half way through a transition.
+    const now = new DOMMatrixReadOnly(getComputedStyle(sheet).transform).m42
+    pull = { id: event.pointerId, y: event.clientY - now, at: event.timeStamp }
+    dy = 0
+    grabber.setPointerCapture(event.pointerId)
+    sheet.classList.add('is-dragging')
+  })
+  grabber.addEventListener('pointermove', (event) => {
+    if (event.pointerId !== pull?.id) return
+    const raw = event.clientY - pull.y
+    dy = raw >= 0 ? raw : -Math.sqrt(-raw) * OVERPULL
+    sheet.style.transform = `translate3d(0, ${String(dy)}px, 0)`
+  })
+  const release = (event: PointerEvent): void => {
+    if (event.pointerId !== pull?.id) return
+    const speed = dy / Math.max(1, event.timeStamp - pull.at)
+    pull = null
+    // Back to the stylesheet's transitions, from wherever the finger left it.
+    sheet.classList.remove('is-dragging')
+    sheet.style.transform = ''
+    if (dy > sheet.offsetHeight * CLOSE_SHARE || speed > FLICK_SPEED) close()
+  }
+  grabber.addEventListener('pointerup', release)
+  grabber.addEventListener('pointercancel', release)
+}
+
 export function openSheet(options: SheetOptions): SheetHandle {
   openHandle?.close()
   const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
@@ -36,6 +82,7 @@ export function openSheet(options: SheetOptions): SheetHandle {
   const titleId = `sheet-title-${String(++sheetCount)}`
   sheet.setAttribute('aria-labelledby', titleId)
   sheet.innerHTML = `
+    <div class="sheet-grabber" aria-hidden="true"></div>
     <h2 class="sheet-title" id="${titleId}"></h2>
     <button class="icon-button sheet-close" type="button" aria-label="Close">
       <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>
@@ -58,7 +105,7 @@ export function openSheet(options: SheetOptions): SheetHandle {
     setTimeout(() => {
       scrim.remove()
       sheet.remove()
-    }, 300)
+    }, SHEET_OUT_MS)
     opener?.focus()
     options.onClose?.()
   }
@@ -69,6 +116,8 @@ export function openSheet(options: SheetOptions): SheetHandle {
 
   options.build(body, close)
   sheet.querySelector('.sheet-close')?.addEventListener('click', close)
+  const grabber = sheet.querySelector<HTMLElement>('.sheet-grabber')
+  if (grabber) pullToClose(sheet, grabber, close)
   scrim.addEventListener('click', close)
   document.addEventListener('keydown', onKey)
 

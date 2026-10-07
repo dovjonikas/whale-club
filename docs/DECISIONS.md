@@ -646,3 +646,27 @@ sequence, which spreads points evenly with no grid and no line (a first
 golden-ratio try fell on a diagonal). Nothing steps back once it has
 arrived, so the climb never stalls. The whole intro still reaches "start
 light" in about twenty-seven seconds.
+
+## 2026-10-07 The brand pass, and what each skill gave
+
+0.12.0 runs the author's design skills in order, and each leaves a record.
+
+- **frontend-design** gave `docs/brand/BRAND.md`: the bubble as the mark,
+  cream line glyphs, the colours by row place, Fraunces kept for display
+  and Atkinson Hyperlegible for everything read. Its critique cut a second
+  signature bubble and a wave line, so the one tiny bubble rising from the
+  top right stays the single thing to remember.
+- **ui-ux-pro-max** searches a database with a Python script, and this
+  machine has no Python. Its rules were read from the skill's own
+  `references/pro-rules.md` instead, and nothing was presented as a search
+  result: no emoji as icons, one stroke weight, icon sizes from tokens, 3:1
+  for a glyph against its bubble, 44 px targets, press feedback in 80 to
+  150 ms, micro-interactions in 150 to 300 ms, colour never the only signal,
+  a scrim at 40 to 60 %.
+- **emil-design-eng** gave the strong curves, one press rule for every
+  pressable, sheets on the iOS drawer curve that leave faster than they
+  come and can be pulled down, hover only on real pointers, and nothing
+  growing from zero. The Before/After table is in `docs/QUALITY.md`.
+- **review-animations** can only be started by the author; it refuses to
+  run when the agent calls it. The new motion is checked against the emil
+  rules in `docs/QUALITY.md`, and the skill is left for the author to run.
