@@ -19,12 +19,15 @@ export function checkinNotice(store: Store, sound: Sound): NoticeBuilder {
     card.className = 'leaf checkin'
     card.setAttribute('aria-label', 'check-in')
     const ask = (question: string, answer: string, then: () => void): void => {
+      const focused = card.contains(document.activeElement)
       card.innerHTML = `<span class="leaf-title">${question}</span>
         <div class="leaf-actions"><button type="button" class="button-primary">${answer}</button></div>`
-      card.querySelector('button')?.addEventListener('click', () => {
+      const button = card.querySelector('button')
+      button?.addEventListener('click', () => {
         sound.play('checkin')
         then()
       })
+      if (focused) button?.focus({ preventScroll: true })
     }
     ask(voice.checkin.question1, voice.checkin.answer1, () => {
       ask(voice.checkin.question2, voice.checkin.answer2, () => {

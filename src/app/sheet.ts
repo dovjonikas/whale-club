@@ -89,7 +89,7 @@ export function openSheet(options: SheetOptions): SheetHandle {
   sheet.setAttribute('aria-labelledby', titleId)
   sheet.innerHTML = `
     <div class="sheet-grabber" aria-hidden="true"></div>
-    <h2 class="sheet-title" id="${titleId}"></h2>
+    <h2 class="sheet-title" id="${titleId}" tabindex="-1"></h2>
     <button class="icon-button sheet-close" type="button" aria-label="Close">
       ${icon('close')}
     </button>
@@ -118,7 +118,11 @@ export function openSheet(options: SheetOptions): SheetHandle {
       scrim.remove()
       sheet.remove()
     }, SHEET_OUT_MS)
-    opener?.focus()
+    // The opener may have been drawn again or deleted; then the row is the place to come back to.
+    const back = opener?.isConnected
+      ? opener
+      : app?.querySelector<HTMLElement>('.card-main, .card-add')
+    back?.focus({ preventScroll: true })
     options.onClose?.()
   }
 
@@ -138,8 +142,14 @@ export function openSheet(options: SheetOptions): SheetHandle {
   requestAnimationFrame(() => {
     scrim.classList.add('is-open')
     sheet.classList.add('is-open')
-    const first = sheet.querySelector<HTMLElement>('input, button:not(.sheet-close)')
-    first?.focus()
+    // With a keyboard and a mouse, straight into the first field. On a phone the title takes the
+    // focus instead: a screen reader starts there, and no keyboard springs up over the sheet.
+    const first = sheet.querySelector<HTMLElement>(
+      'input:not([disabled]), [role=slider], button:not(.sheet-close):not([disabled])',
+    )
+    const heading = sheet.querySelector<HTMLElement>('.sheet-title')
+    if (first && matchMedia('(pointer: fine)').matches) first.focus({ preventScroll: true })
+    else heading?.focus({ preventScroll: true })
   })
 
   const handle: SheetHandle = { body, close }

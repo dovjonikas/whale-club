@@ -41,7 +41,7 @@
   gap: var(--s2);
   padding: var(--s3) var(--s1) var(--s2);
   border-radius: var(--r);
-  touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
   transition: transform var(--dur-fast) var(--ease);
 }
 
@@ -69,7 +69,7 @@
     0 0 10px rgba(255, 180, 110, 0.5);
   animation: stone-warm 3.2s ease-in-out infinite alternate;
   color: #ffd9a8;
-  font-size: 10px;
+  font-size: var(--t-2xs);
   font-weight: 700;
   line-height: 14px;
 }
@@ -437,6 +437,20 @@
 }
 
 /* Delete: red, on the card, in edit mode or after a swipe to the left. */
+/* Small controls keep their look and reach 44 px with a target around them. */
+.card-delete::after,
+.row-edit::after,
+.next-find::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
+.row-edit,
+.next-find {
+  position: relative;
+}
+
 .card-delete {
   display: none;
   position: absolute;

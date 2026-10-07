@@ -338,7 +338,6 @@
   stroke-linecap: round;
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
-  transition: stroke-dashoffset 1s linear;
   filter: drop-shadow(0 0 3px rgba(255, 217, 138, 0.6));
 }
 

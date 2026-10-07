@@ -25,8 +25,11 @@ async function lockInThing(page: Page, name: string): Promise<void> {
 /** A tap on a lock-in card opens the dial; this sets the length and starts. */
 async function startLockIn(page: Page, name: string, minutes: number): Promise<void> {
   await card(page, name).click()
-  // The sheet moves focus to its button on the next frame; wait for that before taking it.
-  await expect(page.getByRole('button', { name: 'lock in', exact: true })).toBeFocused()
+  // The sheet moves focus into itself on the next frame (the slider, or on a phone its title);
+  // wait for that before taking it.
+  await expect
+    .poll(() => page.evaluate(() => document.activeElement?.closest('[role=dialog]') !== null))
+    .toBe(true)
   const slider = page.getByRole('slider', { name: 'minutes' })
   await slider.focus()
   await page.keyboard.press('Home')

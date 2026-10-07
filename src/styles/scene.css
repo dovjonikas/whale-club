@@ -132,6 +132,13 @@ canvas.particles {
   border-radius: 50%;
 }
 
+/* The star is small; the finger's target around it is not. */
+.day-star::after {
+  content: '';
+  position: absolute;
+  inset: -8px;
+}
+
 .day-star:focus-visible {
   outline: 2px solid var(--star);
 }
@@ -582,5 +589,31 @@ canvas.lanterns {
 @media (prefers-reduced-motion: reduce) {
   .scene-flash {
     animation-duration: 1ms;
+  }
+}
+
+/* Under reduced motion the whale still comes, as light rather than motion:
+   it fades in where it would surface, stays, and fades. The global rule
+   would otherwise jump its keyframes to their last, invisible frame, and
+   the day's reward would never be seen. */
+@media (prefers-reduced-motion: reduce) {
+  .whale {
+    transform: translate(-50%, -60%);
+    animation-name: surface-still !important;
+    animation-duration: 4s !important;
+    animation-timing-function: linear !important;
+  }
+}
+
+@keyframes surface-still {
+  0% {
+    opacity: 0;
+  }
+  15%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
   }
 }

@@ -46,8 +46,9 @@ export function openAddSheet(
           }
           <label class="field">
             <span class="field-label">${voice.add.name}</span>
-            <input class="input" name="name" type="text" maxlength="24" autocomplete="off" enterkeyhint="done" placeholder="${voice.add.placeholder}" required />
+            <input class="input" name="name" type="text" maxlength="24" autocomplete="off" enterkeyhint="done" placeholder="${voice.add.placeholder}" required aria-describedby="add-name-error" />
           </label>
+          <p class="field-error" id="add-name-error" hidden>${voice.add.needName}</p>
           <div class="icon-slot"></div>
           <div class="kind-slot"></div>
           <div class="days-slot"></div>
@@ -70,8 +71,13 @@ export function openAddSheet(
       body.querySelector('.days-slot')?.replaceWith(days.element)
       if (!form || !nameInput) return
 
+      const error = body.querySelector<HTMLElement>('.field-error')
       nameInput.addEventListener('input', () => {
         picture.follow(nameInput.value)
+        if (error && nameInput.value.trim()) {
+          error.hidden = true
+          nameInput.removeAttribute('aria-invalid')
+        }
       })
       body.querySelectorAll<HTMLButtonElement>('[data-starter]').forEach((chip) => {
         chip.addEventListener('click', () => {
@@ -89,6 +95,8 @@ export function openAddSheet(
         event.preventDefault()
         const name = nameInput.value.trim()
         if (!name) {
+          if (error) error.hidden = false
+          nameInput.setAttribute('aria-invalid', 'true')
           nameInput.focus()
           return
         }

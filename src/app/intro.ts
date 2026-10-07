@@ -563,6 +563,7 @@ export function playIntro(
     overlay.remove()
     app?.classList.remove('is-behind-intro')
     app?.removeAttribute('inert')
+    app?.querySelector<HTMLElement>('.card-main, .card-add')?.focus({ preventScroll: true })
     options.onEnd(how)
   }
 
@@ -599,5 +600,6 @@ export function playIntro(
   }
   score = Score.for(options.sound)
   score?.begin()
+  q('.intro-skip').focus({ preventScroll: true })
   promise()
 }

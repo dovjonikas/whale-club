@@ -134,7 +134,7 @@ button.log-cell {
 }
 
 .log-dots b {
-  font-size: 8px;
+  font-size: var(--t-2xs);
   line-height: 1;
   color: var(--ink-dim);
 }

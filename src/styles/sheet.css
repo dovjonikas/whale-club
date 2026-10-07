@@ -31,6 +31,8 @@
   box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
   transform: translate3d(0, 100%, 0);
   transition: transform var(--dur-sheet-out) var(--ease-drawer);
+  /* Scrolling a sheet to its end never scrolls or bounces what is behind it. */
+  overscroll-behavior: contain;
 }
 
 .sheet.is-open {
@@ -103,7 +105,7 @@
   height: var(--touch);
   padding: 0 var(--s3);
   border-radius: 10px;
-  border: 1px solid var(--card-edge);
+  border: 1px solid var(--control-edge);
   background: rgba(2, 4, 9, 0.5);
   font-size: var(--t-md);
 }
@@ -123,7 +125,7 @@
   height: var(--touch);
   padding: 0 var(--s3);
   border-radius: var(--r-pill);
-  border: 1px solid var(--card-edge);
+  border: 1px solid var(--control-edge);
   background: rgba(2, 4, 9, 0.4);
   font-size: var(--t-sm);
   transition:
@@ -204,7 +206,7 @@
   padding: var(--s3) var(--s4);
   border-radius: var(--r);
   background: var(--card);
-  border: 1px solid var(--card-edge);
+  border: 1px solid var(--control-edge);
   display: grid;
   grid-template-columns: 1fr auto;
   gap: var(--s2) var(--s3);
@@ -236,7 +238,7 @@
 
 .leaf .button-primary {
   width: auto;
-  height: 40px;
+  height: var(--touch);
   padding: 0 var(--s4);
   font-size: var(--t-sm);
 }
@@ -364,7 +366,7 @@
 }
 
 .tile.is-next {
-  border-color: var(--card-edge);
+  border-color: var(--control-edge);
 }
 
 .tile.is-next .tile-caption {
@@ -414,7 +416,7 @@
   padding: var(--s3);
   border-radius: var(--r);
   background: rgba(2, 4, 9, 0.4);
-  border: 1px solid var(--card-edge);
+  border: 1px solid var(--control-edge);
   counter-increment: step;
 }
 
@@ -541,7 +543,7 @@
   min-height: 160px;
   padding: var(--s4);
   border-radius: var(--r);
-  border: 1px solid var(--card-edge);
+  border: 1px solid var(--control-edge);
   background: rgba(2, 4, 9, 0.4);
   font-size: var(--t-md);
   font-weight: 700;
@@ -591,7 +593,7 @@
   right: 4px;
   padding: 0 5px;
   border-radius: var(--r-pill);
-  font-size: 9px;
+  font-size: var(--t-2xs);
   font-weight: 700;
   line-height: 15px;
   letter-spacing: 0.02em;
@@ -617,7 +619,7 @@
 .day-chip {
   height: var(--touch);
   border-radius: 12px;
-  border: 1px solid var(--card-edge);
+  border: 1px solid var(--control-edge);
   background: rgba(2, 4, 9, 0.4);
   color: var(--ink-dim);
   font-weight: 700;
@@ -658,7 +660,7 @@
   min-height: 84px;
   padding: var(--s3);
   border-radius: var(--r);
-  border: 1px solid var(--card-edge);
+  border: 1px solid var(--control-edge);
   background: rgba(2, 4, 9, 0.4);
   text-align: left;
   transition:
@@ -750,7 +752,7 @@
 
 .undo-button {
   min-width: var(--touch);
-  height: 36px;
+  height: var(--touch);
   padding: 0 var(--s3);
   border-radius: var(--r-pill);
   background: var(--abyss);
@@ -845,7 +847,7 @@
   width: var(--touch);
   height: var(--touch);
   border-radius: 50%;
-  border: 1px solid var(--card-edge);
+  border: 1px solid var(--control-edge);
   background: rgba(2, 4, 9, 0.4);
   color: var(--star-pale);
   transition:
@@ -884,6 +886,13 @@
   margin-bottom: var(--s1);
   font-size: var(--t-xs);
   color: var(--ink-dim);
+}
+
+/* A field that needs something says so right under it. */
+.field-error {
+  margin: calc(-1 * var(--s2)) 0 var(--s4);
+  font-size: var(--t-xs);
+  color: #ff7a72;
 }
 
 /* A starter wears its picture before its name. */

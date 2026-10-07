@@ -58,6 +58,15 @@ export interface BubbleState {
   manual?: boolean
 }
 
+/** Text for markup: what a person typed is never read as markup. */
+function escape(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+}
+
 /** A monogram: the first letter of a name, as a capital. */
 export function monogram(name: string): string {
   const first = Array.from(name.trim())[0] ?? '·'
@@ -88,7 +97,7 @@ export function inside(color: string): string {
 function mark(thing: BubbleThing, ink: string, className: string, opacity: number): string {
   const found = thing.icon === LETTER ? undefined : glyph(thing.icon)
   if (!found) {
-    return `<text class="${className}" x="${String(CENTRE.x)}" y="${String(CENTRE.y)}" fill="${ink}" opacity="${String(opacity)}" font-family="'Atkinson Hyperlegible', system-ui, sans-serif" font-weight="700" font-size="${String(R * 1.05)}" text-anchor="middle" dominant-baseline="central">${monogram(thing.name)}</text>`
+    return `<text class="${className}" x="${String(CENTRE.x)}" y="${String(CENTRE.y)}" fill="${ink}" opacity="${String(opacity)}" font-family="'Atkinson Hyperlegible', system-ui, sans-serif" font-weight="700" font-size="${String(R * 1.05)}" text-anchor="middle" dominant-baseline="central">${escape(monogram(thing.name))}</text>`
   }
   const side = 2 * R * GLYPH_SHARE
   const scale = side / 24
@@ -110,7 +119,7 @@ export function bubbleSvg(
   const lockIn = thing.kind === 'lockIn'
   const progress = done ? 1 : Math.min(1, Math.max(0, state.progress ?? 0))
   const a11y = options.label
-    ? `role="img" aria-label="${options.label.replace(/"/g, '&quot;')}"`
+    ? `role="img" aria-label="${escape(options.label)}"`
     : 'aria-hidden="true" focusable="false"'
   const { x, y } = CENTRE
   const rim = lockIn

@@ -42,6 +42,9 @@ button {
 input {
   font: inherit;
   color: inherit;
+  /* The page cannot be selected; a field must be, or editing a name is hard on a phone. */
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 :focus-visible {

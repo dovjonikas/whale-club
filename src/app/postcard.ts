@@ -222,9 +222,21 @@ async function drawCreatures(
       stageFor(last7(data, thing.id, today)),
     )
     await drawSvg(ctx, svg, x, top, size, size)
-    ctx.fillText(thing.name, x + size / 2, top + size + layout.nameSize * 1.2)
+    ctx.fillText(
+      fit(ctx, thing.name, size + gap * 0.8),
+      x + size / 2,
+      top + size + layout.nameSize * 1.2,
+    )
     x += size + gap
   }
+}
+
+/** A name cut to a width, with an ellipsis, so it never runs into its neighbour's. */
+function fit(ctx: CanvasRenderingContext2D, text: string, width: number): string {
+  if (ctx.measureText(text).width <= width) return text
+  let cut = Array.from(text)
+  while (cut.length > 1 && ctx.measureText(`${cut.join('')}…`).width > width) cut = cut.slice(0, -1)
+  return `${cut.join('').trimEnd()}…`
 }
 
 function wrap(ctx: CanvasRenderingContext2D, text: string, width: number): string[] {

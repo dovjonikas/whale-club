@@ -66,6 +66,8 @@ export const voice = {
     name: 'name',
     placeholder: 'run',
     button: 'add',
+    /** Under the name field when "add" is pressed with no name. */
+    needName: 'give it a name first.', // TODO-VOICE
     /** From the first open's "start light": three small things to begin with. */
     starters: 'start with something small',
     starterThings: [
