@@ -521,3 +521,14 @@ canvas.particles {
     animation: none;
   }
 }
+
+/* The cove's lanterns (scene/lanterns.ts). The canvas reaches up into the sky
+   so a new lantern can come down into the water; the cove is its lowest quarter. */
+canvas.lanterns {
+  position: absolute;
+  left: 0;
+  top: 40%;
+  width: 100%;
+  height: 31%;
+  pointer-events: none;
+}

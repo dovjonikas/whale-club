@@ -74,7 +74,13 @@ export const voice = {
     button: 'lock in',
     minutes: 'minutes',
     stop: 'stop',
-    back: 'back to the sea',
+    undo: 'undo',
+    pause: 'pause',
+    goOn: 'go on',
+    /** The one pause of a session: the creature sleeps. */
+    paused: 'paused. it is asleep.', // TODO-VOICE
+    /** The pause is over, by a tap or by itself. */
+    goingOn: 'going on.', // TODO-VOICE
     seaSound: 'sea sound',
     /** Said when the person comes back after leaving a session for more than 15 seconds. */
     left: 'you left. it waited.',
@@ -121,6 +127,23 @@ export const voice = {
   share: {
     caption: (day: number) => `day ${String(day)} of whale club`,
   },
+  /** The log: the one view of what has been done. */
+  log: {
+    title: 'the log',
+    summary: (stars: number, lanterns: number, minutes: number) =>
+      `${plural(stars, 'star')}, ${plural(lanterns, 'lantern')}, ${duration(minutes)}`,
+    lanterns: (n: number) => plural(n, 'lantern'),
+    minutes: (n: number) => duration(n),
+    previous: 'previous month',
+    next: 'next month',
+    previousYear: 'previous year',
+    nextYear: 'next year',
+    year: 'the year',
+    back: 'back to the month',
+    checkin: 'checked in',
+    left: 'left, it waited',
+    nothing: 'nothing that day. that is allowed.', // TODO-VOICE
+  },
   /** The lab: a tool for trying the app across days, not part of the game's voice. */
   lab: {
     title: 'the lab',
@@ -136,12 +159,25 @@ export const voice = {
     doAll: 'do everything today',
     seed30: 'seed 30 days',
     seed90: 'seed 90 days',
+    seed365: 'seed 365 days',
     clear: 'clear sandbox',
     time: 'time',
     sea: 'the sandbox',
     version: (v: string) => `version ${v}`,
   },
 } as const
+
+function plural(n: number, word: string): string {
+  return `${String(n)} ${word}${n === 1 ? '' : 's'}`
+}
+
+/** 400 as "6 h 40 min", 40 as "40 min". */
+function duration(minutes: number): string {
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (h === 0) return `${String(m)} min`
+  return m === 0 ? `${String(h)} h` : `${String(h)} h ${String(m)} min`
+}
 
 /** Picks a line from a list by a day and an id, so the choice holds all day. */
 export function pick<T>(list: readonly T[], seed: string): T {

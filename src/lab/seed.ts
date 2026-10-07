@@ -16,6 +16,10 @@ import { EVERY_DAY } from '../store/types'
  * the same history. Today itself is left alone.
  */
 const DONE_SHARE = 0.8
+/** Of the things done, the share that were a lock-in run to its end: a lantern each. */
+const LOCKED_SHARE = 0.55
+/** Of the planned things not done, the share with a session left along the way: a dim lantern. */
+const LEFT_SHARE = 0.12
 
 /** What the lab adds when the sandbox has nothing to seed: three plain things. */
 const STARTERS: readonly Omit<Thing, 'createdAt'>[] = [
@@ -67,11 +71,23 @@ export function seedHistory(data: AppData, today: DateKey, days: number): AppDat
     const day: DayRecord = { done: [], minutes: {} }
     if (!isGap(back)) {
       for (const thing of things) {
-        if (!plannedOn(next, thing, date) || random() >= DONE_SHARE) continue
+        if (!plannedOn(next, thing, date)) continue
+        const sessions = (day.sessions ??= [])
+        if (random() >= DONE_SHARE) {
+          if (random() < LEFT_SHARE) {
+            const minutes = Math.round(thing.minutes / 2)
+            day.minutes[thing.id] = minutes
+            sessions.push({ thing: thing.id, minutes, left: true })
+          }
+          continue
+        }
         day.done.push(thing.id)
-        // Every other done thing was a lock-in, for lanterns and minutes in the log.
-        if (random() < 0.5) day.minutes[thing.id] = thing.minutes
+        if (random() < LOCKED_SHARE) {
+          day.minutes[thing.id] = thing.minutes
+          sessions.push({ thing: thing.id, minutes: thing.minutes })
+        }
       }
+      if (day.sessions?.length === 0) delete day.sessions
     }
     next.days[date] = day
   }

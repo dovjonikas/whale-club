@@ -19,8 +19,12 @@ src/
     app.ts           wires store, scene and row together; the only place that knows all three
     row.ts, card.ts  the row of things and one card
     addSheet.ts, sheet.ts, toast.ts, line.ts
-    session.ts       a lock-in, measured by timestamps; leaving it waits, never fails
-    sessionScreen.ts the quiet screen and the growing creature
+    session.ts       a lock-in, measured by timestamps; leaving it waits, never fails; undo, one pause
+    sessionScreen.ts the deep-water screen, the growing creature, the hidden time
+    lockIn.ts        a lock-in from the dial to the end, and the opening's steps
+    opening.ts       runs the end of a session in order; a tap skips to the end
+    logSheet.ts      the log: a month, the year, a day
+    sceneData.ts     data to scene: collectibles shown, stones, lanterns, warmth
     dial.ts          the lock-in dial, 10 to 120 minutes
     wakeLock.ts      the screen kept on during a session
     header.ts        the title and the four buttons
@@ -44,10 +48,11 @@ src/
     rarity.ts        a find's shine, from the date it was earned
     random.ts        the seeded generator and the string hash
     particles.ts     bioluminescent drift and the tap bursts
-    creatures.ts     SVG for every world, line and stage
-    collectibles.ts  the sixty collectibles: id, world, line, day, place, drawing
+    lanterns.ts      the cove's lanterns on one canvas, a sprite per colour and size
+    creatures/       SVG for every world, line and stage: kit.ts and one file per world
+    collectibles/    the sixty collectibles, one list per world, built by build.ts
     draw.ts          small shared drawing helpers: tints, faces, fish, jellies, stems
-    art.ts, art2.ts  the larger collectible drawings, one function each
+    art/             the larger collectible drawings, one file per world
     depths.ts        the water line, moonlight shafts, deep whales and kelp
     textures.ts      grain and caustics, rendered once into data URLs
     visitors.ts      the whale, the daily visitors, the sleeper on the empty screen
@@ -58,6 +63,7 @@ src/
     types.ts         AppData, Thing, DayRecord, Settings
     store.ts         load, save, actions, subscribe; the only localStorage reader for data
     clock.ts         now() and today(): the only place that reads the device clock
+    log.ts           the log's arithmetic: a month's summary, a day's entry, weeks
     lab.ts           the lab's storage: which keys are live, the sandbox copy, the offset
     migrate.ts       a strict guard from stored JSON to AppData, by version
     derive.ts        last7, stage, totalDone, stones waiting, found, stars, streak: all arithmetic
@@ -174,7 +180,23 @@ marked as left, and the creature's size is held where it was. A session
 that ran out during a short absence ends clean at the moment it ran out.
 `Store.finishSession` writes the end: a clean one is a full count; a
 left one is done but listed in `days[date].waited`, which `counted()`
-leaves out of the stars and the stones.
+leaves out of the stars and the stones. Either way the session is added to
+`days[date].sessions`, which is what the lanterns and the log read.
+
+The first `UNDO_MS` can be undone (`SessionService.undo`): the key is
+cleared and nothing is written. One pause per session (`pausedAt`,
+`pauseUsed`): elapsed time stops at `pausedAt`; the pause ends by a tap
+(`goOn`) or by itself at `PAUSE_MS`, and its length joins `pausedMs`.
+Being hidden inside a pause is not leaving; if the pause ran out while
+hidden, only the time after its end counts as away.
+
+`app/lockIn.ts` holds the new lantern and today's first star back in the
+scene before writing the end, then runs `app/opening.ts`: rise, lantern,
+creature, star (only when there is a new star or the day is all done),
+line, offer. Each step has a `play` and an `end`; a tap calls every
+remaining `end` at once and sets `data-instant` on the frame for a frame,
+so running transitions land too. The frame's `data-opening` names the
+step, and "done" at the end.
 
 ## 7. Postcards
 
@@ -209,7 +231,9 @@ projects: iPhone 13, Pixel 5, desktop 1366x768. Tests go through the real
 UI by role and name; `helpers.seed()` writes a history into storage before
 load for anything that would otherwise take weeks. `page.clock` drives
 lock-in sessions. `npm test` runs them all; CI runs them beside the build and only a
-push to `main` deploys.
+push to `main` deploys. A fourth project, `perf`, depends on the other
+three, so it runs last and alone, without a trace: frame timing with a
+year of lanterns.
 
 ## 10. The lab
 

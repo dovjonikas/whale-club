@@ -101,11 +101,15 @@ export class Store {
     const already = day.done.includes(thingId) && !(day.waited?.includes(thingId) ?? false)
     const done = day.done.includes(thingId) ? day.done : [...day.done, thingId]
     const waited = !clean && !already
+    const session = clean
+      ? { thing: thingId, minutes }
+      : { thing: thingId, minutes, left: true as const }
     const next = withWaited(
       {
         ...day,
         done,
         minutes: { ...day.minutes, [thingId]: (day.minutes[thingId] ?? 0) + minutes },
+        sessions: [...(day.sessions ?? []), session],
       },
       thingId,
       waited,

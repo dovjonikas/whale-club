@@ -28,16 +28,23 @@ import { renderHeader } from './header'
 import { host } from './host'
 import { Line } from './line'
 import { LockIn } from './lockIn'
+import { openLogSheet } from './logSheet'
 import { openMenuSheet } from './menuSheet'
 import { Notices } from './notices'
 import { Postcards } from './postcards'
 import { recapNotice } from './recap'
 import { Row } from './row'
-import { dayLabel, hasJacket, shownCollectibles, stonesFor, warmthOf } from './sceneData'
+import {
+  dayLabel,
+  hasJacket,
+  lanternsFor,
+  shownCollectibles,
+  stonesFor,
+  warmthOf,
+} from './sceneData'
 import { openThingSheet } from './thingSheet'
 import { Sound } from './sound'
 import { surpriseFor } from './surprise'
-import { showToast } from './toast'
 
 const SURPRISE_DELAY_MS = 4000
 /** The postcard button waits for the moment's animation to finish. */
@@ -97,7 +104,12 @@ export function startApp(root: HTMLElement, labEntered = false): void {
         postcards.sendNow({ kind: 'sea', line: line.current() || voice.postcard.sea })
       },
       onMenu() {
-        openMenuSheet(store, enterLabFromMenu)
+        openMenuSheet(store, {
+          onLab: enterLabFromMenu,
+          onLog: () => {
+            openLogSheet(store)
+          },
+        })
       },
     },
     sound.isMuted(),
@@ -146,6 +158,10 @@ export function startApp(root: HTMLElement, labEntered = false): void {
   })
 
   const lockIn = new LockIn({ store, scene, sound, line, row, postcards })
+  // The open sky is the way into the log, as the stars are into their days.
+  scene.onSky(() => {
+    openLogSheet(store)
+  })
 
   /**
    * Everything a done tap can set off. The scene shows all of it; the line
@@ -241,10 +257,11 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     scene.setDays(
       { dates: stars, streak: streakDays(stars), today, label: (date) => dayLabel(data, date) },
       (date) => {
-        showToast(dayLabel(data, date))
+        openLogSheet(store, date)
       },
     )
 
+    scene.setLanterns(lanternsFor(data))
     scene.setCollectibles(shownCollectibles(data), arrivals)
     arrivals.clear()
     const fell = scene.setStones(stonesFor(data))

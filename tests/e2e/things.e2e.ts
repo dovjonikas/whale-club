@@ -68,7 +68,7 @@ test('data from before 0.9 loses its mode and every thing gets a lock-in length'
     version: number
     things: Record<string, unknown>[]
   }
-  expect(data.version).toBe(4)
+  expect(data.version).toBe(5)
   expect(data.things.map((t) => t.mode)).toEqual([undefined, undefined])
   expect(data.things.map((t) => t.minutes)).toEqual([30, 15])
 })

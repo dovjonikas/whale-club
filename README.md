@@ -24,7 +24,11 @@ all that happens.
   &nbsp;
   <img src="docs/screenshots/iphone-dial.webp" alt="The lock-in dial: 30 minutes" width="200">
   &nbsp;
-  <img src="docs/screenshots/iphone-session.webp" alt="A lock-in session: the time, the quiet scene and the creature grown to a star" width="200">
+  <img src="docs/screenshots/iphone-session.webp" alt="A lock-in session: deep water, the creature grown to a star inside a slow ring, the time hidden" width="200">
+  &nbsp;
+  <img src="docs/screenshots/iphone-opening.webp" alt="The end of a session: the world comes back up and a new lantern comes down into the cove" width="200">
+  &nbsp;
+  <img src="docs/screenshots/iphone-log.webp" alt="The log: a month in one sentence, each day with its star and a dot for each lantern" width="200">
 </p>
 
 <p align="center">

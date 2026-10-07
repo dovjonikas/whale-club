@@ -87,27 +87,136 @@
   color: var(--ink-dim);
 }
 
-/* The session: the whole frame, the scene quiet behind it. */
+/* The session: the world sinks, deep water rises over it, and what stays is
+   the creature, a slow ring and the thing's name. Transforms and opacity only. */
 .session {
   position: absolute;
   inset: 0;
   z-index: 9;
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto 1fr auto;
   justify-items: center;
   padding: calc(var(--safe-top) + var(--s4)) var(--s4) calc(var(--safe-bottom) + var(--s6));
-  background: linear-gradient(180deg, rgba(2, 4, 9, 0.35), rgba(2, 4, 9, 0.7));
-  opacity: 0;
-  transition: opacity var(--dur-slow) var(--ease);
+  overflow: hidden;
+  cursor: default;
 }
 
-.session.is-open {
-  opacity: 1;
+/* The deep: a column of dark water with light coming down through it. It
+   rises from below when the session starts and goes back down at the end,
+   the way the surface moves when you sink and come up. */
+.session-deep {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(120% 50% at 50% 0%, rgba(62, 242, 224, 0.1), transparent 60%),
+    linear-gradient(180deg, #072a45 0%, #041a30 38%, #020b18 100%);
+  transform: translate3d(0, 100%, 0);
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* While a session runs, the row and the header step back: only the scene stays. */
+.session.is-open .session-deep {
+  transform: none;
+}
+
+.session.is-rising .session-deep {
+  transform: translate3d(0, 100%, 0);
+  transition-duration: 1.2s;
+}
+
+/* Light from far above, slanting down and swaying. */
+.session-deep i {
+  position: absolute;
+  top: -20%;
+  width: 18%;
+  height: 90%;
+  background: linear-gradient(180deg, rgba(170, 235, 255, 0.12), transparent);
+  transform-origin: 50% 0;
+  transform: rotate(12deg);
+  animation: deep-sway 14s ease-in-out infinite alternate;
+}
+
+.session-deep i:nth-child(1) {
+  left: 18%;
+}
+
+.session-deep i:nth-child(2) {
+  left: 46%;
+  width: 12%;
+  animation-duration: 18s;
+  animation-delay: -5s;
+}
+
+.session-deep i:nth-child(3) {
+  left: 70%;
+  width: 22%;
+  animation-duration: 21s;
+  animation-delay: -9s;
+}
+
+@keyframes deep-sway {
+  from {
+    transform: rotate(8deg);
+    opacity: 0.6;
+  }
+  to {
+    transform: rotate(16deg);
+    opacity: 1;
+  }
+}
+
+/* A few motes drifting up, very slowly: the water is alive. */
+.session-deep b {
+  position: absolute;
+  bottom: -4%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(201, 251, 245, 0.55);
+  animation: mote-rise 22s linear infinite;
+}
+
+.session-deep b:nth-of-type(1) {
+  left: 22%;
+}
+
+.session-deep b:nth-of-type(2) {
+  left: 41%;
+  animation-delay: -7s;
+  animation-duration: 28s;
+}
+
+.session-deep b:nth-of-type(3) {
+  left: 63%;
+  animation-delay: -14s;
+}
+
+.session-deep b:nth-of-type(4) {
+  left: 84%;
+  animation-delay: -3s;
+  animation-duration: 31s;
+}
+
+@keyframes mote-rise {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(12px, -105vh, 0);
+    opacity: 0;
+  }
+}
+
+/* While a session runs, the row and the header step back too. */
 #app.is-behind-session {
   opacity: 0;
+}
+
+#app {
   transition: opacity var(--dur-slow) var(--ease);
 }
 
@@ -119,16 +228,37 @@
   font-size: var(--t-xs);
 }
 
+.session-top,
+.session-clock,
+.session-line,
+.session-name,
+.session-actions,
+.session-ring {
+  transition: opacity var(--dur) var(--ease);
+}
+
+.session-centre {
+  align-self: center;
+  display: grid;
+  justify-items: center;
+  gap: var(--s2);
+  text-align: center;
+}
+
 .session-creature {
-  align-self: end;
+  position: relative;
   width: 150px;
   height: 150px;
+  margin-bottom: var(--s8);
   transform: scale(var(--grow, 0.55));
-  transform-origin: 50% 80%;
-  transition: transform 2.4s var(--ease);
+  transform-origin: 50% 60%;
+  transition:
+    transform 2.4s var(--ease),
+    opacity var(--dur) var(--ease);
 }
 
 .session-breathe {
+  position: relative;
   width: 100%;
   height: 100%;
   animation: breathe 4.2s ease-in-out infinite;
@@ -168,92 +298,23 @@
   }
 }
 
+/* The pause: it sleeps, eyes shut, breathing slow. */
+.session-creature.is-asleep .session-breathe {
+  animation-duration: 7s;
+}
+
+.session-creature.is-asleep .eyes {
+  animation: none;
+  transform: scaleY(0.12);
+}
+
+.session[data-state='paused'] .session-ring {
+  opacity: 0.35;
+}
+
 /* Left and come back: it waited, dimmer, still breathing. */
 .session[data-broken='true'] .session-creature {
   opacity: 0.8;
-}
-
-.session-middle {
-  display: grid;
-  justify-items: center;
-  gap: var(--s2);
-  margin-top: var(--s6);
-  text-align: center;
-}
-
-.session-clock {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-variation-settings:
-    'opsz' 144,
-    'SOFT' 100;
-  font-size: 72px;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  color: var(--star-pale);
-  opacity: 0.92;
-}
-
-.session-line {
-  margin: 0;
-  min-height: 1.4em;
-  color: var(--ink);
-}
-
-.session-name {
-  color: var(--ink-dim);
-  font-size: var(--t-sm);
-}
-
-.session-actions {
-  display: grid;
-  gap: var(--s2);
-  width: min(320px, 100%);
-  margin-top: var(--s6);
-}
-
-.session-stop {
-  justify-self: center;
-  height: var(--touch);
-  padding: 0 var(--s6);
-  border-radius: var(--r-pill);
-  border: 1px solid var(--card-edge);
-  color: var(--ink-dim);
-}
-
-/* The end: a clean session's creature is big, then leaves into the scene. */
-.session[data-state='ended'] .session-creature {
-  transition-duration: 1.2s;
-}
-
-.session-creature.is-leaving {
-  transition:
-    transform 1.6s var(--ease),
-    opacity 1.6s var(--ease);
-  opacity: 0;
-}
-
-.session[data-world='sea'] .session-creature.is-leaving {
-  transform: translate3d(70vw, 6vh, 0) scale(0.6);
-}
-
-.session[data-world='sky'] .session-creature.is-leaving {
-  transform: translate3d(0, -60vh, 0) scale(0.4);
-}
-
-.session[data-world='garden'] .session-creature.is-leaving {
-  transform: scale(2.2);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .session-breathe,
-  .session .eyes {
-    animation: none;
-  }
-}
-
-.session-creature {
-  position: relative;
 }
 
 .session-ring {
@@ -281,6 +342,125 @@
   filter: drop-shadow(0 0 3px rgba(255, 217, 138, 0.6));
 }
 
-.session-breathe {
-  position: relative;
+/* The time is there but out of sight until a tap asks for it. */
+.session-clock {
+  min-height: 1.2em;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-variation-settings:
+    'opsz' 144,
+    'SOFT' 100;
+  font-size: 48px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--star-pale);
+  opacity: 0;
+}
+
+.session[data-time='shown'] .session-clock {
+  opacity: 0.92;
+}
+
+.session-line {
+  margin: 0;
+  min-height: 1.4em;
+  color: var(--ink);
+}
+
+.session-name {
+  color: var(--ink-dim);
+  font-size: var(--t-sm);
+}
+
+.session-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--s4);
+  width: min(320px, 100%);
+}
+
+.session-quiet {
+  min-width: var(--touch);
+  height: var(--touch);
+  padding: 0 var(--s4);
+  border-radius: var(--r-pill);
+  border: 1px solid var(--card-edge);
+  color: var(--ink-dim);
+  font-size: var(--t-sm);
+  transition:
+    transform var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.session-quiet:active {
+  transform: scale(0.97);
+}
+
+/* The opening: everything but the creature goes, the water goes down, the
+   world comes back up; then the creature goes home to its card. */
+.session.is-rising .session-top,
+.session.is-rising .session-clock,
+.session.is-rising .session-line,
+.session.is-rising .session-name,
+.session.is-rising .session-actions,
+.session.is-rising .session-ring {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.session-creature.is-going-home {
+  transform: translate3d(var(--home-x, 0), var(--home-y, -40vh), 0) scale(var(--home-scale, 0.3));
+  transition: transform 0.8s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* Each world goes home its own way: the sea swims (a little overshoot),
+   the sky flies (straight and light), the garden grows into its place. */
+.session[data-world='sea'] .session-creature.is-going-home {
+  transition-timing-function: cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+.session[data-world='garden'] .session-creature.is-going-home .session-breathe {
+  animation: bloom-home 0.8s ease-out;
+}
+
+@keyframes bloom-home {
+  40% {
+    transform: scale(1.3);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.session-creature.is-home {
+  opacity: 0;
+}
+
+/* A skipped opening lands on its end: nothing finishes its transition. */
+#frame[data-instant='true'] .scene,
+#frame[data-instant='true'] #app,
+#frame[data-instant='true'] .session,
+#frame[data-instant='true'] .session * {
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .session-breathe,
+  .session .eyes,
+  .session-deep i,
+  .session-deep b {
+    animation: none;
+  }
+  .session-deep,
+  .session.is-rising .session-deep {
+    transform: none;
+    transition: opacity var(--dur) var(--ease);
+  }
+  .session.is-rising .session-deep {
+    opacity: 0;
+  }
+  .session-creature.is-going-home {
+    transform: scale(var(--grow, 0.55));
+    opacity: 0;
+  }
 }

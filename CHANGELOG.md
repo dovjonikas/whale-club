@@ -2,6 +2,37 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.10.0 - 2026-10-07
+
+Lock in, the opening, the lanterns and the log.
+
+- During a lock-in the world sinks and deep water rises over it, with
+  light coming down through it. What stays is the creature, a slow ring
+  and the thing's name.
+- The time is hidden: a tap anywhere shows it for three seconds. (A
+  setting to keep it on comes with settings.)
+- The first ten seconds can be undone, without a trace. After that it is
+  stop, as before.
+- One pause per session, up to five minutes: the creature sleeps, the time
+  stands still, and being away inside the pause is not leaving. When it
+  runs out the session goes on by itself with one quiet note.
+- The end is an opening: the deep water goes back down over about 1.2 s,
+  then in order the session's lantern comes down into the cove and lights,
+  the creature goes home to its card, today's first star lights (and the
+  whale, when the day is all done), the line, and "send the whale". A tap
+  anywhere lands on the end at once.
+- Lanterns: every lock-in that runs to its end leaves one in the cove under
+  the shore for good; its colour is the thing's, its size the minutes; a
+  left session's is dim. A year of them (the lab's new "seed 365 days")
+  keeps one frame per redraw.
+- The log, the one view of what has been done: a month at a time with each
+  day's star and lantern dots and the month in one sentence ("19 stars, 11
+  lanterns, 6 h 40 min"); the year as twelve small months; a day opened to
+  what was done, the sessions with their minutes and the check-in. It opens
+  from the menu, from a tap on the open sky, and a star opens its own day.
+- Data version 5 keeps sessions one by one; older data gets a lantern for
+  every thing done with minutes.
+
 ## 0.9.0 - 2026-10-07
 
 Tidying, the first step towards 1.0.

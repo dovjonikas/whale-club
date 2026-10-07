@@ -33,16 +33,23 @@ export interface SeedData {
       waited?: string[]
       extra?: string[]
       skip?: string[]
+      sessions?: { thing: string; minutes: number; left?: true }[]
     }
   >
   /** Per thing, the highest tier already cracked. Absent: every earned stone is still waiting. */
   cracked?: Record<string, number>
   settings?: Record<string, unknown>
+  /**
+   * The stored version. Seeds default to 3, so every test also runs the
+   * migrations; a seed with sessions says 5, because before 5 lanterns
+   * were worked out from the minutes.
+   */
+  version?: number
 }
 
 export async function seed(page: Page, data: SeedData): Promise<void> {
   const payload = {
-    version: 3,
+    version: data.version ?? 3,
     things: data.things.map((t) => ({ emoji: '•', ...t })),
     days: Object.fromEntries(Object.entries(data.days).map(([k, v]) => [k, { minutes: {}, ...v }])),
     cracked: data.cracked ?? {},

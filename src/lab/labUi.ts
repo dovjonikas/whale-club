@@ -109,6 +109,7 @@ function openLabSheet(hooks: LabHooks): void {
           <button type="button" class="chip" data-lab="all">${voice.lab.doAll}</button>
           <button type="button" class="chip" data-lab="seed30">${voice.lab.seed30}</button>
           <button type="button" class="chip" data-lab="seed90">${voice.lab.seed90}</button>
+          <button type="button" class="chip" data-lab="seed365">${voice.lab.seed365}</button>
           <button type="button" class="chip" data-lab="clear">${voice.lab.clear}</button>
         </div>
         <button type="button" class="button-quiet lab-exit">${voice.lab.exit}</button>`
@@ -133,6 +134,10 @@ function openLabSheet(hooks: LabHooks): void {
         seed30: () => {
           close()
           hooks.seed(30)
+        },
+        seed365: () => {
+          close()
+          hooks.seed(365)
         },
         seed90: () => {
           close()

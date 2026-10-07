@@ -102,26 +102,24 @@
   transition: opacity 2s var(--ease);
 }
 
-/* During a lock-in the sky turns, slowly; scaled up so its edges stay off screen. */
-.scene[data-session='true'] canvas.stars,
-.scene[data-session='true'] .nebula {
-  transform-origin: 50% 40%;
-  animation: sky-turn 240s linear infinite alternate;
+/* During a lock-in the world sinks out of sight: it slides up a little as the
+   deep water of the session screen rises over it, and comes back down when
+   the session opens up again. Transform only. */
+.scene {
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes sky-turn {
-  from {
-    transform: scale(1.35) rotate(-4deg);
-  }
-  to {
-    transform: scale(1.35) rotate(4deg);
-  }
+.scene[data-session='true'] {
+  transform: translate3d(0, -12%, 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nebula i,
-  .scene[data-session='true'] canvas.stars,
-  .scene[data-session='true'] .nebula {
+  .nebula i {
     animation: none;
+  }
+  .scene,
+  .scene[data-session='true'] {
+    transform: none;
+    transition: none;
   }
 }
