@@ -128,3 +128,56 @@ the copy. Line numbers are as the files stood at the audit.
   `session.css:99`), `.collection-title` overflow at 320 px
   (`sheet.css:286`), future days in the log at 1.6:1 (`log.css:84`), and
   a font preload in `index.html:17`.
+
+## Motion review (review-animations, run by the author, 2026-10-08)
+
+Every motion in the bubble, the intro, the sheets, the session and its
+opening, the stone and its find, the presses and the toasts, against the
+skill's ten standards. Line numbers as the files stood at the review.
+
+| Before                                                                                                                                                                                                                                                            | After                                                                                                                                                      | Why                                                                                   |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `src/styles/base.css:309-317` reduced motion cut every transition and animation to 0.01 ms                                                                                                                                                                        | Movement stops, fades stay: `transition-property: opacity !important` instead of a zero duration; keyframes still land on their end                        | Gentler, not zero: a sheet, a toast, a card leaving should still fade, not blink      |
+| `src/styles/sheet.css:30-46` the sheet slides under reduced motion as well (then instantly, by the rule above)                                                                                                                                                    | Under reduced motion it stays in place and fades, 200 ms                                                                                                   | Keep opacity, drop movement                                                           |
+| `src/styles/sheet.css:190-196` toast in and out alike, 260 ms on `--ease`                                                                                                                                                                                         | In 260 ms, out 180 ms, both `--ease-out`; under reduced motion a fade                                                                                      | A system response leaves faster than it came; no slide without motion                 |
+| `src/styles/sheet.css:745-751` undo toast the same                                                                                                                                                                                                                | The same fix                                                                                                                                               | Same reason                                                                           |
+| `src/styles/session.css:114-124` and `src/app/sessionScreen.ts` close: the deep water goes down in 0.9 s but the screen is removed at 700 ms, cut mid-slide; the buttons and the creature stay until they vanish                                                  | Stopping goes down in 600 ms on `--ease-drawer`, everything else on the screen fades out in 200 ms first, and the screen is removed when the water is down | A stop is a request to leave: faster than the entrance, and nothing cut off in flight |
+| `src/styles/row.css:29-31` and `:85-90` a done card transitions `border-color` and a 28 px `box-shadow`                                                                                                                                                           | The glow is its own layer (`.card::after`) that only fades, `--dur` on `--ease-out`                                                                        | Paint-heavy properties off the animated path; a done tap happens many times a week    |
+| `src/styles/base.css:167` icon buttons pressed to `scale(0.92)` on `--dur-fast` / `--ease`; `src/styles/row.css:45-49`, `:471`, `src/styles/sheet.css:151-155`, `:666-673`, `:711`, `src/styles/session.css:389-395` the other presses on `--dur-fast` / `--ease` | Every press `scale(var(--press-scale))` (0.97) on `--dur-press` (140 ms) and `--ease-out`                                                                  | One feel for every press, inside the 0.95 to 0.98 band; 0.92 read as a squash         |
+
+Approved as they are:
+
+- The bubble's fill (`src/styles/bubble.css:19-34`): 200 to 240 ms in, 140 ms
+  out, `--ease-out`, from `scale(0.6)` with opacity, a transition so a
+  quick second tap retargets it; under reduced motion a 200 ms fade.
+- The signature's pop (`bubble.css:75-110`): 300 ms, drops 30 ms apart,
+  a one-shot keyframe on a state change that cannot fire mid-flight; off
+  under reduced motion.
+- The lock-in ring (`bubble.css`, `src/styles/session.css:335-342`): set,
+  not animated; it moves once a second at most.
+- Sheets (`sheet.css:1-46`): in 480 ms, out 300 ms on the drawer curve,
+  dragged by the finger with velocity, damping and capture.
+- The intro (`src/styles/intro.css`): explanatory, seen once, so longer
+  than UI; words on `--ease-out` with a reading rhythm; lids on
+  `--ease-in-out` (moving on screen); every loop stops under reduced
+  motion.
+- The opening (`session.css:398-436`, `src/app/lockIn.ts:33-37`): a
+  ceremony after a finished lock-in, skipped by a tap.
+- The stone (`src/styles/stones.css`): the fall's ease-in is gravity, not
+  a response to a person; shake 260 ms; the find comes out of the stone.
+
+Can wait for the polish stage:
+
+- `src/styles/row.css:543` the first card's hint pulses a `box-shadow`:
+  move it to the glow layer and pulse its opacity.
+- `src/styles/stones.css:123` the crack draws by `stroke-dashoffset`: a
+  `clip-path` reveal would stay on the GPU.
+- `src/styles/row.css:209` dots, and `src/styles/sheet.css:131`, `:626`,
+  `:666`, `:853` chips transition `background` and `border-color`: snap
+  them, or keep the colour change but only there.
+- `src/styles/intro.css:162-175` "start light" fades in over 900 ms: 500 ms
+  would hand it over sooner.
+- `src/styles/stones.css:354` under reduced motion a find appears at once:
+  a 300 ms fade would be gentler.
+- `src/styles/session.css:115` the water rises over 0.9 s: try 700 ms with
+  fresh eyes.

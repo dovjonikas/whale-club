@@ -101,7 +101,7 @@ export class Postcards {
         type: 'image/png',
       })
     } catch {
-      showToast(voice.shareFailed)
+      showToast(`${voice.shareFailed} ${voice.shareFailedNext}`)
       return
     }
     const result = await share(file)

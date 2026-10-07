@@ -150,7 +150,7 @@ input {
   font-size: 20px;
   transition:
     color var(--dur-fast) var(--ease),
-    transform var(--dur-fast) var(--ease);
+    transform var(--dur-press) var(--ease-out);
 }
 
 .icon-button[aria-pressed='true'] {
@@ -165,7 +165,7 @@ input {
 }
 
 .icon-button:active {
-  transform: scale(0.92);
+  transform: scale(var(--press-scale));
 }
 
 /* Every pressable gives a little under a finger, quick in and back on
@@ -306,13 +306,16 @@ input {
   color: var(--ink-dim);
 }
 
+/* Reduced motion: movement stops and keyframes land on their end, but a
+   fade stays a fade, gentler rather than nothing. Whatever hides by moving
+   (a sheet, a toast) fades instead in its own block. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-property: opacity !important;
   }
 }
 

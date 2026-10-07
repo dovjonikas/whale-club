@@ -67,6 +67,10 @@
   /* Sheets come up on the drawer curve and go down faster than they came. */
   --dur-sheet-in: 480ms;
   --dur-sheet-out: 300ms;
+  /* A toast leaves faster than it came (it comes in --dur). */
+  --dur-toast-out: 180ms;
+  /* Stopping a lock-in: the deep water goes down this fast, everything on it fading first. */
+  --dur-session-out: 600ms;
 
   /* Where the sky ends and the sea begins, as a share of the scene's height. */
   --horizon: 58%;

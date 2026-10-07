@@ -2,7 +2,7 @@
 
 ## Done
 
-v0.12.0, live at https://dovjonikas.github.io/whale-club/ after the push.
+v0.12.1, live at https://dovjonikas.github.io/whale-club/ after the push.
 
 - **v0.1.0 to v0.3.0**: the row, the scene, the sky as a calendar, creatures, PWA, collectibles, the whale, rituals, sound, share; a buddy slot (since removed).
 - **v0.4.0**: postcards instead of a buddy; the phone-wide frame; the install leaf after the first thing; Lighthouse through Edge.
@@ -22,6 +22,7 @@ v0.12.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 - **v0.11.2**: the truth beat as a song that climbs: the eyes open on day one, blink at the turn, the stars double at "compound", the first star blooms on the last word with a chord.
 - **v0.11.3**: the intro has a score: "tap to begin" so sound may play, a music box year, a note for every word of the truth, silence at the blink, the notes doubling at "compound", the last word resolving on the peak.
 - **v0.12.0**: the brand: every thing wears a bubble (its picture in cream, the rising signature, filled when done, a timer rim for a lock-in) at its card's corner; 48 glyphs of its own, picked from the name in English or Lithuanian, or a monogram; no emoji anywhere (data v7); the interface's icons, the app icon and the favicon in the same hand; brand.html; strong curves, presses, sheets that can be pulled down; the interface audit with its fixes (docs/QUALITY.md).
+- **v0.12.1**: the author's motion review answered: reduced motion keeps fades, toasts leave faster, a stopped lock-in leaves cleanly, the done glow only fades, one press for everything; typographic apostrophes and a next step on the share error.
 
 ## The road to 1.0 (the author's briefs of 2026-10-07)
 

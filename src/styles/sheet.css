@@ -40,6 +40,18 @@
   transition-duration: var(--dur-sheet-in);
 }
 
+/* Reduced motion: the sheet and its scrim stay in place and fade. */
+@media (prefers-reduced-motion: reduce) {
+  .sheet {
+    transform: none;
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out);
+  }
+  .sheet.is-open {
+    opacity: 1;
+  }
+}
+
 /* While a finger holds the grabber the sheet follows it exactly. */
 .sheet.is-dragging {
   transition: none;
@@ -148,11 +160,11 @@
   color: var(--abyss);
   font-size: var(--t-md);
   font-weight: 700;
-  transition: transform var(--dur-fast) var(--ease);
+  transition: transform var(--dur-press) var(--ease-out);
 }
 
 .button-primary:active {
-  transform: scale(0.97);
+  transform: scale(var(--press-scale));
 }
 
 .button-quiet {
@@ -188,11 +200,12 @@
   font-weight: 700;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
   transform: translate3d(-50%, -140%, 0);
-  transition: transform var(--dur) var(--ease);
+  transition: transform var(--dur-toast-out) var(--ease-out);
 }
 
 .toast.is-open {
   transform: translate3d(-50%, 0, 0);
+  transition-duration: var(--dur);
 }
 
 /* The install leaf: a small card above the row, closable. */
@@ -666,11 +679,11 @@
   transition:
     border-color var(--dur-fast) var(--ease),
     background var(--dur-fast) var(--ease),
-    transform var(--dur-fast) var(--ease);
+    transform var(--dur-press) var(--ease-out);
 }
 
 .kind-choice:active {
-  transform: scale(0.97);
+  transform: scale(var(--press-scale));
 }
 
 .kind-choice[aria-pressed='true'] {
@@ -708,8 +721,12 @@
   font-size: var(--t-sm);
 }
 
+.button-danger {
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
 .button-danger:active {
-  transform: scale(0.97);
+  transform: scale(var(--press-scale));
 }
 
 .without-field .button-quiet:disabled {
@@ -743,11 +760,25 @@
   font-size: var(--t-sm);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
   transform: translate3d(-50%, 160%, 0);
-  transition: transform var(--dur) var(--ease);
+  transition: transform var(--dur-toast-out) var(--ease-out);
 }
 
 .undo-toast.is-open {
   transform: translate3d(-50%, 0, 0);
+  transition-duration: var(--dur);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast,
+  .undo-toast {
+    transform: translate3d(-50%, 0, 0);
+    opacity: 0;
+    transition: opacity 200ms var(--ease-out);
+  }
+  .toast.is-open,
+  .undo-toast.is-open {
+    opacity: 1;
+  }
 }
 
 .undo-button {

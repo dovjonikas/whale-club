@@ -47,6 +47,9 @@ export interface SessionScreen {
   close(): void
 }
 
+/** How long the screen takes to go when a session is stopped: --dur-session-out in tokens.css. */
+const SESSION_OUT_MS = 600
+
 export function openSessionScreen(
   thing: Thing,
   line: Line,
@@ -206,9 +209,10 @@ export function openSessionScreen(
         : app?.querySelector<HTMLElement>('.card-main, .card-add')
       back?.focus({ preventScroll: true })
       screen.classList.remove('is-open')
+      // Removed when the water is down (--dur-session-out), not in the middle of it.
       setTimeout(() => {
         screen.remove()
-      }, 700)
+      }, SESSION_OUT_MS)
     },
   }
 }

@@ -816,3 +816,12 @@ the session screen, several redraws and the intro dropped the keyboard
 focus to the page. A closing sheet now leaves the accessibility tree and
 stops taking taps at once, and on a phone a sheet opens on its title rather
 than springing the keyboard over itself.
+
+## 2026-10-08 Reduced motion keeps its fades
+
+The global reduced-motion rule cut every transition to nothing, so a sheet
+or a toast blinked into place. The review-animations standard is gentler,
+not zero: keep opacity, drop movement. The rule now forces
+`transition-property: opacity` instead of a zero duration (keyframes
+still land on their end), and the things that hide by moving (sheets,
+toasts) stay in place and fade under it.

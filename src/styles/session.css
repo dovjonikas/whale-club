@@ -112,11 +112,24 @@
     radial-gradient(120% 50% at 50% 0%, rgba(62, 242, 224, 0.1), transparent 60%),
     linear-gradient(180deg, #072a45 0%, #041a30 38%, #020b18 100%);
   transform: translate3d(0, 100%, 0);
+  /* Leaving (a stop or an undo): faster than coming, on the drawer curve. */
+  transition: transform var(--dur-session-out) var(--ease-drawer);
+}
+
+/* Sinking in: the water rises slowly, the mood of the session. */
+.session.is-open .session-deep {
+  transform: none;
   transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.session.is-open .session-deep {
-  transform: none;
+/* Leaving, the screen's own things fade first, so nothing is cut off as it goes. */
+/* Low specificity on purpose: the opening's own, slower fades below still win. */
+:where(.session) > :not(.session-deep) {
+  transition: opacity 200ms var(--ease-out);
+}
+
+.session:not(.is-open):not(.is-rising) > :not(.session-deep) {
+  opacity: 0;
 }
 
 .session.is-rising .session-deep {
@@ -387,12 +400,12 @@
   color: var(--ink-dim);
   font-size: var(--t-sm);
   transition:
-    transform var(--dur-fast) var(--ease),
+    transform var(--dur-press) var(--ease-out),
     color var(--dur-fast) var(--ease);
 }
 
 .session-quiet:active {
-  transform: scale(0.97);
+  transform: scale(var(--press-scale));
 }
 
 /* The opening: everything but the creature goes, the water goes down, the
