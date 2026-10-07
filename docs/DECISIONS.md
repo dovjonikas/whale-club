@@ -718,3 +718,29 @@ pads were made as loud with seven notes as with two, and the blink was made
 silent. Now: sea -48 dB, year -26, doubt -26, blink -54, hope -21, stars
 -18, waiting -16, peak -13, peak sample -1.9 dBFS, and the last chord sinks
 and fades instead of droning on.
+
+## 2026-10-07 The intro, measured smooth
+
+The author saw small glitches in the intro: something seemed to scroll,
+the text not always quite centred. Measured before touching anything, in
+a headless phone, frame by frame: nothing scrolled (every scroll offset
+stayed 0) and every text block stayed centred to the pixel. What was real:
+
+- A 124 to 172 ms frozen frame on the tap that starts the year: making the
+  audio context (82 ms) and building the reverb's room (36 ms), in the
+  same tap. The context is now made while "tap to begin" is up (a browser
+  allows one before a gesture; it just waits), the room is built then too
+  and kept, and its loop is one multiplication a sample instead of an
+  exponential. The tap only resumes the sound. Measured after: no frame
+  over 50 ms from the tap into the year.
+- The slow camera push zoomed the whole scene, and zoomed it back over a
+  second as the app appeared after the intro: the world moving under the
+  eye, the likeliest "something scrolled". Deleted, as the motion rules
+  say to when a motion is in doubt.
+- Each word rose on its own compositor layer and lost it when its fade
+  ended, which redraws text snapped to whole pixels: a twitch of a fraction
+  of a pixel, the kind seen only when looking closely. Words keep their
+  layer while the intro is up.
+
+The probe (frame intervals per beat, and the browser's long-animation-frame
+entries naming the script) is the way to check this again.

@@ -130,7 +130,14 @@
   margin: 0;
 }
 
-/* Each phrase comes word by word, like a line of a tune. */
+/* Each phrase comes word by word, like a line of a tune. Every word keeps
+   its own layer for as long as the intro is up: a layer dropped when a
+   fade ends redraws the word snapped to whole pixels, a visible twitch. */
+.intro-truth span,
+.intro-line span {
+  will-change: opacity, transform;
+}
+
 .intro-truth span {
   display: inline-block;
   opacity: 0;
@@ -390,18 +397,11 @@
    Everything below only ever adds: the lids, the light that warms in steps,
    the stars that double, the slow push-in, the little whale's joy. */
 
-/* The stage: what the camera leans into, under the words. */
+/* The stage: the light, the stars and the little whale, under the words. */
 .intro-stage {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  transition: transform 1.2s var(--ease-out);
-}
-
-.intro[data-push='true'] .intro-stage,
-.scene[data-push='true'] {
-  transform: scale(1.045);
-  transition: transform 9s cubic-bezier(0.25, 0.1, 0.25, 1);
 }
 
 /* The light, in four layers that only ever add up. */
@@ -577,11 +577,6 @@
   .intro-sky i {
     transform: none;
     transition-property: opacity;
-  }
-  .intro[data-push='true'] .intro-stage,
-  .scene[data-push='true'] {
-    transform: none;
-    transition: none;
   }
   .intro[data-light='gold'] .intro-sky i.is-on,
   .intro[data-star='on'] .intro-star i,
