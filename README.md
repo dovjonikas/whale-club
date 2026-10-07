@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://dovjonikas.github.io/whale-club/"><img src="docs/screenshots/hero.webp" width="100%" alt="Whale Club: the app icon, a whale's tail in a glass bubble; the name; the line a habit game where nothing dies; and three phones: a lock-in session in deep water, the night sea with the whale surfacing over the horizon, and the collection of finds"></a>
+  <a href="https://dovjonikas.github.io/whale-club/"><img src="docs/screenshots/hero.webp" width="100%" alt="Whale Club: the app icon, a whale's tail in a glass bubble; the name; the line a habit game about small things that add up; and three phones: a lock-in session in deep water, the night sea with the whale surfacing over the horizon, and the collection of finds"></a>
 </p>
 
 <p align="center"><strong>Pick a few small things. Do them. Watch a night sea fill up.</strong></p>

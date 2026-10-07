@@ -31,7 +31,7 @@ export default defineConfig({
       manifest: {
         name: 'Whale Club',
         short_name: 'Whale Club',
-        description: 'A habit game where nothing dies.',
+        description: 'A habit game about small things that add up.',
         start_url: '/whale-club/',
         scope: '/whale-club/',
         display: 'standalone',

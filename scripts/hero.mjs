@@ -56,7 +56,7 @@ body {
 }
 .sea { position: absolute; left: 0; right: 0; top: ${H * 0.86}px; bottom: 0;
   background: linear-gradient(180deg, rgba(10, 36, 71, 0.9), #020409); }
-.text { position: absolute; left: 104px; top: 168px; width: 640px; }
+.text { position: absolute; left: 104px; top: 140px; width: 660px; }
 .mark { width: 112px; height: 112px; border-radius: 26px;
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(142, 240, 228, 0.18); }
 h1 {
@@ -94,7 +94,7 @@ h1 {
 <div class="text">
   <img class="mark" src="${icon}" alt="">
   <h1>whale club</h1>
-  <p class="line">A habit game where nothing dies.</p>
+  <p class="line">A habit game about small things<br>that add up.</p>
   <div class="facts"><span>offline PWA</span><span>no account</span><span>no server</span></div>
 </div>
 <div class="phone p1"><img src="${shot('iphone-session.webp')}" alt=""></div>
