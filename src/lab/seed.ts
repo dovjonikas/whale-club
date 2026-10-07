@@ -23,7 +23,7 @@ const STARTERS: readonly Omit<Thing, 'createdAt'>[] = [
     id: 'lab-run',
     name: 'run',
     emoji: '🏃',
-    mode: 'tap',
+    minutes: 30,
     days: [...EVERY_DAY],
     world: 'sea',
     order: 0,
@@ -32,7 +32,6 @@ const STARTERS: readonly Omit<Thing, 'createdAt'>[] = [
     id: 'lab-read',
     name: 'read',
     emoji: '📚',
-    mode: 'timer',
     minutes: 20,
     days: [...EVERY_DAY],
     world: 'sky',
@@ -42,7 +41,7 @@ const STARTERS: readonly Omit<Thing, 'createdAt'>[] = [
     id: 'lab-practice',
     name: 'practice',
     emoji: '🌱',
-    mode: 'tap',
+    minutes: 30,
     // Weekdays and Saturday: Sunday off, so a rest dash shows in the dots.
     days: [true, true, true, true, true, true, false],
     world: 'garden',
@@ -70,7 +69,8 @@ export function seedHistory(data: AppData, today: DateKey, days: number): AppDat
       for (const thing of things) {
         if (!plannedOn(next, thing, date) || random() >= DONE_SHARE) continue
         day.done.push(thing.id)
-        if (thing.mode === 'timer') day.minutes[thing.id] = thing.minutes ?? 20
+        // Every other done thing was a lock-in, for lanterns and minutes in the log.
+        if (random() < 0.5) day.minutes[thing.id] = thing.minutes
       }
     }
     next.days[date] = day

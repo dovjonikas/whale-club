@@ -2,6 +2,23 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.9.0 - 2026-10-07
+
+Tidying, the first step towards 1.0.
+
+- No other app is named anywhere in the repo any more; the README's
+  comparison section is gone.
+- One kind of thing: the add sheet asks for a name, an emoji, the days and
+  a lock-in length (30 minutes by default). "Tap when done / timer", the
+  minutes row and the note about holding a card are gone. Data version 4
+  drops `mode`; every thing has a length. Migration tested.
+- Leftovers from earlier versions listed in DECISIONS and cleared.
+- The big modules split by world or job: collectibles and their drawings
+  (scene/collectibles/, scene/art/), the creatures (scene/creatures/), and
+  app.ts (lock-in in app/lockIn.ts, the data-to-scene helpers in
+  app/sceneData.ts). Nothing behaves differently.
+- Lighthouse on the live v0.8.0: mobile 98/100/100/100, desktop 100 in all four.
+
 ## 0.8.0 - 2026-10-07
 
 The lab, and lighter pictures.

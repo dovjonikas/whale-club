@@ -2,7 +2,7 @@
 
 ## Done
 
-v0.8.0, live at https://dovjonikas.github.io/whale-club/ after the push.
+v0.9.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
 - **v0.1.0 to v0.3.0**: the row, the scene, the sky as a calendar, creatures, PWA, collectibles, the whale, rituals, sound, share; a buddy slot (since removed).
 - **v0.4.0**: postcards instead of a buddy; the phone-wide frame; the install leaf after the first thing; Lighthouse through Edge.
@@ -15,6 +15,42 @@ v0.8.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 - **v0.6.0**: days. A thing's sheet (three dots on its card) with seven day chips, all on by default, and today's exception ("not today" / "also today"); the add sheet has the same line; the first screen shows only today's things, the rest in a "not today" strip; week dots with a dash for a day off; last7, streak, all done, missed yesterday and the recap count planned days only; a rest day is one quiet line, no star, no dim; data version 3.
 - **v0.7.0**: a design pass, nothing functional. Film grain; the sea's depth (water line, moonlight shafts, caustics, deep whales, kelp); creatures and all sixty collectibles redrawn with shading, faces and rim light; the whale surfacing redrawn; lit glass cards with a squash on tap; a pebble for a waiting stone; richer bursts; a sleeping whale on the empty first screen.
 - **v0.8.0**: the lab (five taps on the version in the menu, or `?lab=1`): a sandbox copy of the sea with a clock that moves by days, a striped bar on every screen with exit, one-tap controls (+1 day, +7 days, -1 day, back to real time, do everything today, seed 30 / 90 days, clear sandbox); one clock module for every "today" and "now", held by a lint rule; screenshots as WebP under 300 KB; the startup no longer forces a layout or encodes the textures synchronously (Lighthouse performance back from 70).
+
+## The road to 1.0 (the author's brief of 2026-10-07, in eight stages)
+
+The brief is in the author's journal (consistency-game/prompt-6-product.md),
+with two additions sent the same day: a settings sheet (stage 6) and art
+slots for collectibles (stage 4). Product principles win over any item.
+
+- [x] **0.9.0 tidying**: no other app's name; one kind of thing (data v4,
+      no mode, one lock-in length); leftovers listed in DECISIONS; big modules
+      split (collectibles, art, creatures, app.ts).
+- [ ] **0.10.0 lock in, the opening, the log**: the world sinks during a
+      session, time hidden by default (a tap shows it 3 s), undo in the first
+      10 s, one free pause up to 5 min; the end is an opening (deep water rises
+      in about 1.2 s, then the lantern, the creature, krill, a star, one line,
+      send the whale; a tap skips); lanterns in a cove for every clean session
+      (dim for a left one), 400+ at 60 fps, lab "seed 365"; the log sheet (a
+      month calendar, a year of 12 small months, a day card).
+- [ ] **0.11.0 krill and the dock**: krill derived from history, purchases
+      stored as {itemId, date}; docs/ECONOMY.md; the chip, "+10"; about 30
+      cosmetic items in four tiers, "save for this", "who wears it?".
+- [ ] **0.12.0 the first year**: tiers to 365 (240, 300, 365) with new
+      finds; the first-week set; seasons, sky events, special days; days 100,
+      200, 365; art slots (public/art/<id>.webp, silhouettes from alpha,
+      docs/ART.md, npm run art:check).
+- [ ] **0.13.0 gentle mechanics**: quiet days (moons in the dots), welcome
+      back +20, sleeping creatures that wave, new chapter, "after...", the
+      evening line, the Android badge.
+- [ ] **0.14.0 trust**: back up and restore with a checksum and undo, the
+      monthly backup dot, storage.persist; settings sheet (sound, a day ends
+      at, week start, seasons, show the time, default length, postcards, your
+      sea, about).
+- [ ] **0.15.0 polish**: docs/QUALITY.md from the checklist, iOS startup
+      images, sheet physics, press states, tokens, 60 fps with 400 lanterns,
+      Lighthouse.
+- [ ] **1.0.0**: README rewritten for strangers, "how it works" sheet,
+      tag and GitHub release, a senior review pass.
 
 ## How the timer worked before v0.5 (the audit asked for)
 
