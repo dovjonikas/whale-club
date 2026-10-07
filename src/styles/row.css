@@ -230,8 +230,10 @@
   font-size: var(--t-lg);
 }
 
-.card-add:hover {
-  color: var(--ink);
+@media (hover: hover) and (pointer: fine) {
+  .card-add:hover {
+    color: var(--ink);
+  }
 }
 
 /* On narrow cards the emoji steps aside for the name, and then the clock icon for the words. */
@@ -273,10 +275,16 @@
   fill: currentColor;
 }
 
-.card-edit:hover,
 .card-edit:focus-visible {
   opacity: 1;
   color: var(--ink);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .card-edit:hover {
+    opacity: 1;
+    color: var(--ink);
+  }
 }
 
 /* Not today: one thin strip under the row, open on a tap. */

@@ -5,11 +5,12 @@
   z-index: 10;
   background: var(--scrim);
   opacity: 0;
-  transition: opacity var(--dur) var(--ease);
+  transition: opacity var(--dur-sheet-out) var(--ease-drawer);
 }
 
 .sheet-scrim.is-open {
   opacity: 1;
+  transition-duration: var(--dur-sheet-in);
 }
 
 .sheet {
@@ -29,11 +30,41 @@
   border-top: 1px solid rgba(62, 242, 224, 0.22);
   box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
   transform: translate3d(0, 100%, 0);
-  transition: transform var(--dur) var(--ease);
+  transition: transform var(--dur-sheet-out) var(--ease-drawer);
 }
 
 .sheet.is-open {
   transform: translate3d(0, 0, 0);
+  transition-duration: var(--dur-sheet-in);
+}
+
+/* While a finger holds the grabber the sheet follows it exactly. */
+.sheet.is-dragging {
+  transition: none;
+}
+
+/* The grabber: the strip along the top that a finger can pull down. The
+   close button stays the visible way out; this is a shortcut. */
+.sheet-grabber {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: calc(var(--safe-right) + var(--touch) + var(--s2));
+  height: var(--touch);
+  touch-action: none;
+  cursor: grab;
+}
+
+.sheet-grabber::before {
+  content: '';
+  position: absolute;
+  top: 7px;
+  left: calc(50% + (var(--touch) + var(--s2)) / 2);
+  width: 36px;
+  height: 5px;
+  margin-left: -18px;
+  border-radius: var(--r-pill);
+  background: rgba(232, 240, 245, 0.22);
 }
 
 .sheet-title {
@@ -97,7 +128,8 @@
   font-size: var(--t-sm);
   transition:
     background var(--dur-fast) var(--ease),
-    border-color var(--dur-fast) var(--ease);
+    border-color var(--dur-fast) var(--ease),
+    scale var(--dur-press) var(--ease-out);
 }
 
 .chip[aria-pressed='true'] {
@@ -135,8 +167,10 @@
   font-size: var(--t-sm);
 }
 
-.button-quiet:hover {
-  color: var(--ink);
+@media (hover: hover) and (pointer: fine) {
+  .button-quiet:hover {
+    color: var(--ink);
+  }
 }
 
 .sheet-note {
@@ -479,7 +513,8 @@
   transform: translate3d(0, 8px, 0) scale(0.96);
   transition:
     opacity var(--dur) var(--ease),
-    transform var(--dur) var(--ease-bounce);
+    transform var(--dur) var(--ease-bounce),
+    scale var(--dur-press) var(--ease-out);
 }
 
 .offer.is-in {
@@ -594,7 +629,8 @@
   font-weight: 700;
   transition:
     background var(--dur-fast) var(--ease),
-    color var(--dur-fast) var(--ease);
+    color var(--dur-fast) var(--ease),
+    scale var(--dur-press) var(--ease-out);
 }
 
 .day-chip[aria-pressed='true'] {

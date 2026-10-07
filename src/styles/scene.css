@@ -213,7 +213,7 @@ canvas.particles {
 
 @keyframes unlock {
   0% {
-    transform: translate(-50%, -50%) scale(0);
+    transform: translate(-50%, -50%) scale(0.5);
     opacity: 0;
   }
   60% {
@@ -227,7 +227,7 @@ canvas.particles {
 
 @keyframes unlock-garden {
   0% {
-    transform: translate(-50%, -100%) scale(0);
+    transform: translate(-50%, -100%) scale(0.5);
     opacity: 0;
   }
   60% {
