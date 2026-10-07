@@ -1,4 +1,4 @@
-import { COLLECTIBLES, collectibleSvg, type Collectible } from '../scene/collectibles'
+import { collectibleSvg, type Collectible } from '../scene/collectibles'
 import { creatureSvg } from '../scene/creatures'
 import { resolveTokens } from '../scene/palette'
 import { shoreSvg } from '../scene/shore'
@@ -10,6 +10,7 @@ import { dayNumber, last7, lineFor, stageFor, starDays, streakDays } from '../st
 import type { AppData, PostcardFormat } from '../store/types'
 import { voice } from '../voice'
 import { BRAND } from './brand'
+import { shownCollectibles } from './sceneData'
 import { dayBubble } from './thingMark'
 
 /**
@@ -122,14 +123,15 @@ export async function renderPostcard(
   const shoreTop = horizon - H * 0.02
   await drawSvg(ctx, shoreSvg(), 0, shoreTop, W, H * (format === 'story' ? 0.06 : 0.07))
   const scale = Math.min(W / PHONE_W, H / PHONE_H)
-  const items = visibleIds
-    .map((id) => COLLECTIBLES.find((c) => c.id === id))
-    .filter((c): c is Collectible => c !== undefined)
-  for (const item of items) {
-    const size = item.size * scale
-    const y = mapY(item.y, horizon, H)
-    const top = item.world === 'garden' ? y - size : y - size / 2
-    await drawSvg(ctx, collectibleSvg(item), item.x * W - size / 2, top, size, size)
+  // Where each thing stands now, so the postcard shows the person's own arrangement.
+  const visible = new Set(visibleIds)
+  const placed = shownCollectibles(data).filter(({ item }) => visible.has(item.id))
+  const items = placed.map(({ item }) => item)
+  for (const { item, at } of placed) {
+    const size = item.size * at.depth * scale
+    const y = mapY(at.y, horizon, H)
+    const top = at.stand ? y - size : y - size / 2
+    await drawSvg(ctx, collectibleSvg(item), at.x * W - size / 2, top, size, size)
   }
 
   if (moment.kind === 'whale') {

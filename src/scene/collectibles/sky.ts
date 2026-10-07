@@ -1,5 +1,5 @@
 import * as art from '../art'
-import { dots, star5 } from '../draw'
+import { dots, star5, veil } from '../draw'
 import { sky, type Collectible } from './build'
 
 /** The sky's twenty finds, line A then line B. */
@@ -92,8 +92,13 @@ export const SKY: readonly Collectible[] = [
     0.42,
     300,
     'sway',
-    () =>
-      `<path d="M0 60 Q 20 20, 40 50 T 80 40 T 100 55 V 100 H 0 Z" fill="var(--leaf)" opacity="0.18"/><path d="M0 70 Q 25 35, 50 60 T 100 50 V 100 H 0 Z" fill="var(--glow)" opacity="0.14"/>`,
+    () => {
+      // Two curtains that fade at the top and the bottom and thin to a point at
+      // both ends, so the light has no edge anywhere.
+      const [green, greenFill] = veil('var(--leaf)', 0.34)
+      const [teal, tealFill] = veil('var(--glow)', 0.26)
+      return `${green}${teal}<path d="M2 66 Q 20 40, 40 52 T 80 46 Q 92 48, 98 62 Q 80 70, 60 70 T 20 72 Q 8 70, 2 66 Z" fill="${greenFill}"/><path d="M10 66 Q 30 50, 50 58 T 90 58 Q 72 68, 50 70 T 10 66 Z" fill="${tealFill}"/>`
+    },
   ),
   sky(
     'a',

@@ -1,6 +1,15 @@
-import { COLLECTIBLES, collectiblesFor, type Collectible } from '../scene/collectibles'
-import { rarityOf } from '../scene/rarity'
-import type { ShownCollectible } from '../scene/scene'
+import {
+  ATMOSPHERE,
+  COLLECTIBLES,
+  COMPANIONS,
+  collectiblesFor,
+  type Collectible,
+} from '../scene/collectibles'
+import { DOCK, dockCollectible } from '../scene/dock'
+import { rarityOf, type Rarity } from '../scene/rarity'
+import type { ShownCollectible, Standing } from '../scene/scene'
+import { CHEST, placeAll, spotsFor, type Spot, type SpotWorld } from '../scene/spots'
+import { rooms } from './dockData'
 import type { LanternSpec } from '../scene/lanterns'
 import type { StoneSpec } from '../scene/stones'
 import { fromKey, todayKey } from '../store/dates'
@@ -79,14 +88,127 @@ export function lanternsFor(data: AppData, today: DateKey = todayKey()): Lantern
   return specs
 }
 
-/** Everything found, by every thing that ever was: a deleted thing's finds stay in the scene. */
-export function shownCollectibles(data: AppData): ShownCollectible[] {
-  const shown: ShownCollectible[] = []
+/** Something that stands in a place: a find, or a thing from the dock. */
+export interface PlacedThing {
+  id: string
+  world: SpotWorld
+  item: Collectible
+  rarity: Rarity
+  /** When it was got: the day its find was reached, or the day it was bought. */
+  since: DateKey
+  from: 'find' | 'dock'
+}
+
+/** The whole arrangement: what stands where, the places there are, and the chest. */
+export interface Arrangement {
+  things: PlacedThing[]
+  /** Thing id to place id, or "chest". */
+  where: Map<string, string>
+  spots: Spot[]
+  rooms: Set<string>
+}
+
+/** Every find found, by every thing that ever was (a deleted thing's finds stay), with its shine. */
+function finds(data: AppData): { item: Collectible; rarity: Rarity; since: DateKey }[] {
+  const found: { item: Collectible; rarity: Rarity; since: DateKey }[] = []
   for (const thing of everyThing(data).values()) {
-    const found = new Set(foundFor(data, thing, COLLECTIBLES))
+    const ids = new Set(foundFor(data, thing, COLLECTIBLES))
     for (const item of COLLECTIBLES) {
-      if (!found.has(item.id)) continue
-      shown.push({ item, rarity: rarityOf(item.id, reachedOn(data, thing.id, item.days)) })
+      if (!ids.has(item.id)) continue
+      const since = reachedOn(data, thing.id, item.days) ?? thing.createdAt
+      found.push({ item, rarity: rarityOf(item.id, reachedOn(data, thing.id, item.days)), since })
+    }
+  }
+  return found
+}
+
+/**
+ * Everything that stands in a place, in the order it was got: the finds
+ * that are things (not the scene's weather, not a companion) and the
+ * dock's placed things. Same day, finds first; then the catalogues' order.
+ */
+export function placedThings(data: AppData): PlacedThing[] {
+  const fromFinds: PlacedThing[] = finds(data)
+    .filter(({ item }) => !ATMOSPHERE.has(item.id) && !(item.id in COMPANIONS))
+    .map(({ item, rarity, since }) => ({
+      id: item.id,
+      world: item.world,
+      item,
+      rarity,
+      since,
+      from: 'find',
+    }))
+  const fromDock: PlacedThing[] = (data.bought ?? []).flatMap((b) => {
+    const entry = DOCK.find((d) => d.id === b.item)
+    const item = entry ? dockCollectible(entry) : null
+    return item
+      ? [
+          {
+            id: item.id,
+            world: item.world,
+            item,
+            rarity: 'common' as const,
+            since: b.date,
+            from: 'dock' as const,
+          },
+        ]
+      : []
+  })
+  const order = (t: PlacedThing): number =>
+    t.from === 'find'
+      ? COLLECTIBLES.indexOf(t.item)
+      : COLLECTIBLES.length + DOCK.findIndex((d) => d.id === t.id)
+  return [...fromFinds, ...fromDock].sort(
+    (a, b) => a.since.localeCompare(b.since) || order(a) - order(b),
+  )
+}
+
+export function arrangementOf(data: AppData): Arrangement {
+  const owned = rooms(data)
+  const things = placedThings(data)
+  return {
+    things,
+    where: placeAll(things, data.placement, owned),
+    spots: spotsFor(owned),
+    rooms: owned,
+  }
+}
+
+/**
+ * What the scene draws and where: each placed thing at its place (the
+ * chest's stay out), a companion beside its host, and the scene's weather
+ * where it was drawn.
+ */
+export function shownCollectibles(data: AppData): ShownCollectible[] {
+  const { things, where, spots } = arrangementOf(data)
+  const byId = new Map(spots.map((spot) => [spot.id, spot]))
+  const shown: ShownCollectible[] = []
+  const standing = new Map<string, Standing>()
+  for (const thing of things) {
+    const spot = byId.get(where.get(thing.id) ?? CHEST)
+    if (!spot) continue
+    const at = { x: spot.x, y: spot.y, stand: spot.stand, depth: spot.depth }
+    standing.set(thing.id, at)
+    shown.push({ item: thing.item, rarity: thing.rarity, at })
+  }
+  for (const { item, rarity } of finds(data)) {
+    if (ATMOSPHERE.has(item.id)) {
+      shown.push({
+        item,
+        rarity,
+        at: { x: item.x, y: item.y, stand: item.world === 'garden', depth: 1 },
+        weather: true,
+      })
+      continue
+    }
+    const companion = COMPANIONS[item.id]
+    const host = companion && standing.get(companion.host)
+    if (companion && host) {
+      shown.push({
+        item,
+        rarity,
+        at: { ...host, x: host.x + companion.dx, y: host.y + companion.dy },
+      })
     }
   }
   return shown

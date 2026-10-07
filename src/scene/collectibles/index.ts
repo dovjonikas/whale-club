@@ -29,3 +29,34 @@ export function collectiblesFor(world: World, line: Line): Collectible[] {
 export function collectibleSvg(item: Collectible): string {
   return `<svg viewBox="0 0 100 100" aria-hidden="true">${item.draw()}</svg>`
 }
+
+/**
+ * Finds that are the scene's weather rather than a thing in it: a light
+ * over the whole sea, the aurora, the milky way, a ring round the moon.
+ * They keep the place they were drawn for and are never arranged.
+ */
+export const ATMOSPHERE: ReadonlySet<string> = new Set([
+  'sea-a-lighthouse',
+  'sea-a-song',
+  'sea-b-deep',
+  'sky-a-moon',
+  'sky-a-aurora',
+  'sky-a-whale-stars',
+  'sky-a-turning',
+  'sky-b-milkyway',
+  'sky-b-fullmoon',
+  'sky-b-meteors',
+  'garden-a-fireflies',
+  'garden-a-island',
+  'garden-b-wind',
+])
+
+/**
+ * Finds that belong to another and go where it goes: the bees round the
+ * sunflower, the cat asleep on the bench. Offsets are fractions of the
+ * scene, as they were drawn.
+ */
+export const COMPANIONS: Readonly<Record<string, { host: string; dx: number; dy: number }>> = {
+  'garden-a-bees': { host: 'garden-a-sunflower', dx: 0.04, dy: 0 },
+  'garden-b-cat': { host: 'garden-b-bench', dx: 0, dy: 0 },
+}

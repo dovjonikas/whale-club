@@ -239,45 +239,25 @@
   animation: found 2.6s cubic-bezier(0.3, 1.2, 0.4, 1) both;
 }
 
-.collectible[data-world='garden'].is-found {
-  animation-name: found-garden;
-}
-
 @keyframes found {
   0% {
-    transform: translate(-50%, -50%) translate(var(--from-x), var(--from-y)) scale(0.2, 0.2);
+    transform: translate(-50%, var(--anchor-y)) translate(var(--from-x), var(--from-y))
+      scale(0.2, 0.2);
   }
   10% {
-    transform: translate(-50%, -50%) translate(var(--from-x), var(--from-y)) scale(1.9, 1.2);
+    transform: translate(-50%, var(--anchor-y)) translate(var(--from-x), var(--from-y))
+      scale(1.9, 1.2);
   }
   18% {
-    transform: translate(-50%, -50%) translate(var(--from-x), var(--from-y)) scale(1.4, 1.75);
+    transform: translate(-50%, var(--anchor-y)) translate(var(--from-x), var(--from-y))
+      scale(1.4, 1.75);
   }
   26%,
   62% {
-    transform: translate(-50%, -50%) translate(var(--from-x), var(--from-y)) scale(1.6);
+    transform: translate(-50%, var(--anchor-y)) translate(var(--from-x), var(--from-y)) scale(1.6);
   }
   100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-}
-
-@keyframes found-garden {
-  0% {
-    transform: translate(-50%, -100%) translate(var(--from-x), var(--from-y)) scale(0.2);
-  }
-  10% {
-    transform: translate(-50%, -100%) translate(var(--from-x), var(--from-y)) scale(1.9, 1.2);
-  }
-  18% {
-    transform: translate(-50%, -100%) translate(var(--from-x), var(--from-y)) scale(1.4, 1.75);
-  }
-  26%,
-  62% {
-    transform: translate(-50%, -100%) translate(var(--from-x), var(--from-y)) scale(1.6);
-  }
-  100% {
-    transform: translate(-50%, -100%) scale(1);
+    transform: translate(-50%, var(--anchor-y)) scale(1);
   }
 }
 
