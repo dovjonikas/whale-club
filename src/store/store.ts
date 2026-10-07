@@ -1,11 +1,12 @@
+import { now } from './clock'
+import { dataKey } from './lab'
 import { migrate } from './migrate'
 import { todayKey } from './dates'
 import type { AppData, DateKey, DayRecord, Mode, Settings, Thing, World } from './types'
 import { emptyData, EVERY_DAY, MAX_THINGS, WORLD_ORDER } from './types'
 
-export const STORAGE_KEY = 'whaleclub:data'
-/** Where an unreadable record is parked rather than thrown away. */
-const BROKEN_KEY = 'whaleclub:data.broken'
+/** Where an unreadable record is parked rather than thrown away, next to its own key. */
+const BROKEN_SUFFIX = '.broken'
 
 type Listener = (data: AppData) => void
 
@@ -57,6 +58,11 @@ export class Store {
     if (input.mode === 'timer' && input.minutes && input.minutes > 0) thing.minutes = input.minutes
     this.commit({ ...this.data, things: [...this.data.things, thing] })
     return thing
+  }
+
+  /** Replaces everything at once. Only the lab does this, and only to its own sandbox. */
+  replace(data: AppData): void {
+    this.commit(data)
   }
 
   removeThing(id: string): void {
@@ -209,7 +215,7 @@ export function worldForOrder(order: number): World {
 function load(): AppData {
   let text: string | null = null
   try {
-    text = localStorage.getItem(STORAGE_KEY)
+    text = localStorage.getItem(dataKey())
   } catch {
     // Private mode, or storage disabled: the app still runs, for this session only.
     return emptyData()
@@ -220,7 +226,7 @@ function load(): AppData {
   } catch (error) {
     console.warn('whale club: stored data could not be read, starting fresh', error)
     try {
-      localStorage.setItem(BROKEN_KEY, text)
+      localStorage.setItem(dataKey() + BROKEN_SUFFIX, text)
     } catch {
       // Nothing more to do: the copy could not be parked either.
     }
@@ -230,7 +236,7 @@ function load(): AppData {
 
 function save(data: AppData): void {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    localStorage.setItem(dataKey(), JSON.stringify(data))
   } catch (error) {
     console.warn('whale club: could not save', error)
   }
@@ -238,5 +244,5 @@ function save(data: AppData): void {
 
 function newId(): string {
   if (typeof crypto.randomUUID === 'function') return crypto.randomUUID()
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+  return `${now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
 }

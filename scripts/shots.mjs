@@ -2,6 +2,7 @@
 // pinned clock, at an iPhone, an Android phone and a desktop size, into
 // docs/screenshots/. Running it twice gives the same pictures. The iPhone
 // pass also saves the two postcards the app paints, story and square.
+// `npm run shots` then runs squeeze.mjs, which turns them into WebP under 300 KB.
 // Needs the preview server: `npm run build && npm run preview` first.
 /* global window, navigator, FileReader, Buffer */
 import { chromium, devices } from '@playwright/test'
@@ -227,6 +228,22 @@ for (const [file, off] of [
   await page.goto(base)
   await page.waitForTimeout(1800)
   await page.screenshot({ path: resolve(out, 'iphone-first.png') })
+  await context.close()
+}
+
+// The lab, opened by ?lab=1 on the same five weeks: the bar and its sheet.
+{
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.install({ time: NOW })
+  await page.addInitScript(
+    (json) => localStorage.setItem('whaleclub:data', json),
+    JSON.stringify(data),
+  )
+  await page.goto(`${base}?lab=1`)
+  await page.getByRole('dialog', { name: 'the lab' }).waitFor()
+  await page.waitForTimeout(900)
+  await page.screenshot({ path: resolve(out, 'iphone-lab.png') })
   await context.close()
 }
 

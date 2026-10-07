@@ -18,6 +18,8 @@ interface SheetOptions {
 }
 
 let openHandle: SheetHandle | null = null
+/** Each sheet title gets its own id, for aria-labelledby. */
+let sheetCount = 0
 
 export function openSheet(options: SheetOptions): SheetHandle {
   openHandle?.close()
@@ -31,7 +33,7 @@ export function openSheet(options: SheetOptions): SheetHandle {
   sheet.className = 'sheet'
   sheet.setAttribute('role', 'dialog')
   sheet.setAttribute('aria-modal', 'true')
-  const titleId = `sheet-title-${String(Date.now())}`
+  const titleId = `sheet-title-${String(++sheetCount)}`
   sheet.setAttribute('aria-labelledby', titleId)
   sheet.innerHTML = `
     <h2 class="sheet-title" id="${titleId}"></h2>

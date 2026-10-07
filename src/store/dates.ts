@@ -1,7 +1,8 @@
+import { today } from './clock'
 import type { DateKey } from './types'
 
 /** Today on the local clock. The app never thinks in UTC; a day is the person's day. */
-export function todayKey(now: Date = new Date()): DateKey {
+export function todayKey(now: Date = today()): DateKey {
   return toKey(now)
 }
 

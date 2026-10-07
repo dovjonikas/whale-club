@@ -10,6 +10,8 @@ import { addThing, card, dateKey, dismissInstallLeaf, setHidden, stored } from '
  */
 async function startLockIn(page: Page, name: string, minutes: number): Promise<void> {
   await page.getByRole('button', { name: `lock in: ${name}` }).click()
+  // The sheet moves focus to its button on the next frame; wait for that before taking it.
+  await expect(page.getByRole('button', { name: 'lock in', exact: true })).toBeFocused()
   const slider = page.getByRole('slider', { name: 'minutes' })
   await slider.focus()
   await page.keyboard.press('Home')

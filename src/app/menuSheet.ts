@@ -9,7 +9,11 @@ import { openSheet } from './sheet'
  * The menu is one screen: the club. Three rules, one sentence about who
  * is in it, the day count with a small streak, and the postcard size.
  */
-export function openMenuSheet(store: Store): void {
+/** Taps on the version, close together, that open the lab. */
+const LAB_TAPS = 5
+const LAB_TAP_GAP_MS = 2500
+
+export function openMenuSheet(store: Store, onLab: () => void): void {
   openSheet({
     title: 'the club',
     build(body) {
@@ -34,7 +38,16 @@ export function openMenuSheet(store: Store): void {
               )
               .join('')}
           </div>
-        </div>`
+        </div>
+        <button type="button" class="menu-version" aria-label="${voice.lab.version(__APP_VERSION__)}">v${__APP_VERSION__}</button>`
+      // Hidden on purpose: five quick taps on the version open the lab. No hint, no feedback.
+      let taps = 0
+      let lastTap = 0
+      body.querySelector('.menu-version')?.addEventListener('click', (event) => {
+        taps = event.timeStamp - lastTap < LAB_TAP_GAP_MS ? taps + 1 : 1
+        lastTap = event.timeStamp
+        if (taps >= LAB_TAPS) onLab()
+      })
       const chips = body.querySelectorAll<HTMLButtonElement>('[data-format]')
       chips.forEach((chip) => {
         chip.addEventListener('click', () => {

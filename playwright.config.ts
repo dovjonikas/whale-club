@@ -18,6 +18,8 @@ export default defineConfig({
   timeout: 60_000,
   expect: { timeout: 10_000 },
   fullyParallel: true,
+  // Every page runs the whole animated scene; more than six at once starves them and tests time out.
+  workers: process.env.CI ? undefined : 6,
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {

@@ -1,0 +1,87 @@
+/* The lab: a thin striped bar over every screen while the sandbox is on,
+   and the lab's sheet. Never seen outside the lab. */
+
+:root {
+  --lab-h: calc(36px + env(safe-area-inset-top, 0px));
+}
+
+/* The bar takes the top of the screen; the whole frame moves down under it,
+   so nothing in the app, a sheet or a session is ever covered. */
+html[data-lab='true'] {
+  --safe-top: 0px;
+}
+
+html[data-lab='true'] #frame {
+  top: var(--lab-h);
+}
+
+.lab-bar {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 50%;
+  width: min(100%, var(--frame-w));
+  height: var(--lab-h);
+  padding: env(safe-area-inset-top, 0px) var(--s2) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  transform: translateX(-50%);
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(242, 201, 76, 0.16) 0 8px,
+      rgba(242, 201, 76, 0.06) 8px 16px
+    ),
+    #120f05;
+  border-bottom: 1px solid rgba(242, 201, 76, 0.45);
+  color: var(--sun);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.lab-bar button {
+  height: 100%;
+  min-width: var(--touch);
+  padding: 0 var(--s2);
+  color: inherit;
+}
+
+.lab-bar-exit {
+  border-left: 1px solid rgba(242, 201, 76, 0.3);
+}
+
+.lab-note {
+  margin: 0;
+  color: var(--sun);
+  font-size: var(--t-sm);
+}
+
+.lab-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s2);
+  margin-top: var(--s4);
+}
+
+.lab-group .chip:disabled {
+  opacity: 0.4;
+}
+
+.lab-exit {
+  margin-top: var(--s4);
+}
+
+/* The version at the bottom of the menu: quiet, and a full touch target. */
+.menu-version {
+  display: block;
+  min-width: var(--touch);
+  min-height: var(--touch);
+  margin: var(--s4) auto 0;
+  padding: 0 var(--s3);
+  color: var(--ink-dim);
+  font-size: var(--t-xs);
+  opacity: 0.6;
+}

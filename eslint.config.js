@@ -23,6 +23,24 @@ export default tseslint.config(
     },
   },
   {
+    // Every "today" and "now" goes through src/store/clock.ts, so the lab can move time.
+    files: ['src/**/*.ts'],
+    ignores: ['src/store/clock.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "CallExpression[callee.object.name='Date'][callee.property.name='now']",
+          message: 'Use now() from src/store/clock.ts.',
+        },
+        {
+          selector: "NewExpression[callee.name='Date'][arguments.length=0]",
+          message: 'Use today() from src/store/clock.ts.',
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.js', '**/*.mjs'],
     ...tseslint.configs.disableTypeChecked,
     languageOptions: {

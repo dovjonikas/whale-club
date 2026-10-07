@@ -4,6 +4,7 @@ import { resolveTokens } from '../scene/palette'
 import { shoreSvg } from '../scene/shore'
 import { StarField } from '../scene/stars'
 import { whaleSvg } from '../scene/visitors'
+import { today } from '../store/clock'
 import { fromKey, todayKey } from '../store/dates'
 import { dayNumber, last7, lineFor, stageFor, starDays, streakDays } from '../store/derive'
 import type { AppData, PostcardFormat } from '../store/types'
@@ -78,7 +79,7 @@ export async function renderPostcard(
   moment: Moment,
   format: PostcardFormat,
   visibleIds: readonly string[],
-  now: Date = new Date(),
+  now: Date = today(),
 ): Promise<Blob> {
   const [W, H] = SIZE[format]
   const layout = LAYOUT[format]

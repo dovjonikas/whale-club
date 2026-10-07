@@ -10,37 +10,37 @@ all that happens.
 **Live:** https://dovjonikas.github.io/whale-club/
 
 <p align="center">
-  <img src="docs/screenshots/iphone-scene.png" alt="Whale Club on an iPhone: a night sky of stars laid out as a calendar, a sea, and three cards with creatures" width="280">
+  <img src="docs/screenshots/iphone-scene.webp" alt="Whale Club on an iPhone: a night sky of stars laid out as a calendar, a sea, and three cards with creatures" width="280">
   &nbsp;&nbsp;
-  <img src="docs/screenshots/android-all-done.png" alt="Whale Club on an Android phone after every thing is done for the day: the whale surfaces" width="280">
+  <img src="docs/screenshots/android-all-done.webp" alt="Whale Club on an Android phone after every thing is done for the day: the whale surfaces" width="280">
   &nbsp;&nbsp;
-  <img src="docs/screenshots/iphone-collection.png" alt="The Collection sheet: unlocked collectibles and silhouettes of the next ones" width="280">
+  <img src="docs/screenshots/iphone-collection.webp" alt="The Collection sheet: unlocked collectibles and silhouettes of the next ones" width="280">
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/iphone-stone.png" alt="A stone floating at the water line, waiting to be cracked" width="200">
+  <img src="docs/screenshots/iphone-stone.webp" alt="A stone floating at the water line, waiting to be cracked" width="200">
   &nbsp;
-  <img src="docs/screenshots/iphone-find.png" alt="The find out of its stone: a jellyfish at night" width="200">
+  <img src="docs/screenshots/iphone-find.webp" alt="The find out of its stone: a jellyfish at night" width="200">
   &nbsp;
-  <img src="docs/screenshots/iphone-dial.png" alt="The lock-in dial: 30 minutes" width="200">
+  <img src="docs/screenshots/iphone-dial.webp" alt="The lock-in dial: 30 minutes" width="200">
   &nbsp;
-  <img src="docs/screenshots/iphone-session.png" alt="A lock-in session: the time, the quiet scene and the creature grown to a star" width="200">
+  <img src="docs/screenshots/iphone-session.webp" alt="A lock-in session: the time, the quiet scene and the creature grown to a star" width="200">
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/iphone-first.png" alt="The first screen: one sentence, an empty card, and a small whale asleep under the surface" width="240">
+  <img src="docs/screenshots/iphone-first.webp" alt="The first screen: one sentence, an empty card, and a small whale asleep under the surface" width="240">
   &nbsp;
-  <img src="docs/screenshots/iphone-not-today.png" alt="The first screen on a day one thing is off: two cards and the not today strip opened" width="240">
+  <img src="docs/screenshots/iphone-not-today.webp" alt="The first screen on a day one thing is off: two cards and the not today strip opened" width="240">
   &nbsp;
-  <img src="docs/screenshots/iphone-days.png" alt="A thing's sheet with the seven day chips" width="240">
+  <img src="docs/screenshots/iphone-days.webp" alt="A thing's sheet with the seven day chips" width="240">
   &nbsp;
-  <img src="docs/screenshots/iphone-rest.png" alt="A rest day: nothing planned, one quiet line" width="240">
+  <img src="docs/screenshots/iphone-rest.webp" alt="A rest day: nothing planned, one quiet line" width="240">
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/postcard-story.png" alt="A postcard in the story size: the night sky, the whale over the horizon, all of it. all the smoke., day 35 of whale club" width="280">
+  <img src="docs/screenshots/postcard-story.webp" alt="A postcard in the story size: the night sky, the whale over the horizon, all of it. all the smoke., day 35 of whale club" width="280">
   &nbsp;&nbsp;
-  <img src="docs/screenshots/postcard-square.png" alt="The same postcard in the square size" width="420">
+  <img src="docs/screenshots/postcard-square.webp" alt="The same postcard in the square size" width="420">
 </p>
 
 ## The rules
@@ -158,6 +158,12 @@ npm test
 
 Runs every test on an iPhone 13, a Pixel 5 and a 1366x768 desktop against
 the production build. `npm run lint` runs ESLint and Prettier.
+
+A hidden lab with a movable clock, see docs: [the lab](docs/ARCHITECTURE.md#10-the-lab).
+
+<p align="center">
+  <img src="docs/screenshots/iphone-lab.webp" alt="The lab: a striped bar at the top and a sheet with fake time controls over a sandbox copy of the sea" width="240">
+</p>
 
 ## Deploy
 
