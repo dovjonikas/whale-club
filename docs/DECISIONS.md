@@ -825,3 +825,15 @@ not zero: keep opacity, drop movement. The rule now forces
 `transition-property: opacity` instead of a zero duration (keyframes
 still land on their end), and the things that hide by moving (sheets,
 toasts) stay in place and fade under it.
+
+## 2026-10-08 The README is written for a stranger with a minute
+
+The README had grown a picture at a time, nineteen screenshots in loose
+rows. It is now written for someone deciding in a minute whether this is
+good work: one banner, what it is in two sentences, why it exists, the
+screens in a captioned grid, then the engineering (data, structure, how it
+is checked) for whoever reads on. The banner is composed by
+`scripts/hero.mjs` from the screenshots `npm run shots` has just made, in
+the app's own fonts and colours, so it stays in step with them; it is 2:1
+so it also serves as the repository's social preview. The licence names
+its holder, as the author's other projects do.
