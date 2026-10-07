@@ -227,7 +227,7 @@ build and the tests, and never deploy.
 
 ## License
 
-**[MIT](LICENSE)** © 2026 Dovydas Jonikas.
+**[MIT](LICENSE)**.
 
 In one sentence: take it, change it, ship it. Keep the copyright line and
 the license text with any copy you pass on, and take it as it is: there is
