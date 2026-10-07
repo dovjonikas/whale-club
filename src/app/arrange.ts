@@ -332,7 +332,7 @@ function ringsHtml(now: Arrangement, held: string | null, room: string | undefin
       const top = spot.stand
         ? `calc(${(spot.y * 100).toFixed(2)}% - ${String(Math.round((RING / 2) * spot.depth))}px * var(--scene-scale, 1))`
         : `${(spot.y * 100).toFixed(2)}%`
-      return `<button type="button" class="arrange-spot ${state}" data-spot="${spot.id}" data-world="${spot.world}" data-holder="${holder}" aria-label="${escapeHtml(label)}" aria-pressed="${String(holder !== '' && holder === held)}" style="left: ${(spot.x * 100).toFixed(2)}%; top: ${top}"></button>`
+      return `<button type="button" class="arrange-spot ${state}" data-spot="${spot.id}" data-world="${spot.world}" data-holder="${holder}" aria-label="${escapeHtml(label)}" aria-pressed="${String(holder !== '' && holder === held)}" style="left: ${(spot.x * 100).toFixed(2)}%; top: ${top}; --depth: ${String(spot.depth)}"></button>`
     })
     .join('')
 }

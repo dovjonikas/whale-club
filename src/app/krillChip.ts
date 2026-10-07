@@ -8,6 +8,10 @@ import { goalOf } from './dockData'
 const RISE_HOLD_MS = 900
 /** Its fade out; --dur-sheet-out's feel, a little quicker. */
 const RISE_OUT_MS = 400
+/** While the lock-in screen covers the header, the rise waits, looking again this often. */
+const RISE_WAIT_MS = 250
+/** And gives up waiting after this long: a rise nobody sees is not worth keeping. */
+const RISE_WAIT_MAX_MS = 12_000
 
 /**
  * The krill chip under the title: a drawn krill and the balance, and under
@@ -77,8 +81,19 @@ export class KrillChip {
     this.goal.dataset.ready = String(goal.left === 0)
   }
 
-  /** A small "+N" beside the chip, up and gone. Transitions, so reduced motion keeps the fade alone. */
-  rise(amount: number): void {
+  /**
+   * A small "+N" beside the chip, up and gone. Transitions, so reduced
+   * motion keeps the fade alone. A session's minutes are kept while its
+   * screen still covers the header, so the rise waits for the opening to
+   * bring the world back, and rises then.
+   */
+  rise(amount: number, waited = 0): void {
+    if (document.querySelector('.session') && waited < RISE_WAIT_MAX_MS) {
+      setTimeout(() => {
+        this.rise(amount, waited + RISE_WAIT_MS)
+      }, RISE_WAIT_MS)
+      return
+    }
     const rise = document.createElement('span')
     rise.className = 'krill-rise'
     rise.setAttribute('aria-hidden', 'true')

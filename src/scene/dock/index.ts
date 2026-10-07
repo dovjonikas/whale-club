@@ -183,7 +183,17 @@ export const DOCK: readonly DockItem[] = [
     'none',
     art.telescope,
   ),
-  place('comet', 'comet', 'that stays', 'middling', 1800, 'sky', 50, 'none', art.comet),
+  place(
+    'moon-swing',
+    'moon swing',
+    'hanging from a small moon',
+    'middling',
+    1800,
+    'sky',
+    48,
+    'sway',
+    art.moonSwing,
+  ),
   other(
     'friday-stars',
     'friday stars',
