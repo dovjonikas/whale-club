@@ -1,6 +1,7 @@
 import type { DateKey, World } from '../store/types'
 import type { Collectible } from './collectibles'
 import { collectibleSvg } from './collectibles'
+import { deepHtml, kelpHtml, shaftsHtml, surfaceSvg } from './depths'
 import { moonPhase, moonSvg } from './moon'
 import { startParallax } from './parallax'
 import { ParticleField } from './particles'
@@ -8,8 +9,9 @@ import type { Rarity } from './rarity'
 import { shoreSvg } from './shore'
 import { StarField } from './stars'
 import { StoneLayer, type StoneSpec } from './stones'
+import { causticsUrl, grainUrl } from './textures'
 import { ticker } from './ticker'
-import { visitorSvg, whaleSvg, type VisitorKind } from './visitors'
+import { sleeperSvg, visitorSvg, whaleSvg, type VisitorKind } from './visitors'
 
 /**
  * The scene behind everything. Back to front: the sky (a nebula of slow
@@ -66,15 +68,23 @@ export class Scene {
         <canvas class="stars"></canvas>
         <div class="moon">${moonSvg(moonPhase(new Date()))}</div>
       </div>
-      <div class="layer sea" data-depth="0.8" aria-hidden="true"></div>
+      <div class="layer sea" data-depth="0.8" aria-hidden="true">
+        <div class="caustics"><i></i></div>
+        ${shaftsHtml()}
+        ${deepHtml()}
+        ${kelpHtml()}
+      </div>
       <div class="layer shore" data-depth="0.5" aria-hidden="true">
         <div class="shore-warmth"></div>
         ${shoreSvg()}
+        <div class="surface">${surfaceSvg()}</div>
       </div>
       <div class="scene-things" aria-hidden="true"></div>
+      <div class="sleeper" aria-hidden="true">${sleeperSvg()}</div>
       <div class="stones" role="group" aria-label="stones"></div>
       <canvas class="particles" aria-hidden="true"></canvas>
       <div class="scene-glow" aria-hidden="true"></div>
+      <div class="grain" aria-hidden="true"></div>
       <div class="scene-dim" aria-hidden="true"></div>
       <div class="star-hits" role="group" aria-label="your days"></div>`
     parent.prepend(this.root)
@@ -97,6 +107,11 @@ export class Scene {
     this.resize()
     this.stars.start()
     this.particles.start()
+    // The textures are drawn once, after the first paint, so they never hold up the first screen.
+    setTimeout(() => {
+      this.root.style.setProperty('--grain', `url(${grainUrl()})`)
+      this.root.style.setProperty('--caustics', `url(${causticsUrl()})`)
+    }, 60)
   }
 
   /** The sky's day-stars, with a label and a tap for each. */
@@ -181,6 +196,11 @@ export class Scene {
     this.root.style.setProperty('--warmth', Math.max(0, Math.min(1, level)).toFixed(2))
   }
 
+  /** Nothing added yet: the small whale sleeps at the water line. */
+  setEmpty(empty: boolean): void {
+    this.root.dataset.empty = String(empty)
+  }
+
   setQuiet(quiet: boolean): void {
     this.root.dataset.quiet = String(quiet)
   }
@@ -203,6 +223,11 @@ export class Scene {
     whale.className = 'whale'
     whale.innerHTML = whaleSvg(jacket)
     this.thingsLayer.append(whale)
+    this.thingsLayer.querySelector('.whale-ring')?.remove()
+    const ring = document.createElement('div')
+    ring.className = 'whale-ring'
+    this.thingsLayer.append(ring)
+    ring.addEventListener('animationend', () => ring.remove(), { once: true })
     this.glow()
     whale.addEventListener('animationend', () => whale.remove(), { once: true })
     const rect = this.root.getBoundingClientRect()

@@ -31,7 +31,13 @@ export function openDial(
         <div class="dial" role="slider" tabindex="0" aria-label="${voice.lockIn.minutes}"
           aria-valuemin="${String(MIN_MINUTES)}" aria-valuemax="${String(MAX_MINUTES)}">
           <svg viewBox="0 0 240 240" aria-hidden="true">
+            <defs>
+              <linearGradient id="dial-light" x1="0" y1="1" x2="1" y2="0">
+                <stop offset="0" stop-color="#3ef2e0"/><stop offset="1" stop-color="#ffd98a"/>
+              </linearGradient>
+            </defs>
             <path class="dial-track" d="${arc(SWEEP_DEG)}"/>
+            ${ticks()}
             <path class="dial-fill" d=""/>
             <circle class="dial-knob" r="13"/>
           </svg>
@@ -113,6 +119,25 @@ export function openDial(
       show()
     },
   })
+}
+
+/** A small mark at every quarter of an hour, so the ring can be read without the number. */
+function ticks(): string {
+  const marks: string[] = []
+  for (let m = 15; m < MAX_MINUTES; m += 15) {
+    const deg = ((m - MIN_MINUTES) / (MAX_MINUTES - MIN_MINUTES)) * SWEEP_DEG
+    const start = (360 - SWEEP_DEG) / 2
+    const a = ((start + deg - 90) * Math.PI) / 180
+    const inner = R - 16
+    const x0 = C + inner * Math.cos(a)
+    const y0 = C + inner * Math.sin(a)
+    const x1 = C + (inner - 5) * Math.cos(a)
+    const y1 = C + (inner - 5) * Math.sin(a)
+    marks.push(
+      `<path class="dial-tick" d="M${x0.toFixed(1)} ${y0.toFixed(1)} L${x1.toFixed(1)} ${y1.toFixed(1)}"/>`,
+    )
+  }
+  return marks.join('')
 }
 
 function clamp(minutes: number): number {

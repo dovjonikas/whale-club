@@ -329,6 +329,7 @@ export function startApp(root: HTMLElement): void {
   function render(data: AppData): void {
     const today = todayKey()
     onboarding.hidden = data.things.length > 0
+    scene.setEmpty(data.things.length === 0)
     row.render(data)
 
     const stars = starDays(data)

@@ -257,3 +257,37 @@ done, and the check-in is still there for anyone who opens the app anyway.
 Tap is done and lock in has its own button, so the sheet needed a third,
 quiet way in: three dots in the card's top corner, a full touch target.
 The strip's names open the same sheet.
+
+## 2026-10-07 Textures are rendered once, never shipped as images
+
+The grain and the caustics are generated in the browser on the first frame
+after load (a short delay keeps them off the critical path) and set as
+CSS variables holding data URLs. No image files to precache, nothing to
+fetch offline, and the tiles are small enough that the cost is a few
+milliseconds once.
+
+## 2026-10-07 Gradient ids are unique per drawing
+
+Creatures and collectibles now use SVG gradients, and the same drawing can
+be on the screen several times (a card, the scene, a sheet). A shared id
+would make one drawing's gradient depend on another's being in the DOM, so
+every drawing takes its ids from a counter.
+
+## 2026-10-07 The sea's finds live in the water
+
+Sea collectibles were placed on the shore line with the rest. They now sit
+in a band just under the surface, between the water line and the cards,
+so the sea's things look like they belong to the sea.
+
+## 2026-10-07 Drawings split by size, not by world
+
+Small shared pieces (tints, faces, fish, jellies, stems) are in draw.ts;
+the larger collectible drawings are one function each in art.ts and
+art2.ts; collectibles.ts stays a list. Splitting by world would have put
+the shared pieces in three places.
+
+## 2026-10-07 The empty screen has a sleeper, not an arrow
+
+The first screen keeps its one sentence and its one empty card. A small
+whale asleep under the surface makes it feel inhabited without saying
+anything more or pointing at anything. It leaves with the first thing.

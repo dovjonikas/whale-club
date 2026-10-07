@@ -1,0 +1,253 @@
+/* The sea's depth and the grain over the whole scene. Transforms and
+   opacity only; under reduced motion everything holds still. */
+
+/* Grain: a fine noise tile over the scene, below the UI. */
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background-image: var(--grain);
+  background-size: 160px 160px;
+  mix-blend-mode: overlay;
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+/* The bright line where the sea meets the sand, drifting slowly sideways. */
+.surface {
+  position: absolute;
+  left: 0;
+  top: 64%;
+  width: 200%;
+  height: 22px;
+  animation: surface-drift 38s linear infinite;
+  will-change: transform;
+  pointer-events: none;
+}
+
+.surface svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes surface-drift {
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* Moonlight shafts: long soft bands slanting down from the moon's side. */
+.shafts {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4%;
+  height: 80%;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(#000 0%, rgba(0, 0, 0, 0.5) 45%, transparent 85%);
+  mask-image: linear-gradient(#000 0%, rgba(0, 0, 0, 0.5) 45%, transparent 85%);
+  pointer-events: none;
+}
+
+.shafts i {
+  position: absolute;
+  top: -10%;
+  width: 14%;
+  height: 130%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(170, 235, 255, 0.07) 40%,
+    rgba(170, 235, 255, 0.11) 50%,
+    rgba(170, 235, 255, 0.07) 60%,
+    transparent
+  );
+  transform-origin: 50% 0;
+  transform: rotate(16deg);
+  animation: shaft-sway 17s ease-in-out infinite alternate;
+}
+
+.shafts i:nth-child(1) {
+  left: 52%;
+  width: 9%;
+}
+
+.shafts i:nth-child(2) {
+  left: 64%;
+  animation-duration: 21s;
+  animation-delay: -6s;
+}
+
+.shafts i:nth-child(3) {
+  left: 78%;
+  width: 7%;
+  animation-duration: 15s;
+  animation-delay: -3s;
+}
+
+.shafts i:nth-child(4) {
+  left: 36%;
+  width: 6%;
+  opacity: 0.6;
+  animation-duration: 24s;
+}
+
+.shafts i:nth-child(5) {
+  left: 88%;
+  width: 11%;
+  opacity: 0.8;
+  animation-duration: 19s;
+  animation-delay: -11s;
+}
+
+@keyframes shaft-sway {
+  from {
+    transform: rotate(13deg);
+    opacity: 0.6;
+  }
+  to {
+    transform: rotate(20deg);
+    opacity: 1;
+  }
+}
+
+/* The caustic net just under the surface, fading with depth. */
+.caustics {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 4%;
+  height: 40%;
+  overflow: hidden;
+  opacity: 0.1;
+  -webkit-mask-image: linear-gradient(#000, transparent);
+  mask-image: linear-gradient(#000, transparent);
+  pointer-events: none;
+}
+
+.caustics i {
+  position: absolute;
+  inset: -256px 0 0 -256px;
+  background-image: var(--caustics);
+  background-size: 256px 256px;
+  animation: caustics-drift 48s linear infinite;
+  will-change: transform;
+}
+
+@keyframes caustics-drift {
+  to {
+    transform: translate3d(256px, 128px, 0);
+  }
+}
+
+/* Two whales far down, in silhouette, passing very slowly. */
+.deep {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.deep-whale {
+  position: absolute;
+  left: 0;
+  color: #030a18;
+  will-change: transform;
+}
+
+.deep-whale svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.deep-whale.is-far {
+  top: 42%;
+  width: 46%;
+  opacity: 0.55;
+  animation: deep-swim 150s linear infinite;
+  animation-delay: -40s;
+}
+
+.deep-whale.is-near {
+  top: 58%;
+  width: 72%;
+  opacity: 0.7;
+  animation: deep-swim 210s linear infinite;
+  animation-delay: -150s;
+}
+
+@keyframes deep-swim {
+  from {
+    transform: translate3d(-110%, 0, 0);
+  }
+  to {
+    transform: translate3d(240%, -6%, 0);
+  }
+}
+
+/* Kelp at the very bottom, swaying from its root. */
+.kelp {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 110px;
+  pointer-events: none;
+}
+
+.kelp span {
+  position: absolute;
+  bottom: -6px;
+  width: 18px;
+  transform-origin: 50% 100%;
+  animation: kelp-sway 7s ease-in-out infinite alternate;
+}
+
+.kelp svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@keyframes kelp-sway {
+  from {
+    transform: rotate(-5deg);
+  }
+  to {
+    transform: rotate(6deg);
+  }
+}
+
+/* The moon's light spreads further, softly. */
+.moon::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 240px;
+  height: 240px;
+  margin: -120px 0 0 -120px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 244, 214, 0.16),
+    rgba(255, 244, 214, 0.05) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface,
+  .shafts i,
+  .caustics i,
+  .deep-whale,
+  .kelp span {
+    animation: none;
+  }
+  .deep {
+    display: none;
+  }
+}

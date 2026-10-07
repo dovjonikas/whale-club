@@ -63,7 +63,13 @@ export function edit(card: HTMLElement): HTMLButtonElement {
 export function updateCard(card: HTMLElement, thing: Thing, view: CardView): void {
   const button = main(card)
   const name = card.querySelector('.card-name')
-  if (name) name.textContent = `${thing.emoji} ${thing.name}`
+  if (name) {
+    name.innerHTML = '<span class="card-emoji"></span><span class="card-word"></span>'
+    const emoji = name.querySelector('.card-emoji')
+    const word = name.querySelector('.card-word')
+    if (emoji) emoji.textContent = `${thing.emoji} `
+    if (word) word.textContent = thing.name
+  }
   const mode = card.querySelector('.card-mode')
   if (mode) mode.textContent = thing.mode === 'timer' ? `${String(thing.minutes ?? 0)} min` : ''
 

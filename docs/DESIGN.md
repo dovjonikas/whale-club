@@ -110,3 +110,38 @@ their own consistency without a single number.
 Not the warm-cream-and-serif template, not the black-and-acid-green
 template. Bioluminescence is the light source, warm stars the counterpoint,
 one red accent earned, not given. Cards are the only rectangles on screen.
+
+## v0.7 pass: depth and charm (2026-10-07)
+
+The brief was "draw beautiful things" in the spirit of an earlier page of
+the author's: soft illustration with warmth, never glossy. Only the
+technique carries over; every drawing here is new.
+
+- **Grain.** A fine film grain over the whole scene, rendered once into a
+  tile, so the night reads like paper, not like a screen. Static.
+- **The water line.** A thin bright wave along the horizon, drifting
+  sideways very slowly, with moonlight glints.
+- **Under the water.** Faint slanted moonlight shafts that sway; a
+  moonlit caustic net in the top band of the sea, generated once and
+  drifting; far down, the silhouettes of two big whales passing very slowly.
+  On a tall screen, kelp at the bottom, swaying.
+- **Creatures.** Redrawn with soft shading (lighter top, darker belly),
+  rim light, blush on the cheeks, eyes with catchlights, and at the last
+  stage a small thing of their own (the whale's spout, the star's twinkle,
+  the sunflower's bee). Gradient ids are unique per drawing.
+- **The whale surfacing.** Shaded, blushing, a ring of water where it
+  breaks the surface, droplets from the spout.
+- **Cards.** Glass with a lit top edge; the creature on a soft pool of its
+  world's light; done fills the bottom edge with the world's colour and
+  puts a small glowing check in the corner; a tap squashes and pops.
+- **Bursts.** Bubbles with a glint, four-point sparkles in the sky, two-tone
+  petals in the garden.
+- **Collectibles.** All sixty redrawn in the same hand (shading, a face
+  where it fits, a soft rim). The sea's finds sit in the band just under
+  the surface, so nothing of the sea lies on the sand.
+- **A stone on a card.** A small shaded pebble with a warm glow that rocks
+  very slightly, instead of a ring.
+- **The empty first screen.** A small whale asleep at the water line,
+  breathing out tiny bubbles, under the first sentence.
+
+Motion stays transform and opacity; nothing new runs a loop of its own.

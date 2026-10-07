@@ -28,6 +28,8 @@ all that happens.
 </p>
 
 <p align="center">
+  <img src="docs/screenshots/iphone-first.png" alt="The first screen: one sentence, an empty card, and a small whale asleep under the surface" width="240">
+  &nbsp;
   <img src="docs/screenshots/iphone-not-today.png" alt="The first screen on a day one thing is off: two cards and the not today strip opened" width="240">
   &nbsp;
   <img src="docs/screenshots/iphone-days.png" alt="A thing's sheet with the seven day chips" width="240">
