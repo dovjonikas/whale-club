@@ -104,11 +104,52 @@ addition and the first brief disagree, the evening addition wins.
     spots, arrange opens after a purchase, reduced motion, the clarity
     test's new job "move a find"; screenshots of arrange mode and the island
     on the whale.
-- [ ] **0.14.0 the first year**: tiers to 365 (240, 300, 365) with new
-      finds; the first-week set; seasons, sky events, special days; days 100,
-      200, 365; art slots (public/art/<id>.webp, silhouettes from alpha,
-      docs/ART.md, npm run art:check). Also: the day-star calendar packs a
-      year into 52 thin rows; older weeks should become a quieter band.
+- [ ] **0.14.0 the first year, the path to legendary, less noise** (the
+      fourth evening addition joins it):
+  - tiers to 365 (240, 300, 365) with new finds; the first-week set;
+    seasons, sky events, special days; days 100, 200, 365; art slots
+    (public/art/<id>.webp, silhouettes from alpha, docs/ART.md, npm run
+    art:check);
+  - constellations instead of the sky calendar (the log is the calendar
+    now): every day with something done lights one star of the current
+    constellation, shown ahead as faint stars and dotted lines in the shape
+    of its legendary; paths of 30, 60, then 100 stars (about four
+    legendaries a year for a steady person); a brighter star and a rare
+    find half way, the legendary at the end; after the first done of a day
+    a star rises from the card, flies to its place and its line joins (about
+    1 s, a tap skips); a missed day takes nothing, rest days do not count; a
+    finished constellation stays bright for good and the next path's faint
+    outline appears; the "next" bar shows both goals (the next find "in 2
+    days", the legendary's silhouette "12/30"); the per-thing stones stay;
+  - rarity earned, not drawn: per-thing finds are common, rare comes from
+    half way, legendary only from a path's end; the date-based rarity goes
+    (finds already found keep theirs); four or five legendaries of our own
+    for the first year (a golden whale, say), each with an art slot;
+  - a legendary stands apart: its own drawing with movement (a light
+    shimmer, gold or pearl), bigger, its own sound; a ceremony (the scene
+    darkens, the whole constellation lights, a beam comes down, the find
+    appears; about 3 s, a tap skips; reduced motion: a calm appearance); a
+    plaque with its name and "earned on 2026-11-12 · day 30"; a "legendary"
+    row in the Collection (silhouettes until earned); a gold frame and the
+    plaque on its postcard; never sold in the dock;
+  - less noise: the sky only constellations and atmosphere, no 365-dot
+    grid; the cove's last 30 days of lanterns apart and bright, older ones
+    merged into a soft glow that grows over the months (the log still shows
+    every one); the visible items limited to the spots of 0.13, the rest in
+    the chest; the daily surprise stays; a test: after the lab's seed 365 no
+    more than 40 separate objects in the scene (background aside), and a "a
+    year, readable" screenshot;
+  - the lab: "seed 365" shows about four finished constellations; "+1 star"
+    and "finish this path";
+  - tests: a star for each day done, a missed day takes nothing, rest days
+    do not count; path lengths 30, 60, 100; rare half way, legendary at the
+    end; the "next" bar with both goals; the ceremony and reduced motion;
+    the plaque with its date; the gold postcard frame; the migration (old
+    rarity stays, the date rarity is not used for new finds); the object
+    limit after seed 365; the clarity test's new job "see how far the
+    legendary is"; screenshots of a constellation half way, the ceremony,
+    a year's scene after seed 365. DECISIONS: why rarity is earned, why the
+    sky is no longer a calendar.
 - [ ] **0.15.0 gentle mechanics**: quiet days (moons in the dots and in the
       log), welcome back +20, sleeping creatures that wave, new chapter,
       "after...", the evening line (shown in the log's day), the Android badge.
