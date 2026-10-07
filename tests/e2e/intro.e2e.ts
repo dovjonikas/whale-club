@@ -2,19 +2,27 @@ import { expect, test, type Page } from '@playwright/test'
 import { dateKey, seed } from './helpers'
 
 /**
- * The first minute: three beats on a first open (the promise, the truth,
- * the first step), never again by itself, always skippable, and again on
- * request. These tests use Playwright's own `test`: the helpers' one skips
- * the intro.
+ * The first minute: on a first open one tap to begin (so the music may
+ * play), then three beats (the promise, the truth, the first step), never
+ * again by itself, always skippable, and again on request. These tests use
+ * Playwright's own `test`: the helpers' one skips the intro.
  */
 const intro = (page: Page) => page.getByRole('dialog', { name: 'whale club' })
 const beat = (page: Page) => intro(page)
+const begin = async (page: Page) => {
+  await intro(page)
+    .getByRole('button', { name: /tap to begin/ })
+    .click()
+  await expect(beat(page)).toHaveAttribute('data-beat', 'promise')
+}
 
 test('a first open plays the intro; anything stored and it does not', async ({ page, browser }) => {
   await page.goto('')
   await expect(intro(page)).toBeVisible()
-  await expect(intro(page)).toHaveAttribute('data-beat', 'promise')
+  await expect(intro(page)).toHaveAttribute('data-beat', 'gate')
+  await expect(intro(page).getByRole('button', { name: /tap to begin/ })).toBeVisible()
   await expect(intro(page).getByRole('button', { name: 'skip' })).toBeVisible()
+  await begin(page)
 
   const other = await browser.newPage()
   await seed(other, {
@@ -37,8 +45,19 @@ test('skip goes to the first step, and from there out', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Add a thing' })).toBeVisible()
 })
 
+test('one tap to begin, by touch or by key, so the music may play', async ({ page }) => {
+  await page.goto('')
+  await expect(beat(page)).toHaveAttribute('data-beat', 'gate')
+  await expect(intro(page).getByRole('button', { name: /tap to begin/ })).toBeFocused()
+  await page.keyboard.press('Enter')
+  await expect(beat(page)).toHaveAttribute('data-beat', 'promise')
+  await expect(intro(page).locator('.intro-day')).toHaveText(/day \d+/)
+})
+
 test('a tap anywhere goes on to the next beat', async ({ page }) => {
   await page.goto('')
+  await expect(beat(page)).toHaveAttribute('data-beat', 'gate')
+  await intro(page).click({ position: { x: 100, y: 120 } })
   await expect(beat(page)).toHaveAttribute('data-beat', 'promise')
   await intro(page).click({ position: { x: 100, y: 300 } })
   await expect(beat(page)).toHaveAttribute('data-beat', 'truth')
@@ -69,6 +88,7 @@ test('the truth climbs: the doubt gives way to the hope, the stars double, the l
   page,
 }) => {
   await page.goto('')
+  await begin(page)
   await intro(page).click({ position: { x: 100, y: 300 } })
   const truth = intro(page).locator('.intro-truth')
   await expect(truth).toHaveAttribute('data-half', '1')
@@ -81,8 +101,9 @@ test('the truth climbs: the doubt gives way to the hope, the stars double, the l
 
 test('the whole intro reaches the first step within thirty seconds', async ({ page }) => {
   test.setTimeout(60_000)
-  const start = Date.now()
   await page.goto('')
+  await begin(page)
+  const start = Date.now()
   await expect(intro(page)).toContainText('a year of small things.', { timeout: 15_000 })
   await expect(page.getByRole('button', { name: 'start light' })).toBeVisible({ timeout: 30_000 })
   expect(Date.now() - start).toBeLessThan(30_000)
@@ -95,7 +116,7 @@ test('under reduced motion the year is three still frames with the same lines', 
 }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   await page.goto('')
-  await expect(intro(page)).toHaveAttribute('data-beat', 'promise')
+  await begin(page)
   await expect(intro(page).locator('.intro-day')).toHaveText('day 1')
   await expect(intro(page).locator('.intro-day')).toHaveText('day 100', { timeout: 5000 })
   await expect(intro(page).locator('.intro-day')).toHaveText('day 365', { timeout: 5000 })
