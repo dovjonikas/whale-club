@@ -9,6 +9,7 @@ import './styles/sheet.css'
 import './styles/sky.css'
 import './styles/stones.css'
 import './styles/session.css'
+import './styles/depths.css'
 
 import { startApp } from './app/app'
 import { showToast } from './app/toast'

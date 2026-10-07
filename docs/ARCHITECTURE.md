@@ -46,7 +46,11 @@ src/
     particles.ts     bioluminescent drift and the tap bursts
     creatures.ts     SVG for every world, line and stage
     collectibles.ts  the sixty collectibles: id, world, line, day, place, drawing
-    visitors.ts      the whale and the daily visitors
+    draw.ts          small shared drawing helpers: tints, faces, fish, jellies, stems
+    art.ts, art2.ts  the larger collectible drawings, one function each
+    depths.ts        the water line, moonlight shafts, deep whales and kelp
+    textures.ts      grain and caustics, rendered once into data URLs
+    visitors.ts      the whale, the daily visitors, the sleeper on the empty screen
     palette.ts       the tokens as hex, for the share picture
     shore.ts         the sand strip and the garden's anchor group
     parallax.ts      a few pixels of drift between the layers

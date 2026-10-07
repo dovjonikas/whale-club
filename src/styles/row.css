@@ -17,10 +17,13 @@
   display: flex;
   flex-direction: column;
   border-radius: var(--r);
-  background: var(--card);
+  background: linear-gradient(180deg, rgba(18, 40, 78, 0.78), rgba(6, 18, 43, 0.86) 60%);
   border: 1px solid var(--card-edge);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 10px 24px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   text-align: center;
   -webkit-touch-callout: none;
   transition:
@@ -84,15 +87,25 @@
   min-width: 16px;
   height: 14px;
   padding: 0 3px;
-  border-radius: 50% 45% 50% 40%;
-  background: #2d2a33;
+  border-radius: 52% 46% 50% 42%;
+  background:
+    radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.45) 0 12%, transparent 26%),
+    radial-gradient(circle at 70% 70%, #1c1a22 0 6%, transparent 7%),
+    radial-gradient(circle at 40% 35%, #8b8595, #4b4654 50%, #26232c);
   box-shadow:
-    inset 0 0 0 1px rgba(255, 180, 110, 0.6),
-    0 0 10px rgba(255, 180, 110, 0.45);
+    inset 0 -2px 3px rgba(0, 0, 0, 0.45),
+    0 0 10px rgba(255, 180, 110, 0.5);
+  animation: stone-warm 3.2s ease-in-out infinite alternate;
   color: #ffd9a8;
   font-size: 10px;
   font-weight: 700;
   line-height: 14px;
+}
+
+@keyframes stone-warm {
+  to {
+    transform: translate3d(0, -1px, 0) rotate(-4deg);
+  }
 }
 
 .card-stone[hidden] {
@@ -151,11 +164,17 @@
   0% {
     transform: translate3d(0, 0, 0) scale(1);
   }
-  35% {
-    transform: translate3d(0, -18px, 0) scale(1.08, 0.94);
+  14% {
+    transform: translate3d(0, 2px, 0) scale(1.14, 0.82);
   }
-  70% {
-    transform: translate3d(0, 2px, 0) scale(0.96, 1.04);
+  38% {
+    transform: translate3d(0, -20px, 0) scale(0.9, 1.12);
+  }
+  62% {
+    transform: translate3d(0, 0, 0) scale(1.1, 0.88);
+  }
+  80% {
+    transform: translate3d(0, -3px, 0) scale(0.97, 1.04);
   }
   100% {
     transform: translate3d(0, 0, 0) scale(1);
@@ -250,7 +269,16 @@
   color: var(--ink);
 }
 
-/* On the narrowest cards the clock icon goes and the words stay. */
+/* On narrow cards the emoji steps aside for the name, and then the clock icon for the words. */
+@container (max-width: 96px) {
+  .card-emoji {
+    display: none;
+  }
+  .card-name {
+    font-size: var(--t-xs);
+  }
+}
+
 @container (max-width: 72px) {
   .card-lock svg {
     display: none;
@@ -375,4 +403,38 @@
 .row[data-count='0'] .card-add {
   flex: 0 0 108px;
   min-height: 132px;
+}
+
+/* The creature stands in a soft pool of its world's light, brighter when done. */
+.creature {
+  position: relative;
+}
+
+.creature::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6%;
+  width: 120%;
+  height: 34%;
+  margin-left: -60%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--world-glow), transparent);
+  opacity: 0.45;
+  transition: opacity var(--dur) var(--ease);
+  pointer-events: none;
+}
+
+.card[data-done='true'] .creature::before {
+  opacity: 1;
+}
+
+.creature svg {
+  position: relative;
+}
+
+/* Done: the lock-in edge takes on the world's light too. */
+.card[data-done='true'] .card-lock {
+  background: linear-gradient(180deg, transparent, var(--world-glow));
+  color: var(--ink);
 }

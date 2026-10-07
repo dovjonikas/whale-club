@@ -2,7 +2,7 @@
 
 ## Done
 
-v0.6.0, live at https://dovjonikas.github.io/whale-club/ after the push.
+v0.7.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
 - **v0.1.0 to v0.3.0**: the row, the scene, the sky as a calendar, creatures, PWA, collectibles, the whale, rituals, sound, share; a buddy slot (since removed).
 - **v0.4.0**: postcards instead of a buddy; the phone-wide frame; the install leaf after the first thing; Lighthouse through Edge.
@@ -13,6 +13,7 @@ v0.6.0, live at https://dovjonikas.github.io/whale-club/ after the push.
   - notices moved under the header; data version 2 with a migration from 1;
   - the third rule is now the author's: "you never give up on yourself".
 - **v0.6.0**: days. A thing's sheet (three dots on its card) with seven day chips, all on by default, and today's exception ("not today" / "also today"); the add sheet has the same line; the first screen shows only today's things, the rest in a "not today" strip; week dots with a dash for a day off; last7, streak, all done, missed yesterday and the recap count planned days only; a rest day is one quiet line, no star, no dim; data version 3.
+- **v0.7.0**: a design pass, nothing functional. Film grain; the sea's depth (water line, moonlight shafts, caustics, deep whales, kelp); creatures and all sixty collectibles redrawn with shading, faces and rim light; the whale surfacing redrawn; lit glass cards with a squash on tap; a pebble for a waiting stone; richer bursts; a sleeping whale on the empty first screen.
 
 ## How the timer worked before v0.5 (the audit asked for)
 
@@ -26,7 +27,7 @@ v0.6.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
 - `npm run lint`, `tsc --noEmit`, `npm run build`: clean.
 - `npm test`: 151 passed, 14 skipped (device-specific), on iPhone 13, Pixel 5 and desktop. New: days (the strip on a Saturday, also today for one day, not today, the seven chips, a new thing's days, three a week reaching the whale, the dots, a streak across a weekend, all done with a thing off, a rest day, the migration from version 2).
-- Screenshots regenerated, including the not-today strip, the thing's sheet with the day chips, and a rest day.
+- Screenshots regenerated after the v0.7 pass, with a new one of the empty first screen; earlier: the not-today strip, the thing's sheet with the day chips, and a rest day.
 - Known: on a 320px phone the day chips are 37px wide (44px tall); everything from 375px up is 44px both ways.
 
 ## Next

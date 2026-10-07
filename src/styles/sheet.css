@@ -22,9 +22,12 @@
   overflow-y: auto;
   padding: var(--s4) calc(var(--safe-right) + var(--s4)) calc(var(--safe-bottom) + var(--s4))
     calc(var(--safe-left) + var(--s4));
-  border-radius: var(--r) var(--r) 0 0;
-  background: #091833;
-  border-top: 1px solid var(--card-edge);
+  border-radius: 22px 22px 0 0;
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(62, 242, 224, 0.08), transparent 60%),
+    linear-gradient(180deg, #0d2042, #081530 40%);
+  border-top: 1px solid rgba(62, 242, 224, 0.22);
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.5);
   transform: translate3d(0, 100%, 0);
   transition: transform var(--dur) var(--ease);
 }
@@ -598,4 +601,15 @@
   background: rgba(62, 242, 224, 0.16);
   border-color: var(--glow);
   color: var(--star-pale);
+}
+
+/* The handle: says this sheet slides, and where from. */
+.sheet::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin: calc(var(--s2) * -1) auto var(--s3);
+  border-radius: var(--r-pill);
+  background: rgba(232, 240, 245, 0.22);
 }

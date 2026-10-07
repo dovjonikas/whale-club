@@ -167,20 +167,62 @@ export class ParticleField {
         : 1 - k
       ctx.globalAlpha = Math.max(0, alpha)
       ctx.fillStyle = p.color
-      ctx.beginPath()
       if (p.kind === 'bubble') {
+        // A thin rim, a faint film, and a glint; it swells a little as it rises.
+        const r = p.size * (1 + k * 0.35)
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(190, 245, 240, 0.12)'
+        ctx.fill()
         ctx.strokeStyle = p.color
         ctx.lineWidth = 1
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
         ctx.stroke()
-      } else if (p.kind === 'petal') {
-        ctx.ellipse(p.x, p.y, p.size * 1.6, p.size, p.phase + t, 0, Math.PI * 2)
+        ctx.fillStyle = '#ffffff'
+        ctx.beginPath()
+        ctx.arc(p.x - r * 0.38, p.y - r * 0.38, Math.max(0.6, r * 0.24), 0, Math.PI * 2)
         ctx.fill()
+      } else if (p.kind === 'petal') {
+        ctx.save()
+        ctx.translate(p.x, p.y)
+        ctx.rotate(p.phase + t * 2)
+        petal(ctx, p.size * 2.4, p.color, '#f2a31f')
+        ctx.restore()
+      } else if (p.kind === 'spark') {
+        sparkle(ctx, p.x, p.y, p.size * 1.9 * (1 - k * 0.5))
       } else {
+        ctx.beginPath()
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
         ctx.fill()
       }
     }
     ctx.globalAlpha = 1
   }
+}
+
+/** A four-point sparkle centred on (x, y), arms of length r. */
+function sparkle(ctx: CanvasRenderingContext2D, x: number, y: number, r: number): void {
+  const k = r * 0.2
+  ctx.beginPath()
+  ctx.moveTo(x, y - r)
+  ctx.quadraticCurveTo(x + k, y - k, x + r, y)
+  ctx.quadraticCurveTo(x + k, y + k, x, y + r)
+  ctx.quadraticCurveTo(x - k, y + k, x - r, y)
+  ctx.quadraticCurveTo(x - k, y - k, x, y - r)
+  ctx.fill()
+}
+
+/** A pointed petal along the x axis, with a deeper fold of colour at its base. */
+function petal(ctx: CanvasRenderingContext2D, length: number, color: string, base: string): void {
+  const draw = (len: number, dx: number, fill: string): void => {
+    const h = len / 2
+    const w = len * 0.36
+    ctx.fillStyle = fill
+    ctx.beginPath()
+    ctx.moveTo(dx - h, 0)
+    ctx.quadraticCurveTo(dx, -w, dx + h, 0)
+    ctx.quadraticCurveTo(dx, w, dx - h, 0)
+    ctx.fill()
+  }
+  draw(length, 0, color)
+  draw(length * 0.42, -length * 0.29, base)
 }

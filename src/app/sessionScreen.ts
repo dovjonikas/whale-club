@@ -38,7 +38,13 @@ export function openSessionScreen(
     <div class="session-top">
       <button type="button" class="chip session-sound" aria-pressed="${String(options.sound)}">${voice.lockIn.seaSound}</button>
     </div>
-    <div class="session-creature"><div class="session-breathe"></div></div>
+    <div class="session-creature">
+      <svg class="session-ring" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="46" pathLength="100"/>
+        <circle class="session-ring-fill" cx="50" cy="50" r="46" pathLength="100"/>
+      </svg>
+      <div class="session-breathe"></div>
+    </div>
     <div class="session-middle">
       <div class="session-clock" role="timer" aria-live="off"></div>
       <p class="session-line"></p>
@@ -74,6 +80,10 @@ export function openSessionScreen(
     }
     creature.style.setProperty('--grow', (0.55 + 0.6 * progress).toFixed(3))
   }
+  const ring = screen.querySelector<SVGCircleElement>('.session-ring-fill')
+  const fill = (progress: number): void => {
+    ring?.style.setProperty('stroke-dashoffset', (100 - Math.min(1, progress) * 100).toFixed(2))
+  }
 
   soundButton.addEventListener('click', () => {
     const on = soundButton.getAttribute('aria-pressed') !== 'true'
@@ -95,6 +105,7 @@ export function openSessionScreen(
       clock.textContent = formatClock(remainingMs)
       // A session that was left keeps the creature the size it was when it waited.
       grow(waitedAt ?? progress)
+      fill(progress)
     },
     left() {
       screen.dataset.broken = 'true'
@@ -103,6 +114,7 @@ export function openSessionScreen(
     end(clean, line, onSend, onBack) {
       screen.dataset.state = 'ended'
       screen.dataset.clean = String(clean)
+      fill(1)
       if (clean) grow(1)
       said.textContent = line
       clock.textContent = ''

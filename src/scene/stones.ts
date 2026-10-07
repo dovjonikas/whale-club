@@ -144,16 +144,22 @@ function stoneSvg(): string {
   ] as const
   return `<svg viewBox="0 0 60 50" aria-hidden="true">
     <defs>
+      <radialGradient id="stone-rock" cx="0.35" cy="0.3" r="0.8">
+        <stop offset="0" stop-color="#7a7388"/>
+        <stop offset="0.55" stop-color="#4a4554"/>
+        <stop offset="1" stop-color="#25222c"/>
+      </radialGradient>
       <radialGradient id="stone-core" r="60%">
         <stop offset="0" stop-color="#fff4d6"/>
         <stop offset="0.5" stop-color="#ffb46e"/>
         <stop offset="1" stop-color="#e65a3c" stop-opacity="0"/>
       </radialGradient>
     </defs>
-    <path class="stone-rock" d="M10 30 C 6 20, 14 10, 26 9 C 38 7, 52 13, 52 25 C 53 36, 44 44, 30 44 C 18 45, 12 39, 10 30 Z" fill="#4a4554" stroke="#8a8296" stroke-width="1.2"/>
+    <path class="stone-rock" d="M10 30 C 6 20, 14 10, 26 9 C 38 7, 52 13, 52 25 C 53 36, 44 44, 30 44 C 18 45, 12 39, 10 30 Z" fill="url(#stone-rock)" stroke="#2a2731" stroke-width="1"/>
+    <path class="stone-rock" d="M14 34 C 20 42, 40 44, 50 30" stroke="#ffb46e" stroke-width="1.4" fill="none" opacity="0.35"/>
+    <path class="stone-rock" d="M22 15 l 6 -2 l 3 5 l -5 3 Z" fill="#8f87a0" opacity="0.5"/>
     <path class="stone-rock" d="M16 16 C 22 11, 34 10, 42 14" stroke="#a49cb0" stroke-width="2" fill="none" stroke-linecap="round"/>
-    <circle class="stone-rock" cx="38" cy="30" r="2.4" fill="#332f3b"/>
-    <circle class="stone-rock" cx="22" cy="34" r="1.8" fill="#332f3b"/>
+    <g class="stone-rock" fill="#2a2731" opacity="0.7"><circle cx="38" cy="31" r="1.5"/><circle cx="41" cy="22" r="0.9"/><circle cx="20" cy="33" r="1.1"/><circle cx="27" cy="38" r="0.8"/><circle cx="33" cy="17" r="0.7"/></g>
     <ellipse class="stone-core" cx="31" cy="27" rx="13" ry="10" fill="url(#stone-core)"/>
     <path class="crack crack-1" d="M30 10 l-3 8 l5 5 l-4 7" />
     <path class="crack crack-2" d="M51 24 l-9 2 l-4 6 l-7 1" />

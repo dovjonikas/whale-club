@@ -2,6 +2,29 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.7.0 - 2026-10-07
+
+A design pass: the same screen, drawn with more care. Nothing about how
+the app works has changed.
+
+- A fine film grain over the whole scene, so the night reads like paper.
+- The sea has depth: a bright wave along the water line, slanted moonlight
+  shafts, a caustic net under the surface, two big whales passing far down
+  in silhouette, kelp at the bottom on a tall screen.
+- Every creature redrawn with soft shading, rim light, blush and eyes with
+  a catchlight; at the last stage each has a small thing of its own.
+- The sixty collectibles redrawn in the same hand; the sea's finds sit in
+  the water, not on the sand.
+- The whale surfacing is shaded and blushing, with a ring of water and
+  droplets from its spout.
+- Cards are lit glass; a tap squashes and pops; a waiting stone on a card
+  is a small shaded pebble.
+- Bursts: bubbles with a glint, sparkles in the sky, two-tone petals.
+- The empty first screen has a small whale asleep under the surface,
+  breathing out bubbles; it leaves when the first thing is added.
+- The dial and the session ring use a sea-to-moon gradient; the dial's
+  creature is larger.
+
 ## 0.6.0 - 2026-10-07
 
 Days: optional planning that adds nothing to the first screen.

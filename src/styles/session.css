@@ -33,14 +33,21 @@
 }
 
 .dial-fill {
-  stroke: var(--glow);
-  filter: drop-shadow(0 0 6px rgba(62, 242, 224, 0.5));
+  stroke: url(#dial-light);
+  filter: drop-shadow(0 0 6px rgba(62, 242, 224, 0.45));
+}
+
+.dial-tick {
+  stroke: rgba(232, 240, 245, 0.25);
+  stroke-width: 2;
+  stroke-linecap: round;
 }
 
 .dial-knob {
   fill: var(--star-pale);
-  stroke: var(--glow);
+  stroke: var(--star);
   stroke-width: 3;
+  filter: drop-shadow(0 0 8px rgba(255, 217, 138, 0.7));
 }
 
 .dial-centre {
@@ -53,8 +60,8 @@
 }
 
 .dial-creature {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
 }
 
 .dial-creature svg {
@@ -243,4 +250,37 @@
   .session .eyes {
     animation: none;
   }
+}
+
+.session-creature {
+  position: relative;
+}
+
+.session-ring {
+  position: absolute;
+  inset: -22%;
+  width: 144%;
+  height: 144%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.session-ring circle {
+  fill: none;
+  stroke: rgba(232, 240, 245, 0.08);
+  stroke-width: 1.2;
+}
+
+.session-ring .session-ring-fill {
+  stroke: rgba(255, 217, 138, 0.55);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  transition: stroke-dashoffset 1s linear;
+  filter: drop-shadow(0 0 3px rgba(255, 217, 138, 0.6));
+}
+
+.session-breathe {
+  position: relative;
 }

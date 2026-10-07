@@ -219,4 +219,15 @@ for (const [file, off] of [
   }
   await context.close()
 }
+// The very first screen: nothing added yet, the whale asleep under the surface.
+{
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.install({ time: NOW })
+  await page.goto(base)
+  await page.waitForTimeout(1800)
+  await page.screenshot({ path: resolve(out, 'iphone-first.png') })
+  await context.close()
+}
+
 await browser.close()
