@@ -163,24 +163,38 @@ interface Held {
   sources: OscillatorNode[]
 }
 
-/** A room as an impulse response: stereo noise, smoothed more as it fades, so it darkens like a real one. */
+/**
+ * A room as an impulse response: stereo noise, smoothed more as it fades,
+ * so it darkens like a real one. The fade is one multiplication a sample
+ * rather than an exponential, and a context's room is built once and kept:
+ * the intro builds it while "tap to begin" waits (Score.warm), so the tap
+ * itself never stalls a frame.
+ */
+const rooms = new WeakMap<BaseAudioContext, AudioBuffer>()
+
 function roomImpulse(ctx: BaseAudioContext): AudioBuffer {
+  const kept = rooms.get(ctx)
+  if (kept) return kept
   const rate = ctx.sampleRate
   const length = Math.floor(rate * ROOM_S)
   const buffer = ctx.createBuffer(2, length, rate)
   // Down 60 dB over the room's length.
-  const tau = ROOM_S / Math.log(1000)
+  const fade = Math.exp(-Math.log(1000) / (ROOM_S * rate))
+  const darkening = 0.75 / length
   const predelay = Math.floor(rate * ROOM_PREDELAY_S)
   for (let channel = 0; channel < 2; channel++) {
     const data = buffer.getChannelData(channel)
     let smooth = 0
+    let level = fade ** predelay
+    let darken = 0.2 + darkening * predelay
     for (let i = predelay; i < length; i++) {
-      const t = i / rate
-      const darken = 0.2 + 0.75 * (t / ROOM_S)
       smooth = smooth * darken + (Math.random() * 2 - 1) * (1 - darken)
-      data[i] = smooth * Math.exp(-t / tau)
+      data[i] = smooth * level
+      level *= fade
+      darken += darkening
     }
   }
+  rooms.set(ctx, buffer)
   return buffer
 }
 
@@ -198,6 +212,12 @@ export class Score {
   static for(sound: Sound): Score | null {
     const ctx = sound.context()
     return ctx ? new Score(ctx, ctx.destination) : null
+  }
+
+  /** Builds the room ahead of the first note, while nothing moves. */
+  static warm(sound: Sound): void {
+    const ctx = sound.context()
+    if (ctx) roomImpulse(ctx)
   }
 
   constructor(

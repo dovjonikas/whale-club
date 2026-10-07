@@ -77,6 +77,21 @@ export class Sound {
     lfo.stop(this.ctx.currentTime + 1.5)
   }
 
+  /**
+   * Makes the audio context ahead of a tap, suspended, so the tap that
+   * starts the music only has to resume it: making one takes long enough
+   * (80 ms and more on a phone) to stutter whatever moves just then. A
+   * browser allows a context before a gesture; it just does not play.
+   */
+  prepare(): void {
+    if (this.muted || this.ctx) return
+    try {
+      this.ctx = new AudioContext()
+    } catch {
+      // Audio is optional.
+    }
+  }
+
   /** Call from inside a user gesture. Safe to call many times. */
   unlock(): void {
     try {

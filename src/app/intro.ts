@@ -93,6 +93,8 @@ const TRUTH = {
 const TRUTH_WORD_MS = 200
 /** The word the stars start doubling on. */
 const COMPOUND = 'compound'
+/** How long "tap to begin" is up before the audio is readied behind it, ms: after it is drawn. */
+const WARM_MS = 400
 /** After the last word lands, the peak rings this long before "start light". */
 const PEAK_HOLD_MS = 1300
 /** How often the year's music box plays a note, in days: its rhythm follows the year's own pace. */
@@ -482,10 +484,6 @@ export function playIntro(
     later(TRUTH.phrase3, () => {
       sing(firstHalf)
     })
-    later(starsAt, () => {
-      scene.setPush(true)
-      overlay.dataset.push = 'true'
-    })
     WAVES.forEach((_, wave) => {
       later(starsAt + (WAVE_AT[wave] ?? 0), () => {
         lightWave(wave)
@@ -521,8 +519,6 @@ export function playIntro(
       lightWave(wave)
     })
     wake()
-    scene.setPush(true)
-    overlay.dataset.push = 'true'
     light('gold')
     overlay.dataset.calf = 'blow'
     overlay.dataset.star = 'on'
@@ -531,7 +527,7 @@ export function playIntro(
   const start = (): void => {
     truthAtItsEnd()
     overlay.dataset.beat = 'start'
-    q('.intro-start').focus()
+    q('.intro-start').focus({ preventScroll: true })
   }
 
   /** On by a tap or "skip": to the truth, or straight to the end with the music settling home. */
@@ -549,6 +545,7 @@ export function playIntro(
   /** The first tap: the music is allowed now, and it starts with the year. */
   const begin = (): void => {
     if (beat !== 'gate') return
+    stopTimers()
     options.sound.unlock()
     score = Score.for(options.sound)
     score?.begin()
@@ -559,7 +556,6 @@ export function playIntro(
   const end = (how: IntroEnd): void => {
     stopTimers()
     score?.end()
-    scene.setPush(false)
     scene.preview(null)
     scene.setSilhouette(false)
     scene.setEmpty(!options.hasThings)
@@ -590,10 +586,15 @@ export function playIntro(
   app?.classList.add('is-behind-intro')
   app?.setAttribute('inert', '')
   if (gated) {
-    // The quiet sea, and one tap to begin with sound.
+    // The quiet sea, and one tap to begin with sound. While it waits, the
+    // audio is made ready, so the tap only has to start it.
     overlay.dataset.beat = 'gate'
     scene.setEmpty(false)
-    q('.intro-begin').focus()
+    q('.intro-begin').focus({ preventScroll: true })
+    later(WARM_MS, () => {
+      options.sound.prepare()
+      Score.warm(options.sound)
+    })
     return
   }
   score = Score.for(options.sound)
