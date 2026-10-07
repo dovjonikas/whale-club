@@ -216,11 +216,6 @@
   white-space: nowrap;
 }
 
-.card-mode {
-  font-size: var(--t-xs);
-  color: var(--ink-dim);
-}
-
 /* Seven dots, the last seven days, today last. The only counting in the app. */
 /* Seven dots that share the card's width, so a narrow card keeps all of them inside. */
 .dots {

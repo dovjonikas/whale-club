@@ -101,22 +101,6 @@ And underneath all three: nothing dies. You just missed a day.
   whale to. No accounts, no codes: the picture is the only thing that
   leaves the phone.
 
-## Why not Forest
-
-Forest is lovely and it got a lot of people to put their phones down. Whale
-Club starts from a different idea of what helps someone keep going: one
-living scene instead of a field of trees; the things done without a clock
-and the sessions in one place; no coins, no shop, no subscription, no ads,
-no account; offline from the home screen; collectibles instead of currency
-and postcards instead of a leaderboard. And nothing dies. A session you
-leave waits for you; a day you miss dims the sea for a day.
-
-One honest note: a phone does not let a web app play sound or show a
-notification in the background. If the session ends while the app is
-hidden, the end is worked out from the clock and shown when you come back.
-Lay the phone next to you with the screen on, the way Forest asks; Whale
-Club keeps the screen awake while a session runs.
-
 ## Tech
 
 Vite, TypeScript (strict, no `any`), vanilla DOM, SVG creatures, two small
@@ -127,13 +111,13 @@ Actions to GitHub Pages.
 
 ## Lighthouse
 
-Measured on the live URL with Lighthouse 12 through Microsoft Edge,
-2026-10-07, before the accessibility fix in 0.4.0:
+Measured on the live URL (v0.8.0) with Lighthouse 12.8 through Microsoft
+Edge, 2026-10-07, the median of three runs:
 
 |         | Performance | Accessibility | Best practices | SEO |
 | ------- | ----------- | ------------- | -------------- | --- |
-| Mobile  | 99          | 93            | 100            | 100 |
-| Desktop | 100         | 93            | 100            | 100 |
+| Mobile  | 98          | 100           | 100            | 100 |
+| Desktop | 100         | 100           | 100            | 100 |
 
 Lighthouse 12 no longer has a PWA category. Installability is held by the
 tests instead: the manifest, the service worker, an offline reload and an

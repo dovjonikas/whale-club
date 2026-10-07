@@ -2,8 +2,8 @@ import { now } from './clock'
 import { dataKey } from './lab'
 import { migrate } from './migrate'
 import { todayKey } from './dates'
-import type { AppData, DateKey, DayRecord, Mode, Settings, Thing, World } from './types'
-import { emptyData, EVERY_DAY, MAX_THINGS, WORLD_ORDER } from './types'
+import type { AppData, DateKey, DayRecord, Settings, Thing, World } from './types'
+import { DEFAULT_MINUTES, emptyData, EVERY_DAY, MAX_THINGS, WORLD_ORDER } from './types'
 
 /** Where an unreadable record is parked rather than thrown away, next to its own key. */
 const BROKEN_SUFFIX = '.broken'
@@ -37,7 +37,6 @@ export class Store {
   addThing(input: {
     name: string
     emoji: string
-    mode: Mode
     minutes?: number
     days?: readonly boolean[]
   }): Thing | null {
@@ -49,13 +48,12 @@ export class Store {
       id: newId(),
       name,
       emoji: input.emoji.trim() || '•',
-      mode: input.mode,
+      minutes: input.minutes ?? DEFAULT_MINUTES,
       days: [...(input.days ?? EVERY_DAY)],
       world: worldForOrder(order),
       createdAt: todayKey(),
       order,
     }
-    if (input.mode === 'timer' && input.minutes && input.minutes > 0) thing.minutes = input.minutes
     this.commit({ ...this.data, things: [...this.data.things, thing] })
     return thing
   }

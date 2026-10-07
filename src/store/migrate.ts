@@ -1,6 +1,6 @@
 import { earnedTier } from './derive'
 import type { AppData, DayRecord, Settings, Thing } from './types'
-import { emptyData, EVERY_DAY } from './types'
+import { DEFAULT_MINUTES, emptyData, EVERY_DAY, MAX_MINUTES, MIN_MINUTES } from './types'
 
 /**
  * Turns whatever was in storage into a valid AppData, or throws.
@@ -18,7 +18,10 @@ export function migrate(raw: unknown): AppData {
       return fromV1(raw)
     case 2:
     case 3:
-      // Version 2 had no days; validateThing gives a thing without them every day.
+    case 4:
+      // Version 2 had no days and versions 2 and 3 had a mode (tap or timer) and an
+      // optional length; validateThing gives every thing its days and a length,
+      // and leaves the mode behind: since 0.5 every thing can be tapped or locked in.
       return validateV2(raw)
     default:
       throw new Error(`unknown version ${String(raw.version)}`)
@@ -64,11 +67,10 @@ function validateCommon(raw: Record<string, unknown>): AppData {
 
 function validateThing(raw: unknown): Thing {
   if (!isRecord(raw)) throw new Error('thing is not an object')
-  const { id, name, emoji, mode, minutes, world, createdAt, order, days } = raw
+  const { id, name, emoji, minutes, world, createdAt, order, days } = raw
   if (typeof id !== 'string' || !id) throw new Error('thing without id')
   if (typeof name !== 'string') throw new Error('thing without name')
   if (typeof emoji !== 'string') throw new Error('thing without emoji')
-  if (mode !== 'tap' && mode !== 'timer') throw new Error('thing with bad mode')
   if (world !== 'sea' && world !== 'sky' && world !== 'garden') throw new Error('bad world')
   if (typeof createdAt !== 'string') throw new Error('thing without createdAt')
   if (typeof order !== 'number') throw new Error('thing without order')
@@ -76,9 +78,11 @@ function validateThing(raw: unknown): Thing {
     Array.isArray(days) && days.length === 7 && days.every((d) => typeof d === 'boolean')
       ? days
       : [...EVERY_DAY]
-  const thing: Thing = { id, name, emoji, mode, days: planned, world, createdAt, order }
-  if (typeof minutes === 'number' && minutes > 0) thing.minutes = minutes
-  return thing
+  const length =
+    typeof minutes === 'number' && Number.isFinite(minutes)
+      ? Math.min(MAX_MINUTES, Math.max(MIN_MINUTES, Math.round(minutes)))
+      : DEFAULT_MINUTES
+  return { id, name, emoji, minutes: length, days: planned, world, createdAt, order }
 }
 
 function validateDay(raw: unknown): DayRecord {

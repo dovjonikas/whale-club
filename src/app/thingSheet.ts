@@ -58,7 +58,7 @@ export function openThingSheet(store: Store, thing: Thing): void {
       if (!form || !name || !emoji || !minutes || !slot || !todayChip) return
       name.value = thing.name
       emoji.value = thing.emoji
-      minutes.value = String(thing.minutes ?? 25)
+      minutes.value = String(thing.minutes)
       const days = daysField(thing.days)
       slot.replaceWith(days.element)
 

@@ -1,6 +1,6 @@
 import { creatureSvg } from '../scene/creatures'
 import type { Line, Stage } from '../store/derive'
-import type { Thing } from '../store/types'
+import { MAX_MINUTES, MIN_MINUTES, type Thing } from '../store/types'
 import { voice } from '../voice'
 import { openSheet } from './sheet'
 
@@ -10,8 +10,6 @@ import { openSheet } from './sheet'
  * minutes in steps of 5, and one big button. It opens on the last length
  * chosen for this thing.
  */
-export const MIN_MINUTES = 10
-export const MAX_MINUTES = 120
 const STEP = 5
 /** The ring leaves a gap at the top so the ends do not meet. */
 const SWEEP_DEG = 330
@@ -26,7 +24,7 @@ export function openDial(
   openSheet({
     title: `${thing.emoji} ${thing.name}`,
     build(body, close) {
-      let minutes = clamp(thing.minutes ?? 25)
+      let minutes = clamp(thing.minutes)
       body.innerHTML = `
         <div class="dial" role="slider" tabindex="0" aria-label="${voice.lockIn.minutes}"
           aria-valuemin="${String(MIN_MINUTES)}" aria-valuemax="${String(MAX_MINUTES)}">

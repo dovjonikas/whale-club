@@ -11,8 +11,6 @@
 
 export type World = 'sea' | 'sky' | 'garden'
 
-export type Mode = 'tap' | 'timer'
-
 /** A date on the person's own clock, `YYYY-MM-DD`. Sorts as a string. */
 export type DateKey = string
 
@@ -20,9 +18,12 @@ export interface Thing {
   id: string
   name: string
   emoji: string
-  mode: Mode
-  /** The last lock-in length for this thing, in minutes; the dial opens on it. */
-  minutes?: number
+  /**
+   * The lock-in length for this thing, in minutes; the dial opens on it and
+   * remembers the last one chosen. Every thing can be tapped done or locked
+   * in, so every thing has one.
+   */
+  minutes: number
   /**
    * The weekdays it is planned on, Monday first. All seven by default: the
    * same things every day, as before there were days at all.
@@ -68,7 +69,7 @@ export interface Settings {
 }
 
 export interface AppData {
-  version: 3
+  version: 4
   things: Thing[]
   days: Record<DateKey, DayRecord>
   /**
@@ -82,11 +83,17 @@ export interface AppData {
 
 export const MAX_THINGS = 5
 
+/** A new thing's lock-in length, and what a thing from before lengths gets. */
+export const DEFAULT_MINUTES = 30
+/** The dial's range; a stored length is kept inside it. */
+export const MIN_MINUTES = 10
+export const MAX_MINUTES = 120
+
 export const WORLD_ORDER: readonly World[] = ['sea', 'sky', 'garden']
 
 /** Every day of the week on: what a new thing, and every thing from before days, gets. */
 export const EVERY_DAY: readonly boolean[] = [true, true, true, true, true, true, true]
 
 export function emptyData(): AppData {
-  return { version: 3, things: [], days: {}, cracked: {}, settings: { sound: true } }
+  return { version: 4, things: [], days: {}, cracked: {}, settings: { sound: true } }
 }

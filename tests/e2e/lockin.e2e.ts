@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { addThing, card, dateKey, dismissInstallLeaf, setHidden, stored } from './helpers'
 
 /**
- * Lock in, Forest with a twist: nothing dies. A session is measured from
+ * Lock in, where nothing dies. A session is measured from
  * timestamps; leaving for more than fifteen seconds does not fail it, the
  * creature waits and the session goes on, but its end counts the showing
  * up without the star or the step towards a stone. The clock is
@@ -160,5 +160,5 @@ test('the dial opens on the last length chosen for that thing', async ({ page })
   await expect(page.getByRole('slider', { name: 'minutes' })).toHaveAttribute('aria-valuenow', '40')
   await page.keyboard.press('Escape')
   await page.getByRole('button', { name: 'lock in: read' }).click()
-  await expect(page.getByRole('slider', { name: 'minutes' })).toHaveAttribute('aria-valuenow', '25')
+  await expect(page.getByRole('slider', { name: 'minutes' })).toHaveAttribute('aria-valuenow', '30')
 })

@@ -613,3 +613,8 @@
   border-radius: var(--r-pill);
   background: rgba(232, 240, 245, 0.22);
 }
+
+/* The add sheet's own-emoji field sits in the chip row, the width of a chip and a half. */
+.chip-emoji-input {
+  width: 64px;
+}

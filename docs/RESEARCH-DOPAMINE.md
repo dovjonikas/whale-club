@@ -111,7 +111,7 @@ People are more likely to start goal-directed behaviour right after temporal lan
 - Evidence that intact streaks motivate: Silverman and Barasch (2023), seven studies. When a log highlighted an intact streak, people engaged more in the behaviour than when the log highlighted a broken streak. People treated keeping the streak as a goal in itself. The negative effect of a broken streak was larger when the person blamed themselves, and was reduced when the streak could be repaired.
 - Evidence: Silverman and Barasch (2023), "On or Off Track: How (Broken) Streaks Affect Consumer Decisions", Journal of Consumer Research 49:1095-1117. https://doi.org/10.1093/jcr/ucac029 and https://udspace.udel.edu/handle/19716/34160
 - Loss aversion: losses loom roughly twice as large as equivalent gains (Kahneman and Tversky 1979, "Prospect Theory", Econometrica 47:263-291, https://doi.org/10.2307/1914185). A streak counter turns each day into a potential loss, which is why it works and why it hurts.
-- Industry data: Duolingo reports that users who reach a 10-day streak are less likely to churn and that streak features (streak freeze, repair, calendar views) were among their most effective retention levers. This is a company blog, not peer review, and Duolingo's business model rewards engagement, not necessarily wellbeing. https://blog.duolingo.com/duolingo-streak-research/
+- Industry data: a large language-learning app has published that users who reach a 10-day streak are less likely to churn and that streak features (freezes, repair, calendar views) were among its most effective retention levers. This is a company blog, not peer review, and an engagement-funded business model rewards engagement, not necessarily wellbeing.
 - Downside (practice, widely reported, not well quantified in peer review): "streak anxiety", compulsive checking, and quitting entirely after one miss. Several blog posts cite a "2020 CHI study" with a "63 percent more likely to quit" figure; this research could not locate that paper and the figure should be treated as unverified.
 - Key fact: Lally et al. (2010) found that missing a single opportunity did not materially affect habit formation, whether the miss was early or late. https://www.ucl.ac.uk/news/2009/aug/how-long-does-it-take-form-habit
 - Consequence: the streak's psychology is real but double-edged. Silverman and Barasch's own data say repairability blunts the damage, and Lally says a miss does not matter to the habit. The design answer is a streak that is visible but small, cannot "die", and whose break is attributed to nothing (the scene goes quiet; no reason is demanded).
@@ -164,7 +164,7 @@ Barasz, John, Keenan and Norton (2017) showed that merely framing items as a "se
 Norton, Mochon and Ariely (2012): people value things they assembled themselves more than identical things assembled by others, and expect others to share the valuation. The effect only holds when the build is completed; destroying or failing to finish it removes the effect.
 
 - Evidence: Norton, Mochon, Ariely (2012), "The IKEA effect: when labor leads to love", Journal of Consumer Psychology 22:453-460. https://dash.harvard.edu/handle/1/12136084
-- Consequence: the scene the person has built (their sky, their garden) becomes something they value disproportionately. This is the retention engine of Whale Club and also why destroying it (Forest's dead tree) is so costly: the evidence says the valuation dissipates when the build is destroyed.
+- Consequence: the scene the person has built (their sky, their garden) becomes something they value disproportionately. This is the retention engine of Whale Club and also why destroying it (a timer whose plant dies when you leave) is so costly: the evidence says the valuation dissipates when the build is destroyed.
 
 ### 1.21 Social accountability (buddy)
 
@@ -246,7 +246,7 @@ Each item: the recommendation, then the rationale and source.
    Rationale: effort adds value to the outcome and dopamine supports effort-related choice (Salamone and Correa 2012; Inzlicht et al. 2018). The IKEA effect requires completed labour (Norton et al. 2012), and a finished timer is completed labour. Keep it slight: a large difference would turn taps into "lesser" check-ins and pressure people toward timers they do not need.
 
 10. Nothing dies. A missed day makes the sea quiet for a day; nothing is removed.
-    Rationale: Forest's mechanic (the tree withers if you leave the app) uses loss aversion deliberately (https://en.wikipedia.org/wiki/Forest_(application)). Loss aversion works for a single 25-minute session, which is Forest's use case. For a months-long habit the evidence points the other way: a visible failure signal starts the what-the-hell spiral (Polivy and Herman), destroying a built thing removes the IKEA valuation (Norton et al. 2012, the "destroyed creation" condition), a self-attributed break reduces subsequent engagement (Silverman and Barasch 2023), and a single miss is irrelevant to habit formation anyway (Lally 2010). Inference: long-term retention is better served by preserving the person's investment than by threatening it. This has not been tested head-to-head in a published study; it is the most defensible reading of the evidence.
+    Rationale: a focus timer whose plant withers when you leave uses loss aversion deliberately. Loss aversion works for a single 25-minute session, which is that design's use case. For a months-long habit the evidence points the other way: a visible failure signal starts the what-the-hell spiral (Polivy and Herman), destroying a built thing removes the IKEA valuation (Norton et al. 2012, the "destroyed creation" condition), a self-attributed break reduces subsequent engagement (Silverman and Barasch 2023), and a single miss is irrelevant to habit formation anyway (Lally 2010). Inference: long-term retention is better served by preserving the person's investment than by threatening it. This has not been tested head-to-head in a published study; it is the most defensible reading of the evidence.
 
 11. Resuming after a quiet day must be the easiest action on screen.
     Rationale: Fogg's model says raise ability rather than motivation (book); Stawarz et al. (2015) found that cue support beats reminders. Concretely: on return, the homework list is already open, the first item is one tap away, there is no "welcome back" modal, no "what happened?" prompt and no summary of what was missed. The self-compassion evidence (Breines and Chen 2012) says a neutral re-entry restores motivation; an interrogation does not.
@@ -267,7 +267,7 @@ Each item: the recommendation, then the rationale and source.
     Rationale: Nunes and Dreze (2006). It is honest (they did do something) and it makes the day-3 collectible feel already underway.
 
 17. Start the ladder at day 3 and make day 7 a visible landmark.
-    Rationale: Duolingo reports a 10-day streak as a churn inflection (company blog, not peer review); the first week is the usual drop-off window in habit apps (practice). An early unlock gives the first completion-point before interest fades.
+    Rationale: published industry data puts a churn inflection near a 10-day streak (company blog, not peer review); the first week is the usual drop-off window in habit apps (practice). An early unlock gives the first completion-point before interest fades.
 
 18. Keep the weekly recap private by default; if a buddy is added, they see only "5/7" and the whale count, never a comparison.
     Rationale: accountability to a friend raised goal achievement in Matthews' study (university summary, not peer-reviewed); social comparison added nothing over plain measurement in Zuckerman and Gal-Oz (2014) and leaderboards reduced motivation in Hanus and Fox (2015). Relatedness without ranking.
@@ -389,8 +389,6 @@ Books and practitioner sources (not primary evidence):
 - Ferster and Skinner, Schedules of Reinforcement (1957). https://www.bfskinner.org/wp-content/uploads/2015/05/Schedules_of_Reinforcement_PDF.pdf
 - Fogg, Tiny Habits (2019).
 - Nielsen, "Response Times: The 3 Important Limits" (1993). https://nngroup.com/articles/response-times-3-important-limits
-- Duolingo blog, "How Duolingo's streak works" and related posts. https://blog.duolingo.com/duolingo-streak-research/
 - Matthews, Dominican University goals study summary (unpublished). https://www.dominican.edu/sites/default/files/2020-02/gailmatthews-harvard-goals-researchsummary.pdf
-- Forest app description. https://en.wikipedia.org/wiki/Forest_(application)
 
 Claims labelled as folk wisdom or unverified in this document: "don't break the chain" (Seinfeld), "21 days to form a habit" (Maltz), the "63 percent more likely to quit after one miss" figure, Fogg's celebration mechanism as a standalone effect, Clear's identity framing, and the inference that "nothing dies" beats punishment for long-term retention (derived, not directly tested).

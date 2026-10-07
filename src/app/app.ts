@@ -1,27 +1,22 @@
-import { COLLECTIBLES, collectiblesFor } from '../scene/collectibles'
-import { rarityOf } from '../scene/rarity'
-import { Scene, type ShownCollectible } from '../scene/scene'
-import type { StoneSpec } from '../scene/stones'
-import { fromKey, todayKey } from '../store/dates'
+import { collectiblesFor } from '../scene/collectibles'
+import { Scene } from '../scene/scene'
+import { todayKey } from '../store/dates'
 import {
   allDoneToday,
-  foundFor,
   isRestDay,
   last7,
   lineFor,
   missedYesterday,
   plannedThings,
-  reachedOn,
   stageFor,
   starDays,
   streakDays,
-  waitingTiers,
 } from '../store/derive'
 import { Store } from '../store/store'
 import { emptyData } from '../store/types'
 import { seedHistory } from '../lab/seed'
 import { enterLabFromMenu, startLabUi } from '../lab/labUi'
-import type { AppData, DateKey, Thing, World } from '../store/types'
+import type { AppData, DateKey, Thing } from '../store/types'
 import { pick, voice } from '../voice'
 import { installNotice, listenForInstallPrompt } from '../pwa/install'
 import { openAddSheet } from './addSheet'
@@ -32,22 +27,19 @@ import { openDial } from './dial'
 import { renderHeader } from './header'
 import { host } from './host'
 import { Line } from './line'
+import { LockIn } from './lockIn'
 import { openMenuSheet } from './menuSheet'
 import { Notices } from './notices'
-import type { Moment } from './postcard'
 import { Postcards } from './postcards'
 import { recapNotice } from './recap'
 import { Row } from './row'
-import { elapsedMs, SessionService, totalMs, type Session } from './session'
-import { openSessionScreen, type SessionScreen } from './sessionScreen'
+import { dayLabel, hasJacket, shownCollectibles, stonesFor, warmthOf } from './sceneData'
 import { openThingSheet } from './thingSheet'
 import { Sound } from './sound'
 import { surpriseFor } from './surprise'
 import { showToast } from './toast'
-import { keepAwake, letSleep } from './wakeLock'
 
 const SURPRISE_DELAY_MS = 4000
-const JACKET_ID = 'sea-a-jacket'
 /** The postcard button waits for the moment's animation to finish. */
 const OFFER_AFTER_WHALE_MS = 2200
 const OFFER_AFTER_FIND_MS = 2800
@@ -135,9 +127,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
         thing,
         { line: lineFor(data, thing), stage: stageFor(last7(data, thing.id, todayKey())) },
         (minutes) => {
-          store.setThingMinutes(thing.id, minutes)
-          sessions.start(thing.id, minutes)
-          openSession(thing)
+          lockIn.start(thing, minutes)
         },
       )
     },
@@ -154,6 +144,8 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       })
     },
   })
+
+  const lockIn = new LockIn({ store, scene, sound, line, row, postcards })
 
   /**
    * Everything a done tap can set off. The scene shows all of it; the line
@@ -237,97 +229,6 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     }, SURPRISE_DELAY_MS)
   }
 
-  // --- Lock in ---------------------------------------------------------------------------------
-
-  let screen: SessionScreen | null = null
-
-  const sessions = new SessionService({
-    tick(session, elapsed) {
-      screen?.update(elapsed / totalMs(session), totalMs(session) - elapsed, waitedAt(session))
-    },
-    left() {
-      screen?.left()
-    },
-    finish(session, clean) {
-      finishSession(session, clean)
-    },
-  })
-
-  function waitedAt(session: Session): number | null {
-    return session.brokenAtMs === undefined ? null : session.brokenAtMs / totalMs(session)
-  }
-
-  function openSession(thing: Thing): void {
-    const data = store.get()
-    postcards.clearOffer()
-    screen?.close()
-    scene.setSession(true)
-    keepAwake()
-    sound.setSea(data.settings.sessionSound === true)
-    screen = openSessionScreen(thing, lineFor(data, thing), {
-      sound: data.settings.sessionSound === true,
-      onSound(on) {
-        store.setSettings({ sessionSound: on })
-        sound.setSea(on)
-      },
-      onStop() {
-        const stopped = sessions.stop()
-        const minutes = stopped ? Math.floor(elapsedMs(stopped) / 60_000) : 0
-        if (stopped) store.addMinutes(stopped.thingId, minutes)
-        closeSession()
-        line.say(voice.lockIn.stopped(minutes), { quiet: true })
-      },
-    })
-    const session = sessions.current()
-    if (session) {
-      const elapsed = elapsedMs(session)
-      screen.update(elapsed / totalMs(session), totalMs(session) - elapsed, waitedAt(session))
-      if (session.broken) screen.left()
-    }
-  }
-
-  function closeSession(): void {
-    screen?.close()
-    screen = null
-    scene.setSession(false)
-    sound.setSea(false)
-    letSleep()
-  }
-
-  function finishSession(session: Session, clean: boolean): void {
-    const thing = store.get().things.find((t) => t.id === session.thingId)
-    if (!thing) {
-      closeSession()
-      return
-    }
-    if (!screen) openSession(thing)
-    const before = stageFor(last7(store.get(), thing.id, todayKey()))
-    store.finishSession(thing.id, session.minutes, clean)
-    sound.setSea(false)
-    letSleep()
-    sound.play(clean ? 'whale' : 'timer')
-    const said = clean ? voice.timerEnd : voice.lockIn.broken
-    const moment: Moment = allDoneToday(store.get(), todayKey())
-      ? { kind: 'whale', line: said }
-      : { kind: 'stage', line: said }
-    screen?.end(
-      clean,
-      said,
-      () => {
-        postcards.sendNow(moment)
-      },
-      closeSession,
-    )
-    const card = row.card(thing.id)
-    if (card && clean) {
-      animate(card, 'is-jumping')
-      if (stageFor(last7(store.get(), thing.id, todayKey())) > before) animate(card, 'is-growing')
-    }
-    scene.setSession(false)
-    // The screen stays until the person goes back to the sea; the whale is already up behind it.
-    if (allDoneToday(store.get(), todayKey())) scene.surfaceWhale(hasJacket(store.get()))
-  }
-
   // --- Render ----------------------------------------------------------------------------------
 
   function render(data: AppData): void {
@@ -368,12 +269,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     notices.render()
   })
 
-  const resumed = sessions.resume()
-  if (resumed) {
-    const thing = store.get().things.find((t) => t.id === resumed.thingId)
-    if (thing) openSession(thing)
-    else sessions.stop()
-  }
+  lockIn.resume()
 
   const opening = store.get()
   if (isRestDay(opening, todayKey())) line.say(voice.restDay, { quiet: true })
@@ -407,64 +303,6 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     },
     labEntered,
   )
-}
-
-function shownCollectibles(data: AppData): ShownCollectible[] {
-  const shown: ShownCollectible[] = []
-  for (const thing of data.things) {
-    const found = new Set(foundFor(data, thing, COLLECTIBLES))
-    for (const item of COLLECTIBLES) {
-      if (!found.has(item.id)) continue
-      shown.push({ item, rarity: rarityOf(item.id, reachedOn(data, thing.id, item.days)) })
-    }
-  }
-  return shown
-}
-
-/**
- * Where each waiting stone lies: sea stones float at the water line, sky
- * stones hang in the lower sky, garden stones lie on the sand. Spread by
- * the thing's place in the row so two things' stones do not overlap.
- */
-function stonesFor(data: AppData): StoneSpec[] {
-  const specs: StoneSpec[] = []
-  const Y: Record<World, number> = { sea: 0.605, sky: 0.4, garden: 0.585 }
-  for (const thing of data.things) {
-    waitingTiers(data, thing.id).forEach((tier, i) => {
-      specs.push({
-        key: `${thing.id}:${String(tier)}`,
-        world: thing.world,
-        x: 0.12 + ((thing.order * 0.21 + i * 0.12) % 0.78),
-        y: Y[thing.world] - (thing.world === 'sky' ? i * 0.05 : 0),
-        label: voice.stones.label(thing.name),
-      })
-    })
-  }
-  return specs
-}
-
-/** The shore glows warmer the more of the garden has been found. */
-function warmthOf(data: AppData): number {
-  const garden = data.things.filter((t) => t.world === 'garden')
-  const found = garden.reduce((n, t) => n + foundFor(data, t, COLLECTIBLES).length, 0)
-  return 0.25 + Math.min(found, 6) * 0.125
-}
-
-function hasJacket(data: AppData): boolean {
-  return data.things.some((t) => foundFor(data, t, COLLECTIBLES).includes(JACKET_ID))
-}
-
-/** "Tue 3 Nov: run, read" for a star's label and its tap. */
-function dayLabel(data: AppData, date: DateKey): string {
-  const when = fromKey(date).toLocaleDateString('en-GB', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  })
-  const names = (data.days[date]?.done ?? [])
-    .map((id) => data.things.find((t) => t.id === id)?.name)
-    .filter((name): name is string => typeof name === 'string')
-  return names.length > 0 ? `${when}: ${names.join(', ')}` : when
 }
 
 function query(parent: ParentNode, selector: string): HTMLElement {

@@ -60,6 +60,16 @@ export const voice = {
     button: 'Install',
     close: 'not now',
   },
+  /** The add sheet. Labels, not the game's voice. */
+  add: {
+    title: 'new homework',
+    name: 'name',
+    emoji: 'emoji',
+    ownEmoji: 'your own emoji',
+    length: 'lock in',
+    minutes: (m: number) => `${String(m)} min`,
+    button: 'add',
+  },
   lockIn: {
     button: 'lock in',
     minutes: 'minutes',

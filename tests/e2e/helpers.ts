@@ -12,6 +12,7 @@ export interface SeedThing {
   id: string
   name: string
   emoji?: string
+  /** Data from before 0.9 had a mode; seeds without it are the current shape. */
   mode?: 'tap' | 'timer'
   minutes?: number
   world: 'sea' | 'sky' | 'garden'
@@ -42,7 +43,7 @@ export interface SeedData {
 export async function seed(page: Page, data: SeedData): Promise<void> {
   const payload = {
     version: 3,
-    things: data.things.map((t) => ({ emoji: '•', mode: 'tap', ...t })),
+    things: data.things.map((t) => ({ emoji: '•', ...t })),
     days: Object.fromEntries(Object.entries(data.days).map(([k, v]) => [k, { minutes: {}, ...v }])),
     cracked: data.cracked ?? {},
     settings: { sound: true, ...data.settings },
@@ -59,14 +60,13 @@ export async function seed(page: Page, data: SeedData): Promise<void> {
 export async function addThing(
   page: Page,
   name: string,
-  options: { emoji?: string; timer?: number } = {},
+  options: { emoji?: string; minutes?: number } = {},
 ): Promise<void> {
   await page.getByRole('button', { name: 'Add a thing' }).click()
   await page.getByRole('textbox', { name: 'name' }).fill(name)
   if (options.emoji) await page.getByRole('button', { name: options.emoji }).click()
-  if (options.timer) {
-    await page.getByRole('button', { name: 'timer' }).click()
-    await page.getByRole('button', { name: String(options.timer), exact: true }).click()
+  if (options.minutes) {
+    await page.getByRole('button', { name: `${String(options.minutes)} min`, exact: true }).click()
   }
   await page.getByRole('button', { name: 'add', exact: true }).click()
   await page.getByRole('dialog').waitFor({ state: 'hidden' })

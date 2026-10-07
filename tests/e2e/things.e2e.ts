@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { addThing, card } from './helpers'
+import { addThing, card, dateKey, seed, stored } from './helpers'
 
 /**
  * The first screen and the row: one sentence, an example, and up to five
@@ -24,11 +24,53 @@ test('things get sea, sky, garden, sea, sky in that order, and the fifth closes 
   await expect(page.getByRole('button', { name: 'Add a thing' })).toBeHidden()
 })
 
-test('a timer thing shows its minutes on the card', async ({ page }) => {
+test('the add sheet asks for a name, an emoji, the days and a lock-in length, nothing more', async ({
+  page,
+}) => {
   await page.goto('')
-  await addThing(page, 'practice', { emoji: '🎻', timer: 15 })
-  await expect(card(page, 'practice')).toContainText('15 min')
-  await expect(card(page, 'practice')).toContainText('🎻')
+  await page.getByRole('button', { name: 'Add a thing' }).click()
+  const sheet = page.getByRole('dialog')
+  await expect(sheet.getByRole('button', { name: 'timer' })).toHaveCount(0)
+  await expect(sheet.getByText('tap when done')).toHaveCount(0)
+  await expect(sheet.getByText('hold it for a timer', { exact: false })).toHaveCount(0)
+  await expect(sheet.getByRole('button', { name: '30 min' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  )
+  await page.keyboard.press('Escape')
+  await addThing(page, 'practice', { emoji: '🎹', minutes: 45 })
+  await expect(card(page, 'practice')).toContainText('🎹')
+  await page.getByRole('button', { name: 'lock in: practice' }).click()
+  await expect(page.getByRole('slider', { name: 'minutes' })).toHaveAttribute('aria-valuenow', '45')
+})
+
+test('data from before 0.9 loses its mode and every thing gets a lock-in length', async ({
+  page,
+}) => {
+  await seed(page, {
+    things: [
+      { id: 't1', name: 'run', mode: 'tap', world: 'sea', createdAt: dateKey(-3), order: 0 },
+      {
+        id: 't2',
+        name: 'read',
+        mode: 'timer',
+        minutes: 15,
+        world: 'sky',
+        createdAt: dateKey(-3),
+        order: 1,
+      },
+    ],
+    days: { [dateKey(-1)]: { done: ['t1', 't2'] } },
+  })
+  await page.goto('')
+  await card(page, 'run').click()
+  const data = (await stored(page)) as unknown as {
+    version: number
+    things: Record<string, unknown>[]
+  }
+  expect(data.version).toBe(4)
+  expect(data.things.map((t) => t.mode)).toEqual([undefined, undefined])
+  expect(data.things.map((t) => t.minutes)).toEqual([30, 15])
 })
 
 test('an empty name is not added', async ({ page }) => {

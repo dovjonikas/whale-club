@@ -206,9 +206,9 @@ on the water.
 
 The timer was behind a long press and nobody could tell whether it was
 running. It is now a visible "lock in" under every card, a dial, and a
-whole-screen session with the creature growing as company. Forest kills
-the tree when you leave; here, leaving for more than fifteen seconds marks
-the session and the creature waits. The difference is honest rather than
+whole-screen session with the creature growing as company. Leaving for
+more than fifteen seconds marks the session and the creature waits; nothing
+is lost. The difference is honest rather than
 punishing: a clean session is a full day; a left one counts as showing up
 but earns no star and no step towards a stone, and the line says so in
 plain words. Fifteen seconds is long enough to answer a message and short
@@ -361,3 +361,38 @@ before paint, so the first frame is the same; the collectibles scale with
 a CSS variable instead of a read. The textures are drawn in two separate
 idle callbacks and encoded with toBlob, off the main thread. The film
 grain and caustics look the same.
+
+## 2026-10-07 No other app's name in this repo
+
+The README's comparison section, the code comments and the test notes that
+named another app are gone, and the research notes describe designs, not
+products. What a decision rests on is said in its own terms. The git
+history is not rewritten.
+
+## 2026-10-07 One kind of thing (data version 4)
+
+Since 0.5 every card has both a tap and a visible lock in, so the add
+sheet's "tap when done / timer" choice and its minutes row asked a question
+that no longer changed anything. The add sheet now asks for a name, an
+emoji, the days and one lock-in length (15, 30, 45 or 60; 30 by default;
+the dial reaches every five minutes from 10 to 120). Data version 4 drops
+`mode` and makes `minutes` required: a thing from before gets 30 if it
+had no length, and any stored length is kept inside the dial's range. The
+range lives in types.ts, once.
+
+## 2026-10-07 Leftovers from earlier versions, and what happened to each
+
+| leftover                                                    | done                                                 |
+| ----------------------------------------------------------- | ---------------------------------------------------- |
+| "how: tap when done / timer" and "minutes" in the add sheet | removed; one lock-in length instead                  |
+| "tap a card when it is done. hold it for a timer."          | removed; nothing is held any more                    |
+| "N min" under a timer thing's name on its card              | removed with the mode                                |
+| `mode` in the data                                          | dropped by the version 4 migration, with a test      |
+| a violin among the add sheet's emoji                        | replaced by a palette: the examples stay general     |
+| the card comment about a long press                         | rewritten to say what the card is now                |
+| the "timer" sound, played when a left session ends          | renamed "left"                                       |
+| "the timer screen" in the frame's comment                   | "the lock-in screen"                                 |
+| the v0.3 buddy, dropped in migration                        | kept: the comment says why a stored field is ignored |
+| the v0.1 to v0.4 timer key, read once and moved             | kept: it is how an old running session survives      |
+| `quietDay` and `starPlaced` in voice.ts, not said anywhere  | kept for the opening and quiet days (0.10, 0.13)     |
+| the postcard size in the club sheet                         | moves to settings in 0.14                            |

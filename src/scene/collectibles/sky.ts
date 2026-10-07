@@ -1,0 +1,299 @@
+import * as art from '../art'
+import { dots, star5 } from '../draw'
+import { sky, type Collectible } from './build'
+
+/** The sky's twenty finds, line A then line B. */
+export const SKY: readonly Collectible[] = [
+  // SKY, line A
+  sky(
+    'a',
+    3,
+    'sky-a-first',
+    'the first star',
+    'brighter than a day-star',
+    0.15,
+    0.22,
+    24,
+    'twinkle',
+    () => star5(50, 50, 30, 'var(--star-pale)'),
+  ),
+  sky(
+    'a',
+    7,
+    'sky-a-constellation',
+    'seven stars',
+    'your own constellation',
+    0.72,
+    0.18,
+    90,
+    'twinkle',
+    () => {
+      const p: [number, number][] = [
+        [10, 60],
+        [25, 40],
+        [40, 48],
+        [55, 30],
+        [68, 44],
+        [82, 32],
+        [92, 50],
+      ]
+      return `<polyline points="${p.map(([x, y]) => `${x} ${y}`).join(' ')}" stroke="var(--star)" stroke-width="1" fill="none" opacity="0.6"/>${dots(
+        p.map(([x, y]) => [x, y, 2.2]),
+        'var(--star)',
+      )}`
+    },
+  ),
+  sky(
+    'a',
+    14,
+    'sky-a-moon',
+    'a moon ring',
+    'a halo around the moon, ice high up',
+    0.843,
+    0.123,
+    100,
+    'twinkle',
+    () =>
+      `<circle cx="50" cy="50" r="40" fill="none" stroke="var(--star-pale)" stroke-width="2.5" opacity="0.35"/><circle cx="50" cy="50" r="44" fill="none" stroke="var(--glow)" stroke-width="1" opacity="0.2"/>`,
+  ),
+  sky(
+    'a',
+    21,
+    'sky-a-shooting',
+    'a shooting star',
+    'once a session',
+    0.45,
+    0.14,
+    70,
+    'none',
+    () =>
+      `<path d="M5 60 L 80 20" stroke="var(--star-pale)" stroke-width="2" stroke-linecap="round" opacity="0.7"/>${star5(84, 18, 10, 'var(--star-pale)')}`,
+  ),
+  sky(
+    'a',
+    30,
+    'sky-a-comet',
+    'a comet',
+    'with a tail that stays',
+    0.3,
+    0.3,
+    90,
+    'drift',
+    () =>
+      `<path d="M0 70 Q 50 60, 86 30" stroke="var(--glow)" stroke-width="6" stroke-linecap="round" opacity="0.35"/><path d="M10 72 Q 50 64, 86 30" stroke="var(--star-pale)" stroke-width="2" stroke-linecap="round" opacity="0.6"/><circle cx="88" cy="28" r="7" fill="var(--star-pale)"/>`,
+  ),
+  sky(
+    'a',
+    45,
+    'sky-a-aurora',
+    'the aurora',
+    'a slow curtain near the horizon',
+    0.5,
+    0.42,
+    300,
+    'sway',
+    () =>
+      `<path d="M0 60 Q 20 20, 40 50 T 80 40 T 100 55 V 100 H 0 Z" fill="var(--leaf)" opacity="0.18"/><path d="M0 70 Q 25 35, 50 60 T 100 50 V 100 H 0 Z" fill="var(--glow)" opacity="0.14"/>`,
+  ),
+  sky(
+    'a',
+    60,
+    'sky-a-plane',
+    'a paper airplane',
+    'a bit silly on purpose',
+    0.6,
+    0.26,
+    44,
+    'drift',
+    art.plane,
+  ),
+  sky(
+    'a',
+    90,
+    'sky-a-astronaut',
+    'an astronaut',
+    'in the red jacket over the suit',
+    0.15,
+    0.4,
+    48,
+    'drift',
+    art.astronaut,
+  ),
+  sky(
+    'a',
+    120,
+    'sky-a-whale-stars',
+    'a whale in stars',
+    'a second constellation',
+    0.5,
+    0.34,
+    120,
+    'twinkle',
+    () => {
+      const p: [number, number][] = [
+        [10, 55],
+        [25, 42],
+        [45, 36],
+        [65, 40],
+        [85, 52],
+        [78, 66],
+        [55, 70],
+        [30, 66],
+        [95, 42],
+        [92, 64],
+      ]
+      return `<polyline points="${p
+        .slice(0, 8)
+        .map(([x, y]) => `${x} ${y}`)
+        .join(
+          ' ',
+        )} 10 55" stroke="var(--star)" stroke-width="1" fill="none" opacity="0.6"/><polyline points="85 52 95 42 M85 52 92 64" stroke="var(--star)" stroke-width="1" fill="none" opacity="0.6"/>${dots(
+        p.map(([x, y]) => [x, y, 2]),
+        'var(--star)',
+      )}`
+    },
+  ),
+  sky(
+    'a',
+    180,
+    'sky-a-turning',
+    'the turning sky',
+    'the stars circle the pole star',
+    0.5,
+    0.25,
+    260,
+    'sweep',
+    () =>
+      `${[20, 30, 40].map((r) => `<circle cx="50" cy="50" r="${r}" stroke="var(--star)" stroke-width="0.6" fill="none" opacity="0.3" stroke-dasharray="2 6"/>`).join('')}${star5(50, 50, 4, 'var(--star-pale)')}`,
+  ),
+  // SKY, line B
+  sky(
+    'b',
+    3,
+    'sky-b-satellite',
+    'a satellite',
+    'crossing, once a minute',
+    0.3,
+    0.33,
+    30,
+    'drift',
+    art.satellite,
+  ),
+  sky(
+    'b',
+    7,
+    'sky-b-planet',
+    'a planet',
+    'low near the horizon',
+    0.08,
+    0.5,
+    30,
+    'none',
+    art.planet,
+  ),
+  sky(
+    'b',
+    14,
+    'sky-b-moon2',
+    'a second moon',
+    'this sky allows it',
+    0.68,
+    0.36,
+    22,
+    'none',
+    art.smallMoon,
+  ),
+  sky(
+    'b',
+    21,
+    'sky-b-milkyway',
+    'the milky way',
+    'a faint band',
+    0.5,
+    0.3,
+    400,
+    'none',
+    () =>
+      `<path d="M0 70 Q 50 20, 100 40 V 55 Q 50 40, 0 85 Z" fill="var(--star-pale)" opacity="0.07"/>${dots(
+        [
+          [10, 72, 0.8],
+          [30, 50, 0.6],
+          [50, 36, 0.8],
+          [70, 34, 0.6],
+          [90, 40, 0.8],
+          [40, 44, 0.5],
+          [60, 38, 0.5],
+        ],
+        'var(--star-pale)',
+      )}`,
+  ),
+  sky(
+    'b',
+    30,
+    'sky-b-fullmoon',
+    'moonlight on the water',
+    'a path of light under the moon',
+    0.843,
+    0.64,
+    60,
+    'twinkle',
+    () =>
+      [8, 22, 36, 50, 64, 78]
+        .map(
+          (y, i) =>
+            `<rect x="${String(50 - (6 + i * 4))}" y="${String(y)}" width="${String(12 + i * 8)}" height="3" rx="1.5" fill="var(--star-pale)" opacity="${(0.55 - i * 0.07).toFixed(2)}"/>`,
+        )
+        .join(''),
+  ),
+  sky(
+    'b',
+    45,
+    'sky-b-meteors',
+    'a meteor shower',
+    'one a day after the first night',
+    0.4,
+    0.2,
+    120,
+    'twinkle',
+    () =>
+      [
+        [10, 20],
+        [40, 10],
+        [70, 25],
+        [25, 50],
+        [60, 55],
+      ]
+        .map(
+          ([x, y]) =>
+            `<path d="M${x} ${y} l 22 14" stroke="var(--star-pale)" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>`,
+        )
+        .join(''),
+  ),
+  sky('b', 60, 'sky-b-owl', 'an owl', 'on the horizon, blinking', 0.94, 0.55, 30, 'none', art.owl),
+  sky(
+    'b',
+    90,
+    'sky-b-balloon',
+    'a balloon',
+    'the red jacket is the basket',
+    0.33,
+    0.12,
+    50,
+    'drift',
+    art.balloon,
+  ),
+  sky('b', 120, 'sky-b-kite', 'a kite', 'up even at night', 0.62, 0.44, 40, 'sway', art.kite),
+  sky(
+    'b',
+    180,
+    'sky-b-eclipse',
+    'an eclipse',
+    'two seconds, once a week',
+    0.82,
+    0.32,
+    44,
+    'none',
+    () =>
+      `<circle cx="50" cy="50" r="24" fill="var(--star-pale)"/><circle cx="52" cy="50" r="23" fill="var(--zenith)"/><circle cx="50" cy="50" r="27" stroke="var(--star-pale)" stroke-width="1" fill="none" opacity="0.5"/>`,
+  ),
+]

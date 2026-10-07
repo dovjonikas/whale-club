@@ -33,7 +33,7 @@ test('the recap says N/7 for the week and never what was missed', async ({ page 
   // The same arithmetic the app runs, on the same seed, so the test knows
   // which week the app will recap whatever day it runs on.
   const data = emptyData()
-  data.things = things.map((t) => ({ ...t, emoji: '•', mode: 'tap', days: [...EVERY_DAY] }))
+  data.things = things.map((t) => ({ ...t, emoji: '•', minutes: 30, days: [...EVERY_DAY] }))
   for (const [k, v] of Object.entries(days)) data.days[k] = { done: v.done, minutes: {} }
   const expected = recapFor(data)
   if (!expected) throw new Error('the seed should always produce a recap')

@@ -14,9 +14,9 @@ export interface CardView {
 }
 
 /**
- * A card is two buttons: the card itself, which marks today done (a tap,
- * as always), and "lock in" under it, which opens the dial. Nothing hides
- * behind a long press any more.
+ * A card is two buttons: the card itself, which marks today done, and
+ * "lock in" under it, which opens the dial. Both are visible, so nothing
+ * has to be discovered.
  */
 export function createCard(thing: Thing): HTMLElement {
   const card = document.createElement('div')
@@ -28,7 +28,6 @@ export function createCard(thing: Thing): HTMLElement {
       <span class="card-stone" hidden aria-hidden="true"></span>
       <span class="creature"></span>
       <span class="card-name"></span>
-      <span class="card-mode"></span>
       <span class="dots" aria-hidden="true">${'<span class="dot"></span>'.repeat(7)}</span>
       <span class="visually-hidden card-days"></span>
     </button>
@@ -70,8 +69,6 @@ export function updateCard(card: HTMLElement, thing: Thing, view: CardView): voi
     if (emoji) emoji.textContent = `${thing.emoji} `
     if (word) word.textContent = thing.name
   }
-  const mode = card.querySelector('.card-mode')
-  if (mode) mode.textContent = thing.mode === 'timer' ? `${String(thing.minutes ?? 0)} min` : ''
 
   button.setAttribute('aria-label', thing.name)
   button.setAttribute('aria-pressed', String(view.done))

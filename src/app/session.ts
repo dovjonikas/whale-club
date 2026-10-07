@@ -6,7 +6,7 @@ import { labOn, sessionKey } from '../store/lab'
  * counting ticks: a reload, a locked phone or an app closed for an hour
  * comes back to the right number.
  *
- * Whale Club's twist on Forest: nothing dies. If the app is hidden for
+ * Nothing dies. If the app is hidden for
  * more than GRACE_MS, the session does not fail. The creature stops and
  * waits; the time away is not counted; the session goes on from where it
  * was when the person comes back. It is only marked as one that was left,
