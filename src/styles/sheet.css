@@ -754,3 +754,27 @@
 .how-rules li {
   font-size: var(--t-md);
 }
+
+/* "other": hours and minutes, for any length up to ten hours. */
+.length-other {
+  display: flex;
+  gap: var(--s3);
+  margin-top: var(--s3);
+}
+
+.length-other[hidden] {
+  display: none;
+}
+
+.length-part {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  color: var(--ink-dim);
+}
+
+.length-part .input {
+  width: 76px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}

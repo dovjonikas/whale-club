@@ -586,3 +586,42 @@ intro's own tests use Playwright's `test` and get a true first open.
 Opening `?lab=1` on a device with nothing stored is a first open, and the
 intro would have played over the lab's own sheet. In the lab the intro
 plays only when asked for, with "first open again".
+
+## 2026-10-07 The intro is paced like a piece of music
+
+The author found "a year of small things." gone before it could be read,
+and the truth beat empty. The pacing now follows what on-screen text and
+motion storytelling both say: text stays about a second for every two or
+three words, long enough to be read twice (SSW, "Do you give enough time
+to read texts in your videos?"); a sequence reads as intentional when it is
+timed like music, with accelerando, ritardando before the climax and a
+fermata held longer than expected (dylantarre, "rhythm and pacing" in the
+animation principles playbook); and pauses give each moment the contrast
+that makes it land (Gameshead, "Why great games know when to slow down").
+So: a breath of quiet, a year eased in and out (slow first days, fast
+middle, slow last days), a held beat at 365, the whale, then the line word
+by word and three seconds more. The truth comes a phrase at a time, with a
+small story under it so the empty sea has someone in it: the little whale
+of day one wakes, rises, blows, and the first star lights on the last
+word. Notes come from one pentatonic scale, so any order is a tune and none
+clashes. Everything still moves by transform and opacity only, reaches
+"start light" in under thirty seconds, and a tap still skips.
+
+## 2026-10-07 A quiet glass under text that floats over the scene
+
+Text over the scene had only a shadow and read as unfinished against
+stars and sand. It now sits on one shared, nearly invisible glass
+(`--float-bg`, `--float-edge`, `--float-blur`): the line, "edit", the next
+find, "not today"; the header gets a soft fall of dark from the top and the
+first sentence a pool of dark behind it. One treatment, so it reads as a
+system, not patches.
+
+## 2026-10-07 Any length from five minutes to ten hours
+
+A person who practises for five hours had no way to say so. The add sheet
+and the thing's sheet keep four common lengths and add "other", which
+opens hours and minutes. The dial is spread over stops rather than
+minutes (five-minute steps to an hour, quarters to three hours, half hours
+to ten), so the short lengths most people pick keep the most room and one
+key press is always one stop. Ten hours is the ceiling: longer is a day,
+not a session.

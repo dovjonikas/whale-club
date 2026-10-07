@@ -2,6 +2,26 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.11.1 - 2026-10-07
+
+The author's first look at 0.11, answered.
+
+- The intro is paced like music: a quiet opening, a year that gathers pace
+  and slows into its last days, a held moment at 365, the whale rising, and
+  "a year of small things." word by word, staying long enough to read
+  twice. The truth comes a phrase at a time while a small story plays
+  under it: a little whale asleep under the surface wakes, swims up and
+  blows, and the first star lights above it on the last word. Soft notes of
+  a pentatonic scale for the finds once sound is on. Under 30 seconds to
+  "start light".
+- Text over the scene (the line, "edit", the next find, the title, the first
+  sentence, "not today") sits on a quiet glass, there but hardly seen, so
+  it reads against stars, sand and water alike.
+- A lock-in can be any length from five minutes to ten hours: "other" in
+  the add sheet and the thing's sheet opens hours and minutes; the dial
+  stops every five minutes up to an hour, every quarter up to three, every
+  half hour up to ten; lengths read "5 h", "1 h 30 min".
+
 ## 0.11.0 - 2026-10-07
 
 Two kinds of thing, clear editing, and the first minute.

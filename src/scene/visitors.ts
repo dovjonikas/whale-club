@@ -80,24 +80,35 @@ export function visitorSvg(kind: VisitorKind): string {
  * The small whale asleep at the water line on the empty first screen,
  * before there is anything to do: eyes shut, a slow breath of bubbles.
  */
-export function sleeperSvg(): string {
+/** Gradient ids for each small whale drawn, so two on one page never share one. */
+let sleepers = 0
+
+/**
+ * The small whale: asleep under the surface on the empty first screen, and
+ * in the intro, where it wakes (`awake`), rises and blows.
+ */
+export function sleeperSvg(awake = false): string {
+  const n = String(++sleepers)
+  const eyes = awake
+    ? `<g class="eyes"><circle cx="119" cy="50" r="3.4" fill="#061020"/><circle cx="135" cy="48" r="3.4" fill="#061020"/><circle cx="120.2" cy="48.8" r="1.1" fill="#fff"/><circle cx="136.2" cy="46.8" r="1.1" fill="#fff"/></g>`
+    : `<path d="M114 50 q 5 4 10 0" stroke="#061020" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    <path d="M130 48 q 5 4 10 0" stroke="#061020" stroke-width="2.4" fill="none" stroke-linecap="round"/>`
   return `<svg viewBox="0 0 160 84" aria-hidden="true">
     <defs>
-      <linearGradient id="sleeper-body" x1="0" y1="0" x2="0" y2="1">
+      <linearGradient id="sleeper-body-${n}" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#63bfdc"/><stop offset="0.6" stop-color="#2a7fa3"/><stop offset="1" stop-color="#15506d"/>
       </linearGradient>
-      <linearGradient id="sleeper-belly" x1="0" y1="0" x2="0" y2="1">
+      <linearGradient id="sleeper-belly-${n}" x1="0" y1="0" x2="0" y2="1">
         <stop offset="0" stop-color="#bfeaf2"/><stop offset="1" stop-color="#6fb3c8"/>
       </linearGradient>
     </defs>
     <path d="M30 46 C 20 40, 12 30, 4 30 C 8 36, 10 42, 14 46 C 8 50, 4 58, 6 64 C 14 60, 22 54, 30 52 Z" fill="#1f6b8c"/>
-    <path d="M26 50 C 30 28, 96 16, 138 30 C 156 36, 158 56, 146 66 C 128 80, 70 80, 44 68 C 34 63, 26 58, 26 50 Z" fill="url(#sleeper-body)"/>
-    <path d="M58 70 C 82 78, 124 76, 144 64 C 136 74, 116 79, 92 79 C 78 79, 66 76, 58 70 Z" fill="url(#sleeper-belly)" opacity="0.85"/>
+    <path d="M26 50 C 30 28, 96 16, 138 30 C 156 36, 158 56, 146 66 C 128 80, 70 80, 44 68 C 34 63, 26 58, 26 50 Z" fill="url(#sleeper-body-${n})"/>
+    <path d="M58 70 C 82 78, 124 76, 144 64 C 136 74, 116 79, 92 79 C 78 79, 66 76, 58 70 Z" fill="url(#sleeper-belly-${n})" opacity="0.85"/>
     <path d="M84 72 L 120 70 M 88 75 L 116 74" stroke="#4d93ab" stroke-width="1" stroke-linecap="round" opacity="0.6"/>
     <path d="M86 58 C 82 66, 72 72, 62 72 C 68 66, 74 60, 86 58 Z" fill="#1d6a8a"/>
     <path d="M60 30 C 84 22, 116 22, 134 30" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.18"/>
-    <path d="M114 50 q 5 4 10 0" stroke="#061020" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-    <path d="M130 48 q 5 4 10 0" stroke="#061020" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    ${eyes}
     <ellipse cx="114" cy="59" rx="5" ry="2.6" fill="#ff8fa3" opacity="0.55"/>
     <ellipse cx="144" cy="57" rx="3.6" ry="2.2" fill="#ff8fa3" opacity="0.45"/>
     <path d="M124 62 q 4 2.6 8 0" stroke="#061020" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.7"/>

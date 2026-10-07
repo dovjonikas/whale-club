@@ -145,3 +145,26 @@ test('the lab: do everything today finishes the lock-ins as whole sessions', asy
   })
   expect(sessions).toEqual([{ thing: 't2', minutes: 20 }])
 })
+
+test('a lock-in can be any length up to ten hours: other, in hours and minutes', async ({
+  page,
+}) => {
+  await page.goto('')
+  await page.getByRole('button', { name: 'Add a thing' }).click()
+  await page.getByRole('textbox', { name: 'name' }).fill('deep work')
+  await page.getByRole('dialog').getByRole('button', { name: 'lock in', exact: true }).click()
+  await page.getByRole('button', { name: 'other' }).click()
+  await page.getByRole('spinbutton', { name: 'h' }).fill('5')
+  await page.getByRole('spinbutton', { name: 'min' }).fill('0')
+  await page.getByRole('button', { name: 'add', exact: true }).click()
+  await dismissInstallLeaf(page)
+  await expect(cardOf(page, 'deep work')).toContainText('5 h')
+  await card(page, 'deep work').click()
+  const dial = page.getByRole('slider', { name: 'minutes' })
+  await expect(dial).toHaveAttribute('aria-valuenow', '300')
+  await expect(dial).toHaveAttribute('aria-valuetext', '5 h')
+  // One key press is one stop: half an hour at this length.
+  await dial.focus()
+  await page.keyboard.press('ArrowRight')
+  await expect(dial).toHaveAttribute('aria-valuenow', '330')
+})

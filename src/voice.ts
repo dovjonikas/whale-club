@@ -84,10 +84,13 @@ export const voice = {
     lockIn: 'lock in',
     lockInLine: 'e.g. study, practice an instrument. counts when the timer runs to the end.', // TODO-VOICE
     length: 'how long',
+    other: 'other',
+    hours: 'h',
+    minutes: 'min',
   },
   /** What a card says under its name. */
   card: {
-    length: (m: number) => `${String(m)} min`,
+    length: (m: number) => duration(m),
     finish: (seen: number, total: number) => `${String(seen)}/${String(total)} · finish`,
     doneToday: 'done today',
     /** Once, on a new thing's card. */
@@ -119,7 +122,7 @@ export const voice = {
   explain: {
     stone: 'a stone fell in. tap it three times.', // TODO-VOICE
     lantern: 'a lantern for every lock-in you finish.', // TODO-VOICE
-    kept: 'the minutes are kept. tap the card to finish.', // TODO-VOICE
+    kept: 'minutes kept. tap the card to finish.', // TODO-VOICE
     firstStar: 'your first star.', // TODO-VOICE
     yours: 'yours. it grows on the days you show up.', // TODO-VOICE
   },

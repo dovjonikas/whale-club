@@ -3,6 +3,7 @@ import { collectiblesFor } from '../scene/collectibles'
 import { beginningSvg, creatureSvg } from '../scene/creatures'
 import type { Scene } from '../scene/scene'
 import { reducedMotion, ticker, type FrameHandle } from '../scene/ticker'
+import { sleeperSvg } from '../scene/visitors'
 import { addDays, todayKey } from '../store/dates'
 import { last7, reachedOn, stageFor, starDays, streakDays, UNLOCK_DAYS } from '../store/derive'
 import type { AppData, DateKey, World } from '../store/types'
@@ -10,37 +11,61 @@ import { emptyData } from '../store/types'
 import { voice } from '../voice'
 import { host } from './host'
 import { lanternsFor } from './sceneData'
+import type { Sound } from './sound'
 
 /**
  * The first minute, in three beats, on a first open only (and on request).
+ * It is paced like a short piece of music, not a slideshow: a quiet
+ * opening, a year that speeds up through its middle and slows into its
+ * last days, a held moment at the top, and room after every line to read
+ * it twice.
  *
  * The promise: the real scene, drawing a seeded year (the lab's, not a
- * forecast of this person's), a day counter running from 1 to 365 faster
- * and faster, stars filling the sky, creatures growing, stones falling and
- * opening, lanterns gathering, and at the end the whale rising before the
- * moon. All of it in silhouette: the creatures dark shapes with a rim of
- * light, the finds only flashes. It shows that the sea fills, not what
- * with. Because it is the real scene, the promise grows with the content.
+ * forecast of this person's), a day counter from 1 to 365, stars filling
+ * the sky, creatures growing, finds opening as flashes, lanterns
+ * gathering, and at the end the whale rising before the moon. All of it in
+ * silhouette: it shows that the sea fills, not what with.
  *
- * The truth: back in a second to the empty sea of day one, and the
- * author's sentence, in their words.
+ * The truth: the empty sea of day one and the author's sentence, a phrase
+ * at a time, while a small story plays under it: a little whale asleep
+ * under the surface wakes, swims up and blows, and the first star lights
+ * above it on the last word.
  *
  * The first step: one button, "start light".
  *
- * "skip" is always there; a tap anywhere goes on to the next beat. Under
- * reduced motion the promise is three still frames (day 1, 100, 365) that
- * fade into each other.
+ * "skip" is always there; a tap anywhere goes on to the next beat (and
+ * lands the beat it leaves on its end). Under reduced motion the year is
+ * three still frames and everything else fades instead of moving.
  */
 export type IntroEnd = 'start' | 'skip'
 type Beat = 'promise' | 'truth' | 'start'
 
-const PROMISE_MS = 7000
-/** The day counter speeds up: day = 1 + 364 * t^ACCELERATION. */
-const ACCELERATION = 2.2
-const PROMISE_HOLD_MS = 1800
-const TRUTH_SECOND_MS = 3500
-const TRUTH_MS = 9500
-const STILL_MS = 2000
+/** A breath of quiet before the year starts. */
+const OPENING_MS = 1100
+/** The year: slow first days, fast middle, slow last days (an ease in and out). */
+const YEAR_MS = 7000
+/** Held at day 365 before the whale rises: the fermata. */
+const FERMATA_MS = 600
+/** The whale rising, then the line. */
+const WHALE_MS = 1500
+/** Each word of the promise's line follows the last by this much. */
+const WORD_MS = 240
+/** The line stays long enough to be read twice, and then some. */
+const LINE_HOLD_MS = 3000
+const FADE_MS = 700
+/** The truth: when each phrase, and each moment of the little story, comes. */
+const TRUTH_CUES = {
+  phrase1: 400,
+  phrase2: 2500,
+  wake: 4300,
+  phrase3: 5300,
+  rise: 5900,
+  blow: 7400,
+  phrase4: 7600,
+  star: 9800,
+  start: 11600,
+} as const
+const STILL_MS = 2200
 const STILL_DAYS = [1, 100, 365]
 const FPS = 30
 const YEAR = 365
@@ -67,10 +92,21 @@ function markSeen(): void {
   }
 }
 
+/** Slow, fast, slow: a year that gathers pace and then arrives. */
+function easeInOut(t: number): number {
+  return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+}
+
+/** The author's sentence, split into phrases at its own commas; not a word changed. */
+function phrases(): string[] {
+  return voice.intro.truth.flatMap((paragraph) =>
+    paragraph.split(/(?<=,) (?=because |that )/).map((p) => p.trim()),
+  )
+}
+
 interface Year {
   data: AppData
   start: DateKey
-  today: DateKey
   dates: DateKey[]
   lanterns: ReturnType<typeof lanternsFor>
   finds: { date: DateKey; world: World; x: number; y: number }[]
@@ -91,7 +127,6 @@ function seededYear(): Year {
   return {
     data,
     start: addDays(today, -YEAR),
-    today,
     dates: starDays(data),
     // Lights, not colours: every lantern the same warm light.
     lanterns: lanternsFor(data, today).map((l) => ({ ...l, color: LANTERN_LIGHT })),
@@ -101,22 +136,32 @@ function seededYear(): Year {
 
 export function playIntro(
   scene: Scene,
-  options: { hasThings: boolean; onEnd: (end: IntroEnd) => void },
+  options: { hasThings: boolean; sound: Sound; onEnd: (end: IntroEnd) => void },
 ): void {
   const year = seededYear()
+  const lines = phrases()
   const app = document.getElementById('app')
   const overlay = document.createElement('section')
   overlay.className = 'intro'
   overlay.setAttribute('role', 'dialog')
   overlay.setAttribute('aria-label', 'whale club')
+  overlay.dataset.calf = 'asleep'
   overlay.innerHTML = `
     <button type="button" class="intro-skip">${voice.intro.skip}</button>
     <div class="intro-day" aria-hidden="true"></div>
     <div class="intro-creatures" aria-hidden="true">
       ${year.data.things.map((t) => `<span class="intro-creature" data-world="${t.world}" style="left:${String(CREATURE_X[t.world] * 100)}%"></span>`).join('')}
     </div>
-    <p class="intro-line" aria-live="polite"></p>
-    <div class="intro-truth">${voice.intro.truth.map((p) => `<p>${p}</p>`).join('')}</div>
+    <p class="intro-line" aria-live="polite">${voice.intro.promise
+      .split(' ')
+      .map((w, i) => `<span style="--i:${String(i)}">${w}</span>`)
+      .join(' ')}</p>
+    <div class="intro-truth">${lines.map((p) => `<p>${p}</p>`).join('')}</div>
+    <div class="intro-star" aria-hidden="true"></div>
+    <div class="intro-calf" aria-hidden="true">
+      <span class="intro-calf-body">${sleeperSvg(false)}</span>
+      <span class="intro-spout"><i></i><i></i><i></i></span>
+    </div>
     <button type="button" class="button-primary intro-start">${options.hasThings ? voice.intro.back : voice.intro.start}</button>
     <div class="intro-veil" aria-hidden="true"></div>`
   const q = (selector: string): HTMLElement => {
@@ -125,9 +170,10 @@ export function playIntro(
     return element
   }
   const dayLabel = q('.intro-day')
-  const line = q('.intro-line')
   const veil = q('.intro-veil')
+  const calfBody = q('.intro-calf-body')
   const creatures = [...overlay.querySelectorAll<HTMLElement>('.intro-creature')]
+  const truthLines = [...overlay.querySelectorAll<HTMLElement>('.intro-truth p')]
 
   let beat: Beat = 'promise'
   let handle: FrameHandle | null = null
@@ -144,6 +190,7 @@ export function playIntro(
   // --- the promise --------------------------------------------------------------------------
   let shownDay = 0
   let findIndex = 0
+  let note = 0
   const drawDay = (day: number, flashes: boolean): void => {
     if (day === shownDay) return
     shownDay = day
@@ -167,13 +214,14 @@ export function playIntro(
       element.innerHTML =
         stage === null ? beginningSvg(thing.world) : creatureSvg(thing.world, thing.line, stage)
     })
-    // Every find reached by now opens as a flash; a few at most per frame.
+    // Every find reached by now opens as a flash and a note, rising through the scale.
     let fired = 0
     while (findIndex < year.finds.length && (year.finds[findIndex]?.date ?? '') <= until) {
       const find = year.finds[findIndex]
       findIndex++
       if (find && flashes && fired < 2) {
         scene.flash(find.x, find.y, find.world)
+        options.sound.note(note++)
         fired++
       }
     }
@@ -183,69 +231,119 @@ export function playIntro(
     scene.setSilhouette(true)
     scene.setEmpty(false)
     overlay.dataset.beat = 'promise'
+    drawDay(1, false)
     if (reducedMotion()) {
       // Three still frames, faded into each other.
       STILL_DAYS.forEach((day, i) => {
         later(i * STILL_MS, () => {
           veil.classList.add('is-on')
-          later(250, () => {
+          later(300, () => {
             drawDay(day, false)
             veil.classList.remove('is-on')
           })
         })
       })
-      later(STILL_DAYS.length * STILL_MS, endOfYear)
+      later(STILL_DAYS.length * STILL_MS, topOfTheYear)
       return
     }
-    const startedAt = performance.now()
-    handle = ticker.add((now) => {
-      const t = Math.min(1, (now - startedAt) / PROMISE_MS)
-      drawDay(Math.max(1, Math.round(1 + (YEAR - 1) * Math.pow(t, ACCELERATION))), true)
-      if (t >= 1) {
-        handle?.remove()
-        handle = null
-        endOfYear()
-      }
-    }, FPS)
-  }
-
-  const endOfYear = (): void => {
-    drawDay(YEAR, false)
-    scene.surfaceWhale(false)
-    line.textContent = voice.intro.promise
-    later(PROMISE_HOLD_MS, () => {
-      go('truth')
+    later(OPENING_MS, () => {
+      const startedAt = performance.now()
+      handle = ticker.add((now) => {
+        const t = Math.min(1, (now - startedAt) / YEAR_MS)
+        drawDay(Math.max(1, Math.round(1 + (YEAR - 1) * easeInOut(t))), true)
+        if (t >= 1) {
+          handle?.remove()
+          handle = null
+          later(FERMATA_MS, topOfTheYear)
+        }
+      }, FPS)
     })
   }
 
-  // --- the truth and the first step ---------------------------------------------------------
+  /** Day 365: the whale rises before the moon, then the line, word by word, and it stays. */
+  const topOfTheYear = (): void => {
+    drawDay(YEAR, false)
+    // The year's creatures step back; the whale has the moment to itself.
+    overlay.dataset.top = 'true'
+    scene.surfaceWhale(false)
+    options.sound.play('whale')
+    later(WHALE_MS, () => {
+      overlay.dataset.line = 'on'
+      const words = voice.intro.promise.split(' ').length
+      later(words * WORD_MS + LINE_HOLD_MS, () => {
+        overlay.dataset.line = 'off'
+        later(FADE_MS, () => {
+          go('truth')
+        })
+      })
+    })
+  }
+
+  // --- the truth, and the little story under it ---------------------------------------------
+  const showPhrase = (i: number): void => {
+    truthLines[i]?.classList.add('is-on')
+  }
+  const wake = (): void => {
+    if (overlay.dataset.calf !== 'asleep') return
+    overlay.dataset.calf = 'awake'
+    calfBody.innerHTML = sleeperSvg(true)
+  }
   const truth = (): void => {
     overlay.dataset.beat = 'truth'
-    line.textContent = ''
     scene.preview(null)
     scene.setSilhouette(false)
-    scene.setEmpty(!options.hasThings)
-    overlay.dataset.part = '1'
-    later(TRUTH_SECOND_MS, () => {
-      overlay.dataset.part = '2'
+    scene.setEmpty(false)
+    later(TRUTH_CUES.phrase1, () => {
+      showPhrase(0)
     })
-    later(TRUTH_MS, () => {
+    later(TRUTH_CUES.phrase2, () => {
+      showPhrase(1)
+    })
+    later(TRUTH_CUES.wake, wake)
+    later(TRUTH_CUES.phrase3, () => {
+      showPhrase(2)
+    })
+    later(TRUTH_CUES.rise, () => {
+      overlay.dataset.calf = 'up'
+    })
+    later(TRUTH_CUES.blow, () => {
+      overlay.dataset.calf = 'blow'
+    })
+    later(TRUTH_CUES.phrase4, () => {
+      showPhrase(3)
+    })
+    later(TRUTH_CUES.star, () => {
+      overlay.dataset.star = 'on'
+      options.sound.note(7)
+    })
+    later(TRUTH_CUES.start, () => {
       go('start')
     })
   }
 
+  /** The end of the truth, all at once: every phrase, the whale up, the star lit. */
+  const truthAtItsEnd = (): void => {
+    truthLines.forEach((_, i) => {
+      showPhrase(i)
+    })
+    wake()
+    overlay.dataset.calf = 'blow'
+    overlay.dataset.star = 'on'
+  }
+
   const start = (): void => {
+    truthAtItsEnd()
     overlay.dataset.beat = 'start'
-    overlay.dataset.part = '2'
     q('.intro-start').focus()
   }
 
   const go = (next: Beat): void => {
     stopTimers()
-    if (beat === 'promise' && next !== 'promise') {
+    if (beat === 'promise') {
       scene.preview(null)
       scene.setSilhouette(false)
-      scene.setEmpty(!options.hasThings)
+      scene.setEmpty(false)
+      overlay.dataset.line = 'off'
     }
     beat = next
     if (next === 'truth') truth()
@@ -264,7 +362,7 @@ export function playIntro(
     options.onEnd(how)
   }
 
-  // skip: the first time, on to the first step; from the first step, out.
+  // skip: on to the first step; from the first step, out.
   q('.intro-skip').addEventListener('click', () => {
     if (beat === 'start') end('skip')
     else go('start')
