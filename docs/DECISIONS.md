@@ -396,3 +396,81 @@ range lives in types.ts, once.
 | the v0.1 to v0.4 timer key, read once and moved             | kept: it is how an old running session survives      |
 | `quietDay` and `starPlaced` in voice.ts, not said anywhere  | kept for the opening and quiet days (0.10, 0.13)     |
 | the postcard size in the club sheet                         | moves to settings in 0.14                            |
+
+## 2026-10-07 The world sinks during a lock-in
+
+The session used to sit over the scene with the sky turning behind it.
+Now the scene slides up and deep water rises over it, and the screen holds
+only the creature, a ring and the name. The world is the thing that pulls
+the eye; for the length of a session it is put away, and its coming back
+is the reward.
+
+## 2026-10-07 The time is hidden by default
+
+A countdown in the middle of the screen becomes the thing watched. The ring
+says how far along it is without a number; a tap anywhere shows the time
+for three seconds. Settings (0.15) will have "show the time" for people who
+want it on.
+
+## 2026-10-07 Undo for ten seconds, then stop
+
+A wrong thing or a wrong length is noticed in the first seconds. Undo then
+leaves no trace at all, not even minutes. After ten seconds the same place
+holds stop, which writes the minutes down.
+
+## 2026-10-07 One pause, five minutes, and it ends by itself
+
+Interruptions happen (a door, a call). One pause per session, up to five
+minutes: the creature sleeps, the time stands still, and being away inside
+the pause is not leaving. It ends by itself after five minutes, with one
+quiet note, so a pause cannot quietly become the end of the session. A
+second pause would make the pause a habit.
+
+## 2026-10-07 The end is an opening, and a tap skips it
+
+What a session gave is shown in order (the lantern, the creature going
+home, the star, the line, the whale to send) instead of all at once,
+because each piece is noticed only when it has its own moment. Nobody waits
+for it: a tap anywhere lands on the final state, the same one the sequence
+ends in. The record is written before the opening starts; the scene holds
+the new lantern and star back and the opening lets them in.
+
+## 2026-10-07 Lanterns are one canvas of stamped sprites
+
+Four hundred lanterns after a year rule out one element each. They are
+drawn on one canvas: each lantern is a sprite drawn once per colour, size
+and dimness, stamped with drawImage; the flicker runs at 12 frames a second
+on the shared ticker; under reduced motion they are drawn once. Where each
+floats comes from its date and its place in the day, so it never moves.
+Measured alone, a year of them (490 from the lab's 365-day seed) keeps the
+median frame at 16.7 ms in headless Chromium.
+
+## 2026-10-07 Frame timing runs alone, after everything else
+
+Timed with five other browsers rendering beside it, the frame test measured
+the machine, not the scene (83 ms medians that were 16.7 alone), and the
+trace recorder's screencast cost frames of its own. It is now its own
+Playwright project that depends on the three device projects, so it runs
+last, alone, without a trace.
+
+## 2026-10-07 Lanterns from before version 5 come from the minutes
+
+Until 0.10 a day kept minutes per thing, not sessions. A thing done with
+minutes almost always got them from a lock-in that ran to its end (a
+stopped session is minutes without done), so the migration gives each such
+pair one lantern, dim if it was left. A stopped session later tapped done
+gets a lantern it did not strictly earn; the generous side is the side to
+err on.
+
+## 2026-10-07 One view of the record, and no charts
+
+The log is the only place the record is shown as a record: a month
+calendar with stars and lantern dots, a sentence for the month, the year as
+twelve small months, a day's card. The sky already is the picture; a chart
+would be a second picture of the same thing, and a number to fall short of.
+
+## 2026-10-07 The sky is found by height
+
+The canvases over the sky take the taps, so the scene listens for a tap
+above the horizon that is not on a star, a stone or a button, and opens the
+log. A star opens its own day instead of a toast.

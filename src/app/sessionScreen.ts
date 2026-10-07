@@ -5,53 +5,80 @@ import { voice } from '../voice'
 import { host } from './host'
 
 /**
- * The screen while a lock-in runs: the scene gone quiet behind it, the
- * time in a big calm face, and the thing's creature, small at first (an
- * egg, a spark, a seed) and growing as the minutes pass. It breathes and
- * now and then blinks; it is company. If the person leaves and comes
- * back, it has stopped growing and waited. At the end it is either big
- * and leaves into the scene, or still small, and the line says so plainly.
+ * The screen while a lock-in runs. The world sinks out of sight and deep
+ * water rises over it; what stays is the thing's creature, small at first
+ * (an egg, a spark, a seed) and growing as the minutes pass, a slow ring
+ * around it, and the thing's name. It breathes and now and then blinks;
+ * it is company.
+ *
+ * The time is hidden unless the person asks for it in settings: a tap
+ * anywhere shows it for SHOW_TIME_MS. A countdown watched is a countdown
+ * that becomes the thing, and the session is the point.
+ *
+ * In the first seconds the session can be undone; after that it can be
+ * stopped. Once per session it can pause, and the creature sleeps.
  */
 const BEGINNING = 0.12
 const STAGE_SPAN = 0.22
+const SHOW_TIME_MS = 3000
+
+export interface SessionOptions {
+  sound: boolean
+  showTime: boolean
+  onSound: (on: boolean) => void
+  onStop: () => void
+  onUndo: () => void
+  onPause: () => void
+  onGoOn: () => void
+}
 
 export interface SessionScreen {
+  readonly element: HTMLElement
   update(progress: number, remainingMs: number, waitedAt: number | null): void
   left(): void
-  end(clean: boolean, line: string, onSend: () => void, onBack: () => void): void
+  paused(on: boolean, used: boolean): void
+  undoable(on: boolean): void
+  /** The session is over: the screen freezes in its last state, ready for the opening. */
+  ended(clean: boolean): void
+  /** Where the creature is on screen, for its way home. */
+  creature(): HTMLElement
   close(): void
 }
 
 export function openSessionScreen(
   thing: Thing,
   line: Line,
-  options: { sound: boolean; onSound: (on: boolean) => void; onStop: () => void },
+  options: SessionOptions,
 ): SessionScreen {
   const screen = document.createElement('section')
   screen.className = 'session'
   screen.dataset.world = thing.world
   screen.dataset.state = 'running'
   screen.dataset.broken = 'false'
+  screen.dataset.time = options.showTime ? 'shown' : 'hidden'
   screen.setAttribute('role', 'dialog')
   screen.setAttribute('aria-label', `${voice.lockIn.button}: ${thing.name}`)
   screen.innerHTML = `
+    <div class="session-deep" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b><b></b><b></b></div>
     <div class="session-top">
       <button type="button" class="chip session-sound" aria-pressed="${String(options.sound)}">${voice.lockIn.seaSound}</button>
     </div>
-    <div class="session-creature">
-      <svg class="session-ring" viewBox="0 0 100 100" aria-hidden="true">
-        <circle cx="50" cy="50" r="46" pathLength="100"/>
-        <circle class="session-ring-fill" cx="50" cy="50" r="46" pathLength="100"/>
-      </svg>
-      <div class="session-breathe"></div>
-    </div>
-    <div class="session-middle">
+    <div class="session-centre">
+      <div class="session-creature">
+        <svg class="session-ring" viewBox="0 0 100 100" aria-hidden="true">
+          <circle cx="50" cy="50" r="46" pathLength="100"/>
+          <circle class="session-ring-fill" cx="50" cy="50" r="46" pathLength="100"/>
+        </svg>
+        <div class="session-breathe"></div>
+      </div>
       <div class="session-clock" role="timer" aria-live="off"></div>
-      <p class="session-line"></p>
-      <div class="session-name">${thing.emoji} ${thing.name}</div>
+      <p class="session-line" aria-live="polite"></p>
+      <div class="session-name"></div>
     </div>
     <div class="session-actions">
-      <button type="button" class="session-stop">${voice.lockIn.stop}</button>
+      <button type="button" class="session-quiet session-undo">${voice.lockIn.undo}</button>
+      <button type="button" class="session-quiet session-stop" hidden>${voice.lockIn.stop}</button>
+      <button type="button" class="session-quiet session-pause">${voice.lockIn.pause}</button>
     </div>`
   const q = (selector: string): HTMLElement => {
     const element = screen.querySelector<HTMLElement>(selector)
@@ -62,8 +89,11 @@ export function openSessionScreen(
   const breathe = q('.session-breathe')
   const clock = q('.session-clock')
   const said = q('.session-line')
-  const actions = q('.session-actions')
   const soundButton = q('.session-sound')
+  const undoButton = q('.session-undo')
+  const stopButton = q('.session-stop')
+  const pauseButton = q('.session-pause')
+  q('.session-name').textContent = `${thing.emoji} ${thing.name}`
 
   let form = ''
   const grow = (progress: number): void => {
@@ -85,12 +115,29 @@ export function openSessionScreen(
     ring?.style.setProperty('stroke-dashoffset', (100 - Math.min(1, progress) * 100).toFixed(2))
   }
 
+  // A tap anywhere that is not a button shows the time for a moment.
+  let timeTimer = 0
+  screen.addEventListener('click', (event) => {
+    if (options.showTime || screen.dataset.state === 'ended') return
+    if (event.target instanceof Element && event.target.closest('button')) return
+    screen.dataset.time = 'shown'
+    clearTimeout(timeTimer)
+    timeTimer = window.setTimeout(() => {
+      screen.dataset.time = 'hidden'
+    }, SHOW_TIME_MS)
+  })
+
   soundButton.addEventListener('click', () => {
     const on = soundButton.getAttribute('aria-pressed') !== 'true'
     soundButton.setAttribute('aria-pressed', String(on))
     options.onSound(on)
   })
-  q('.session-stop').addEventListener('click', options.onStop)
+  undoButton.addEventListener('click', options.onUndo)
+  stopButton.addEventListener('click', options.onStop)
+  pauseButton.addEventListener('click', () => {
+    if (screen.dataset.state === 'paused') options.onGoOn()
+    else options.onPause()
+  })
 
   said.textContent = voice.timerStart
   grow(0)
@@ -101,6 +148,7 @@ export function openSessionScreen(
   requestAnimationFrame(() => screen.classList.add('is-open'))
 
   return {
+    element: screen,
     update(progress, remainingMs, waitedAt) {
       clock.textContent = formatClock(remainingMs)
       // A session that was left keeps the creature the size it was when it waited.
@@ -111,25 +159,37 @@ export function openSessionScreen(
       screen.dataset.broken = 'true'
       said.textContent = voice.lockIn.left
     },
-    end(clean, line, onSend, onBack) {
+    paused(on, used) {
+      screen.dataset.state = on ? 'paused' : 'running'
+      creature.classList.toggle('is-asleep', on)
+      pauseButton.textContent = on ? voice.lockIn.goOn : voice.lockIn.pause
+      // One pause per session: once it is over, the button goes.
+      pauseButton.hidden = used && !on
+      said.textContent = on ? voice.lockIn.paused : used ? voice.lockIn.goingOn : said.textContent
+    },
+    undoable(on) {
+      undoButton.hidden = !on
+      stopButton.hidden = on
+    },
+    ended(clean) {
+      clearTimeout(timeTimer)
       screen.dataset.state = 'ended'
       screen.dataset.clean = String(clean)
+      creature.classList.remove('is-asleep')
       fill(1)
       if (clean) grow(1)
-      said.textContent = line
-      clock.textContent = ''
-      actions.innerHTML = `
-        <button type="button" class="button-primary session-send">${voice.postcard.sendWhale}</button>
-        <button type="button" class="button-quiet session-back">${voice.lockIn.back}</button>`
-      actions.querySelector('.session-send')?.addEventListener('click', onSend)
-      actions.querySelector('.session-back')?.addEventListener('click', onBack)
-      if (clean) setTimeout(() => creature.classList.add('is-leaving'), 1400)
+    },
+    creature() {
+      return creature
     },
     close() {
+      clearTimeout(timeTimer)
       app?.classList.remove('is-behind-session')
       app?.removeAttribute('inert')
       screen.classList.remove('is-open')
-      setTimeout(() => screen.remove(), 700)
+      setTimeout(() => {
+        screen.remove()
+      }, 700)
     },
   }
 }

@@ -9,7 +9,8 @@ import type { World } from '../store/types'
  * swallowing it. Everything is an enveloped oscillator: no files to load
  * or cache, and nothing plays before the person has touched the screen.
  */
-export type SoundKind = 'tap' | 'untap' | 'whale' | 'unlock' | 'left' | 'checkin' | 'grow'
+export type SoundKind =
+  'tap' | 'untap' | 'whale' | 'unlock' | 'left' | 'resume' | 'checkin' | 'grow'
 
 export class Sound {
   private ctx: AudioContext | null = null
@@ -126,6 +127,10 @@ export class Sound {
         return
       case 'checkin':
         this.tone(740, 0, 0.08, 0.03, 'square')
+        return
+      // The pause ran out and the session goes on: one low, quiet note.
+      case 'resume':
+        this.tone(392, 0, 0.5, 0.025, 'sine')
         return
     }
   }

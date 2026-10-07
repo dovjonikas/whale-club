@@ -56,8 +56,12 @@ for (let i = -34; i <= 0; i++) {
     if (i % 3 !== 0 || i > -7) done.push('read')
     if (i >= -30 && (i % 4 !== 2 || i > -7)) done.push('practice')
   }
+  // Some of the reading and practice were lock-ins: a lantern each in the cove.
+  const minutes = {}
+  if (done.includes('read') && i % 2 === 0) minutes.read = 30
+  if (done.includes('practice') && i % 3 === 0) minutes.practice = 20
   if (i === 0) days[key(i)] = { done: ['run', 'read'], minutes: { read: 30 }, checkin: true }
-  else if (done.length) days[key(i)] = { done, minutes: {} }
+  else if (done.length) days[key(i)] = { done, minutes }
 }
 
 // Every tier earned is cracked, except run's newest, which waits as a stone.
@@ -186,6 +190,19 @@ for (const { name, options } of targets) {
   await page.clock.fastForward('18:00')
   await page.clock.runFor(3000)
   await shot(page, 'iphone-session.png')
+  // The end: the deep water goes down, the lantern comes into the cove, the creature goes home.
+  await page.clock.fastForward('12:00')
+  await page.clock.runFor(2300)
+  await page.waitForTimeout(900)
+  await shot(page, 'iphone-opening.png')
+  await page.clock.runFor(4000)
+  await page.waitForTimeout(1200)
+  await shot(page, 'iphone-cove.png')
+  await page.getByRole('button', { name: 'Menu' }).click()
+  await page.getByRole('button', { name: 'the log' }).click()
+  await page.clock.runFor(600)
+  await page.waitForTimeout(500)
+  await shot(page, 'iphone-log.png')
   await context.close()
 }
 

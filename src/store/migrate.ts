@@ -22,6 +22,9 @@ export function migrate(raw: unknown): AppData {
       // Version 2 had no days and versions 2 and 3 had a mode (tap or timer) and an
       // optional length; validateThing gives every thing its days and a length,
       // and leaves the mode behind: since 0.5 every thing can be tapped or locked in.
+      // Before version 5 sessions were not kept one by one; lanterns come from the minutes.
+      return withLanterns(validateV2(raw))
+    case 5:
       return validateV2(raw)
     default:
       throw new Error(`unknown version ${String(raw.version)}`)
@@ -38,6 +41,28 @@ function fromV1(raw: Record<string, unknown>): AppData {
   for (const thing of data.things) {
     const tier = earnedTier(data, thing.id)
     if (tier > 0) data.cracked[thing.id] = tier
+  }
+  return data
+}
+
+/**
+ * Before version 5 a day kept the minutes per thing, not the sessions. A
+ * thing that was done and has minutes almost always got them from a
+ * lock-in that ran to its end (a stopped one is minutes without done), so
+ * each such pair becomes one lantern, dim if the session was left. A
+ * stopped session that was later tapped done gets a lantern it did not
+ * strictly earn; that is the generous side to err on.
+ */
+function withLanterns(data: AppData): AppData {
+  for (const day of Object.values(data.days)) {
+    const sessions = day.done
+      .filter((id) => (day.minutes[id] ?? 0) > 0)
+      .map((id) =>
+        day.waited?.includes(id)
+          ? { thing: id, minutes: day.minutes[id] ?? 0, left: true as const }
+          : { thing: id, minutes: day.minutes[id] ?? 0 },
+      )
+    if (sessions.length > 0) day.sessions = sessions
   }
   return data
 }
@@ -107,6 +132,17 @@ function validateDay(raw: unknown): DayRecord {
     }
   }
   if (raw.checkin === true) day.checkin = true
+  if (Array.isArray(raw.sessions)) {
+    const sessions = raw.sessions.filter(isRecord).flatMap((s) => {
+      if (typeof s.thing !== 'string' || typeof s.minutes !== 'number' || s.minutes < 0) return []
+      return [
+        s.left === true
+          ? { thing: s.thing, minutes: s.minutes, left: true as const }
+          : { thing: s.thing, minutes: s.minutes },
+      ]
+    })
+    if (sessions.length > 0) day.sessions = sessions
+  }
   return day
 }
 
@@ -121,6 +157,7 @@ function validateSettings(raw: unknown): Settings {
   if (raw.postcardFormat === 'story' || raw.postcardFormat === 'square')
     settings.postcardFormat = raw.postcardFormat
   if (raw.sessionSound === true) settings.sessionSound = true
+  if (raw.showTime === true) settings.showTime = true
   return settings
 }
 

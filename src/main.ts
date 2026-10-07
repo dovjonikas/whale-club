@@ -10,6 +10,7 @@ import './styles/sky.css'
 import './styles/stones.css'
 import './styles/session.css'
 import './styles/depths.css'
+import './styles/log.css'
 import './styles/lab.css'
 
 import { startApp } from './app/app'

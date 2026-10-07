@@ -1,0 +1,221 @@
+/* The log: a month at a time, the year as twelve small months, a day's record. */
+.menu-row {
+  width: 100%;
+  min-height: var(--touch);
+  margin-bottom: var(--s6);
+  padding: 0 var(--s4);
+  border-radius: var(--r);
+  border: 1px solid var(--card-edge);
+  background: rgba(2, 4, 9, 0.35);
+  color: var(--ink);
+  font-size: var(--t-md);
+  text-align: left;
+}
+
+.log-head {
+  display: grid;
+  grid-template-columns: var(--touch) 1fr var(--touch);
+  align-items: center;
+  gap: var(--s2);
+}
+
+.log-title {
+  justify-self: center;
+  min-height: var(--touch);
+  padding: 0 var(--s3);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--t-md);
+  color: var(--star-pale);
+  display: grid;
+  place-items: center;
+}
+
+.log-head .icon-button:disabled {
+  opacity: 0.25;
+}
+
+.log-summary {
+  margin: var(--s2) 0 var(--s4);
+  text-align: center;
+  color: var(--ink-dim);
+  font-size: var(--t-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.log-weekdays,
+.log-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--s1);
+}
+
+.log-weekdays {
+  margin-bottom: var(--s1);
+  text-align: center;
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+}
+
+.log-cell {
+  position: relative;
+  aspect-ratio: 1;
+  min-height: var(--touch);
+  display: grid;
+  grid-template-rows: 1fr auto;
+  justify-items: center;
+  align-items: center;
+  padding: 2px 0 4px;
+  border-radius: var(--r);
+  color: var(--ink-dim);
+  font-size: var(--t-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+button.log-cell {
+  background: rgba(232, 240, 245, 0.03);
+}
+
+.log-cell.is-future {
+  opacity: 0.3;
+}
+
+.log-cell[data-today='true'] {
+  box-shadow: inset 0 0 0 1px var(--card-edge);
+}
+
+.log-num {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+/* A day with something done has its star behind its number. */
+.log-star {
+  grid-row: 1;
+  grid-column: 1;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.log-cell[data-star='true'] .log-star {
+  opacity: 1;
+  background: radial-gradient(circle, rgba(255, 217, 138, 0.55), rgba(255, 217, 138, 0) 70%);
+}
+
+.log-cell[data-star='true'] .log-num {
+  color: var(--star-pale);
+  font-weight: 700;
+}
+
+.log-dots {
+  display: flex;
+  gap: 2px;
+  height: 5px;
+  align-items: center;
+}
+
+.log-dots i {
+  width: 4px;
+  height: 5px;
+  border-radius: 50% 50% 45% 45%;
+  background: var(--lantern, var(--star));
+  box-shadow: 0 0 4px var(--lantern, var(--star));
+}
+
+.log-dots i.is-dim {
+  opacity: 0.35;
+  box-shadow: none;
+}
+
+.log-dots b {
+  font-size: 8px;
+  line-height: 1;
+  color: var(--ink-dim);
+}
+
+.log-year {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s3);
+  margin-top: var(--s4);
+}
+
+.log-month {
+  display: grid;
+  gap: var(--s1);
+  padding: var(--s2);
+  border-radius: var(--r);
+  background: rgba(232, 240, 245, 0.03);
+  color: var(--ink);
+  font-size: var(--t-xs);
+  text-align: left;
+}
+
+.log-month:disabled {
+  opacity: 0.3;
+}
+
+.log-month-dots {
+  display: grid;
+  grid-template-columns: repeat(7, 6px);
+  gap: 3px;
+}
+
+.log-month-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(232, 240, 245, 0.08);
+}
+
+.log-month-dots i.is-pad {
+  visibility: hidden;
+}
+
+.log-month-dots i.is-star {
+  background: var(--star);
+  box-shadow: 0 0 3px rgba(255, 217, 138, 0.6);
+}
+
+.log-day {
+  list-style: none;
+  margin: var(--s4) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s2);
+}
+
+.log-day li {
+  min-height: var(--touch);
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 0 var(--s3);
+  border-radius: var(--r);
+  background: rgba(232, 240, 245, 0.04);
+}
+
+.log-session.is-left {
+  color: var(--ink-dim);
+}
+
+.log-lantern {
+  width: 7px;
+  height: 9px;
+  border-radius: 50% 50% 45% 45%;
+  background: var(--star);
+  box-shadow: 0 0 6px var(--star);
+}
+
+.log-session.is-left .log-lantern {
+  opacity: 0.35;
+  box-shadow: none;
+}
+
+.log-nothing {
+  margin: var(--s6) 0 0;
+  text-align: center;
+  color: var(--ink-dim);
+}

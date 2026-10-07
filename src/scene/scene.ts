@@ -3,6 +3,7 @@ import type { DateKey, World } from '../store/types'
 import type { Collectible } from './collectibles'
 import { collectibleSvg } from './collectibles'
 import { deepHtml, kelpHtml, shaftsHtml, surfaceSvg } from './depths'
+import { LanternLayer, type LanternSpec } from './lanterns'
 import { moonPhase, moonSvg } from './moon'
 import { startParallax } from './parallax'
 import { ParticleField } from './particles'
@@ -30,6 +31,8 @@ import { sleeperSvg, visitorSvg, whaleSvg, type VisitorKind } from './visitors'
 const PHONE_WIDTH = 390
 const NIGHT_FROM = 21
 const NIGHT_TO = 5
+/** Where the sky ends, as a fraction of the scene's height (--horizon in tokens.css). */
+const HORIZON = 0.58
 
 export interface SceneDays {
   dates: readonly DateKey[]
@@ -48,6 +51,10 @@ export class Scene {
   private readonly stars: StarField
   private readonly particles: ParticleField
   private readonly stones: StoneLayer
+  private readonly lanterns: LanternLayer
+  private readonly lanternCanvas: HTMLCanvasElement
+  /** Today's new star, kept back until the opening shows it. */
+  private heldStar: DateKey | null = null
   private readonly skyLayer: HTMLElement
   private readonly starHits: HTMLElement
   private readonly thingsLayer: HTMLElement
@@ -57,6 +64,7 @@ export class Scene {
   private shown = new Set<string>()
   private rendered = false
   private onStarTap: ((date: DateKey) => void) | null = null
+  private onSkyTap: (() => void) | null = null
 
   constructor(parent: HTMLElement, onCrack: (key: string) => void) {
     this.root = document.createElement('div')
@@ -80,6 +88,7 @@ export class Scene {
         ${shoreSvg()}
         <div class="surface">${surfaceSvg()}</div>
       </div>
+      <canvas class="lanterns" aria-hidden="true"></canvas>
       <div class="scene-things" aria-hidden="true"></div>
       <div class="sleeper" aria-hidden="true">${sleeperSvg()}</div>
       <div class="stones" role="group" aria-label="stones"></div>
@@ -96,6 +105,15 @@ export class Scene {
     this.stars = new StarField(canvas(this.query('canvas.stars')))
     this.particles = new ParticleField(canvas(this.query('canvas.particles')))
     this.stones = new StoneLayer(this.query('.stones'), onCrack)
+    this.lanternCanvas = canvas(this.query('canvas.lanterns'))
+    this.lanterns = new LanternLayer(this.lanternCanvas)
+    // The canvases above the sky take the taps, so the sky is found by height:
+    // a tap above the horizon that is not on a star, a stone or a button.
+    this.root.addEventListener('click', (event) => {
+      if (event.target instanceof Element && event.target.closest('button, .stone')) return
+      const rect = this.root.getBoundingClientRect()
+      if (event.clientY - rect.top < rect.height * HORIZON) this.onSkyTap?.()
+    })
     // The star buttons are left out of the parallax: at depth 0.25 the canvas
     // drifts two pixels at most, and a button that keeps moving is one a finger misses.
     this.stopParallax = startParallax([this.skyLayer, this.query('.shore'), this.query('.sea')])
@@ -127,7 +145,58 @@ export class Scene {
   setDays(days: SceneDays, onTap: (date: DateKey) => void): void {
     this.days = days
     this.onStarTap = onTap
-    this.stars.setDays(days.dates, days.streak, days.today)
+    this.applyDays()
+  }
+
+  /** A tap on the open sky, away from any star. */
+  onSky(handler: () => void): void {
+    this.onSkyTap = handler
+  }
+
+  /** Keeps today's star out of the sky until `revealStar`, so the opening can light it. */
+  holdStar(date: DateKey): void {
+    this.heldStar = date
+    this.applyDays()
+  }
+
+  /** The held star appears, with a little star dust. */
+  revealStar(): void {
+    const date = this.heldStar
+    if (date === null) return
+    this.heldStar = null
+    this.applyDays()
+    const star = this.stars.positions().find((s) => s.date === date)
+    if (star) this.particles.burst('sky', star.x, star.y, 14)
+  }
+
+  /** Every lantern in the cove. */
+  setLanterns(specs: readonly LanternSpec[]): void {
+    this.lanterns.set(specs)
+  }
+
+  holdLantern(key: string): void {
+    this.lanterns.hold(key)
+  }
+
+  arriveLantern(key: string): void {
+    this.lanterns.arrive(key)
+  }
+
+  /** Whatever the opening was holding back, all at once: a skipped opening. */
+  releaseHeld(): void {
+    this.lanterns.release()
+    if (this.heldStar !== null) {
+      this.heldStar = null
+      this.applyDays()
+    }
+  }
+
+  private applyDays(): void {
+    const days = this.days
+    if (!days) return
+    const held = this.heldStar
+    const dates = held === null ? days.dates : days.dates.filter((d) => d !== held)
+    this.stars.setDays(dates, days.streak, days.today)
     this.renderStarHits()
   }
 
@@ -324,7 +393,8 @@ export class Scene {
     const scale = Math.min(Math.max(width / PHONE_WIDTH, 0.8), 2)
     this.root.style.setProperty('--scene-scale', scale.toFixed(3))
     this.stars.resize(this.skyLayer.clientWidth, this.skyLayer.clientHeight)
-    this.particles.resize(width, height, 0.58)
+    this.particles.resize(width, height, HORIZON)
+    this.lanterns.resize(this.lanternCanvas.clientWidth, this.lanternCanvas.clientHeight)
     this.renderStarHits()
   }
 

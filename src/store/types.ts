@@ -35,6 +35,17 @@ export interface Thing {
   order: number
 }
 
+/**
+ * One lock-in that ran to its end. Each is a lantern in the cove for good:
+ * a clean one lit, a left one dim. Undone and stopped sessions leave none.
+ */
+export interface SessionRecord {
+  thing: string
+  minutes: number
+  /** The person left for longer than the grace and came back: a dim lantern. */
+  left?: true
+}
+
 export interface DayRecord {
   /** Ids of the things done that day. A thing appears at most once. */
   done: string[]
@@ -52,6 +63,8 @@ export interface DayRecord {
   skip?: string[]
   /** The daily check-in was answered. */
   checkin?: boolean
+  /** Lock-ins that ran to their end that day, in order. */
+  sessions?: SessionRecord[]
 }
 
 export type PostcardFormat = 'story' | 'square'
@@ -66,10 +79,12 @@ export interface Settings {
   postcardFormat?: PostcardFormat
   /** The quiet sea sound during a lock-in. Off unless switched on. */
   sessionSound?: boolean
+  /** Show the time left during a lock-in. Off: a tap shows it for a moment. */
+  showTime?: boolean
 }
 
 export interface AppData {
-  version: 4
+  version: 5
   things: Thing[]
   days: Record<DateKey, DayRecord>
   /**
@@ -95,5 +110,5 @@ export const WORLD_ORDER: readonly World[] = ['sea', 'sky', 'garden']
 export const EVERY_DAY: readonly boolean[] = [true, true, true, true, true, true, true]
 
 export function emptyData(): AppData {
-  return { version: 4, things: [], days: {}, cracked: {}, settings: { sound: true } }
+  return { version: 5, things: [], days: {}, cracked: {}, settings: { sound: true } }
 }

@@ -1,6 +1,7 @@
 import { COLLECTIBLES } from '../scene/collectibles'
 import { rarityOf } from '../scene/rarity'
 import type { ShownCollectible } from '../scene/scene'
+import type { LanternSpec } from '../scene/lanterns'
 import type { StoneSpec } from '../scene/stones'
 import { fromKey } from '../store/dates'
 import { foundFor, reachedOn, waitingTiers } from '../store/derive'
@@ -10,6 +11,40 @@ import { voice } from '../voice'
 /** The bridge from the data to what the scene draws: plain functions of AppData. */
 
 const JACKET_ID = 'sea-a-jacket'
+
+/** A lantern's colour by the thing's place in the row: five things, five lights. */
+export const LANTERN_COLORS = ['#ffd98a', '#ff9fb2', '#8ef0e4', '#c8b6ff', '#ffb27a'] as const
+/** Sessions this long or longer get the middling lantern, and the large one. */
+const LANTERN_MIDDLE_MINUTES = 25
+const LANTERN_LARGE_MINUTES = 50
+
+/** The key of the lantern a day's session number `index` leaves. */
+export function lanternKey(date: DateKey, index: number): string {
+  return `${date}:${String(index)}`
+}
+
+/**
+ * Every lantern in the cove: one per session that ran to its end, oldest
+ * first. A thing that has since been deleted keeps its lanterns, in the
+ * first colour; history is not rewritten.
+ */
+export function lanternsFor(data: AppData): LanternSpec[] {
+  const order = new Map(data.things.map((t) => [t.id, t.order]))
+  const specs: LanternSpec[] = []
+  for (const date of Object.keys(data.days).sort()) {
+    data.days[date]?.sessions?.forEach((session, index) => {
+      const minutes = session.minutes
+      specs.push({
+        key: lanternKey(date, index),
+        date,
+        color: LANTERN_COLORS[(order.get(session.thing) ?? 0) % LANTERN_COLORS.length] ?? '#ffd98a',
+        size: minutes >= LANTERN_LARGE_MINUTES ? 2 : minutes >= LANTERN_MIDDLE_MINUTES ? 1 : 0,
+        dim: session.left === true,
+      })
+    })
+  }
+  return specs
+}
 
 export function shownCollectibles(data: AppData): ShownCollectible[] {
   const shown: ShownCollectible[] = []

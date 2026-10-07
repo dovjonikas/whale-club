@@ -29,15 +29,27 @@ export default defineConfig({
   projects: [
     {
       name: 'iphone',
+      testIgnore: /perf\.e2e\.ts/,
       use: { ...devices['iPhone 13'], defaultBrowserType: 'chromium' },
     },
     {
       name: 'android',
+      testIgnore: /perf\.e2e\.ts/,
       use: { ...devices['Pixel 5'] },
     },
     {
       name: 'desktop',
+      testIgnore: /perf\.e2e\.ts/,
       use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 768 } },
+    },
+    {
+      // Frame timing means nothing while other pages share the machine, so it runs
+      // last, alone, once the three devices are done.
+      name: 'perf',
+      testMatch: /perf\.e2e\.ts/,
+      dependencies: ['iphone', 'android', 'desktop'],
+      // A trace records the screen, which costs frames of its own.
+      use: { ...devices['Desktop Chrome'], viewport: { width: 1366, height: 768 }, trace: 'off' },
     },
   ],
   webServer: {
