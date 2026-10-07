@@ -57,24 +57,24 @@ what it costs ([`docs/DECISIONS.md`](docs/DECISIONS.md)).
 
 <table>
   <tr>
-    <td align="center" width="33%"><img src="docs/screenshots/iphone-scene.webp" width="240" alt="The home screen: a night sky of stars laid out as a calendar, a shore with sunflowers, a sea with fish, and three cards with creatures"><br><b>The sea</b><br><sub>Every day you show up is a star. A streak draws a constellation.</sub></td>
-    <td align="center" width="33%"><img src="docs/screenshots/iphone-all-done.webp" width="240" alt="Everything done for the day: the whale surfaces over the horizon and a button offers to send it"><br><b>All done</b><br><sub>The whale surfaces, with one line and one button to send it.</sub></td>
-    <td align="center" width="33%"><img src="docs/screenshots/iphone-collection.webp" width="240" alt="The collection: unlocked finds and the silhouettes of the next ones, each with its day"><br><b>The collection</b><br><sub>Sixty finds at 3 to 180 days. The next one is always in sight.</sub></td>
+    <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-scene.webp" width="240" alt="The home screen: a night sky of stars laid out as a calendar, a shore with sunflowers, a sea with fish, and three cards with creatures"><br><b>The sea</b><br><sub>Every day you show up is a star. A streak draws a constellation.</sub></td>
+    <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-all-done.webp" width="240" alt="Everything done for the day: the whale surfaces over the horizon and a button offers to send it"><br><b>All done</b><br><sub>The whale surfaces, with one line and one button to send it.</sub></td>
+    <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-collection.webp" width="240" alt="The collection: unlocked finds and the silhouettes of the next ones, each with its day"><br><b>The collection</b><br><sub>Sixty finds at 3 to 180 days. The next one is always in sight.</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/iphone-dial.webp" width="240" alt="The lock-in dial set to 30 minutes"><br><b>Lock in</b><br><sub>Turn the dial, from 10 to 120 minutes.</sub></td>
-    <td align="center"><img src="docs/screenshots/iphone-session.webp" width="240" alt="A lock-in session: deep water, the creature inside a slow ring, the time hidden"><br><b>Deep water</b><br><sub>Only the creature and a slow ring. The time hides until you tap.</sub></td>
-    <td align="center"><img src="docs/screenshots/iphone-opening.webp" width="240" alt="The end of a session: the world comes back and a new lantern comes down into the cove"><br><b>Coming back up</b><br><sub>The world returns in order and leaves a lantern in the cove.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-dial.webp" width="240" alt="The lock-in dial set to 30 minutes"><br><b>Lock in</b><br><sub>Turn the dial, from 10 to 120 minutes.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-session.webp" width="240" alt="A lock-in session: deep water, the creature inside a slow ring, the time hidden"><br><b>Deep water</b><br><sub>Only the creature and a slow ring. The time hides until you tap.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-opening.webp" width="240" alt="The end of a session: the world comes back and a new lantern comes down into the cove"><br><b>Coming back up</b><br><sub>The world returns in order and leaves a lantern in the cove.</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/iphone-stone.webp" width="240" alt="A stone floating at the water line, waiting to be cracked"><br><b>A stone</b><br><sub>What you earn falls in as a stone and waits for you.</sub></td>
-    <td align="center"><img src="docs/screenshots/iphone-find.webp" width="240" alt="A find out of its stone: a jellyfish at night"><br><b>A find</b><br><sub>Three taps crack it. Some come out rare.</sub></td>
-    <td align="center"><img src="docs/screenshots/iphone-log.webp" width="240" alt="The log: a month in one sentence, each day with its star and a dot for each lantern"><br><b>The log</b><br><sub>A month in one sentence. Never what was missed.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-stone.webp" width="240" alt="A stone floating at the water line, waiting to be cracked"><br><b>A stone</b><br><sub>What you earn falls in as a stone and waits for you.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-find.webp" width="240" alt="A find out of its stone: a jellyfish at night"><br><b>A find</b><br><sub>Three taps crack it. Some come out rare.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-log.webp" width="240" alt="The log: a month in one sentence, each day with its star and a dot for each lantern"><br><b>The log</b><br><sub>A month in one sentence. Never what was missed.</sub></td>
   </tr>
   <tr>
-    <td align="center"><img src="docs/screenshots/iphone-promise.webp" width="240" alt="The first minute: a year drawn in silhouette, the day counter running, the sky filling with stars"><br><b>The first minute</b><br><sub>A year in silhouette, the counter running to 365.</sub></td>
-    <td align="center"><img src="docs/screenshots/iphone-truth.webp" width="240" alt="The first minute at its peak: the author's sentence under a sky of doubled stars, the little whale at the surface"><br><b>The promise</b><br><sub>The idea in one sentence, a synthesised note for every word.</sub></td>
-    <td align="center"><img src="docs/screenshots/iphone-first.webp" width="240" alt="The first screen: one sentence, an empty card, and a small whale asleep under the surface"><br><b>Day one</b><br><sub>One empty card, and a small whale asleep under the surface.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-promise.webp" width="240" alt="The first minute: a year drawn in silhouette, the day counter running, the sky filling with stars"><br><b>The first minute</b><br><sub>A year in silhouette, the counter running to 365.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-truth.webp" width="240" alt="The first minute at its peak: the author's sentence under a sky of doubled stars, the little whale at the surface"><br><b>The promise</b><br><sub>The idea in one sentence, a synthesised note for every word.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-first.webp" width="240" alt="The first screen: one sentence, an empty card, and a small whale asleep under the surface"><br><b>Day one</b><br><sub>One empty card, and a small whale asleep under the surface.</sub></td>
   </tr>
 </table>
 
@@ -141,9 +141,9 @@ from the app: **[the icon set](https://dovjonikas.github.io/whale-club/brand.htm
 The plan and its critique are in [`docs/brand/BRAND.md`](docs/brand/BRAND.md).
 
 <p align="center">
-  <img src="docs/screenshots/brand-states.webp" width="440" alt="brand.html: a bubble empty, done, a lock-in at none, half and done, done without the timer, and a monogram">
+  <img src="docs/screenshots/brand-states.webp" width="400" alt="brand.html: a bubble empty, done, a lock-in at none, half and done, done without the timer, and a monogram">
   &nbsp;
-  <img src="docs/screenshots/brand-glyphs.webp" width="440" alt="brand.html: the glyphs by group, each in its bubble and at 20 px">
+  <img src="docs/screenshots/brand-glyphs.webp" width="400" alt="brand.html: the glyphs by group, each in its bubble and at 20 px">
 </p>
 
 ## Your data
