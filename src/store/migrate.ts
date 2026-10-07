@@ -32,8 +32,10 @@ export function migrate(raw: unknown): AppData {
       return withKinds(validateV2(raw))
     case 6:
     case 7:
+    case 8:
       // Before version 7 things wore emoji; validateThing gives each its glyph.
-      return validateV2(raw)
+      // Before version 8 nothing was bought or placed; validateDock reads what there is.
+      return validateDock(raw, validateV2(raw))
     default:
       throw new Error(`unknown version ${String(raw.version)}`)
   }
@@ -108,6 +110,44 @@ function validateV2(raw: Record<string, unknown>): AppData {
       if (typeof tier === 'number' && tier > 0) data.cracked[id] = tier
     }
   }
+  return data
+}
+
+/**
+ * The dock and the arrangement: purchases with a price, the goal, what is
+ * hidden or worn, and where things stand. Anything malformed is dropped on
+ * its own; none of it can cost a day of history.
+ */
+function validateDock(raw: Record<string, unknown>, data: AppData): AppData {
+  if (Array.isArray(raw.bought)) {
+    const bought = raw.bought
+      .filter(isRecord)
+      .flatMap((b) =>
+        typeof b.item === 'string' &&
+        typeof b.date === 'string' &&
+        typeof b.price === 'number' &&
+        b.price >= 0
+          ? [{ item: b.item, date: b.date, price: Math.round(b.price) }]
+          : [],
+      )
+    if (bought.length > 0) data.bought = bought
+  }
+  if (typeof raw.goal === 'string') data.goal = raw.goal
+  if (Array.isArray(raw.hidden)) {
+    const hidden = [...new Set(raw.hidden.filter(isString))]
+    if (hidden.length > 0) data.hidden = hidden
+  }
+  const pairs = (value: unknown): Record<string, string> | undefined => {
+    if (!isRecord(value)) return undefined
+    const kept = Object.fromEntries(
+      Object.entries(value).filter((entry): entry is [string, string] => isString(entry[1])),
+    )
+    return Object.keys(kept).length > 0 ? kept : undefined
+  }
+  const wears = pairs(raw.wears)
+  if (wears) data.wears = wears
+  const placement = pairs(raw.placement)
+  if (placement) data.placement = placement
   return data
 }
 

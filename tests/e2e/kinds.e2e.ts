@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test'
 import { expect, test, addThing, card, dateKey, dismissInstallLeaf, seed, stored } from './helpers'
+import { DATA_VERSION } from '../../src/store/types'
 
 /**
  * Two kinds of thing. A tap thing is a list: a tap marks it, a tap takes
@@ -58,7 +59,7 @@ test('data from before 0.11 gets a kind: lock in where most done days had minute
     version: number
     things: { kind: string; minutes: number }[]
   }
-  expect(data.version).toBe(7)
+  expect(data.version).toBe(DATA_VERSION)
   expect(data.things.map((t) => t.kind)).toEqual(['lockIn', 'tap'])
   expect(data.things[0]?.minutes).toBe(25)
   await expect(cardOf(page, 'study')).toContainText('25 min')

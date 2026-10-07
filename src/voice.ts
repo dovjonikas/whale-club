@@ -248,6 +248,59 @@ export const voice = {
     legendSoft: 'soft: finished in parts',
     legendDim: 'faint: started, not finished',
   },
+  /** Krill: the chip by the title, what a day added, and the goal under it. */
+  krill: {
+    /** The chip, to a screen reader: it opens the dock. */
+    label: (n: number) => `${count(n)} krill. open the dock`, // TODO-VOICE
+    gained: (n: number) => `+${count(n)}`,
+    goal: (left: number, name: string) => `${count(left)} to the ${name}`, // TODO-VOICE
+    goalReady: (name: string) => `the ${name}: ready when you are`, // TODO-VOICE
+  },
+  /** The dock: a pier on the shore where krill buys things to look at. */
+  dock: {
+    title: 'the dock', // TODO-VOICE
+    pier: 'the dock, on the shore',
+    intro: 'krill buys looks here. nothing else, ever.', // TODO-VOICE
+    balance: (n: number) => `${count(n)} krill`,
+    tiers: {
+      small: 'small',
+      middling: 'middling',
+      large: 'large',
+      legendary: 'legendary',
+    },
+    price: (n: number) => count(n),
+    get: 'get it',
+    save: 'save for this',
+    saving: 'saving for this',
+    stopSaving: 'stop saving',
+    short: (n: number) => `${count(n)} to go`, // TODO-VOICE
+    owned: 'yours',
+    hide: 'hide',
+    show: 'show',
+    hidden: 'hidden',
+    whoWears: 'who wears it?', // TODO-VOICE
+    wornBy: (name: string) => `worn by ${name}`, // TODO-VOICE
+    arrived: (name: string) => `the ${name} is here.`, // TODO-VOICE
+    /** An unowned thing, to a screen reader: its silhouette and price. */
+    locked: (name: string, price: number) => `${name}, ${count(price)} krill`,
+  },
+  /** Arranging the scene: places, the chest, and moving a thing between them. */
+  arrange: {
+    open: 'arrange',
+    title: 'arrange your sea', // TODO-VOICE
+    hint: 'drag a thing to another place.', // TODO-VOICE
+    done: 'done',
+    tidy: 'tidy up',
+    putAway: 'put away',
+    putOut: 'put out',
+    chest: 'the chest',
+    chestEmpty: 'nothing put away.', // TODO-VOICE
+    /** A new find with no free place left in its world. */
+    toChest: (name: string) => `no room for ${name}. it waits in the chest.`, // TODO-VOICE
+    noRoom: 'no free place in that world.', // TODO-VOICE
+    place: (name: string, n: number) => `${name}, place ${String(n)}`,
+    empty: (n: number) => `empty place ${String(n)}`,
+  },
   /** The lab: a tool for trying the app across days, not part of the game's voice. */
   lab: {
     title: 'the lab',
@@ -271,6 +324,11 @@ export const voice = {
     version: (v: string) => `version ${v}`,
   },
 } as const
+
+/** 1200 as "1,200": krill is counted, so it reads like money does. */
+function count(n: number): string {
+  return Math.round(n).toLocaleString('en-US')
+}
 
 function plural(n: number, word: string): string {
   return `${String(n)} ${word}${n === 1 ? '' : 's'}`
