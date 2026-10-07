@@ -15,6 +15,9 @@ const MAX_BYTES = 300 * 1024
 const MAX_WIDTH = 780
 /** The desktop pictures are wide by nature; they keep more width. */
 const MAX_WIDTH_WIDE = 1366
+/** The banner spans the README's whole width, so it keeps the most, and may weigh a little more. */
+const MAX_WIDTH_HERO = 1800
+const MAX_BYTES_HERO = 450 * 1024
 
 const pngs = readdirSync(dir).filter((name) => name.endsWith('.png'))
 for (const name of pngs) {
@@ -22,11 +25,14 @@ for (const name of pngs) {
   const to = from.replace(/\.png$/, '.webp')
   const meta = await sharp(from).metadata()
   const wide = (meta.width ?? 0) > (meta.height ?? 0)
-  const width = Math.min(meta.width ?? MAX_WIDTH, wide ? MAX_WIDTH_WIDE : MAX_WIDTH)
+  const hero = name.startsWith('hero')
+  const cap = hero ? MAX_WIDTH_HERO : wide ? MAX_WIDTH_WIDE : MAX_WIDTH
+  const width = Math.min(meta.width ?? MAX_WIDTH, cap)
+  const limit = hero ? MAX_BYTES_HERO : MAX_BYTES
   let quality = 82
   for (;;) {
     await sharp(from).resize({ width }).webp({ quality, effort: 6 }).toFile(to)
-    if (statSync(to).size <= MAX_BYTES || quality <= 40) break
+    if (statSync(to).size <= limit || quality <= 40) break
     quality -= 6
   }
   unlinkSync(from)

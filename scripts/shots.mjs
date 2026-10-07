@@ -3,6 +3,7 @@
 // docs/screenshots/. Running it twice gives the same pictures. The iPhone
 // pass also saves the two postcards the app paints, story and square.
 // `npm run shots` then runs squeeze.mjs, which turns them into WebP under 300 KB.
+// Then hero.mjs composes the README banner from three of them, and squeeze runs again.
 // Needs the preview server: `npm run build && npm run preview` first.
 /* global window, navigator, FileReader, Buffer */
 import { chromium, devices } from '@playwright/test'
