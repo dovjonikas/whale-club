@@ -45,7 +45,12 @@ function pullToClose(sheet: HTMLElement, grabber: HTMLElement, close: () => void
     const now = new DOMMatrixReadOnly(getComputedStyle(sheet).transform).m42
     pull = { id: event.pointerId, y: event.clientY - now, at: event.timeStamp }
     dy = 0
-    grabber.setPointerCapture(event.pointerId)
+    try {
+      // Keeps the pull going if the finger slides off the strip.
+      grabber.setPointerCapture(event.pointerId)
+    } catch {
+      // The pointer is already gone (or never was a real one); the pull still works where it is.
+    }
     sheet.classList.add('is-dragging')
   })
   grabber.addEventListener('pointermove', (event) => {

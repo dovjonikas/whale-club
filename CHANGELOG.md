@@ -2,6 +2,29 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.11.3 - 2026-10-07
+
+The intro has a score.
+
+- A first open starts on "tap to begin" over the quiet sea: a browser plays
+  no sound before a first touch, and this one tap lets the music start with
+  the year. Enter works too; "skip" is still there.
+- The year is a music box whose notes run as fast as the days do, its
+  chords turning with the seasons (C, A minor, F, G). Day 365 holds on a
+  suspended chord, the whale sings as it rises, and "a year of small
+  things." is sung a note a word, leaning on F and falling home to E.
+- Every word of the truth has its note. The doubt falls softly in A minor
+  and stops on an unresolved B; the blink is real silence; the hope opens on
+  F with a new low voice; at "compound" the notes double with the stars
+  (one, two, four, eight, sixteen); "stay consistent" waits on G with C
+  held over it; and the last word, "small.", lands on a wide C chord with
+  the F falling to E, high bells, and the whale singing upward, then rings
+  out and fades under "start light".
+- Felt piano, warm pad, a whale's voice, an echo and a long generated room;
+  all synthesised, nothing loaded. Measured offline: no clipping, and a
+  climb from the doubt to the peak of about thirteen decibels.
+- Sheets: a grabber that has lost its pointer no longer throws.
+
 ## 0.11.2 - 2026-10-07
 
 The truth beat, played like a song that climbs.

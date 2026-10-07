@@ -129,6 +129,9 @@ export const voice = {
   /** The first open: three beats, never again unless asked. */
   intro: {
     skip: 'skip',
+    /** The first screen of a first open: one tap, so the music is allowed to play. */
+    begin: 'tap to begin', // TODO-VOICE
+    beginLine: 'with sound, if you can.', // TODO-VOICE
     next: 'tap to go on',
     day: (n: number) => `day ${String(n)}`,
     promise: 'a year of small things.', // TODO-VOICE

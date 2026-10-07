@@ -11,10 +11,15 @@ import { emptyData } from '../store/types'
 import { voice } from '../voice'
 import { host } from './host'
 import { lanternsFor } from './sceneData'
+import { Score } from './score'
 import type { Sound } from './sound'
 
 /**
- * The first minute, in three beats, on a first open only (and on request).
+ * The first minute, in three beats, on a first open only (and on request),
+ * with music under it (src/app/score.ts). A browser plays no sound before
+ * a first touch, so when sound is on and not yet allowed, the intro opens
+ * on "tap to begin" over the quiet sea; that tap starts the music and the
+ * year together.
  * It is paced like a short piece of music, not a slideshow: a quiet
  * opening, a year that speeds up through its middle and slows into its
  * last days, a held moment at the top, and room after every line to read
@@ -45,7 +50,7 @@ import type { Sound } from './sound'
  * three still frames and everything else fades instead of moving.
  */
 export type IntroEnd = 'start' | 'skip'
-type Beat = 'promise' | 'truth' | 'start'
+type Beat = 'gate' | 'promise' | 'truth' | 'start'
 
 /** A breath of quiet before the year starts. */
 const OPENING_MS = 1100
@@ -61,8 +66,10 @@ const WORD_MS = 240
 const LINE_HOLD_MS = 3000
 const FADE_MS = 700
 /**
- * The truth's score: when each phrase and each moment of the little story
- * comes, in ms from the start of the beat.
+ * The truth's timing: when each phrase and each moment of the little story
+ * comes, in ms from the start of the beat. Two moments follow from the
+ * words themselves: the stars start on "compound", and the peak lands on
+ * the last word.
  */
 const TRUTH = {
   /** Under the lids the year gives way to day one. */
@@ -72,34 +79,36 @@ const TRUTH = {
   flutter: 750,
   open: 1000,
   phrase1: 1200,
-  phrase2: 3600,
+  phrase2: 3800,
   /** The turn: the lids close on the doubt, the light warms under them, and they open on the hope. */
   blink: 6100,
   turn: 6450,
   reopen: 6600,
   wake: 6900,
   phrase3: 6950,
-  /** The stars double as "compound" is read. */
-  stars: 7300,
-  rise: 8100,
-  phrase4: 9400,
-  /** The last word: the whale blows, the first star blooms, the chord. */
-  peak: 11000,
-  start: 12300,
+  rise: 8700,
+  phrase4: 10000,
 } as const
+/** Each word of the truth follows the last by this much, slow enough that its note is heard as a melody. */
+const TRUTH_WORD_MS = 200
+/** The word the stars start doubling on. */
+const COMPOUND = 'compound'
+/** After the last word lands, the peak rings this long before "start light". */
+const PEAK_HOLD_MS = 1300
+/** How often the year's music box plays a note, in days: its rhythm follows the year's own pace. */
+const STEP_DAYS = 14
+
 /** The stars of the truth come in doubling waves, each sooner than the last: an accelerando. */
 const WAVES = [1, 2, 4, 8, 16]
 const WAVE_AT = [0, 560, 980, 1280, 1480]
 /** A wave's stars sparkle in over this much, not all at once. */
 const WAVE_SPREAD_MS = 160
-/** The melody: one note per wave rising up the scale, then the chord, played as a quick arpeggio. */
-const WAVE_NOTE = 0
-const CHORD = [5, 7, 8, 10]
-const CHORD_GAP_S = 0.07
 const STILL_MS = 2200
 const STILL_DAYS = [1, 100, 365]
 const FPS = 30
 const YEAR = 365
+/** The year's four seasons, each with its chord. */
+const SEASON_DAYS = YEAR / 4
 /** Where each world's creature stands while the year runs, as a fraction of the width. */
 const CREATURE_X: Record<World, number> = { sea: 0.25, sky: 0.5, garden: 0.75 }
 const LANTERN_LIGHT = '#ffd98a'
@@ -213,6 +222,11 @@ export function playIntro(
   overlay.dataset.lids = 'open'
   overlay.innerHTML = `
     <button type="button" class="intro-skip">${voice.intro.skip}</button>
+    <button type="button" class="intro-begin">
+      <span class="intro-begin-bubble" aria-hidden="true"></span>
+      <span class="intro-begin-title">${voice.intro.begin}</span>
+      <span class="intro-begin-line">${voice.intro.beginLine}</span>
+    </button>
     <div class="intro-day" aria-hidden="true"></div>
     <div class="intro-creatures" aria-hidden="true">
       ${year.data.things.map((t) => `<span class="intro-creature" data-world="${t.world}" style="left:${String(CREATURE_X[t.world] * 100)}%"></span>`).join('')}
@@ -234,8 +248,8 @@ export function playIntro(
         <span class="intro-spout"><i></i><i></i><i></i></span>
       </div>
     </div>
-    <p class="intro-line" aria-live="polite">${wordsOf(voice.intro.promise)}</p>
-    <div class="intro-truth" data-half="1">${sentence
+    <p class="intro-line" aria-live="polite" style="--word-ms:${String(WORD_MS)}ms">${wordsOf(voice.intro.promise)}</p>
+    <div class="intro-truth" data-half="1" style="--word-ms:${String(TRUTH_WORD_MS)}ms">${sentence
       .map(
         (half) =>
           `<div class="intro-half">${half.map((p) => `<p>${wordsOf(p)}</p>`).join('')}</div>`,
@@ -258,8 +272,20 @@ export function playIntro(
   const skyDots = [...overlay.querySelectorAll<HTMLElement>('.intro-sky i')]
   /** The phrases of the first half; the second half's come after them. */
   const firstHalf = sentence[0]?.length ?? 0
+  const wordsIn = (phrase: string | undefined): string[] => (phrase ?? '').split(' ')
+  const hope = sentence[1] ?? []
+  /** The stars start on "compound", and the peak lands on the last word. */
+  const compoundAt = Math.max(
+    0,
+    wordsIn(hope[0]).findIndex((w) => w.startsWith(COMPOUND)),
+  )
+  const starsAt = TRUTH.phrase3 + compoundAt * TRUTH_WORD_MS
+  const peakAt = TRUTH.phrase4 + (wordsIn(hope[1]).length - 1) * TRUTH_WORD_MS
 
-  let beat: Beat = 'promise'
+  /** The music: none while sound is off, or until a tap allows it. */
+  let score: Score | null = null
+  const gated = !options.sound.isMuted() && !options.sound.isRunning()
+  let beat: Beat = gated ? 'gate' : 'promise'
   let handle: FrameHandle | null = null
   const timers: number[] = []
   const later = (ms: number, run: () => void): void => {
@@ -274,10 +300,20 @@ export function playIntro(
   // --- the promise --------------------------------------------------------------------------
   let shownDay = 0
   let findIndex = 0
-  let note = 0
+  let stepAt = 0
+  let season = -1
   const drawDay = (day: number, flashes: boolean): void => {
     if (day === shownDay) return
     shownDay = day
+    const quarter = Math.min(3, Math.floor((day - 1) / SEASON_DAYS))
+    if (quarter !== season) {
+      season = quarter
+      score?.season(quarter)
+    }
+    // The music box keeps the year's pace: slow, rushing, slow.
+    const step = Math.floor(day / STEP_DAYS)
+    if (flashes && step > stepAt) score?.step(step, quarter)
+    stepAt = step
     const until = addDays(year.start, day)
     const dates = year.dates.filter((d) => d <= until)
     scene.preview({
@@ -298,14 +334,14 @@ export function playIntro(
       element.innerHTML =
         stage === null ? beginningSvg(thing.world) : creatureSvg(thing.world, thing.line, stage)
     })
-    // Every find reached by now opens as a flash and a note, rising through the scale.
+    // Every find reached by now opens as a flash and a high, quiet bell.
     let fired = 0
     while (findIndex < year.finds.length && (year.finds[findIndex]?.date ?? '') <= until) {
       const find = year.finds[findIndex]
       findIndex++
       if (find && flashes && fired < 2) {
         scene.flash(find.x, find.y, find.world)
-        options.sound.note(note++)
+        score?.sparkle(quarter, findIndex)
         fired++
       }
     }
@@ -327,7 +363,10 @@ export function playIntro(
           })
         })
       })
-      later(STILL_DAYS.length * STILL_MS, topOfTheYear)
+      later(STILL_DAYS.length * STILL_MS, () => {
+        score?.fermata()
+        topOfTheYear()
+      })
       return
     }
     later(OPENING_MS, () => {
@@ -338,6 +377,7 @@ export function playIntro(
         if (t >= 1) {
           handle?.remove()
           handle = null
+          score?.fermata()
           later(FERMATA_MS, topOfTheYear)
         }
       }, FPS)
@@ -350,14 +390,16 @@ export function playIntro(
     // The year's creatures step back; the whale has the moment to itself.
     overlay.dataset.top = 'true'
     scene.surfaceWhale(false)
-    options.sound.play('whale')
+    score?.whale()
     later(WHALE_MS, () => {
       overlay.dataset.line = 'on'
       const words = voice.intro.promise.split(' ').length
+      score?.line(WORD_MS, words)
       later(words * WORD_MS + LINE_HOLD_MS, () => {
-        // The line goes as the eyes close slowly on the year.
+        // The line goes as the eyes close slowly on the year, and the music with it.
         overlay.dataset.line = 'off'
         overlay.dataset.lids = 'sleep'
+        score?.close()
         later(FADE_MS, () => {
           go('truth')
         })
@@ -401,52 +443,69 @@ export function playIntro(
     light('gold')
     overlay.dataset.calf = 'blow'
     overlay.dataset.star = 'on'
-    CHORD.forEach((step, i) => {
-      options.sound.note(step, i * CHORD_GAP_S)
-    })
+    score?.peak()
+  }
+  /** A phrase appears word by word, and its melody under it, a note a word. */
+  const sing = (i: number): void => {
+    showPhrase(i)
+    score?.phrase(i, TRUTH_WORD_MS)
   }
 
   const truth = (): void => {
     overlay.dataset.beat = 'truth'
     overlay.dataset.lids = 'shut'
     light('cold')
+    score?.close()
     later(TRUTH.dayOne, dayOne)
     later(TRUTH.peek, lids('peek'))
     later(TRUTH.flutter, lids('shut'))
-    later(TRUTH.open, lids('open'))
+    later(TRUTH.open, () => {
+      lids('open')()
+      score?.doubt()
+    })
     later(TRUTH.phrase1, () => {
-      showPhrase(0)
+      sing(0)
     })
     later(TRUTH.phrase2, () => {
-      showPhrase(1)
+      sing(1)
     })
-    later(TRUTH.blink, lids('shut'))
+    later(TRUTH.blink, () => {
+      lids('shut')()
+      score?.blink()
+    })
     later(TRUTH.turn, turn)
-    later(TRUTH.reopen, lids('open'))
+    later(TRUTH.reopen, () => {
+      lids('open')()
+      score?.turn()
+    })
     later(TRUTH.wake, wake)
     later(TRUTH.phrase3, () => {
-      showPhrase(firstHalf)
+      sing(firstHalf)
     })
-    later(TRUTH.stars, () => {
+    later(starsAt, () => {
       scene.setPush(true)
       overlay.dataset.push = 'true'
     })
     WAVES.forEach((_, wave) => {
-      later(TRUTH.stars + (WAVE_AT[wave] ?? 0), () => {
+      later(starsAt + (WAVE_AT[wave] ?? 0), () => {
         lightWave(wave)
-        options.sound.note(WAVE_NOTE + wave)
+        score?.wave(wave)
       })
     })
     later(TRUTH.rise, () => {
       overlay.dataset.calf = 'up'
     })
     later(TRUTH.phrase4, () => {
-      showPhrase(firstHalf + 1)
       light('warm')
+      score?.consistent()
+      sing(firstHalf + 1)
     })
-    later(TRUTH.peak, peak)
-    later(TRUTH.start, () => {
-      go('start')
+    later(peakAt, peak)
+    later(peakAt + PEAK_HOLD_MS, () => {
+      // The natural end: the peak rings on under "start light".
+      stopTimers()
+      beat = 'start'
+      start()
     })
   }
 
@@ -475,15 +534,31 @@ export function playIntro(
     q('.intro-start').focus()
   }
 
+  /** On by a tap or "skip": to the truth, or straight to the end with the music settling home. */
   const go = (next: Beat): void => {
     stopTimers()
     beat = next
-    if (next === 'truth') truth()
-    else start()
+    if (next === 'truth') {
+      truth()
+      return
+    }
+    score?.settle()
+    start()
+  }
+
+  /** The first tap: the music is allowed now, and it starts with the year. */
+  const begin = (): void => {
+    if (beat !== 'gate') return
+    options.sound.unlock()
+    score = Score.for(options.sound)
+    score?.begin()
+    beat = 'promise'
+    promise()
   }
 
   const end = (how: IntroEnd): void => {
     stopTimers()
+    score?.end()
     scene.setPush(false)
     scene.preview(null)
     scene.setSilhouette(false)
@@ -503,14 +578,25 @@ export function playIntro(
   q('.intro-start').addEventListener('click', () => {
     end('start')
   })
+  q('.intro-begin').addEventListener('click', begin)
   overlay.addEventListener('click', (event) => {
     if (event.target instanceof Element && event.target.closest('button')) return
-    if (beat === 'promise') go('truth')
+    if (beat === 'gate') begin()
+    else if (beat === 'promise') go('truth')
     else if (beat === 'truth') go('start')
   })
 
   host().append(overlay)
   app?.classList.add('is-behind-intro')
   app?.setAttribute('inert', '')
+  if (gated) {
+    // The quiet sea, and one tap to begin with sound.
+    overlay.dataset.beat = 'gate'
+    scene.setEmpty(false)
+    q('.intro-begin').focus()
+    return
+  }
+  score = Score.for(options.sound)
+  score?.begin()
   promise()
 }

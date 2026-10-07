@@ -12,11 +12,6 @@ import type { World } from '../store/types'
 export type SoundKind =
   'tap' | 'untap' | 'whale' | 'unlock' | 'left' | 'resume' | 'checkin' | 'grow'
 
-/** C major pentatonic over two octaves: C D E G A, C D E G A, C. */
-const PENTATONIC = [
-  523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.51, 1567.98, 1760, 2093,
-]
-
 export class Sound {
   private ctx: AudioContext | null = null
   private sea: { source: AudioBufferSourceNode; lfo: OscillatorNode; gain: GainNode } | null = null
@@ -140,17 +135,14 @@ export class Sound {
     }
   }
 
-  /**
-   * One note of a pentatonic scale, soft and short, for the intro's melody:
-   * whatever order they come in, they never clash. `at` delays it, in
-   * seconds, so a chord can be played as a quick arpeggio.
-   */
-  note(step: number, at = 0): void {
-    if (this.muted || !this.ctx) return
-    const freq =
-      PENTATONIC[((step % PENTATONIC.length) + PENTATONIC.length) % PENTATONIC.length] ?? 523
-    this.tone(freq, at, 0.9, 0.022, 'sine')
-    this.tone(freq * 2, at + 0.02, 0.5, 0.006, 'sine')
+  /** The audio context for longer music (the intro's score), or none while muted or not yet allowed. */
+  context(): AudioContext | null {
+    return this.muted ? null : this.ctx
+  }
+
+  /** Whether sound can play now: a tap has opened it and nothing has closed it since. */
+  isRunning(): boolean {
+    return this.ctx?.state === 'running'
   }
 
   private tone(

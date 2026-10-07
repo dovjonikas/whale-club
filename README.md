@@ -91,8 +91,9 @@ And underneath all three: nothing dies. You just missed a day.
   opening, the whale rising before the moon), then the author's sentence
   played like a song that climbs: the eyes open on the empty sea of day
   one, blink at the turn, the stars double as "compound" is read, and the
-  first star blooms on the last word. Then one button: "start light". Skip
-  is always there.
+  first star blooms on the last word. A small score plays under it, a note
+  for every word, all synthesised. Then one button: "start light". Skip is
+  always there.
   After that, every mechanic explains itself in one line the first time it
   shows, and the next find is always in sight above the row.
 - **Days, if you want them.** Every thing is planned every day unless

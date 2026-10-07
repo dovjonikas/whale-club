@@ -2,7 +2,7 @@
 
 ## Done
 
-v0.11.2, live at https://dovjonikas.github.io/whale-club/ after the push.
+v0.11.3, live at https://dovjonikas.github.io/whale-club/ after the push.
 
 - **v0.1.0 to v0.3.0**: the row, the scene, the sky as a calendar, creatures, PWA, collectibles, the whale, rituals, sound, share; a buddy slot (since removed).
 - **v0.4.0**: postcards instead of a buddy; the phone-wide frame; the install leaf after the first thing; Lighthouse through Edge.
@@ -20,6 +20,7 @@ v0.11.2, live at https://dovjonikas.github.io/whale-club/ after the push.
 - **v0.11.0**: two kinds of thing (tap when done, lock in); only the minutes the timer saw count, parts add up, "12/25 · finish"; did it without the timer; "edit" with delete and undo, retired things keep their history; the first minute (promise, truth, start light); the next find in sight; one-line explanations; the log's legend; how it works; data v6; the clarity test.
 - **v0.11.1**: the author's first look answered: the intro paced like music with a small story in the truth beat; a quiet glass under text over the scene; lengths up to ten hours ("other", a stepped dial).
 - **v0.11.2**: the truth beat as a song that climbs: the eyes open on day one, blink at the turn, the stars double at "compound", the first star blooms on the last word with a chord.
+- **v0.11.3**: the intro has a score: "tap to begin" so sound may play, a music box year, a note for every word of the truth, silence at the blink, the notes doubling at "compound", the last word resolving on the peak.
 
 ## The road to 1.0 (the author's briefs of 2026-10-07)
 

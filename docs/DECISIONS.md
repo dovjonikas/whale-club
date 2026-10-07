@@ -670,3 +670,51 @@ light" in about twenty-seven seconds.
 - **review-animations** can only be started by the author; it refuses to
   run when the agent calls it. The new motion is checked against the emil
   rules in `docs/QUALITY.md`, and the skill is left for the author to run.
+
+## 2026-10-07 The intro has a score
+
+The author asked for music that catches the heart, "almost a melody, but it
+echoes", with notes under the words because the text felt too quiet. Three
+findings shaped it.
+
+- What gives shivers and tears is known well enough to compose for. In
+  Sloboda's study of passages that reliably moved listeners, 18 of 20
+  contained an appoggiatura, a note that clashes with the chord and then
+  resolves; shivers went with new or unprepared harmony and sudden changes
+  in texture and loudness ("Anatomy of a tear-jerker", after Sloboda 1991;
+  Frontiers in Psychology 2018, "Musical chills"). The same research names
+  crescendos, a new voice entering, and the range widening at the climax,
+  and stresses that each works only against what came just before.
+- The harmony walks from vulnerable to bright: A minor, F, G, C, the road
+  the vi to IV to V to I progressions take in so much music meant to lift,
+  with the fourth held over the G (a suspension) so the arrival is waited
+  for.
+- The echo is a timbre and a space: a soft felt-piano tone (a strong
+  fundamental, few quiet overtones, two oscillators a few cents apart)
+  sent into a feedback echo and a long room. The room is generated, noise
+  that darkens as it fades, so nothing is loaded. The method of a felt
+  piano with an echo was also how the author's other page did it; the
+  notes, the voicings and the code here are new.
+
+So `src/app/score.ts` is written as a score, with named notes and voicings.
+Every word of the truth has a note, so the text sings as it appears: the
+doubt falls quietly and stops on an unresolved B, the blink is a true
+silence (the whole mix drops, echoes too), the hope enters with a bass that
+was not there, "compound" doubles the notes with the stars, and the last
+word lands on the peak, F over C falling to E. The words now come one every
+200 ms, slow enough to hear as a melody, and the timing is derived from the
+text: the stars start on "compound" and the peak on the last word.
+
+Because a browser plays nothing before a first touch, a first open now
+begins with "tap to begin" over the quiet sea; without it the music could
+never start where it should. It only shows when sound is on and not yet
+allowed, it answers Enter, and "skip" stays.
+
+The mix was checked by rendering the whole score offline with every cue at
+its real time (`scripts/score-render.js`, run in the browser on the dev
+server) and measuring each section. The first render clipped and was flat,
+the doubt as loud as the peak, so the levels became one table (`LEVEL`),
+pads were made as loud with seven notes as with two, and the blink was made
+silent. Now: sea -48 dB, year -26, doubt -26, blink -54, hope -21, stars
+-18, waiting -16, peak -13, peak sample -1.9 dBFS, and the last chord sinks
+and fades instead of droning on.
