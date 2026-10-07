@@ -141,8 +141,9 @@ export class StarField {
     const weeks = Math.max(MIN_ROWS, weekIndex(firstWeek, this.today) + 1)
     const left = 0.08 * this.width
     const right = 0.92 * this.width
-    // The first row sits under the title, so it starts a little way down.
-    const top = 0.17 * this.height
+    // The first row sits under the title and the krill under it (and its goal line), so a
+    // star is never under the chip a finger reaches for.
+    const top = 0.24 * this.height
     const bottom = 0.88 * this.height
     const cellW = (right - left) / 7
     const cellH = (bottom - top) / weeks

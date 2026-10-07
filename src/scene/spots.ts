@@ -58,8 +58,8 @@ const SEA_LOW = 0.668
 /** The reef's row, deeper still, on the coral. */
 const REEF = 0.704
 /** The island's two rows on the whale's back, far away at the horizon. */
-const ISLAND_BACK = 0.538
-const ISLAND_FRONT = 0.556
+const ISLAND_BACK = 0.507
+const ISLAND_FRONT = 0.534
 const ISLAND_DEPTH = 0.78
 
 /**
@@ -73,8 +73,8 @@ const BASE: readonly Spot[] = [
   spot('shore-5', 'garden', 0.78, SAND),
   spot('shore-3', 'garden', 0.36, SAND),
   spot('shore-4', 'garden', 0.64, SAND),
-  spot('shore-1', 'garden', 0.08, SAND),
-  spot('shore-6', 'garden', 0.92, SAND),
+  spot('shore-1', 'garden', 0.09, SAND),
+  spot('shore-6', 'garden', 0.91, SAND),
 
   spot('sea-2', 'sea', 0.29, SEA_HIGH),
   spot('sea-7', 'sea', 0.6, SEA_LOW),
@@ -107,12 +107,12 @@ const ROOMS: Readonly<Record<Room, readonly Spot[]>> = {
   // Six on the island the big whale carries, at the left of the horizon, far away.
   island: (
     [
-      [0.24, ISLAND_FRONT],
-      [0.12, ISLAND_FRONT],
-      [0.36, ISLAND_FRONT],
-      [0.19, ISLAND_BACK],
-      [0.31, ISLAND_BACK],
-      [0.07, ISLAND_BACK],
+      [0.22, ISLAND_FRONT],
+      [0.11, ISLAND_FRONT],
+      [0.33, ISLAND_FRONT],
+      [0.2, ISLAND_BACK],
+      [0.28, ISLAND_BACK],
+      [0.12, ISLAND_BACK],
     ] as const
   ).map(([x, y], i) =>
     spot(`island-${String(i + 1)}`, 'garden', x, y, { room: 'island', depth: ISLAND_DEPTH }),

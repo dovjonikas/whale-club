@@ -1,3 +1,4 @@
+import { icon } from '../brand/icons'
 import { escapeHtml, thingMark } from './thingMark'
 import { collectibleSvg, collectiblesFor } from '../scene/collectibles'
 import { creatureSvg } from '../scene/creatures'
@@ -16,10 +17,10 @@ import { openSheet } from './sheet'
  * recommendation 5). A rare or legendary find carries a small mark; that
  * is all rarity does. No graphs.
  */
-export function openCollectionSheet(store: Store): void {
+export function openCollectionSheet(store: Store, onArrange?: () => void): void {
   openSheet({
     title: 'collection',
-    build(body) {
+    build(body, close) {
       const data = store.get()
       const today = todayKey()
       if (data.things.length === 0) {
@@ -74,7 +75,15 @@ export function openCollectionSheet(store: Store): void {
             <ul class="tiles">${tiles}</ul>
           </section>`
         })
-      body.innerHTML = sections.join('')
+      // Arranging lives here, one step in, so the first screen stays for today's things.
+      const arrange = onArrange
+        ? `<button type="button" class="button-quiet collection-arrange">${icon('chest')}<span>${voice.arrange.open}</span></button>`
+        : ''
+      body.innerHTML = arrange + sections.join('')
+      body.querySelector('.collection-arrange')?.addEventListener('click', () => {
+        close()
+        onArrange?.()
+      })
     },
   })
 }

@@ -12,6 +12,8 @@
   --sun: #f2c94c;
   --sand: #c9a86a;
   --jacket: #e63946;
+  /* Krill: a warm coral, the one colour the currency wears. */
+  --krill: #ff9e8a;
   --ink: #e8f0f5;
   --ink-dim: #7f93a6;
   --card: rgba(6, 18, 43, 0.72);
@@ -71,6 +73,10 @@
   --dur-toast-out: 180ms;
   /* Stopping a lock-in: the deep water goes down this fast, everything on it fading first. */
   --dur-session-out: 600ms;
+  /* A "+10" by the krill: up over this, then gone. A notice, not a celebration. */
+  --dur-rise: 700ms;
+  /* A thing settling into a place when it is let go, or swapping with another. */
+  --dur-snap: 220ms;
 
   /* Where the sky ends and the sea begins, as a share of the scene's height. */
   --horizon: 58%;

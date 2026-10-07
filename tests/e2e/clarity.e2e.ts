@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test'
-import { expect, test, dismissInstallLeaf } from './helpers'
+import { dateKey, expect, seed, test, dismissInstallLeaf } from './helpers'
 
 /**
  * The clarity test. Every everyday job is done through words a person can
@@ -148,4 +148,42 @@ test('fifteen everyday jobs, by visible words, each within two taps', async ({ p
   await tap(button(page, 'the log'))
   await within2(page.getByText('star: a day you did something'))
   await expect(page.getByText('lantern: a lock in you finished')).toBeVisible()
+})
+
+test('16. move a find: arrange is in sight within two taps, then the find and its new place', async ({
+  page,
+}) => {
+  // A person a few weeks in, with finds in the scene.
+  const things = [
+    {
+      id: 'run',
+      name: 'run',
+      world: 'sea' as const,
+      createdAt: dateKey(-20),
+      order: 0,
+      kind: 'tap' as const,
+    },
+  ]
+  const days: Record<string, { done: string[] }> = {}
+  for (let i = -20; i < 0; i++) days[dateKey(i)] = { done: ['run'] }
+  await seed(page, {
+    things,
+    days,
+    cracked: { run: 14 },
+    settings: { installDismissedAt: dateKey(-1) },
+  })
+  await page.goto('')
+  await fromFirstScreen(page)
+  await tap(button(page, 'Collection'))
+  await within2(button(page, 'arrange'))
+  await tap(button(page, 'arrange'))
+  // The find and a free place of its world, both by their names.
+  await page.getByRole('button', { name: /^a fish, place \d$/ }).click()
+  const free = page.locator('.arrange-spot.is-free[data-world="sea"]').first()
+  const place = await free.getAttribute('aria-label')
+  await free.click()
+  await expect(
+    page.getByRole('button', { name: place?.replace('empty place', 'a fish, place') ?? '' }),
+  ).toBeVisible()
+  await tap(button(page, 'done'))
 })

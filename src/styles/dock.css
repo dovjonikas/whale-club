@@ -1,0 +1,857 @@
+/* Krill and the dock: the chip under the title, the goal line, the pier,
+   the dock sheet, and arranging the scene. */
+
+/* --- The title and the krill under it --------------------------------- */
+
+.header-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+
+.krill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.krill-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 28px;
+  padding: 0 var(--s3) 0 var(--s2);
+  border-radius: var(--r-pill);
+  background: var(--float-bg);
+  border: 1px solid var(--float-edge);
+  color: var(--ink);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+/* The visible chip is small; the finger gets the full 44 px. */
+.krill-chip::after {
+  content: '';
+  position: absolute;
+  inset: -8px -4px;
+}
+
+.krill-chip:active {
+  transform: scale(var(--press-scale));
+}
+
+.krill-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--krill);
+  flex: none;
+}
+
+/* "+10": rises beside the chip and fades. Transitions, so it can be caught
+   by the next one, and reduced motion keeps only the fade. */
+.krill-rise {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  margin: -0.6em 0 0 var(--s2);
+  color: var(--krill);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    transform var(--dur-rise) var(--ease-out),
+    opacity var(--dur-press) var(--ease-out);
+}
+
+.krill-rise.is-up {
+  opacity: 1;
+  transform: translateY(-8px);
+}
+
+.krill-rise.is-gone {
+  opacity: 0;
+  transform: translateY(-14px);
+  transition-duration: 400ms;
+}
+
+/* The goal: one thin line under the chip, and how far along it is. */
+.krill-goal {
+  margin: 0;
+  display: grid;
+  gap: 2px;
+  font-size: var(--t-2xs);
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.krill-goal[hidden] {
+  display: none;
+}
+
+.krill-goal-bar {
+  display: block;
+  height: 2px;
+  border-radius: 1px;
+  background: rgba(232, 240, 245, 0.12);
+  overflow: hidden;
+}
+
+.krill-goal-bar i {
+  display: block;
+  height: 100%;
+  background: var(--krill);
+  transform-origin: 0 50%;
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.krill-goal[data-ready='true'] {
+  color: var(--krill);
+}
+
+/* --- The dock sheet ---------------------------------------------------- */
+
+.dock-intro {
+  margin: 0 0 var(--s2);
+}
+
+.dock-balance {
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+  margin: 0 0 var(--s4);
+  font-size: var(--t-md);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.dock-balance .krill-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.dock-tier + .dock-tier {
+  margin-top: var(--s6);
+}
+
+.dock-tier-title {
+  margin: 0 0 var(--s3);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--ink-dim);
+}
+
+.dock-tiles {
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+}
+
+.dock-tiles li {
+  display: grid;
+}
+
+.dock-tile {
+  width: 100%;
+  min-height: var(--touch);
+  padding: var(--s3) var(--s1) var(--s2);
+  color: inherit;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.dock-tile:active {
+  transform: scale(var(--press-scale));
+}
+
+.dock-tile .tile-art {
+  width: 52px;
+  height: 52px;
+}
+
+.dock-tile.is-goal {
+  border-color: var(--krill);
+}
+
+.dock-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.dock-price .krill-icon {
+  width: 12px;
+  height: 12px;
+}
+
+.dock-tile.is-owned .dock-price {
+  color: var(--glow);
+}
+
+/* One thing on its own page. */
+.dock-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  width: auto;
+  min-height: var(--touch);
+  padding: 0 var(--s3) 0 var(--s1);
+}
+
+.dock-back .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.dock-item {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: var(--s2);
+  padding: var(--s2) 0 var(--s4);
+}
+
+.dock-item-art {
+  width: 132px;
+  height: 132px;
+  display: grid;
+  place-items: center;
+}
+
+.dock-item-art svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Not yours yet: the same drawing, as a silhouette. */
+.dock-item.is-locked .dock-item-art {
+  filter: grayscale(1) brightness(0.25) contrast(1.4);
+  opacity: 0.8;
+}
+
+.dock-item-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  font-weight: 700;
+}
+
+.dock-item-name:focus {
+  outline: none;
+}
+
+.dock-item-line,
+.dock-item-price,
+.dock-short,
+.dock-who {
+  margin: 0;
+  color: var(--ink-dim);
+  font-size: var(--t-sm);
+}
+
+.dock-item-price {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s1);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.dock-short {
+  color: var(--krill);
+  font-variant-numeric: tabular-nums;
+}
+
+.dock-actions {
+  width: 100%;
+  display: grid;
+  gap: var(--s2);
+  margin-top: var(--s3);
+}
+
+.dock-wearers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+  gap: var(--s2);
+}
+
+.dock-wearer {
+  width: 100%;
+  min-height: var(--touch);
+  display: grid;
+  justify-items: center;
+  gap: var(--s1);
+  padding: var(--s2) var(--s1);
+  border-radius: 10px;
+  background: rgba(2, 4, 9, 0.4);
+  border: 1px solid transparent;
+  color: var(--ink);
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.dock-wearer:active {
+  transform: scale(var(--press-scale));
+}
+
+.dock-wearer[aria-pressed='true'] {
+  border-color: var(--krill);
+}
+
+.dock-wearer-art {
+  width: 48px;
+  height: 48px;
+}
+
+.dock-wearer-art svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.dock-wearer-name {
+  font-size: var(--t-xs);
+  overflow-wrap: anywhere;
+}
+
+/* --- The dock in the scene --------------------------------------------- */
+
+/* Below the things that stand in places, above the sea and the shore, and
+   still: the island, the reef and the sand edge carry things, so they stay
+   with them instead of drifting with the layers' parallax. */
+.dock-under {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.dock-under > *,
+.scene .layer .dock-aurora,
+.scene .layer .dock-friday,
+.scene .layer .dock-sky-whale {
+  position: absolute;
+}
+
+.dock-under svg,
+.dock-aurora svg,
+.dock-sky-whale svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.scene[data-empty='true'] .dock-under {
+  display: none;
+}
+
+/* The pier, in the middle of the shore: the dock's door. */
+.pier {
+  left: 50%;
+  top: calc(59.2% - 10px * var(--scene-scale, 1));
+  width: calc(60px * var(--scene-scale, 1));
+  min-height: var(--touch);
+  margin-left: calc(-30px * var(--scene-scale, 1));
+  padding: 0;
+  pointer-events: auto;
+  border-radius: 8px;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.pier[data-long='true'] {
+  width: calc(72px * var(--scene-scale, 1));
+  margin-left: calc(-36px * var(--scene-scale, 1));
+}
+
+.pier:active {
+  transform: scale(var(--press-scale));
+}
+
+.pier:focus-visible {
+  outline: 2px solid var(--star);
+  outline-offset: 2px;
+}
+
+/* The lanterns on the pier: lit after dark, a dark glass in the day. */
+.pier .pier-lantern,
+.pier .pier-lantern-glow {
+  opacity: 0.25;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+.scene[data-dark='true'] .pier .pier-lantern {
+  opacity: 1;
+}
+
+.scene[data-dark='true'] .pier .pier-lantern-glow {
+  opacity: 0.32;
+}
+
+/* The longer shore: a lip of sand at the water's edge. */
+.dock-edge {
+  left: 0;
+  right: 0;
+  top: 59.3%;
+}
+
+/* The reef, on the floor of the visible sea. */
+.dock-reef {
+  left: 0;
+  right: 0;
+  top: 68.6%;
+}
+
+/* The island on the whale, at the left of the horizon. */
+.dock-island {
+  left: 0;
+  top: 48.6%;
+  width: 44%;
+}
+
+/* A glowing tide: the water line lit, breathing. */
+.dock-tide {
+  left: 0;
+  right: 0;
+  top: 59.6%;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--glow) 20%, var(--glow) 80%, transparent);
+  box-shadow: 0 0 14px rgba(62, 242, 224, 0.6);
+  opacity: 0.55;
+  animation: tide-breathe 5s ease-in-out infinite alternate;
+}
+
+@keyframes tide-breathe {
+  to {
+    opacity: 0.9;
+  }
+}
+
+/* The whole cove glowing, after dark. */
+.dock-cove {
+  left: 0;
+  right: 0;
+  top: 58%;
+  bottom: 0;
+}
+
+.dock-cove svg {
+  height: 100%;
+}
+
+.dock-cove .cove-sparks {
+  animation: twinkle 3.5s ease-in-out infinite alternate;
+}
+
+/* A small whale that keeps yours company, back and forth under the surface. */
+.dock-small-whale {
+  left: 18%;
+  top: 63.4%;
+  width: calc(56px * var(--scene-scale, 1));
+  animation: small-whale 38s ease-in-out infinite alternate;
+}
+
+@keyframes small-whale {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(calc(260px * var(--scene-scale, 1)), 6px, 0);
+  }
+}
+
+/* Aurora nights: the upper sky, behind the stars. */
+.scene .layer .dock-aurora {
+  left: 0;
+  right: 0;
+  top: 6%;
+  height: 42%;
+  opacity: 0.9;
+  animation: aurora-drift 24s ease-in-out infinite alternate;
+}
+
+.dock-aurora svg {
+  height: 100%;
+}
+
+@keyframes aurora-drift {
+  from {
+    transform: translate3d(-2%, 0, 0);
+  }
+  to {
+    transform: translate3d(2%, -1%, 0);
+  }
+}
+
+/* Friday's falling stars: three streaks, one after another. */
+.scene .layer .dock-friday {
+  inset: 0;
+}
+
+.dock-friday i {
+  position: absolute;
+  width: 70px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: linear-gradient(90deg, transparent, var(--star-pale));
+  opacity: 0;
+  transform: rotate(-24deg);
+  animation: friday-fall 9s linear infinite;
+}
+
+.dock-friday i:nth-child(1) {
+  left: 18%;
+  top: 14%;
+}
+
+.dock-friday i:nth-child(2) {
+  left: 55%;
+  top: 9%;
+  animation-delay: 3s;
+}
+
+.dock-friday i:nth-child(3) {
+  left: 34%;
+  top: 26%;
+  animation-delay: 6s;
+}
+
+@keyframes friday-fall {
+  0%,
+  86% {
+    opacity: 0;
+    transform: rotate(-24deg) translate3d(0, 0, 0);
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(-24deg) translate3d(90px, 0, 0);
+  }
+}
+
+/* The whale in the sky: once a night, slowly across. */
+.scene .layer .dock-sky-whale {
+  left: -40%;
+  top: 20%;
+  width: 34%;
+  opacity: 0;
+}
+
+.dock-sky-whale.is-crossing {
+  animation: sky-whale-cross 70s linear both;
+}
+
+.dock-sky-whale.is-preview {
+  left: 33%;
+  opacity: 0.9;
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+
+@keyframes sky-whale-cross {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  10%,
+  90% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(440%, -20%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Still things, not missing ones: the small whale rests where it starts,
+     and the sky whale shows itself in place instead of crossing. */
+  .dock-small-whale,
+  .scene .layer .dock-aurora,
+  .dock-tide {
+    animation: none;
+  }
+
+  .dock-sky-whale.is-crossing {
+    left: 33%;
+    animation: none;
+    opacity: 0.85;
+  }
+}
+
+/* --- Arranging the scene ------------------------------------------------ */
+
+/* The row, the header and the floats step out of the way: nothing can be
+   marked or bought while arranging (the app is also inert). */
+body[data-arranging='true'] #app {
+  visibility: hidden;
+}
+
+/* The scene stops: every motion in it holds where it is. */
+.scene[data-arranging='true'] *,
+.scene[data-arranging='true'] *::before,
+.scene[data-arranging='true'] *::after {
+  animation-play-state: paused !important;
+}
+
+.scene[data-arranging='true'] .pier,
+.scene[data-arranging='true'] .stones,
+.scene[data-arranging='true'] .star-hits {
+  pointer-events: none;
+}
+
+.scene[data-arranging='true'] .pier {
+  opacity: 0.35;
+}
+
+.arrange-rings {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* A place: a soft ring. Taken, a little brighter; held, warm; another
+   world's while something is held, faint. */
+.arrange-spot {
+  position: absolute;
+  width: calc(48px * var(--scene-scale, 1));
+  height: calc(48px * var(--scene-scale, 1));
+  margin: calc(-24px * var(--scene-scale, 1)) 0 0 calc(-24px * var(--scene-scale, 1));
+  border-radius: 50%;
+  border: 1.5px dashed rgba(232, 240, 245, 0.38);
+  background: rgba(232, 240, 245, 0.04);
+  pointer-events: auto;
+  touch-action: none;
+  transition:
+    opacity var(--dur) var(--ease-out),
+    transform var(--dur-press) var(--ease-out),
+    border-color var(--dur-press) var(--ease-out);
+}
+
+.arrange-spot.is-taken {
+  border-style: solid;
+  border-color: rgba(62, 242, 224, 0.4);
+  background: rgba(62, 242, 224, 0.07);
+}
+
+.arrange-spot[aria-pressed='true'] {
+  border-color: var(--star);
+  background: rgba(255, 217, 138, 0.12);
+}
+
+.arrange-spot.is-other {
+  opacity: 0.2;
+}
+
+.arrange-spot.is-target {
+  border-color: var(--glow);
+  transform: scale(1.14);
+}
+
+.arrange-spot:focus-visible {
+  outline: 2px solid var(--star);
+  outline-offset: 3px;
+}
+
+/* The places an extension just added: they breathe a few times. */
+.scene[data-arranging='true'] .arrange-spot.is-new {
+  border-color: var(--krill);
+  animation: spot-new 1.4s ease-in-out 3 alternate;
+  animation-play-state: running !important;
+}
+
+@keyframes spot-new {
+  to {
+    transform: scale(1.18);
+  }
+}
+
+.collectible.is-held {
+  filter: drop-shadow(0 0 6px rgba(255, 217, 138, 0.85));
+}
+
+.collectible.is-snapping {
+  transition: transform var(--dur-snap) var(--ease-out);
+}
+
+.arrange-ui {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.arrange-top,
+.arrange-bottom {
+  pointer-events: auto;
+}
+
+.arrange-top {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: calc(var(--safe-top) + var(--s3)) calc(var(--safe-right) + var(--s4)) var(--s6)
+    calc(var(--safe-left) + var(--s4));
+  background: linear-gradient(180deg, rgba(2, 4, 9, 0.85), transparent);
+}
+
+.arrange-heading {
+  flex: 1;
+  min-width: 0;
+}
+
+.arrange-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--t-md);
+  font-weight: 700;
+}
+
+.arrange-title:focus {
+  outline: none;
+}
+
+.arrange-hint {
+  margin: 2px 0 0;
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+}
+
+.arrange-top .button-quiet,
+.arrange-top .button-primary {
+  width: auto;
+  height: var(--touch);
+  padding: 0 var(--s4);
+  font-size: var(--t-sm);
+  flex: none;
+}
+
+.arrange-bottom {
+  display: grid;
+  gap: var(--s2);
+  padding: var(--s6) calc(var(--safe-right) + var(--s4)) calc(var(--safe-bottom) + var(--s4))
+    calc(var(--safe-left) + var(--s4));
+  background: linear-gradient(0deg, rgba(2, 4, 9, 0.85), transparent);
+}
+
+.arrange-tray {
+  display: flex;
+  justify-content: center;
+  gap: var(--s2);
+}
+
+.arrange-away,
+.arrange-chest {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  min-height: var(--touch);
+  padding: 0 var(--s4);
+  border-radius: var(--r-pill);
+  background: var(--float-bg);
+  border: 1px solid var(--float-edge);
+  color: var(--ink);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.arrange-away:active,
+.arrange-chest:active {
+  transform: scale(var(--press-scale));
+}
+
+.arrange-away .icon,
+.arrange-chest .icon {
+  width: 20px;
+  height: 20px;
+}
+
+.arrange-away[hidden] {
+  display: none;
+}
+
+.arrange-chest-list {
+  max-height: 32vh;
+  overflow: auto;
+  padding: var(--s3);
+  border-radius: var(--r);
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+}
+
+.arrange-chest-list[hidden] {
+  display: none;
+}
+
+.arrange-chest-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s1);
+}
+
+.arrange-chest-items li {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+
+.arrange-chest-art {
+  width: 36px;
+  height: 36px;
+  flex: none;
+}
+
+.arrange-chest-art svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.arrange-chest-name {
+  flex: 1;
+  min-width: 0;
+  font-size: var(--t-sm);
+}
+
+.arrange-chest-items .button-quiet {
+  width: auto;
+  padding: 0 var(--s3);
+}
+
+/* "arrange", at the top of the Collection. */
+.collection-arrange {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  width: auto;
+  margin: 0 0 var(--s4);
+  padding: 0 var(--s4) 0 var(--s3);
+  border: 1px solid var(--float-edge);
+  border-radius: var(--r-pill);
+  color: var(--ink);
+}
+
+.collection-arrange .icon {
+  width: 20px;
+  height: 20px;
+}
