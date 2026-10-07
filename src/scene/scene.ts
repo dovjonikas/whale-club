@@ -130,6 +130,13 @@ export class Scene {
     return fresh
   }
 
+  /** The collectibles on screen right now (night ones only after dark), for the postcard. */
+  visibleCollectibleIds(): string[] {
+    return [...this.thingsLayer.querySelectorAll<HTMLElement>('.collectible')].map(
+      (element) => element.dataset.id ?? '',
+    )
+  }
+
   /** Where a collectible is on screen, for a burst. */
   collectibleRect(id: string): DOMRect | undefined {
     return this.thingsLayer.querySelector(`[data-id="${id}"]`)?.getBoundingClientRect()

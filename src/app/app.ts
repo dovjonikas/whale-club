@@ -1,6 +1,6 @@
 import { COLLECTIBLES, type Collectible } from '../scene/collectibles'
 import { Scene } from '../scene/scene'
-import { addDays, fromKey, todayKey } from '../store/dates'
+import { fromKey, todayKey } from '../store/dates'
 import {
   allDoneToday,
   last7,
@@ -8,25 +8,26 @@ import {
   missedYesterday,
   stageFor,
   starDays,
+  streakDays,
   unlockedFor,
 } from '../store/derive'
 import { Store } from '../store/store'
 import type { AppData, DateKey, Thing } from '../store/types'
 import { pick, voice } from '../voice'
-import { setupInstallLeaf } from '../pwa/install'
+import { installNotice, listenForInstallPrompt } from '../pwa/install'
 import { openAddSheet } from './addSheet'
 import { animate } from './card'
-import { host } from './host'
 import { checkinNotice } from './checkin'
-import { openClubSheet } from './clubSheet'
 import { openCollectionSheet } from './collectionSheet'
 import { renderHeader } from './header'
+import { host } from './host'
 import { Line } from './line'
+import { openMenuSheet } from './menuSheet'
 import { Notices } from './notices'
+import type { Moment } from './postcard'
+import { Postcards } from './postcards'
 import { recapNotice } from './recap'
 import { Row } from './row'
-import { openRulesSheet } from './rulesSheet'
-import { shareScene } from './share'
 import { Sound } from './sound'
 import { surpriseFor } from './surprise'
 import { TimerService } from './timer'
@@ -36,6 +37,10 @@ import { showToast } from './toast'
 
 const SURPRISE_DELAY_MS = 4000
 const JACKET_ID = 'sea-a-jacket'
+/** The postcard button waits for the moment's animation to finish. */
+const OFFER_AFTER_WHALE_MS = 2200
+const OFFER_AFTER_UNLOCK_MS = 1400
+const OFFER_AFTER_GROW_MS = 900
 
 /** Wires the store, the scene, the row and the sheets together. One per page. */
 export function startApp(root: HTMLElement): void {
@@ -48,9 +53,10 @@ export function startApp(root: HTMLElement): void {
     <header class="header"></header>
     <main class="stage"><div class="onboarding" hidden><p></p><small></small></div></main>
     <div class="bottom">
+      <div class="offer-slot"></div>
       <p class="line"></p>
       <div class="notice-slot"></div>
-      <div class="row" role="list" aria-label="your homework"></div>
+      <div class="row" role="group" aria-label="your homework"></div>
     </div>`
 
   const line = new Line(query(root, '.line'))
@@ -58,6 +64,7 @@ export function startApp(root: HTMLElement): void {
   query(onboarding, 'p').textContent = voice.firstOpen
   query(onboarding, 'small').textContent = voice.example
   const notices = new Notices(query(root, '.notice-slot'))
+  const postcards = new Postcards(store, scene, line, query(root, '.offer-slot'))
 
   // iOS only allows sound after a gesture; the first touch anywhere opens the gate.
   document.addEventListener(
@@ -81,20 +88,11 @@ export function startApp(root: HTMLElement): void {
       onCollection() {
         openCollectionSheet(store)
       },
-      onRules() {
-        openRulesSheet(store)
+      onSend() {
+        postcards.sendNow({ kind: 'sea', line: line.current() || voice.postcard.sea })
       },
-      onClub() {
-        openClubSheet(store)
-      },
-      onShare() {
-        shareScene(scene, store.get())
-          .then((how) => {
-            if (how === 'downloaded') line.say(voice.shareDone)
-          })
-          .catch(() => {
-            showToast(voice.shareFailed)
-          })
+      onMenu() {
+        openMenuSheet(store)
       },
     },
     sound.isMuted(),
@@ -110,6 +108,7 @@ export function startApp(root: HTMLElement): void {
       const before = stageFor(last7(store.get(), thing.id, todayKey()))
       const done = store.toggleDone(thing.id)
       if (!done) {
+        postcards.clearOffer()
         sound.play('untap')
         line.say(voice.untap)
         return
@@ -133,7 +132,8 @@ export function startApp(root: HTMLElement): void {
   /**
    * Everything a done tap can set off. The scene shows all of it; the line
    * says the rarest: a new collectible, else the whole day done, else the
-   * timer's end, else a creature that grew, else the tap itself.
+   * timer's end, else a creature that grew, else the tap itself. A moment
+   * worth showing gets the postcard button once its animation is over.
    */
   function celebrate(
     thing: Thing,
@@ -143,6 +143,7 @@ export function startApp(root: HTMLElement): void {
   ): void {
     const data = store.get()
     const today = todayKey()
+    postcards.clearOffer()
     animate(card, 'is-jumping')
     const rect = card.getBoundingClientRect()
     scene.burst(thing.world, rect.left + rect.width / 2, rect.top + 8)
@@ -154,23 +155,42 @@ export function startApp(root: HTMLElement): void {
       scene.surfaceWhale(hasJacket(data))
       sound.play('whale')
     }
+    let said: string
     if (fresh.length > 0) {
       sound.play('unlock')
-      line.say(voice.unlock(fresh.map((c) => c.name).join(', ')))
+      said = voice.unlock(fresh.map((c) => c.name).join(', '))
     } else if (done) {
-      line.say(voice.allDone)
+      said = voice.allDone
     } else if (source === 'timer') {
-      line.say(voice.timerEnd)
+      said = voice.timerEnd
     } else if (grew) {
       sound.play('grow')
-      line.say(voice.stageUp)
+      said = voice.stageUp
     } else {
       sound.play('tap', thing.world)
-      line.say(pick(voice.tap[thing.world], today + thing.id))
+      said = pick(voice.tap[thing.world], today + thing.id)
     }
+    line.say(said)
     for (const item of fresh) {
       const where = scene.collectibleRect(item.id)
       if (where) scene.burst(item.world, where.left + where.width / 2, where.top + where.height / 2)
+    }
+
+    const moment: Moment | null = done
+      ? { kind: 'whale', line: said }
+      : fresh.length > 0
+        ? { kind: 'unlock', line: said }
+        : grew
+          ? { kind: 'stage', line: said }
+          : null
+    if (moment) {
+      const label = fresh.length > 0 ? voice.postcard.sendThis : voice.postcard.sendWhale
+      const delay = done
+        ? OFFER_AFTER_WHALE_MS
+        : fresh.length > 0
+          ? OFFER_AFTER_UNLOCK_MS
+          : OFFER_AFTER_GROW_MS
+      postcards.offer(moment, label, delay)
     }
     maybeSurprise(data, today)
   }
@@ -220,7 +240,7 @@ export function startApp(root: HTMLElement): void {
 
     const stars = starDays(data)
     scene.setDays(
-      { dates: stars, streak: constellations(stars), today, label: (date) => dayLabel(data, date) },
+      { dates: stars, streak: streakDays(stars), today, label: (date) => dayLabel(data, date) },
       (date) => {
         showToast(dayLabel(data, date))
       },
@@ -235,12 +255,20 @@ export function startApp(root: HTMLElement): void {
 
     const nothingToday = (data.days[today]?.done.length ?? 0) === 0
     scene.setQuiet(nothingToday && missedYesterday(data, today))
-    notices.offer([recapNotice(store), checkinNotice(store, sound)])
+    notices.offer([
+      installNotice(store),
+      recapNotice(store, (moment) => {
+        postcards.sendNow(moment)
+      }),
+      checkinNotice(store, sound),
+    ])
   }
 
   store.subscribe(render)
   render(store.get())
-  setupInstallLeaf(query(root, '.notice-slot'), store)
+  listenForInstallPrompt(() => {
+    notices.render()
+  })
 
   const resumed = timers.resume()
   if (resumed) {
@@ -267,23 +295,6 @@ function dayLabel(data: AppData, date: DateKey): string {
     .map((id) => data.things.find((t) => t.id === id)?.name)
     .filter((name): name is string => typeof name === 'string')
   return names.length > 0 ? `${when}: ${names.join(', ')}` : when
-}
-
-/** Runs of three or more consecutive star days are joined into constellations. */
-function constellations(stars: readonly DateKey[]): Set<DateKey> {
-  const linked = new Set<DateKey>()
-  let run: DateKey[] = []
-  const flush = (): void => {
-    if (run.length >= 3) for (const d of run) linked.add(d)
-    run = []
-  }
-  for (const date of stars) {
-    const previous = run[run.length - 1]
-    if (previous !== undefined && addDays(previous, 1) !== date) flush()
-    run.push(date)
-  }
-  flush()
-  return linked
 }
 
 function query(parent: ParentNode, selector: string): HTMLElement {

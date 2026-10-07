@@ -1,3 +1,4 @@
+import type { NoticeBuilder } from '../app/notices'
 import { addDays, todayKey } from '../store/dates'
 import type { Store } from '../store/store'
 import { voice } from '../voice'
@@ -5,10 +6,13 @@ import { openInstallSheet } from './installSheet'
 
 /**
  * The install leaf: a small card above the row that offers to put the app
- * on the home screen. iPhone Safari has no install API, so its button
- * opens a sheet with the three steps, big, with the icons to look for; Android Chrome gets one Install
- * button once the browser offers `beforeinstallprompt`; a desktop gets
- * nothing. Closing it is remembered for seven days.
+ * on the home screen, once the person has added their first thing (an
+ * empty first screen is for the first sentence, not for this).
+ *
+ * iPhone Safari has no install API, so its button opens a sheet with the
+ * three steps, big, with the icons to look for. Android Chrome gets one
+ * Install button once the browser offers `beforeinstallprompt`. A desktop
+ * gets nothing. Closing it is remembered for seven days.
  */
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
@@ -17,69 +21,60 @@ interface BeforeInstallPromptEvent extends Event {
 
 const REMIND_AFTER_DAYS = 7
 
-export function setupInstallLeaf(slot: HTMLElement, store: Store): void {
-  if (isStandalone()) return
-  const dismissedAt = store.get().settings.installDismissedAt
-  if (dismissedAt && addDays(dismissedAt, REMIND_AFTER_DAYS) > todayKey()) return
+let deferred: BeforeInstallPromptEvent | null = null
 
-  const ua = navigator.userAgent
-  if (/iPhone|iPod/.test(ua)) {
-    showLeaf(slot, store, iosBody(), null)
-    return
-  }
-  if (ua.includes('Android')) {
-    addEventListener(
-      'beforeinstallprompt',
-      (event) => {
-        event.preventDefault()
-        showLeaf(
-          slot,
-          store,
-          `<span class="leaf-title">${voice.install.android}</span>`,
-          event as BeforeInstallPromptEvent,
-        )
-      },
-      { once: true },
-    )
-  }
-}
-
-function showLeaf(
-  slot: HTMLElement,
-  store: Store,
-  bodyHtml: string,
-  prompt: BeforeInstallPromptEvent | null,
-): void {
-  const leaf = document.createElement('aside')
-  leaf.className = 'leaf'
-  leaf.setAttribute('aria-label', 'install')
-  leaf.innerHTML = `
-    <div>${bodyHtml}</div>
-    <div class="leaf-actions">
-      <button type="button" class="button-primary leaf-install">${prompt ? voice.install.button : voice.install.iosHow}</button>
-      <button type="button" class="button-quiet leaf-close">${voice.install.close}</button>
-    </div>`
-  const close = (): void => {
-    store.setSettings({ installDismissedAt: todayKey() })
-    leaf.remove()
-  }
-  leaf.querySelector('.leaf-close')?.addEventListener('click', close)
-  leaf.querySelector('.leaf-install')?.addEventListener('click', () => {
-    if (!prompt) {
-      openInstallSheet()
-      return
-    }
-    void prompt
-      .prompt()
-      .then(() => prompt.userChoice)
-      .then(() => leaf.remove())
+/** Catches Android's install offer as early as it comes; `onReady` lets the notices redraw. */
+export function listenForInstallPrompt(onReady: () => void): void {
+  if (!navigator.userAgent.includes('Android')) return
+  addEventListener('beforeinstallprompt', (event) => {
+    event.preventDefault()
+    deferred = event as BeforeInstallPromptEvent
+    onReady()
   })
-  if (slot.childElementCount === 0) slot.replaceChildren(leaf)
 }
 
-function iosBody(): string {
-  return `<span class="leaf-title">${voice.install.ios}</span>
-    <span class="leaf-lead">${voice.install.iosLead}</span>`
+export function installNotice(store: Store): NoticeBuilder {
+  return (dismiss) => {
+    if (isStandalone()) return null
+    const data = store.get()
+    if (data.things.length === 0) return null
+    const dismissedAt = data.settings.installDismissedAt
+    if (dismissedAt && addDays(dismissedAt, REMIND_AFTER_DAYS) > todayKey()) return null
+    const iphone = /iPhone|iPod/.test(navigator.userAgent)
+    const prompt = deferred
+    if (!iphone && !prompt) return null
+
+    const leaf = document.createElement('aside')
+    leaf.className = 'leaf'
+    leaf.setAttribute('aria-label', 'install')
+    leaf.innerHTML = `
+      <div>
+        <span class="leaf-title">${iphone ? voice.install.ios : voice.install.android}</span>
+        ${iphone ? `<span class="leaf-lead">${voice.install.iosLead}</span>` : ''}
+      </div>
+      <div class="leaf-actions">
+        <button type="button" class="button-primary leaf-install">${iphone ? voice.install.iosHow : voice.install.button}</button>
+        <button type="button" class="button-quiet leaf-close">${voice.install.close}</button>
+      </div>`
+    leaf.querySelector('.leaf-close')?.addEventListener('click', () => {
+      store.setSettings({ installDismissedAt: todayKey() })
+      dismiss()
+    })
+    leaf.querySelector('.leaf-install')?.addEventListener('click', () => {
+      if (!prompt) {
+        openInstallSheet()
+        return
+      }
+      void prompt
+        .prompt()
+        .then(() => prompt.userChoice)
+        .then(() => {
+          deferred = null
+          dismiss()
+        })
+    })
+    return leaf
+  }
 }
 
 function isStandalone(): boolean {

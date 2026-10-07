@@ -69,10 +69,9 @@ function validateSettings(raw: unknown): Settings {
   if (typeof raw.installDismissedAt === 'string')
     settings.installDismissedAt = raw.installDismissedAt
   if (typeof raw.lastRecapWeek === 'string') settings.lastRecapWeek = raw.lastRecapWeek
-  if (isRecord(raw.buddy) && typeof raw.buddy.name === 'string') {
-    settings.buddy = { name: raw.buddy.name }
-    if (typeof raw.buddy.code === 'string') settings.buddy.code = raw.buddy.code
-  }
+  // A buddy from v0.3 is dropped here on purpose: the club became postcards.
+  if (raw.postcardFormat === 'story' || raw.postcardFormat === 'square')
+    settings.postcardFormat = raw.postcardFormat
   return settings
 }
 

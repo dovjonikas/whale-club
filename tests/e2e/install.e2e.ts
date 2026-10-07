@@ -1,13 +1,21 @@
 import { expect, test } from '@playwright/test'
+import { addThing } from './helpers'
 
 /**
- * The install leaf: an iPhone in Safari gets the two steps, a desktop gets
- * nothing, and closing it is remembered for seven days.
+ * The install leaf: not on the empty first screen, which belongs to the
+ * first sentence; an iPhone in Safari is offered it once a thing exists,
+ * with three steps on request; a desktop gets nothing; closing it is
+ * remembered for seven days.
  */
-test('an iPhone is offered the home screen, with three steps on request', async ({ page }) => {
+test('an iPhone is offered the home screen after the first thing, with three steps on request', async ({
+  page,
+}) => {
   test.skip(test.info().project.name !== 'iphone', 'the iPhone leaf')
   await page.goto('')
   await expect(page.getByText('simple things. add one.')).toBeVisible()
+  await expect(page.getByRole('complementary', { name: 'install' })).toBeHidden()
+
+  await addThing(page, 'run')
   const leaf = page.getByRole('complementary', { name: 'install' })
   await expect(leaf).toBeVisible()
   await expect(leaf).toContainText('put it on your home screen')
@@ -16,6 +24,7 @@ test('an iPhone is offered the home screen, with three steps on request', async 
   await expect(how.getByRole('listitem')).toHaveCount(3)
   await expect(how).toContainText('Add to Home Screen')
   await page.keyboard.press('Escape')
+
   await leaf.getByRole('button', { name: 'not now' }).click()
   await expect(leaf).toBeHidden()
   await page.reload()
@@ -25,6 +34,6 @@ test('an iPhone is offered the home screen, with three steps on request', async 
 test('a desktop is not asked to install', async ({ page }) => {
   test.skip(test.info().project.name !== 'desktop', 'the desktop')
   await page.goto('')
-  await expect(page.getByText('simple things. add one.')).toBeVisible()
+  await addThing(page, 'run')
   await expect(page.getByRole('complementary', { name: 'install' })).toBeHidden()
 })

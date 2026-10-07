@@ -24,8 +24,11 @@ src/
     header.ts        the title and the four buttons
     notices.ts       one notice above the row at a time
     checkin.ts, recap.ts   the two rituals, as notice builders
-    collectionSheet.ts, rulesSheet.ts, clubSheet.ts
-    share.ts         the scene drawn into a PNG, shared or downloaded
+    collectionSheet.ts
+    menuSheet.ts     the club: the rules, one sentence, the postcard size
+    postcard.ts      the scene repainted from the data as a 1080px PNG
+    postcards.ts     the button after a moment, the format choice, the share sheet
+    host.ts          the phone-wide frame everything is appended to
     sound.ts         synthesised tones behind the tap gate, and mute
     surprise.ts, facts.ts  the daily surprise and the sea facts it draws from
   scene/             what is drawn behind the UI
@@ -42,7 +45,6 @@ src/
     types.ts         AppData, Thing, DayRecord, Settings
     store.ts         load, save, actions, subscribe; the only localStorage reader for data
     migrate.ts       a strict guard from stored JSON to AppData, by version
-    code.ts          the share code: things and days as one gzipped base64url string
     derive.ts        last7, stage, totalDone, stars, streak, lines: all arithmetic, nothing stored
     dates.ts         local YYYY-MM-DD keys and week arithmetic
   pwa/
@@ -118,15 +120,21 @@ entry, a `voice.ts` line under `unlock`, a row in `docs/COLLECTIBLES.md`,
 and a case in `tests/e2e/collectibles.e2e.ts` that seeds the days and
 expects it.
 
-## 7. The club and the share code
+## 7. Postcards
 
-`store/code.ts` turns things and days into one string: ids become
-indexes, a day is a list of indexes, the JSON is gzipped where
-`CompressionStream` exists and base64url-encoded, with a prefix that says
-which (`wc1.` plain, `wc1z.` gzipped). A buddy's code is kept in
-`settings.buddy.code` and decoded on demand into synthetic things with
-`buddy-N` ids, so every derive function works on it unchanged. Anything
-that fails to decode is refused whole with one line. Nothing is uploaded.
+`app/postcard.ts` paints a postcard from the data, not from the screen:
+the sky gradient, the day-stars through a second `StarField` at the
+postcard's size, the shore, every collectible that was on screen (by its
+fractional place, sky things kept in the sky and sea things in the sea),
+the whale for an all-done moment, the creatures, the moment's line, the
+day count, the date and the mark. Story is 1080x1920, square 1080x1080.
+
+`app/postcards.ts` owns the button. The share sheet only opens inside a
+tap, and on an iPhone a tap's permission does not survive a long wait, so
+a postcard starts painting the moment its button appears and the tap only
+hands over the finished file. If the browser refuses anyway, the postcard
+opens in a sheet with its own send button, which is a fresh tap. Where
+there is no share sheet, it downloads.
 
 ## 8. The service worker
 

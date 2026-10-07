@@ -2,25 +2,30 @@
 
 ## Done
 
-All three stages are built, tested and committed. v0.3.0.
+v0.4.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
-- **Docs**: DESIGN, COLLECTIBLES, DECISIONS, ARCHITECTURE, RESEARCH-SEA (72 sourced facts, 73 one-liners, 25 collectible ideas, a reading list), RESEARCH-DOPAMINE (the mechanisms, 20 recommendations, a ranked top ten, the pitfalls).
-- **Scaffold**: Vite + strict TypeScript (no `any`), type-checked ESLint + Prettier + .editorconfig, MIT, CHANGELOG, GitHub Actions (lint + build + e2e on PRs, deploy only on push to main), Playwright on iPhone 13 / Pixel 5 / 1366x768. Repo: github.com/dovjonikas/whale-club with description and topics.
-- **Stage 1** (v0.1.0): things, tap, timer, week dots, the three-layer scene with parallax, the sky as a calendar, 24 creature drawings with stages, PWA with a versioned worker, update toast and install leaf, onboarding.
-- **Stage 2** (v0.2.0): 60 collectibles drawn into the scene, Collection sheet with silhouettes and true distance, stage-up, the whale on all done (red jacket from day 90), tappable day-stars, daily surprise from a shuffled pool, check-in, weekly recap, rules sheet, sound gate with tones and mute, share PNG, one notice slot.
-- **Stage 3** (v0.3.0): the club (buddy slot with a gzipped base64url share code, read-only buddy scene), fifth header button, polish pass on five viewports (no overflow, every control 44px), 87 tests passing.
+- **Docs**: DESIGN, COLLECTIBLES, DECISIONS, ARCHITECTURE, RESEARCH-SEA, RESEARCH-DOPAMINE.
+- **Scaffold**: Vite + strict TypeScript, type-checked ESLint + Prettier, MIT, CHANGELOG, GitHub Actions (lint + build + e2e, deploy only on push to main), Playwright on iPhone 13 / Pixel 5 / 1366x768. GitHub Pages enabled with the Actions source.
+- **v0.1.0**: things, tap, timer, week dots, the scene, the sky as a calendar, creatures, PWA, update toast.
+- **v0.2.0**: 60 collectibles, Collection, the whale on all done, tappable stars, daily surprise, check-in, recap, sound, share.
+- **v0.3.0**: a buddy slot with share codes (removed in v0.4.0).
+- **v0.4.0**:
+  - postcards replace the buddy: "send the whale" / "send this" after all done, unlock, stage up and the recap; "send the sea" in the header; story 1080x1920 or square 1080x1080, chosen on the first send, changed in the menu; share sheet or download;
+  - four header buttons; the menu is the club (three rules, one sentence, postcard size);
+  - the app lives in a phone-wide frame, black sides on a desktop;
+  - the install leaf waits for the first thing; iPhone gets three big steps;
+  - every line after a tap fits one row at 320px (tested); sea facts may wrap (DECISIONS);
+  - Lighthouse through Edge on the live URL: mobile 99 / 93 / 100 / 100, desktop 100 / 93 / 100 / 100; the one accessibility finding (a list without items) is fixed.
 
 ## Verified
 
 - `npm run lint`, `tsc --noEmit`, `npm run build`: clean.
-- `npm test`: 87 passed, 6 skipped (device-specific) on the three projects. Two tests (the Android timer, the iPhone share) have each flaked once under full parallel load and passed on every rerun; CI retries once.
-- Polish script (not kept) measured iPhone 13 mini, iPhone 13, Pixel 5, 1366x768 and 1920x1080: no horizontal overflow on any surface, no visible control under 44px.
-- Lighthouse could not run on the development machine: chrome-launcher fails to spawn a browser (`spawn UNKNOWN`) and the Playwright headless shell closes the target Lighthouse opens. Run it from Chrome DevTools against the live Pages URL after the first deploy; the build is 312 KiB precached, fonts latin-only, no third-party requests, so performance should be in the nineties.
+- `npm test`: 92 passed, 10 skipped (device-specific), on three projects.
+- Screenshots regenerated: scene, whale, all done with the postcard button, collection, menu, and both postcards.
 
-## Not done, on purpose
+## Next
 
-- Nothing from the brief is left out. Voice lines are placeholders marked TODO-VOICE.
-- The buddy's scene does not refresh itself; a new code has to be pasted (DECISIONS).
+v0.5.0 (the author's brief of 2026-10-07): the crack (collectibles arrive as stones to break), the deeper sky, and lock in as the heart of the app.
 
 ## How to run
 
@@ -34,9 +39,14 @@ npm run build && npm run preview   # then: npm run shots (README screenshots)
 npm run icons      # after changing public/icons/icon.svg
 ```
 
+Lighthouse, on Windows:
+
+```
+set CHROME_PATH=C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
+npx lighthouse https://dovjonikas.github.io/whale-club/ --chrome-flags="--headless=new"
+```
+
 ## For the author to do by hand
 
-1. **GitHub Pages** is enabled (source: GitHub Actions) and the first deploy went through: https://dovjonikas.github.io/whale-club/. Every push to main redeploys.
-2. **Voice**: replace every line marked `TODO-VOICE` in `src/voice.ts`. Keys: firstOpen, example, thingAdded, tap (sea / sky / garden lists), untap, timerStart, timerEnd, allDone, missedDay, quietDay, weekGood, weekBad, stageUp, unlock(name), starPlaced, checkin.after, install, shareDone, shareFailed, club (yourTyler, who, copied, bad), rules. Keep each under about 60 characters: the line slot is one row on a phone. Tests assert a few of the current strings (untap, allDone, timerEnd, missedDay, unlock, shareDone, the first rule, the check-in answers); change those tests in the same commit.
-3. **Lighthouse** on the live URL from Chrome DevTools (see Verified).
-4. **On the phone**: open the live URL in Safari, Share, Add to Home Screen; tap once to open the sound gate.
+1. **Voice**: replace every line marked `TODO-VOICE` in `src/voice.ts`. Keep each under about 40 characters so it fits one row on a 320px phone; `tests/e2e/lines.e2e.ts` checks that. Tests assert a few of the current strings (untap, allDone, timerEnd, missedDay, unlock, shareDone, the first rule, the check-in answers, the club sentence); change those tests in the same commit.
+2. **On the phone**: open the live URL in Safari, add a thing, tap "show me how" and follow the three steps.

@@ -254,16 +254,6 @@
   color: var(--ink-dim);
 }
 
-.leaf-share {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  vertical-align: -2px;
-  stroke: var(--ink);
-  fill: none;
-  stroke-width: 1.8;
-}
-
 .leaf-actions {
   display: flex;
   flex-direction: column;
@@ -407,7 +397,7 @@
   color: var(--star);
 }
 
-/* The rules. */
+/* The club: the rules and one sentence. */
 .rules {
   margin: 0;
   padding: 0;
@@ -430,90 +420,6 @@
 
 .rules-note {
   margin-top: var(--s6);
-}
-
-/* The club. */
-.club-code {
-  height: auto;
-  padding: var(--s2) var(--s3);
-  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-  font-size: var(--t-xs);
-  line-height: 1.4;
-  resize: none;
-  word-break: break-all;
-}
-
-.your-code {
-  margin-top: var(--s6);
-  padding-top: var(--s4);
-  border-top: 1px solid var(--card-edge);
-}
-
-.your-code .chips {
-  margin-top: var(--s2);
-}
-
-.buddy-title {
-  margin: 0 0 var(--s3);
-  font-size: var(--t-md);
-  font-weight: 700;
-}
-
-.buddy-title span {
-  color: var(--ink-dim);
-  font-weight: 400;
-}
-
-.buddy-scene {
-  position: relative;
-  height: 140px;
-  border-radius: 10px;
-  overflow: hidden;
-  background: linear-gradient(180deg, var(--zenith), var(--night) 85%, #0a2447);
-}
-
-.buddy-sky {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.buddy-day {
-  position: absolute;
-  right: var(--s3);
-  bottom: var(--s2);
-  margin: 0;
-  font-size: var(--t-xs);
-  color: var(--ink-dim);
-}
-
-.buddy-row {
-  display: flex;
-  gap: var(--s2);
-  margin: var(--s3) 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.buddy-row .card {
-  width: 92px;
-  min-height: 112px;
-  padding: var(--s2);
-  cursor: default;
-}
-
-.buddy-row .card .creature {
-  width: 44px;
-  height: 44px;
-}
-
-.buddy-tiles {
-  grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
-}
-
-.buddy-remove {
-  margin-top: var(--s3);
 }
 
 /* The install steps: three big rows, an icon each. */
@@ -577,4 +483,111 @@
 .install-text {
   font-size: var(--t-md);
   line-height: 1.3;
+}
+
+.club-line {
+  margin: var(--s6) 0 0;
+  font-size: var(--t-md);
+  color: var(--ink);
+}
+
+.menu-format {
+  margin-top: var(--s6);
+}
+
+/* The recap: text on its own row, so a 320px phone keeps the line on one. */
+.recap {
+  grid-template-columns: 1fr;
+}
+
+.recap .leaf-actions {
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+/* The postcard button: one, after a moment, warm. */
+.offer-slot {
+  display: flex;
+  justify-content: center;
+}
+
+.offer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  height: var(--touch);
+  margin-bottom: var(--s2);
+  padding: 0 var(--s6);
+  border-radius: var(--r-pill);
+  background: var(--star-pale);
+  color: var(--abyss);
+  font-size: var(--t-md);
+  font-weight: 700;
+  box-shadow: 0 0 32px rgba(255, 217, 138, 0.4);
+  opacity: 0;
+  transform: translate3d(0, 8px, 0) scale(0.96);
+  transition:
+    opacity var(--dur) var(--ease),
+    transform var(--dur) var(--ease-bounce);
+}
+
+.offer.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.offer svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+/* Story or square. */
+.formats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s3);
+}
+
+.format {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--s3);
+  min-height: 160px;
+  padding: var(--s4);
+  border-radius: var(--r);
+  border: 1px solid var(--card-edge);
+  background: rgba(2, 4, 9, 0.4);
+  font-size: var(--t-md);
+  font-weight: 700;
+}
+
+.format-shape {
+  border: 2px solid var(--glow);
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--night) 55%, var(--deep) 55%);
+}
+
+.format-shape.is-story {
+  width: 54px;
+  height: 96px;
+}
+
+.format-shape.is-square {
+  width: 80px;
+  height: 80px;
+}
+
+.postcard-preview {
+  display: block;
+  width: 100%;
+  max-height: 55vh;
+  object-fit: contain;
+  margin-bottom: var(--s4);
+  border-radius: 10px;
 }
