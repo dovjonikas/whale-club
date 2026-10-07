@@ -1,4 +1,4 @@
-import { creatureSvg } from '../scene/creatures'
+import { dressedSvg } from '../scene/dock/wear'
 import type { Line, Stage } from '../store/derive'
 import { LENGTH_STOPS, MAX_MINUTES, MIN_MINUTES, nearestStop, type Thing } from '../store/types'
 import { voice } from '../voice'
@@ -18,7 +18,7 @@ const C = 120
 
 export function openDial(
   thing: Thing,
-  look: { line: Line; stage: Stage },
+  look: { line: Line; stage: Stage; worn?: readonly string[] },
   onStart: (minutes: number) => void,
 ): void {
   openSheet({
@@ -40,7 +40,7 @@ export function openDial(
             <circle class="dial-knob" r="13"/>
           </svg>
           <div class="dial-centre">
-            <span class="dial-creature">${creatureSvg(thing.world, look.line, look.stage)}</span>
+            <span class="dial-creature">${dressedSvg(thing.world, look.line, look.stage, look.worn ?? [])}</span>
             <span class="dial-minutes"></span>
             <span class="dial-unit">min</span>
           </div>

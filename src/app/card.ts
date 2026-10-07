@@ -1,6 +1,6 @@
 import { bubbleSvg, RING } from '../brand/bubble'
 import { icon } from '../brand/icons'
-import { creatureSvg } from '../scene/creatures'
+import { dressedSvg } from '../scene/dock/wear'
 import type { Dot, Line, Stage } from '../store/derive'
 import type { Thing } from '../store/types'
 import { voice } from '../voice'
@@ -18,6 +18,8 @@ export interface CardView {
   line: Line
   /** Stones earned and waiting to be cracked. */
   waiting: number
+  /** What its creature wears from the dock. */
+  worn: readonly string[]
 }
 
 /**
@@ -134,11 +136,11 @@ export function updateCard(card: HTMLElement, thing: Thing, view: CardView): voi
   }
 
   const creature = card.querySelector('.creature')
-  const key = `${thing.world}-${view.line}-${String(view.stage)}`
+  const key = `${thing.world}-${view.line}-${String(view.stage)}-${view.worn.join('+')}`
   if (creature && creature.getAttribute('data-key') !== key) {
     const grew =
       creature.hasAttribute('data-key') && Number(creature.getAttribute('data-stage')) < view.stage
-    creature.innerHTML = creatureSvg(thing.world, view.line, view.stage)
+    creature.innerHTML = dressedSvg(thing.world, view.line, view.stage, view.worn)
     creature.setAttribute('data-key', key)
     creature.setAttribute('data-stage', String(view.stage))
     if (grew) animate(card, 'is-growing')

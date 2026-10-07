@@ -1,4 +1,5 @@
 import type { Scene } from '../scene/scene'
+import { wornBy } from './dockData'
 import { todayKey } from '../store/dates'
 import { allDoneToday, last7, lineFor, stageFor, starDays } from '../store/derive'
 import type { DateKey } from '../store/types'
@@ -84,7 +85,11 @@ export class LockIn {
     }
     openDial(
       thing,
-      { line: lineFor(data, thing), stage: stageFor(last7(data, thing.id, todayKey())) },
+      {
+        line: lineFor(data, thing),
+        stage: stageFor(last7(data, thing.id, todayKey())),
+        worn: wornBy(data, thing.id),
+      },
       (minutes) => {
         store.setThingMinutes(thing.id, minutes)
         this.begin(thing, { minutes, baseMs: 0, extra: done })
@@ -137,6 +142,7 @@ export class LockIn {
     keepAwake()
     sound.setSea(data.settings.sessionSound === true)
     this.screen = openSessionScreen(thing, lineFor(data, thing), {
+      worn: wornBy(data, thing.id),
       sound: data.settings.sessionSound === true,
       showTime: data.settings.showTime === true,
       onSound: (on) => {

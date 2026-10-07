@@ -44,6 +44,13 @@ export function rooms(data: AppData): Set<string> {
   )
 }
 
+/** What one thing's creature wears: owned, shown, and given to it. */
+export function wornBy(data: AppData, thing: string): string[] {
+  return Object.entries(data.wears ?? {})
+    .filter(([item, who]) => who === thing && owns(data, item) && !isHidden(data, item))
+    .map(([item]) => item)
+}
+
 /** The catalogue in its tiers, cheapest first within each. */
 export function dockByTier(): Map<DockItem['tier'], DockItem[]> {
   const tiers = new Map<DockItem['tier'], DockItem[]>()
