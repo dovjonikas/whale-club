@@ -26,6 +26,7 @@ export type IconName =
   | 'sound'
   | 'soundOff'
   | 'check'
+  | 'tail'
 
 /** The stroke every glyph and icon is drawn with, on the 24 grid. */
 export const LINE = 1.75
@@ -62,6 +63,8 @@ export const ICONS: Readonly<Record<IconName, string>> = {
     '<path d="M4.5 10v4h3.5l4.5 4V6L8 10Z"/><path d="M16 9.2a4 4 0 0 1 0 5.6"/><path d="M18.6 6.6a7.6 7.6 0 0 1 0 10.8"/>',
   soundOff: '<path d="M4.5 10v4h3.5l4.5 4V6L8 10Z"/><path d="m16 9.5 5 5"/><path d="m21 9.5-5 5"/>',
   check: '<path d="m5.5 12.5 4 4 9-9.5"/>',
+  // The app's own sign: a whale's tail diving, in the icon and the favicon too.
+  tail: '<path d="M10.4 19C10.9 16.5 11.2 14 11.1 12.3 9.5 11.2 6 10.6 3.4 7.2 6.3 7.4 9.6 8.2 12 10.2 14.4 8.2 17.7 7.4 20.6 7.2 18 10.6 14.5 11.2 12.9 12.3 12.8 14 13.1 16.5 13.6 19"/><path d="M4.5 19.4c1.25.9 2.5.9 3.75 0s2.5-.9 3.75 0 2.5.9 3.75 0 2.5-.9 3.75 0"/>',
 }
 
 /** An icon as inline SVG: decorative, for the word or the accessible name beside it. */
