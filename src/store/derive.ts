@@ -103,3 +103,20 @@ export function unlockedFor(
     .filter((c) => c.world === thing.world && c.line === line && c.days <= total)
     .map((c) => c.id)
 }
+
+/** Runs of three or more consecutive star days, which the sky joins into constellations. */
+export function streakDays(stars: readonly DateKey[]): Set<DateKey> {
+  const linked = new Set<DateKey>()
+  let run: DateKey[] = []
+  const flush = (): void => {
+    if (run.length >= 3) for (const d of run) linked.add(d)
+    run = []
+  }
+  for (const date of stars) {
+    const previous = run[run.length - 1]
+    if (previous !== undefined && addDays(previous, 1) !== date) flush()
+    run.push(date)
+  }
+  flush()
+  return linked
+}

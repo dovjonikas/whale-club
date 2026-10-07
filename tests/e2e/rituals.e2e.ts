@@ -9,8 +9,8 @@ import { addThing, dateKey, dismissInstallLeaf, seed } from './helpers'
  */
 test('the check-in is two taps, then noted, then not asked again today', async ({ page }) => {
   await page.goto('')
-  await dismissInstallLeaf(page)
   await addThing(page, 'run')
+  await dismissInstallLeaf(page)
   const checkin = page.getByRole('complementary', { name: 'check-in' })
   await expect(checkin).toContainText('how are you living?')
   await checkin.getByRole('button', { name: 'good!!!' }).click()
@@ -51,15 +51,16 @@ test('the recap says N/7 for the week and never what was missed', async ({ page 
   await expect(page.getByRole('complementary', { name: 'check-in' })).toBeVisible()
 })
 
-test('the rules are three, and the day count is under them', async ({ page }) => {
+test('the menu is the club: three rules, one sentence, the day count', async ({ page }) => {
   await seed(page, {
     things: [{ id: 't1', name: 'run', world: 'sea', createdAt: dateKey(-4), order: 0 }],
     days: {},
   })
   await page.goto('')
-  await page.getByRole('button', { name: 'Rules' }).click()
-  const sheet = page.getByRole('dialog', { name: 'the rules' })
-  await expect(sheet.getByRole('listitem')).toHaveCount(3)
+  await page.getByRole('button', { name: 'Menu' }).click()
+  const sheet = page.getByRole('dialog', { name: 'the club' })
+  await expect(sheet.getByRole('list').first().getByRole('listitem')).toHaveCount(3)
   await expect(sheet).toContainText('the first rule of whale club is: you show up.')
+  await expect(sheet).toContainText('whale club is you and whoever you send your whale to.')
   await expect(sheet).toContainText('day 5 of whale club')
 })

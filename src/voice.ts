@@ -32,19 +32,6 @@ export const voice = {
     next: (days: number) => (days === 1 ? 'in 1 day' : `in ${days} days`),
   },
   shareDone: 'picture saved.', // TODO-VOICE
-  club: {
-    title: 'the club',
-    yourTyler: 'your tyler:', // TODO-VOICE
-    who: 'who pushes you?', // TODO-VOICE
-    theirCode: 'their code',
-    yourCode: 'your code',
-    save: 'save',
-    copy: 'copy',
-    send: 'send',
-    copied: 'copied.', // TODO-VOICE
-    remove: 'remove',
-    bad: 'that code did not work.', // TODO-VOICE
-  },
   shareFailed: 'could not make the picture.', // TODO-VOICE
   starPlaced: 'a star for today.', // TODO-VOICE
   checkin: {
@@ -73,6 +60,21 @@ export const voice = {
     android: 'put it on your home screen', // TODO-VOICE
     button: 'Install',
     close: 'not now',
+  },
+  /** The menu's one screen: the rules and this. */
+  clubLine: 'whale club is you and whoever you send your whale to.',
+  postcard: {
+    sendWhale: 'send the whale',
+    sendThis: 'send this',
+    sendSea: 'send the sea',
+    /** The postcard's line when it is sent from the header with nothing just said. */
+    sea: 'the sea, today.', // TODO-VOICE
+    which: 'story or square?',
+    story: 'story',
+    square: 'square',
+    format: 'postcards',
+    preview: 'your postcard',
+    send: 'send',
   },
   update: 'new version. tap to reload',
   share: {

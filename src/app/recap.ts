@@ -4,6 +4,7 @@ import type { Store } from '../store/store'
 import type { AppData, DateKey } from '../store/types'
 import { voice } from '../voice'
 import type { NoticeBuilder } from './notices'
+import type { Moment } from './postcard'
 
 /**
  * The weekly recap: "5/7." and one line, no graph. On a Sunday it is the
@@ -28,20 +29,27 @@ export function recapFor(data: AppData, today: DateKey = todayKey()): Recap | nu
   return { week, count }
 }
 
-export function recapNotice(store: Store): NoticeBuilder {
+export function recapNotice(store: Store, onSend: (moment: Moment) => void): NoticeBuilder {
   return (dismiss) => {
     const recap = recapFor(store.get())
     if (!recap) return null
+    const weekLine = recap.count >= 5 ? voice.weekGood : voice.weekBad
     const card = document.createElement('aside')
     card.className = 'leaf recap'
     card.setAttribute('aria-label', 'weekly recap')
     card.innerHTML = `
       <div>
         <span class="leaf-title recap-count">${recap.count}/7.</span>
-        <span class="recap-line">${recap.count >= 5 ? voice.weekGood : voice.weekBad}</span>
+        <span class="recap-line">${weekLine}</span>
       </div>
-      <div class="leaf-actions"><button type="button" class="button-quiet">ok</button></div>`
-    card.querySelector('button')?.addEventListener('click', () => {
+      <div class="leaf-actions">
+        <button type="button" class="button-quiet recap-send">${voice.postcard.sendThis}</button>
+        <button type="button" class="button-quiet recap-ok">ok</button>
+      </div>`
+    card.querySelector('.recap-send')?.addEventListener('click', () => {
+      onSend({ kind: 'recap', line: `${recap.count}/7. ${weekLine}` })
+    })
+    card.querySelector('.recap-ok')?.addEventListener('click', () => {
       store.setSettings({ lastRecapWeek: recap.week })
       dismiss()
     })

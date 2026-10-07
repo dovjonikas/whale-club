@@ -55,8 +55,8 @@ export class StarField {
     this.reduced = matchMedia('(prefers-reduced-motion: reduce)').matches
   }
 
-  resize(width: number, height: number): void {
-    const dpr = Math.min(devicePixelRatio || 1, 2)
+  /** `dpr` is fixed by the postcard, which draws at its own pixel size. */
+  resize(width: number, height: number, dpr = Math.min(devicePixelRatio || 1, 2)): void {
     this.width = width
     this.height = height
     this.canvas.width = Math.round(width * dpr)

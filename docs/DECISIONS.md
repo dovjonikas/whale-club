@@ -124,3 +124,49 @@ current is a message between two people, which is the point of the club.
 chrome-launcher cannot spawn a browser on the development machine, so the
 audit connects to a Chromium that Playwright launches with a debugging
 port. The numbers are in STATE.md.
+
+## 2026-10-07 The club became postcards
+
+The buddy slot asked two people to swap codes and paste them, and what it
+showed was a photograph that never updated. That is admin, not a club.
+Now the club is you and whoever you send your whale to: after a moment
+worth showing, one button paints the scene as a postcard and opens the
+share sheet, straight into the messages people already use. No names, no
+codes, no data leaves the phone except the picture the person chose to
+send. The three decisions above about the share code and the read-only
+buddy scene are superseded by this one; the code is gone.
+
+## 2026-10-07 A postcard is painted from the data, not photographed
+
+Photographing the screen would capture whatever sheet or toast was on top
+and come out at the phone's own size. The postcard repaints the same
+scene from the same data at 1080px, so a story from one phone looks like
+a story from any other, and the square is composed for a square rather
+than cropped from a tall screen.
+
+## 2026-10-07 The postcard is painted before the tap
+
+An iPhone opens the share sheet only inside a tap, and a long wait between
+the tap and the call loses that permission. So both sizes start painting
+the moment the button appears, and the tap hands over a finished file. A
+refusal falls back to a preview sheet with its own send button.
+
+## 2026-10-07 The install leaf waits for the first thing
+
+On the empty first screen the leaf took the space under the first
+sentence before the person had done anything. It is now the first of the
+notices, and it applies only once a thing exists.
+
+## 2026-10-07 Sea facts may take two rows
+
+Every line said after a tap fits one row at 320px, and a test holds that.
+The daily sea facts are up to ninety characters and are the exception:
+cutting them to forty would lose what makes them worth reading, and they
+are said once, quietly.
+
+## 2026-10-07 Lighthouse runs through Edge
+
+chrome-launcher cannot start Playwright's Chromium on the development
+machine, but it can start Edge. CHROME_PATH pointed at msedge.exe and
+--chrome-flags="--headless=new" against the live URL gives the numbers in
+the README.

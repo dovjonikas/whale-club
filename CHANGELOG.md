@@ -2,6 +2,34 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.4.0 - 2026-10-07
+
+Postcards: the club is you and whoever you send your whale to.
+
+- The buddy slot, the share code and the read-only buddy scene are gone,
+  with their tests and docs. A settings.buddy left by v0.3 is dropped on load.
+- After a moment worth showing (the whale surfacing when all is done, an
+  unlock, a creature growing), one button appears: "send the whale", or
+  "send this" for an unlock. The weekly recap has "send this" too, and the
+  header's share button sends the sea any time.
+- A postcard is the scene repainted from the data at 1080x1920 (story) or
+  1080x1080 (square), with the moment's line, the day count, the date and
+  a small "whale club" mark. Chosen on the first send, remembered, changed
+  in the menu. It goes to the share sheet, or downloads where there is none.
+- Four header buttons: sound, collection, send the sea, menu. The menu is
+  one screen, the club: the three rules and one sentence.
+- The install leaf waits for the first thing; the empty first screen is
+  for the first sentence. The iPhone leaf's button opens three big steps.
+- The app lives in a phone-wide frame on every screen; on a desktop the
+  sides are black.
+- The recap's buttons sit under its line, so the line keeps one row on a
+  320px phone; a test holds every line after a tap to one row there.
+- The row of things is a group, not a list without items: Lighthouse
+  accessibility had flagged it.
+- Lighthouse, live URL, through Edge: mobile 99 / 93 / 100 / 100, desktop
+  100 / 93 / 100 / 100 (performance, accessibility, best practices, SEO),
+  measured before the fix above.
+
 ## 0.3.0 - 2026-10-06
 
 Stage 3: your Tyler.

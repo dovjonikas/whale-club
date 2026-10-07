@@ -1,9 +1,11 @@
 // README screenshots, generated rather than taken: a seeded history under a
 // pinned clock, at an iPhone, an Android phone and a desktop size, into
-// docs/screenshots/. Running it twice gives the same pictures.
+// docs/screenshots/. Running it twice gives the same pictures. The iPhone
+// pass also saves the two postcards the app paints, story and square.
 // Needs the preview server: `npm run build && npm run preview` first.
+/* global window, navigator, FileReader, Buffer */
 import { chromium, devices } from '@playwright/test'
-import { mkdirSync } from 'node:fs'
+import { mkdirSync, writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const base = 'http://localhost:4173/whale-club/'
@@ -53,17 +55,30 @@ for (let i = -34; i <= 0; i++) {
     if (i % 3 !== 0 || i > -7) done.push('read')
     if (i >= -30 && (i % 4 !== 2 || i > -7)) done.push('practice')
   }
-  if (i === 0) days[key(i)] = { done: ['run', 'read'], minutes: { read: 30 } }
+  if (i === 0) days[key(i)] = { done: ['run', 'read'], minutes: { read: 30 }, checkin: true }
   else if (done.length) days[key(i)] = { done, minutes: {} }
 }
 
-const data = { version: 1, things, days, settings: { sound: true, installDismissedAt: key(-1) } }
+const data = {
+  version: 1,
+  things,
+  days,
+  settings: {
+    sound: true,
+    installDismissedAt: key(-1),
+    // Last week's Monday, so the recap has already been seen.
+    lastRecapWeek: key(-9),
+    postcardFormat: 'story',
+  },
+}
 
 const targets = [
   { name: 'iphone', options: { ...devices['iPhone 13'] } },
   { name: 'android', options: { ...devices['Pixel 5'] } },
   { name: 'desktop', options: { viewport: { width: 1366, height: 768 } } },
 ]
+
+const shot = (page, file) => page.screenshot({ path: resolve(out, file) })
 
 const browser = await chromium.launch()
 for (const { name, options } of targets) {
@@ -74,16 +89,57 @@ for (const { name, options } of targets) {
     (json) => localStorage.setItem('whaleclub:data', json),
     JSON.stringify(data),
   )
+  // The share sheet records the postcard instead of opening, so its PNG can be saved.
+  await page.addInitScript(() => {
+    window.__cards = []
+    Object.defineProperty(navigator, 'canShare', { value: () => true, configurable: true })
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: (shared) =>
+        new Promise((done) => {
+          const reader = new FileReader()
+          reader.onload = () => {
+            window.__cards.push(reader.result)
+            done()
+          }
+          reader.readAsDataURL(shared.files[0])
+        }),
+    })
+  })
   await page.goto(base)
   await page.waitForTimeout(1200)
-  await page.screenshot({ path: resolve(out, `${name}-scene.png`) })
+  await shot(page, `${name}-scene.png`)
   await page.getByRole('button', { name: 'practice', exact: true }).click()
   await page.waitForTimeout(1500)
-  await page.screenshot({ path: resolve(out, `${name}-all-done.png`) })
-  await page.waitForTimeout(1600)
+  await shot(page, `${name}-whale.png`)
+  await page.getByRole('button', { name: 'send the whale' }).waitFor()
+  await page.waitForTimeout(400)
+  await shot(page, `${name}-all-done.png`)
+
+  if (name === 'iphone') {
+    await page.getByRole('button', { name: 'send the whale' }).click()
+    await page.waitForFunction(() => window.__cards.length === 1)
+    await page.getByRole('button', { name: 'Menu' }).click()
+    await page
+      .getByRole('dialog', { name: 'the club' })
+      .getByRole('button', { name: 'square' })
+      .click()
+    await page.waitForTimeout(400)
+    await shot(page, 'iphone-menu.png')
+    await page.keyboard.press('Escape')
+    await page.waitForTimeout(400)
+    await page.getByRole('button', { name: 'send the sea' }).click()
+    await page.waitForFunction(() => window.__cards.length === 2)
+    const cards = await page.evaluate(() => window.__cards)
+    const save = (dataUrl, file) =>
+      writeFileSync(resolve(out, file), Buffer.from(dataUrl.split(',')[1], 'base64'))
+    save(cards[0], 'postcard-story.png')
+    save(cards[1], 'postcard-square.png')
+  }
+
   await page.getByRole('button', { name: 'Collection' }).click()
   await page.waitForTimeout(500)
-  await page.screenshot({ path: resolve(out, `${name}-collection.png`) })
+  await shot(page, `${name}-collection.png`)
   await context.close()
 }
 await browser.close()

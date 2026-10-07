@@ -94,11 +94,6 @@ export class Store {
     this.commit({ ...this.data, settings: { ...this.data.settings, ...patch } })
   }
 
-  /** Replaces everything. Used by tests to seed a history and by nothing else. */
-  replace(data: AppData): void {
-    this.commit(data)
-  }
-
   private day(date: DateKey) {
     return this.data.days[date] ?? { done: [], minutes: {} }
   }

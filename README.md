@@ -18,7 +18,9 @@ all that happens.
 </p>
 
 <p align="center">
-  <img src="docs/screenshots/desktop-scene.png" alt="Whale Club on a desktop" width="720">
+  <img src="docs/screenshots/postcard-story.png" alt="A postcard in the story size: the night sky, the whale over the horizon, all of it. all the smoke., day 35 of whale club" width="280">
+  &nbsp;&nbsp;
+  <img src="docs/screenshots/postcard-square.png" alt="The same postcard in the square size" width="420">
 </p>
 
 ## The rules
@@ -61,9 +63,12 @@ all that happens.
 - **A weekly recap**: "5/7." and one line. Never what was missed.
 - **Sound** behind a tap gate, one button to mute. **Share** the scene as a
   picture with "day N of whale club" on it.
-- **The club.** One buddy slot: name the person who pushes you, paste
-  their code, and their scene sits beside yours. Read only, no server; the
-  code is the data.
+- **Postcards.** When the whale surfaces, a collectible unlocks or a
+  creature grows, one button appears: send the whale. It paints the scene
+  as a picture (a story or a square) with the day and the moment's line,
+  and opens the share sheet. The club is you and whoever you send your
+  whale to. No accounts, no codes: the picture is the only thing that
+  leaves the phone.
 
 ## Tech
 
@@ -72,6 +77,20 @@ canvases (stars, particles) animated with transforms and opacity only.
 localStorage for data. `vite-plugin-pwa` for the manifest and the
 service worker. Playwright for tests on three device profiles. GitHub
 Actions to GitHub Pages.
+
+## Lighthouse
+
+Measured on the live URL with Lighthouse 12 through Microsoft Edge,
+2026-10-07, before the accessibility fix in 0.4.0:
+
+|         | Performance | Accessibility | Best practices | SEO |
+| ------- | ----------- | ------------- | -------------- | --- |
+| Mobile  | 99          | 93            | 100            | 100 |
+| Desktop | 100         | 93            | 100            | 100 |
+
+Lighthouse 12 no longer has a PWA category. Installability is held by the
+tests instead: the manifest, the service worker, an offline reload and an
+update under an open page.
 
 ## Run
 

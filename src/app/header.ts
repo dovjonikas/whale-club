@@ -1,24 +1,23 @@
+import { voice } from '../voice'
 import { BRAND } from './brand'
 
 /**
- * The header: the title and five quiet buttons. Icons are inline strokes
+ * The header: the title and four quiet buttons. Icons are inline strokes
  * so they take the current colour and need no font or sprite.
  */
 export interface HeaderHandlers {
   onSound: (button: HTMLButtonElement) => void
   onCollection: () => void
-  onRules: () => void
-  onShare: () => void
-  onClub: () => void
+  onSend: () => void
+  onMenu: () => void
 }
 
 const ICONS = {
   sound:
     '<path d="M4 10v4h4l5 4V6L8 10H4z"/><path d="M16 9a4 4 0 0 1 0 6"/><path d="M18.5 6.5a8 8 0 0 1 0 11"/>',
   collection: '<path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.3l6.1-.7z"/>',
-  rules: '<path d="M4 7h16M4 12h16M4 17h10"/>',
-  club: '<circle cx="9" cy="8" r="3.2"/><circle cx="16.5" cy="9.5" r="2.6"/><path d="M3 19c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M14.5 14.2c2.9.3 5 2.4 5 4.8"/>',
-  share: '<path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/>',
+  send: '<path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h10"/>',
 } as const
 
 export function renderHeader(parent: HTMLElement, handlers: HeaderHandlers, muted: boolean): void {
@@ -31,14 +30,11 @@ export function renderHeader(parent: HTMLElement, handlers: HeaderHandlers, mute
       <button type="button" class="icon-button" data-action="collection" aria-label="Collection">
         <svg viewBox="0 0 24 24">${ICONS.collection}</svg>
       </button>
-      <button type="button" class="icon-button" data-action="share" aria-label="Share">
-        <svg viewBox="0 0 24 24">${ICONS.share}</svg>
+      <button type="button" class="icon-button" data-action="send" aria-label="${voice.postcard.sendSea}">
+        <svg viewBox="0 0 24 24">${ICONS.send}</svg>
       </button>
-      <button type="button" class="icon-button" data-action="club" aria-label="Club">
-        <svg viewBox="0 0 24 24">${ICONS.club}</svg>
-      </button>
-      <button type="button" class="icon-button" data-action="rules" aria-label="Rules">
-        <svg viewBox="0 0 24 24">${ICONS.rules}</svg>
+      <button type="button" class="icon-button" data-action="menu" aria-label="Menu">
+        <svg viewBox="0 0 24 24">${ICONS.menu}</svg>
       </button>
     </div>`
   const button = (action: string): HTMLButtonElement => {
@@ -51,7 +47,6 @@ export function renderHeader(parent: HTMLElement, handlers: HeaderHandlers, mute
     handlers.onSound(sound)
   })
   button('collection').addEventListener('click', handlers.onCollection)
-  button('share').addEventListener('click', handlers.onShare)
-  button('club').addEventListener('click', handlers.onClub)
-  button('rules').addEventListener('click', handlers.onRules)
+  button('send').addEventListener('click', handlers.onSend)
+  button('menu').addEventListener('click', handlers.onMenu)
 }

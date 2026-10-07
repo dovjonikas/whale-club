@@ -35,11 +35,7 @@ export interface DayRecord {
   checkin?: boolean
 }
 
-export interface Buddy {
-  name: string
-  /** The share code pasted in, kept so the buddy's scene can be redrawn offline. */
-  code?: string
-}
+export type PostcardFormat = 'story' | 'square'
 
 export interface Settings {
   sound: boolean
@@ -47,7 +43,8 @@ export interface Settings {
   installDismissedAt?: DateKey
   /** The Monday of the last week a recap was shown for. */
   lastRecapWeek?: DateKey
-  buddy?: Buddy
+  /** Chosen the first time a postcard is sent; changed in the menu. */
+  postcardFormat?: PostcardFormat
 }
 
 export interface AppData {
