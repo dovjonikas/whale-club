@@ -3,6 +3,17 @@ import type { DateKey, World } from '../store/types'
 import type { Collectible } from './collectibles'
 import { collectibleSvg } from './collectibles'
 import { deepHtml, kelpHtml, shaftsHtml, surfaceSvg } from './depths'
+import {
+  auroraSkySvg,
+  fridayStarsHtml,
+  glowingCoveSvg,
+  islandWhaleSvg,
+  pierSvg,
+  reefSvg,
+  shoreEdgeSvg,
+  skyWhaleSvg,
+  smallWhaleSvg,
+} from './dock/scene'
 import { LanternLayer, type LanternSpec } from './lanterns'
 import { moonPhase, moonSvg } from './moon'
 import { startParallax } from './parallax'
@@ -13,6 +24,7 @@ import { StarField } from './stars'
 import { StoneLayer, type StoneSpec } from './stones'
 import { causticsUrl, grainUrl } from './textures'
 import { ticker } from './ticker'
+import { voice } from '../voice'
 import { sleeperSvg, visitorSvg, whaleSvg, type VisitorKind } from './visitors'
 
 /**
@@ -29,6 +41,10 @@ import { sleeperSvg, visitorSvg, whaleSvg, type VisitorKind } from './visitors'
  * which stops while the page is hidden or the scene is off screen.
  */
 const PHONE_WIDTH = 390
+/** A night-only dock thing bought in daylight shows itself for this long. */
+const DOCK_PREVIEW_MS = 6000
+/** The sky whale starts across this long after the scene opens in the dark. */
+const SKY_WHALE_WAIT_MS = 20_000
 const NIGHT_FROM = 21
 const NIGHT_TO = 5
 /** Where the sky ends, as a fraction of the scene's height (--horizon in tokens.css). */
@@ -82,6 +98,11 @@ export class Scene {
   private rendered = false
   private onStarTap: ((date: DateKey) => void) | null = null
   private onSkyTap: (() => void) | null = null
+  /** The dock things owned and shown, and the night the sky whale last crossed in. */
+  private dockOwned: ReadonlySet<string> = new Set()
+  private dockKey = ''
+  private skyWhaleNight = ''
+  private skyWhaleTimer = 0
 
   constructor(parent: HTMLElement, onCrack: (key: string) => void) {
     this.root = document.createElement('div')
@@ -91,7 +112,10 @@ export class Scene {
     this.root.innerHTML = `
       <div class="layer sky" data-depth="0.25" aria-hidden="true">
         <div class="nebula"><i></i><i></i><i></i></div>
+        <div class="dock-aurora" hidden>${auroraSkySvg()}</div>
         <canvas class="stars"></canvas>
+        <div class="dock-friday" hidden>${fridayStarsHtml()}</div>
+        <div class="dock-sky-whale" hidden>${skyWhaleSvg()}</div>
         <div class="moon">${moonSvg(moonPhase(today()))}</div>
       </div>
       <div class="layer sea" data-depth="0.8" aria-hidden="true">
@@ -106,6 +130,15 @@ export class Scene {
         <div class="surface">${surfaceSvg()}</div>
       </div>
       <canvas class="lanterns" aria-hidden="true"></canvas>
+      <div class="dock-under">
+        <div class="dock-cove" hidden aria-hidden="true">${glowingCoveSvg()}</div>
+        <div class="dock-island" hidden aria-hidden="true">${islandWhaleSvg()}</div>
+        <div class="dock-tide" hidden aria-hidden="true"></div>
+        <div class="dock-edge" hidden aria-hidden="true">${shoreEdgeSvg()}</div>
+        <div class="dock-reef" hidden aria-hidden="true">${reefSvg()}</div>
+        <div class="dock-small-whale" hidden aria-hidden="true">${smallWhaleSvg()}</div>
+        <button type="button" class="pier"></button>
+      </div>
       <div class="scene-things" aria-hidden="true"></div>
       <div class="sleeper" aria-hidden="true">${sleeperSvg()}</div>
       <div class="stones" role="group" aria-label="stones"></div>
@@ -352,6 +385,122 @@ export class Scene {
   }
 
   /** Nothing added yet: the small whale sleeps at the water line. */
+  /**
+   * The dock in the scene: the pier (its length and its lanterns), the
+   * extensions that add places, and what changes the whole scene. Some
+   * only come out after dark, as their lines say: aurora nights, the cove
+   * glowing, the lanterns lit, Friday's falling stars, and the whale in the
+   * sky, which crosses once a night.
+   */
+  setDock(owned: ReadonlySet<string>, onPier: () => void, now: Date = today()): void {
+    const hour = now.getHours()
+    const dark = hour >= NIGHT_FROM || hour < NIGHT_TO
+    // A Friday night runs on past midnight into Saturday's small hours.
+    const friday = dark && (hour >= NIGHT_FROM ? now.getDay() === 5 : now.getDay() === 6)
+    const key = [...owned].sort().join(',') + String(dark) + String(friday)
+    const pier = this.query('.pier')
+    if (!pier.dataset.wired) {
+      pier.dataset.wired = 'true'
+      pier.addEventListener('click', onPier)
+    }
+    if (key === this.dockKey) return
+    this.dockKey = key
+    this.dockOwned = owned
+    const has = (id: string): boolean => owned.has(id)
+    pier.setAttribute('aria-label', voice.dock.pier)
+    pier.innerHTML = pierSvg(has('longer-dock'), has('dock-lanterns'))
+    pier.dataset.long = String(has('longer-dock'))
+    this.root.dataset.dark = String(dark)
+    const show = (selector: string, on: boolean): void => {
+      this.query(selector).hidden = !on
+    }
+    show('.dock-edge', has('longer-shore'))
+    show('.dock-reef', has('reef'))
+    show('.dock-island', has('island'))
+    show('.dock-small-whale', has('second-whale'))
+    show('.dock-tide', has('glowing-tide'))
+    show('.dock-cove', has('glowing-cove') && dark)
+    show('.dock-aurora', has('aurora') && dark)
+    show('.dock-friday', has('friday-stars') && friday)
+    this.planSkyWhale(has('sky-whale') && dark, now)
+  }
+
+  /**
+   * Shows a thing bought in daylight that only comes out after dark, for a
+   * few seconds, so the purchase is seen; then the scene goes back to its
+   * rules.
+   */
+  previewDock(id: string): void {
+    const selector: Record<string, string> = {
+      aurora: '.dock-aurora',
+      'glowing-cove': '.dock-cove',
+      'friday-stars': '.dock-friday',
+      'sky-whale': '.dock-sky-whale',
+    }
+    const target = selector[id]
+    if (!target) return
+    const element = this.query(target)
+    if (!element.hidden && id !== 'sky-whale') return
+    element.hidden = false
+    element.classList.add('is-preview')
+    setTimeout(() => {
+      element.classList.remove('is-preview')
+      this.dockKey = ''
+      this.setDock(this.dockOwned, () => undefined)
+    }, DOCK_PREVIEW_MS)
+  }
+
+  /** The sky whale crosses once a night, a little while after the scene opens in the dark. */
+  private planSkyWhale(on: boolean, now: Date): void {
+    const whale = this.query('.dock-sky-whale')
+    // The night is named by the evening it began on.
+    const evening = new Date(now)
+    if (now.getHours() < NIGHT_TO) evening.setDate(evening.getDate() - 1)
+    const night = evening.toDateString()
+    if (!on || this.skyWhaleNight === night) {
+      if (!on) whale.hidden = true
+      return
+    }
+    this.skyWhaleNight = night
+    clearTimeout(this.skyWhaleTimer)
+    this.skyWhaleTimer = window.setTimeout(() => {
+      whale.hidden = false
+      whale.classList.add('is-crossing')
+      // Reduced motion: it rests in the sky a while instead of crossing, then goes.
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        setTimeout(() => {
+          whale.classList.remove('is-crossing')
+          whale.hidden = true
+        }, DOCK_PREVIEW_MS)
+        return
+      }
+      whale.addEventListener(
+        'animationend',
+        () => {
+          whale.classList.remove('is-crossing')
+          whale.hidden = true
+        },
+        { once: true },
+      )
+    }, SKY_WHALE_WAIT_MS)
+  }
+
+  /** A shown thing's element, for arranging it by hand. */
+  collectibleElement(id: string): HTMLElement | null {
+    return this.thingsLayer.querySelector<HTMLElement>(`.collectible[data-id="${id}"]`)
+  }
+
+  /** Arranging: the scene stops (its loop and every CSS motion) and the pier and stars step back. */
+  setArranging(on: boolean): void {
+    this.root.dataset.arranging = String(on)
+    ticker.hold(on)
+  }
+
+  /** Where the pier is on screen, for an arrival. */
+  pierRect(): DOMRect {
+    return this.query('.pier').getBoundingClientRect()
+  }
+
   setEmpty(empty: boolean): void {
     this.root.dataset.empty = String(empty)
   }

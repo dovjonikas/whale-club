@@ -1,5 +1,6 @@
 import { glyphFor } from '../brand/match'
 import { now } from './clock'
+import { withGoal, withHidden, withPurchase, withWearer } from './dock'
 import { dataKey } from './lab'
 import { migrate } from './migrate'
 import { todayKey } from './dates'
@@ -254,6 +255,36 @@ export class Store {
 
   setSettings(patch: Partial<Settings>): void {
     this.commit({ ...this.data, settings: { ...this.data.settings, ...patch } })
+  }
+
+  // --- The dock and the arrangement ---------------------------------------------------------
+
+  /** Buys a dock thing at its catalogue price; false when it is owned or the krill is short. */
+  buy(item: string, price: number, date: DateKey = todayKey()): boolean {
+    const next = withPurchase(this.data, item, price, date)
+    if (!next) return false
+    this.commit(next)
+    return true
+  }
+
+  setGoal(item: string | null): void {
+    this.commit(withGoal(this.data, item))
+  }
+
+  setHidden(item: string, hidden: boolean): void {
+    this.commit(withHidden(this.data, item, hidden))
+  }
+
+  setWearer(item: string, thing: string): void {
+    this.commit(withWearer(this.data, item, thing))
+  }
+
+  /** Where everything stands, as records; null forgets them all ("tidy up"). */
+  setPlacement(records: Readonly<Record<string, string>> | null): void {
+    const next: AppData = { ...this.data }
+    if (records === null || Object.keys(records).length === 0) delete next.placement
+    else next.placement = { ...records }
+    this.commit(next)
   }
 
   private day(date: DateKey) {

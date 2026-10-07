@@ -35,10 +35,10 @@ export function shownItems(data: AppData): DockItem[] {
   return ownedItems(data).filter((item) => !isHidden(data, item.id))
 }
 
-/** The extensions owned, which add places to the scene. */
+/** The extensions owned and shown, which add places to the scene. */
 export function rooms(data: AppData): Set<string> {
   return new Set(
-    ownedItems(data)
+    shownItems(data)
       .filter((i) => i.kind === 'room')
       .map((i) => i.id),
   )

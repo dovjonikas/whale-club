@@ -1,5 +1,6 @@
 import { collectibleSvg, collectiblesFor } from '../scene/collectibles'
 import { Scene } from '../scene/scene'
+import { CHEST } from '../scene/spots'
 import { todayKey } from '../store/dates'
 import {
   allDoneToday,
@@ -24,12 +25,17 @@ import { openAddSheet } from './addSheet'
 import { animate } from './card'
 import { checkinNotice } from './checkin'
 import { openCollectionSheet } from './collectionSheet'
+import { openDockSheet } from './dockSheet'
+import { openArrange, type ArrangeOptions } from './arrange'
+import { shownItems } from './dockData'
+import type { DockItem } from '../scene/dock'
 import { renderHeader } from './header'
 import { host } from './host'
 import { Line } from './line'
 import { LockIn } from './lockIn'
 import { openHowItWorks } from './howItWorks'
 import { introDue, playIntro } from './intro'
+import { KrillChip } from './krillChip'
 import { openLogSheet } from './logSheet'
 import { openMenuSheet } from './menuSheet'
 import { Notices } from './notices'
@@ -40,6 +46,7 @@ import {
   dayLabel,
   hasJacket,
   lanternsFor,
+  arrangementOf,
   nextFind,
   shownCollectibles,
   stonesFor,
@@ -94,7 +101,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     { passive: true },
   )
 
-  renderHeader(
+  const krillSlot = renderHeader(
     query(root, '.header'),
     {
       onSound(button) {
@@ -105,7 +112,9 @@ export function startApp(root: HTMLElement, labEntered = false): void {
         if (!muted) sound.play('tap', 'sky')
       },
       onCollection() {
-        openCollectionSheet(store)
+        openCollectionSheet(store, () => {
+          startArrange({})
+        })
       },
       onSend() {
         postcards.sendNow({ kind: 'sea', line: line.current() || voice.postcard.sea })
@@ -124,6 +133,53 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     },
     sound.isMuted(),
   )
+
+  const krill = new KrillChip(() => {
+    openDock()
+  })
+  krillSlot.append(krill.root)
+
+  /** The dock, from the krill chip or the pier; `start` opens one thing's page. */
+  function openDock(start?: string): void {
+    openDockSheet(
+      store,
+      {
+        onArrived: (item) => {
+          arrived(item)
+        },
+        onNoRoom: () => {
+          line.say(voice.arrange.noRoom, { quiet: true })
+        },
+      },
+      start,
+    )
+  }
+
+  /** Arranging the scene, from the Collection or right after something to place was bought. */
+  function startArrange(options: Omit<ArrangeOptions, 'onClose'>): void {
+    openArrange(store, scene, {
+      ...options,
+      onClose: () => {
+        render(store.get())
+      },
+    })
+  }
+
+  /**
+   * Something bought has come: one line, and the scene shows it. A thing
+   * with a place, or more room, opens arranging at once, with the thing
+   * in hand or the new places glowing.
+   */
+  function arrived(item: DockItem): void {
+    sound.play('unlock')
+    const said = voice.dock.arrived(item.name)
+    if (item.kind === 'place') startArrange({ held: item.id, note: said })
+    else if (item.kind === 'room') startArrange({ room: item.id, note: said })
+    else {
+      line.say(said)
+      scene.previewDock(item.id)
+    }
+  }
 
   let surprisedFor: DateKey | null = null
   // Stones that fell in during a render, held until the tap handler says the line.
@@ -308,13 +364,29 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       })
       scene.burst(thing.world, where.left + where.width / 2, where.top + where.height / 2, 28)
     }
+    keepPlaces({ ...data, cracked: { ...data.cracked, [thing.id]: tier } })
     store.crack(thing.id, tier)
     sound.play('unlock')
     if (item) {
-      const said = voice.unlock(item.name)
+      // A full world sends the new find to the chest, and the line says so.
+      const inChest = arrangementOf(store.get()).where.get(item.id) === CHEST
+      const said = inChest ? voice.arrange.toChest(item.name) : voice.unlock(item.name)
       line.say(said)
       postcards.offer({ kind: 'unlock', line: said }, voice.postcard.sendThis, OFFER_AFTER_FIND_MS)
     }
+  }
+
+  /**
+   * Places follow the order things were got, but a stone can wait: one
+   * cracked late was reached early, and would take the place of something
+   * already standing. When it would, the current arrangement is kept as it
+   * is first, so the newcomer takes a free place or waits in the chest.
+   */
+  function keepPlaces(next: AppData): void {
+    const now = arrangementOf(store.get())
+    const then = arrangementOf(next)
+    const bumped = now.things.some((t) => now.where.get(t.id) !== then.where.get(t.id))
+    if (bumped) store.setPlacement(Object.fromEntries(now.where))
   }
 
   /** Once a day, after the first thing done: something new in the scene. */
@@ -337,6 +409,10 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     onboarding.hidden = data.things.length > 0
     scene.setEmpty(data.things.length === 0)
     row.render(data)
+    krill.render(data, today)
+    scene.setDock(new Set(shownItems(data).map((item) => item.id)), () => {
+      openDock()
+    })
 
     const stars = starDays(data)
     scene.setDays(

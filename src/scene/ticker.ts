@@ -27,6 +27,8 @@ export class Ticker {
   private raf = 0
   private visible = !document.hidden
   private onScreen = true
+  /** Held still on purpose: arranging stops the scene so a thing holds still under a finger. */
+  private held = false
 
   constructor() {
     document.addEventListener('visibilitychange', () => {
@@ -46,6 +48,11 @@ export class Ticker {
     }).observe(element)
   }
 
+  hold(on: boolean): void {
+    this.held = on
+    this.update()
+  }
+
   add(frame: Frame, fps: number): FrameHandle {
     const job: Job = { frame, interval: 1000 / fps, last: 0 }
     this.jobs.add(job)
@@ -62,7 +69,7 @@ export class Ticker {
   }
 
   private update(): void {
-    const run = this.visible && this.onScreen && this.jobs.size > 0
+    const run = this.visible && this.onScreen && !this.held && this.jobs.size > 0
     if (run && !this.raf) this.raf = requestAnimationFrame(this.loop)
     if (!run && this.raf) {
       cancelAnimationFrame(this.raf)
