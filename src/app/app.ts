@@ -10,6 +10,7 @@ import {
   last7,
   lineFor,
   missedYesterday,
+  plannedThings,
   reachedOn,
   stageFor,
   starDays,
@@ -17,6 +18,9 @@ import {
   waitingTiers,
 } from '../store/derive'
 import { Store } from '../store/store'
+import { emptyData } from '../store/types'
+import { seedHistory } from '../lab/seed'
+import { enterLabFromMenu, startLabUi } from '../lab/labUi'
 import type { AppData, DateKey, Thing, World } from '../store/types'
 import { pick, voice } from '../voice'
 import { installNotice, listenForInstallPrompt } from '../pwa/install'
@@ -50,7 +54,7 @@ const OFFER_AFTER_FIND_MS = 2800
 const OFFER_AFTER_GROW_MS = 900
 
 /** Wires the store, the scene, the row and the sheets together. One per page. */
-export function startApp(root: HTMLElement): void {
+export function startApp(root: HTMLElement, labEntered = false): void {
   const store = new Store()
   const scene = new Scene(host(), (key) => {
     onCracked(key)
@@ -101,7 +105,7 @@ export function startApp(root: HTMLElement): void {
         postcards.sendNow({ kind: 'sea', line: line.current() || voice.postcard.sea })
       },
       onMenu() {
-        openMenuSheet(store)
+        openMenuSheet(store, enterLabFromMenu)
       },
     },
     sound.isMuted(),
@@ -374,6 +378,35 @@ export function startApp(root: HTMLElement): void {
   const opening = store.get()
   if (isRestDay(opening, todayKey())) line.say(voice.restDay, { quiet: true })
   else if (missedYesterday(opening, todayKey())) line.say(voice.missedDay, { quiet: true })
+
+  // --- The lab (only ever on in the sandbox; see src/store/lab.ts) ------------------------------
+
+  startLabUi(
+    {
+      doAll() {
+        const today = todayKey()
+        const data = store.get()
+        const open = plannedThings(data, today).filter(
+          (t) => !data.days[today]?.done.includes(t.id),
+        )
+        for (const thing of open) store.toggleDone(thing.id)
+        pendingFalls.length = 0
+        if (open.length > 0 && allDoneToday(store.get(), today)) {
+          scene.surfaceWhale(hasJacket(store.get()))
+          line.say(voice.allDone)
+        }
+      },
+      seed(days) {
+        store.replace(seedHistory(store.get(), todayKey(), days))
+        pendingFalls.length = 0
+      },
+      clear() {
+        store.replace(emptyData())
+        pendingFalls.length = 0
+      },
+    },
+    labEntered,
+  )
 }
 
 function shownCollectibles(data: AppData): ShownCollectible[] {

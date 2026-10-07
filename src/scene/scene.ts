@@ -1,3 +1,4 @@
+import { today } from '../store/clock'
 import type { DateKey, World } from '../store/types'
 import type { Collectible } from './collectibles'
 import { collectibleSvg } from './collectibles'
@@ -66,7 +67,7 @@ export class Scene {
       <div class="layer sky" data-depth="0.25" aria-hidden="true">
         <div class="nebula"><i></i><i></i><i></i></div>
         <canvas class="stars"></canvas>
-        <div class="moon">${moonSvg(moonPhase(new Date()))}</div>
+        <div class="moon">${moonSvg(moonPhase(today()))}</div>
       </div>
       <div class="layer sea" data-depth="0.8" aria-hidden="true">
         <div class="caustics"><i></i></div>
@@ -103,15 +104,23 @@ export class Scene {
     this.observer = new ResizeObserver(() => {
       this.resize()
     })
+    // The first size comes from the observer, after layout, rather than read
+    // here, which would force a layout of the whole page before it is built.
     this.observer.observe(this.root)
-    this.resize()
     this.stars.start()
     this.particles.start()
-    // The textures are drawn once, after the first paint, so they never hold up the first screen.
-    setTimeout(() => {
-      this.root.style.setProperty('--grain', `url(${grainUrl()})`)
-      this.root.style.setProperty('--caustics', `url(${causticsUrl()})`)
-    }, 60)
+    // The textures are drawn once, each in its own idle moment after the first
+    // paint, so neither holds up the first screen or a tap.
+    whenIdle(() => {
+      void grainUrl().then((url) => {
+        if (url) this.root.style.setProperty('--grain', `url(${url})`)
+        whenIdle(() => {
+          void causticsUrl().then((next) => {
+            if (next) this.root.style.setProperty('--caustics', `url(${next})`)
+          })
+        })
+      })
+    })
   }
 
   /** The sky's day-stars, with a label and a tap for each. */
@@ -131,11 +140,10 @@ export class Scene {
   setCollectibles(
     shown: readonly ShownCollectible[],
     arrivals: ReadonlyMap<string, { x: number; y: number }> = new Map(),
-    now: Date = new Date(),
+    now: Date = today(),
   ): void {
     const firstRender = !this.rendered
     this.rendered = true
-    const scale = Math.min(Math.max(this.root.clientWidth / PHONE_WIDTH, 0.8), 2)
     const hour = now.getHours()
     const dark = hour >= NIGHT_FROM || hour < NIGHT_TO
     const keep = new Set<string>()
@@ -152,7 +160,8 @@ export class Scene {
         element.dataset.rarity = rarity
         element.style.left = `${(item.x * 100).toFixed(2)}%`
         element.style.top = `${(item.y * 100).toFixed(2)}%`
-        element.style.width = `${String(Math.round(item.size * scale))}px`
+        // Scaled with the scene by a CSS variable the resize sets, so nothing reads layout here.
+        element.style.width = `calc(${String(item.size)}px * var(--scene-scale, 1))`
         element.innerHTML = collectibleSvg(item)
         this.thingsLayer.append(element)
         const from = arrivals.get(item.id)
@@ -312,6 +321,8 @@ export class Scene {
     const width = this.root.clientWidth
     const height = this.root.clientHeight
     if (!width || !height) return
+    const scale = Math.min(Math.max(width / PHONE_WIDTH, 0.8), 2)
+    this.root.style.setProperty('--scene-scale', scale.toFixed(3))
     this.stars.resize(this.skyLayer.clientWidth, this.skyLayer.clientHeight)
     this.particles.resize(width, height, 0.58)
     this.renderStarHits()
@@ -322,6 +333,12 @@ export class Scene {
     if (!element) throw new Error(`scene is missing ${selector}`)
     return element
   }
+}
+
+/** Runs `work` when the main thread is idle, or soon after where there is no idle callback (Safari). */
+function whenIdle(work: () => void): void {
+  if ('requestIdleCallback' in window) requestIdleCallback(work, { timeout: 2000 })
+  else setTimeout(work, 300)
 }
 
 function canvas(element: HTMLElement): HTMLCanvasElement {

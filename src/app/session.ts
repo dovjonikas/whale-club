@@ -1,3 +1,6 @@
+import { now } from '../store/clock'
+import { labOn, sessionKey } from '../store/lab'
+
 /**
  * A lock-in session, kept in storage and measured by the clock, never by
  * counting ticks: a reload, a locked phone or an app closed for an hour
@@ -15,7 +18,6 @@
  * out while away for less than the grace finishes clean, at the moment it
  * ran out.
  */
-const KEY = 'whaleclub:session'
 /** Where v0.1 to v0.4 kept a running timer; picked up once and moved. */
 const OLD_KEY = 'whaleclub:timer'
 export const GRACE_MS = 15_000
@@ -44,8 +46,8 @@ export function totalMs(session: Session): number {
   return session.minutes * 60_000
 }
 
-export function elapsedMs(session: Session, now: number = Date.now()): number {
-  const until = session.hiddenAt ?? now
+export function elapsedMs(session: Session, at: number = now()): number {
+  const until = session.hiddenAt ?? at
   return Math.max(0, until - session.startedAt - session.pausedMs)
 }
 
@@ -63,18 +65,19 @@ export class SessionService {
   }
 
   current(): Session | null {
-    const session = read(KEY)
+    const session = read(sessionKey())
     if (session) return session
+    if (labOn()) return null
     const old = read(OLD_KEY)
     if (!old) return null
     write(OLD_KEY, null)
-    write(KEY, old)
+    write(sessionKey(), old)
     return old
   }
 
   start(thingId: string, minutes: number): Session {
-    const session: Session = { thingId, minutes, startedAt: Date.now(), pausedMs: 0, broken: false }
-    write(KEY, session)
+    const session: Session = { thingId, minutes, startedAt: now(), pausedMs: 0, broken: false }
+    write(sessionKey(), session)
     this.watch()
     return session
   }
@@ -82,7 +85,7 @@ export class SessionService {
   /** Stops early; returns the session so its minutes can be written down. */
   stop(): Session | null {
     const session = this.current()
-    write(KEY, null)
+    write(sessionKey(), null)
     this.unwatch()
     return session
   }
@@ -99,21 +102,21 @@ export class SessionService {
   private hide(): void {
     const session = this.current()
     if (!session || session.hiddenAt) return
-    write(KEY, { ...session, hiddenAt: Date.now() })
+    write(sessionKey(), { ...session, hiddenAt: now() })
   }
 
   private show(): void {
     const session = this.current()
     if (!session?.hiddenAt) return
-    const now = Date.now()
-    const away = now - session.hiddenAt
+    const at = now()
+    const away = at - session.hiddenAt
     const doneAtHide = elapsedMs(session)
     const leftAtHide = totalMs(session) - doneAtHide
     const back: Session = { ...session }
     delete back.hiddenAt
     if (leftAtHide <= Math.min(away, GRACE_MS)) {
       // It ran out while the person was only briefly away: a clean end, at the moment it ran out.
-      write(KEY, back)
+      write(sessionKey(), back)
       this.finish(back)
       return
     }
@@ -124,11 +127,11 @@ export class SessionService {
         broken: true,
         brokenAtMs: back.brokenAtMs ?? doneAtHide,
       }
-      write(KEY, left)
+      write(sessionKey(), left)
       this.on.left(left)
       return
     }
-    write(KEY, back)
+    write(sessionKey(), back)
   }
 
   private watch(): void {
@@ -152,7 +155,7 @@ export class SessionService {
   }
 
   private finish(session: Session): void {
-    write(KEY, null)
+    write(sessionKey(), null)
     this.unwatch()
     this.on.finish(session, !session.broken)
   }

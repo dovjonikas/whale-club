@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { version } from './package.json'
 
 /**
  * Served from GitHub Pages under /whale-club/, so every asset path carries
@@ -9,6 +10,8 @@ import { VitePWA } from 'vite-plugin-pwa'
  */
 export default defineConfig({
   base: '/whale-club/',
+  // The version shows at the bottom of the menu; five taps on it open the lab.
+  define: { __APP_VERSION__: JSON.stringify(version) },
   build: {
     target: 'es2022',
     sourcemap: false,

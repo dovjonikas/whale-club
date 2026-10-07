@@ -2,7 +2,10 @@ import { seeded } from './random'
 
 /**
  * Two textures, each drawn once into a small tile and used as a CSS
- * background, so nothing about them costs a frame afterwards.
+ * background, so nothing about them costs a frame afterwards. The tiles
+ * are encoded with toBlob, which compresses off the main thread, and
+ * handed to CSS as object URLs; toDataURL would encode synchronously and
+ * hold up the first second of the app.
  *
  * The grain is a fine monochrome noise laid over the whole scene, which
  * makes the night read like a printed illustration rather than a flat
@@ -15,11 +18,11 @@ import { seeded } from './random'
 const GRAIN = 160
 const CAUSTICS = 256
 
-export function grainUrl(): string {
+export function grainUrl(): Promise<string> {
   const canvas = document.createElement('canvas')
   canvas.width = canvas.height = GRAIN
   const ctx = canvas.getContext('2d')
-  if (!ctx) return ''
+  if (!ctx) return Promise.resolve('')
   const image = ctx.createImageData(GRAIN, GRAIN)
   const random = seeded(31)
   for (let i = 0; i < image.data.length; i += 4) {
@@ -30,10 +33,10 @@ export function grainUrl(): string {
     image.data[i + 3] = 255
   }
   ctx.putImageData(image, 0, 0)
-  return canvas.toDataURL('image/png')
+  return objectUrl(canvas)
 }
 
-export function causticsUrl(): string {
+export function causticsUrl(): Promise<string> {
   // Computed at half size and scaled up, which keeps the light soft and the work small.
   const n = CAUSTICS / 2
   const period = (Math.PI * 2) / n
@@ -42,7 +45,7 @@ export function causticsUrl(): string {
   const source = document.createElement('canvas')
   source.width = source.height = n
   const sctx = source.getContext('2d')
-  if (!sctx) return ''
+  if (!sctx) return Promise.resolve('')
   const image = sctx.createImageData(n, n)
   for (let y = 0; y < n; y++) {
     for (let x = 0; x < n; x++) {
@@ -55,13 +58,14 @@ export function causticsUrl(): string {
         let dy = Math.abs(wy - py) % n
         if (dx > n / 2) dx = n - dx
         if (dy > n / 2) dy = n - dy
-        const d = Math.hypot(dx, dy)
+        // Squared distances in the loop; the two roots are taken once per pixel.
+        const d = dx * dx + dy * dy
         if (d < f1) {
           f2 = f1
           f1 = d
         } else if (d < f2) f2 = d
       }
-      const light = Math.pow(1 - Math.min(1, (f2 - f1) / 6), 3)
+      const light = Math.pow(1 - Math.min(1, (Math.sqrt(f2) - Math.sqrt(f1)) / 6), 3)
       const i = (y * n + x) * 4
       image.data[i] = 190
       image.data[i + 1] = 245
@@ -73,8 +77,17 @@ export function causticsUrl(): string {
   const canvas = document.createElement('canvas')
   canvas.width = canvas.height = CAUSTICS
   const ctx = canvas.getContext('2d')
-  if (!ctx) return ''
+  if (!ctx) return Promise.resolve('')
   ctx.imageSmoothingQuality = 'high'
   ctx.drawImage(source, 0, 0, CAUSTICS, CAUSTICS)
-  return canvas.toDataURL('image/png')
+  return objectUrl(canvas)
+}
+
+/** A PNG of the canvas as an object URL; empty if the browser cannot encode it. */
+function objectUrl(canvas: HTMLCanvasElement): Promise<string> {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => {
+      resolve(blob ? URL.createObjectURL(blob) : '')
+    }, 'image/png')
+  })
 }

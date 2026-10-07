@@ -57,15 +57,21 @@ src/
   store/             data
     types.ts         AppData, Thing, DayRecord, Settings
     store.ts         load, save, actions, subscribe; the only localStorage reader for data
+    clock.ts         now() and today(): the only place that reads the device clock
+    lab.ts           the lab's storage: which keys are live, the sandbox copy, the offset
     migrate.ts       a strict guard from stored JSON to AppData, by version
     derive.ts        last7, stage, totalDone, stones waiting, found, stars, streak: all arithmetic
     dates.ts         local YYYY-MM-DD keys and week arithmetic
+  lab/               the lab's screen and its seeded history (see section 10)
+    labUi.ts         the bar over every screen and the lab's sheet
+    seed.ts          a believable past, about four planned days in five
   pwa/
     register.ts      service worker registration, update checks, the reload
     install.ts       the install leaf (iPhone steps, Android prompt, desktop nothing)
   styles/            tokens.css holds every colour and size; the rest use them
 tests/e2e/           Playwright, three device projects, against the production build
-scripts/             icons.mjs (SVG to PNG), shots.mjs (README screenshots, seeded and pinned)
+scripts/             icons.mjs (SVG to PNG), shots.mjs (README screenshots, seeded and pinned),
+                     squeeze.mjs (the screenshots to WebP under 300 KB)
 public/icons/        the app icon
 docs/                this folder
 ```
@@ -204,3 +210,59 @@ UI by role and name; `helpers.seed()` writes a history into storage before
 load for anything that would otherwise take weeks. `page.clock` drives
 lock-in sessions. `npm test` runs them all; CI runs them beside the build and only a
 push to `main` deploys.
+
+## 10. The lab
+
+A hidden sandbox with a movable clock, for trying the app across days and
+weeks in a minute, on a real phone, without risking a single real day.
+
+**Getting in.** Five quick taps on the version at the bottom of the menu,
+or `?lab=1` in the URL. Nothing in the app points at it.
+
+**The sandbox.** `store/lab.ts` decides, once at startup and before
+anything reads the store or the clock, which keys are live. Entering copies
+`whaleclub:data` byte for byte into `whaleclub:lab`; from then on the
+store loads and saves `whaleclub:lab`, and a lock-in session lives in
+`whaleclub:lab.session`. The lab is on exactly while `whaleclub:lab.meta`
+exists, so a reload stays in it. Leaving deletes the three lab keys and
+reloads; the real record was never opened for writing. A test compares it
+before and after, byte for byte.
+
+**The clock.** `store/clock.ts` is the only module that reads the device
+clock: `now()` and `today()`. Every day key, the stars, the moon's
+phase, the session timer, the recap and the streak go through it. Outside
+the lab its offset is zero. In the lab the offset, in whole calendar days
+(so a daylight saving change does not shift the hour), lives in the lab's
+meta and nowhere else. An ESLint rule (`no-restricted-syntax`) makes
+`Date.now()` and `new Date()` with no arguments an error in `src/`,
+except in `clock.ts`.
+
+**The controls** (`lab/labUi.ts`), each one tap:
+
+| control             | what it does                                           |
+| ------------------- | ------------------------------------------------------ |
+| +1 day, +7 days     | moves the clock forward and reloads                    |
+| -1 day              | moves it back and reloads                              |
+| back to real time   | offset zero, still in the sandbox                      |
+| do everything today | marks every thing planned today as done, in place      |
+| seed 30 / 90 days   | `lab/seed.ts`: a believable past, in place             |
+| clear sandbox       | an empty sandbox: the first open, in the lab           |
+| exit                | throws the sandbox away and comes back to the real sea |
+
+Moving the clock reloads on purpose: everything that happens once on
+opening (the quiet morning, the check-in, the recap, a session that ran out
+while away) then happens as it would on a real morning. Changing the
+sandbox's data goes through the store like any tap, so stones fall in and
+the whale surfaces where they would.
+
+**The seed** is deterministic (a seeded generator keyed by the day and the
+length): about four planned days in five done, a run of three missed days
+in the middle, yesterday missed so the quiet morning shows, and every tier
+earned except the newest already cracked, so each thing has one stone
+waiting. An empty sandbox gets three plain things first.
+
+**The bar.** While the lab is on, a striped bar sits over the top of the
+screen, outside the phone frame, with the offset ("lab · +3 days", a tap
+opens the lab's sheet) and "exit". The frame moves down by the bar's
+height, so the bar never covers the header, a sheet or a session, and
+nothing covers it.

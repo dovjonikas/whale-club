@@ -111,6 +111,26 @@ export const voice = {
   share: {
     caption: (day: number) => `day ${String(day)} of whale club`,
   },
+  /** The lab: a tool for trying the app across days, not part of the game's voice. */
+  lab: {
+    title: 'the lab',
+    note: 'fake time. your real sea is untouched.',
+    bar: (days: number) =>
+      `lab · ${days >= 0 ? '+' : ''}${String(days)} ${Math.abs(days) === 1 ? 'day' : 'days'}`,
+    today: (when: string) => `today in the lab: ${when}`,
+    exit: 'exit',
+    forward: '+1 day',
+    week: '+7 days',
+    back: '-1 day',
+    real: 'back to real time',
+    doAll: 'do everything today',
+    seed30: 'seed 30 days',
+    seed90: 'seed 90 days',
+    clear: 'clear sandbox',
+    time: 'time',
+    sea: 'the sandbox',
+    version: (v: string) => `version ${v}`,
+  },
 } as const
 
 /** Picks a line from a list by a day and an id, so the choice holds all day. */

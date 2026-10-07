@@ -291,3 +291,73 @@ the shared pieces in three places.
 The first screen keeps its one sentence and its one empty card. A small
 whale asleep under the surface makes it feel inhabited without saying
 anything more or pointing at anything. It leaves with the first thing.
+
+## 2026-10-07 The lab is a sandbox copy, not a flag on the real data
+
+Trying the app across days means writing days that never happened. Doing
+that on the real record, even with an undo, risks the one thing the app
+must never lose. So the lab copies the record into its own key and points
+the store there; leaving deletes the copy. The real key is not opened for
+writing while the lab is on, and a test checks it byte for byte.
+
+## 2026-10-07 One clock module, enforced by lint
+
+A movable clock only works if nothing reads the device clock behind its
+back. `src/store/clock.ts` is the one place, and `no-restricted-syntax`
+makes `Date.now()` and a bare `new Date()` an error anywhere else in
+src. Animation timing (`performance.now()`, rAF timestamps) is not "today"
+and stays as it is.
+
+## 2026-10-07 Moving the lab's clock reloads the page
+
+The app does several things once, on opening: the quiet morning line, the
+check-in, the weekly recap, resuming a session. Re-running each of them on
+a clock change would be a second code path that only the lab uses. A reload
+runs the real one. Changing the sandbox's data (do everything, seed, clear)
+stays in place, through the store, like any tap.
+
+## 2026-10-07 The lab's offset is in whole calendar days
+
+The controls are days, and a day is the person's local day. Moving by
+calendar days (setDate) rather than by 24-hour blocks keeps the time of day
+across a daylight saving change, so +1 day never lands on the same date.
+
+## 2026-10-07 The seed leaves one stone per thing
+
+A seeded month earns several tiers per thing; leaving all of them as
+stones would fill the screen with rocks. Every tier but the newest is
+marked cracked, so the Collection is not empty and one stone per thing
+waits to be cracked, which is what a person coming back after a month
+would see.
+
+## 2026-10-07 Clear sandbox empties it
+
+"Clear" gives the first open (no things, the sleeping whale), still in the
+lab and at the same offset. Getting the real sea back is what exit is for.
+
+## 2026-10-07 The lab's way in is five taps on the version
+
+A hidden gesture on something that is already there, the way developer
+options work on a phone, plus `?lab=1` for a link. The menu gained the
+version line for it; five taps, each within a couple of seconds of the last.
+
+## 2026-10-07 Screenshots are WebP under 300 KB
+
+The film grain made every PNG 1.5 to 1.8 MB. The README shows phones at
+200 to 280 px wide, so the pictures are scaled to 780 px (2x that, and a
+little more) and saved as WebP, which GitHub renders in a README. They are
+now 20 to 60 KB each. The old PNGs stay in the git history; it is not
+rewritten.
+
+## 2026-10-07 Nothing reads layout while the app starts
+
+Lighthouse on the live v0.7 gave 70 for performance on a phone, down from
+99, with one long task of about 1.9 s (simulated). A trace showed two
+causes: the scene read its own size in its constructor, forcing a layout
+of the whole page while it was still being built, and the two textures
+were encoded to PNG synchronously with toDataURL. The scene now takes its
+size from the ResizeObserver's first call, which comes after layout and
+before paint, so the first frame is the same; the collectibles scale with
+a CSS variable instead of a read. The textures are drawn in two separate
+idle callbacks and encoded with toBlob, off the main thread. The film
+grain and caustics look the same.

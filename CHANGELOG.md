@@ -2,6 +2,31 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.8.0 - 2026-10-07
+
+The lab, and lighter pictures.
+
+- **The lab**: a hidden sandbox with a movable clock. Five quick taps on the
+  version at the bottom of the menu, or `?lab=1`, open it. The real record
+  is copied into the lab's own key and never written while the lab is on;
+  a striped bar over every screen, sessions included, shows the offset and
+  an exit that throws the sandbox away. Controls: +1 day, +7 days, -1 day,
+  back to real time, do everything today, seed 30 days, seed 90 days, clear
+  sandbox.
+- One clock for the whole app (`src/store/clock.ts`): every "today" and
+  "now" goes through it, and a lint rule keeps it that way.
+- The version now shows at the bottom of the menu.
+- README screenshots are WebP, each under 300 KB (they were up to 1.7 MB
+  PNGs); `npm run shots` squeezes them at the end.
+- Faster first second: the v0.7 textures were encoded synchronously
+  (toDataURL) and the scene read its size before the page was laid out,
+  which forced a full layout during startup. The size now comes from the
+  ResizeObserver, the textures are drawn in two idle moments and encoded
+  with toBlob, and the caustics loop no longer calls Math.hypot. Lighthouse
+  performance on a phone went from about 70 back to the high 90s.
+- A lock-in test no longer races the sheet for focus.
+- Lighthouse measured again on the live URL.
+
 ## 0.7.0 - 2026-10-07
 
 A design pass: the same screen, drawn with more care. Nothing about how
