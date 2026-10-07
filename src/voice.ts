@@ -33,6 +33,8 @@ export const voice = {
   },
   shareDone: 'picture saved.', // TODO-VOICE
   shareFailed: 'could not make the picture.', // TODO-VOICE
+  /** What to do then, said right after it. */
+  shareFailedNext: 'try again in a moment.', // TODO-VOICE
   starPlaced: 'a star for today.', // TODO-VOICE
   checkin: {
     question1: 'how are you living?',
@@ -102,7 +104,7 @@ export const voice = {
     finish: (seen: number, total: number) => `${String(seen)}/${String(total)} · finish`,
     doneToday: 'done today',
     /** Once, on a new thing's card. */
-    hintTap: "tap it when it's done.", // TODO-VOICE
+    hintTap: 'tap it when it’s done.', // TODO-VOICE
     hintLockIn: 'tap to lock in.', // TODO-VOICE
   },
   /** Editing: a visible word for every change, and delete without "are you sure". */
@@ -145,7 +147,7 @@ export const voice = {
     promise: 'a year of small things.', // TODO-VOICE
     /** The author's own words. Not to be changed. */
     truth: [
-      "the thing is, sometimes doing such small things seems unremarkable, because you can't see the results yet.",
+      'the thing is, sometimes doing such small things seems unremarkable, because you can’t see the results yet.',
       'but results come, after you compound these days, that you stay consistent, even when it seems small.',
     ],
     start: 'start light',

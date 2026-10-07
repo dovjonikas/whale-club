@@ -2,6 +2,26 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.12.1 - 2026-10-08
+
+The author's motion review (review-animations), answered.
+
+- Reduced motion keeps the fades: movement stops and keyframes land on
+  their end, but a sheet, a toast or a leaving card fades instead of
+  blinking. Sheets and toasts stay in place and fade.
+- Toasts leave faster than they come (180 ms out, 260 in, both on the
+  strong ease-out).
+- Stopping a lock-in: the deep water goes down in 600 ms on the drawer
+  curve, the screen's own things fade first, and the screen is removed when
+  the water is down, no longer cut off mid-slide.
+- A done card's glow is a layer of its own that only fades; nothing is
+  repainted as it comes and goes.
+- One feel for every press: 0.97, 140 ms, ease-out (icon buttons were a
+  0.92 squash).
+- Copy: typographic apostrophes ("it’s", "can’t"); the share error says
+  what to do next ("try again in a moment.").
+- Findings, and what waits for polish, in docs/QUALITY.md.
+
 ## 0.12.0 - 2026-10-08
 
 The brand: every thing wears a bubble, in the app's own sign language.

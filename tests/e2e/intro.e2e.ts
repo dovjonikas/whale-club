@@ -76,7 +76,7 @@ test('a tap anywhere goes on to the next beat', async ({ page }) => {
   await expect(intro(page)).toContainText(
     'the thing is, sometimes doing such small things seems unremarkable,',
   )
-  await expect(intro(page)).toContainText("because you can't see the results yet.")
+  await expect(intro(page)).toContainText('because you can’t see the results yet.')
   await tapAt(page, 100, 300)
   await expect(beat(page)).toHaveAttribute('data-beat', 'start')
 })
@@ -92,7 +92,7 @@ test('four taps from a first open to the first card: skip, start light, a small 
   await expect(page.getByRole('button', { name: '10 push-ups', exact: true })).toBeVisible()
   // The first thing is welcomed once, and its card says how it is done.
   await expect(page.locator('.line')).toHaveText('yours. it grows on the days you show up.')
-  await expect(page.locator('.card-hint')).toHaveText("tap it when it's done.")
+  await expect(page.locator('.card-hint')).toHaveText('tap it when it’s done.')
 })
 
 test('the truth climbs: the doubt gives way to the hope, the stars double, the light turns gold', async ({
