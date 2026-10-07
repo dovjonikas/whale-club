@@ -88,9 +88,9 @@ export function islandWhaleSvg(): string {
     <path d="M30 60 C 60 50, 130 48, 168 54 L 168 60 Z" fill="#a9dbe8" opacity="0.22"/>
     <path d="M60 36 C 90 32, 130 33, 156 40" stroke="#fff" stroke-width="1.6" opacity="0.18" fill="none" stroke-linecap="round"/>
     ${face(156, 46, 0.62)}
-    <path d="M24 34 C 44 28, 120 27, 150 34 C 130 38, 44 39, 24 34 Z" fill="var(--sand)" opacity="0.95"/>
-    <path d="M30 28 C 38 14, 60 11, 90 11 C 116 11, 132 15, 136 26 C 108 30, 52 31, 30 28 Z" fill="var(--sand)"/>
-    <path d="M34 27 C 64 30, 112 29, 134 25" stroke="#6e5a39" stroke-width="1" fill="none" opacity="0.4"/>
+    <path d="M10 35 C 40 28, 130 27, 168 34 C 140 39, 40 40, 10 35 Z" fill="var(--sand)" opacity="0.95"/>
+    <path d="M24 29 C 30 14, 52 11, 80 11 C 104 11, 116 15, 120 27 C 96 31, 46 32, 24 29 Z" fill="var(--sand)"/>
+    <path d="M28 28 C 56 31, 96 30, 118 26" stroke="#6e5a39" stroke-width="1" fill="none" opacity="0.4"/>
   </svg>`
 }
 

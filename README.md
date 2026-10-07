@@ -76,6 +76,11 @@ what it costs ([`docs/DECISIONS.md`](docs/DECISIONS.md)).
     <td align="center" valign="top"><img src="docs/screenshots/iphone-truth.webp" width="240" alt="The first minute at its peak: the author's sentence under a sky of doubled stars, the little whale at the surface"><br><b>The promise</b><br><sub>The idea in one sentence, a synthesised note for every word.</sub></td>
     <td align="center" valign="top"><img src="docs/screenshots/iphone-first.webp" width="240" alt="The first screen: one sentence, an empty card, and a small whale asleep under the surface"><br><b>Day one</b><br><sub>One empty card, and a small whale asleep under the surface.</sub></td>
   </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-island.webp" width="240" alt="The night scene with an island on a big whale at the horizon, a sandcastle and shells on it, a pier with lit lanterns, a boat and a buoy in the sea, and the krill balance under the title"><br><b>The island on the whale</b><br><sub>Things bought with krill, standing in their places.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-dock.webp" width="240" alt="The dock: the balance in krill, and the small tier, each thing a silhouette with its price until it is yours"><br><b>The dock</b><br><sub>Thirty things to look at, fixed prices, no chance.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-arrange.webp" width="240" alt="Arranging: the scene holds still, every place a soft ring, the sandcastle held, with done, tidy up and the chest"><br><b>Arrange</b><br><sub>Every place a ring. Drag, or tap and tap.</sub></td>
+  </tr>
 </table>
 
 <p align="center">
@@ -105,7 +110,9 @@ And underneath all three: nothing dies. You just missed a day.
 - **Stones and finds.** Sixty finds across three worlds, earned at 3, 7, 14, 21, 30, 45, 60, 90, 120 and 180 days. Some come out rare and a few legendary; that is only the shine
 - **A missed day** dims the scene for a day and says so. That is the whole punishment
 - **The first minute** shows a year in silhouette, then plays the idea as a short piece of music, then asks for one thing. Skip is always there
-- **Postcards** of the whale, a new find or a grown creature, ready for the share sheet
+- **Krill and the dock.** Every day shown up for earns krill, worked out from the days and never bought. A pier on the shore opens the dock: thirty things to look at in four tiers, fixed prices, no chance, no boxes, no timers. Save for one, and the distance shows under the title
+- **Arrange your sea.** Every world has its places; finds and dock things stand in them by themselves, and anyone who wants to can move them, swap them, or put them away in a chest. A longer shore, a reef and an island on a whale add room
+- **Postcards** of the whale, a new find or a grown creature, ready for the share sheet, with your arrangement on them
 
 <details>
 <summary><strong>The longer list</strong></summary>
@@ -153,7 +160,7 @@ object. Nothing is sent anywhere: there is no backend, no analytics and no
 third-party script. A postcard is the only thing that leaves the phone, and
 only through the share sheet when you send it.
 
-- **Derived, not stored.** Finds, streaks and stars are worked out from the days themselves, so they can never disagree with the history
+- **Derived, not stored.** Finds, streaks, stars and krill are worked out from the days themselves, so they can never disagree with the history; only what was bought is kept, with its price
 - **Migrations.** Every earlier version of the data opens in the current app, held by tests. A record that cannot be read is parked beside the real one, never written over
 - **A lab.** A hidden sandbox with a movable clock, for trying a year in a minute, under its own storage key so it never touches real data ([the lab](docs/ARCHITECTURE.md#10-the-lab))
 
@@ -223,6 +230,7 @@ build and the tests, and never deploy.
 - [`docs/brand/BRAND.md`](docs/brand/BRAND.md): the bubble, the glyphs, the app icon
 - [`docs/QUALITY.md`](docs/QUALITY.md): the motion and interface audits, with what changed
 - [`docs/COLLECTIBLES.md`](docs/COLLECTIBLES.md): every find, by world, line and day
+- [`docs/ECONOMY.md`](docs/ECONOMY.md): what earns krill, what a steady person makes, what the dock costs
 - [`docs/RESEARCH-DOPAMINE.md`](docs/RESEARCH-DOPAMINE.md) and [`docs/RESEARCH-SEA.md`](docs/RESEARCH-SEA.md): the research behind the reward design and the daily surprise
 
 ## License

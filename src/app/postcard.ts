@@ -38,9 +38,9 @@ const SIZE: Record<PostcardFormat, [number, number]> = {
 
 /** The scene's collectible sizes are for a 390px phone; this is that phone's height for scaling. */
 /** Where the dock's layers are in the scene, as fractions of its height (dock.css). */
-const ISLAND_TOP = 0.486
-const ISLAND_WIDTH = 0.44
-const EDGE_TOP = 0.593
+const ISLAND_TOP = 0.493
+const ISLAND_WIDTH = 0.5
+const EDGE_TOP = 0.6
 const REEF_TOP = 0.686
 const SAND_LINE = 0.592
 const PHONE_W = 390

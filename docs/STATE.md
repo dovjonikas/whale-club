@@ -2,7 +2,7 @@
 
 ## Done
 
-v0.12.1, live at https://dovjonikas.github.io/whale-club/ after the push.
+v0.13.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
 - **v0.1.0 to v0.3.0**: the row, the scene, the sky as a calendar, creatures, PWA, collectibles, the whale, rituals, sound, share; a buddy slot (since removed).
 - **v0.4.0**: postcards instead of a buddy; the phone-wide frame; the install leaf after the first thing; Lighthouse through Edge.
@@ -23,6 +23,7 @@ v0.12.1, live at https://dovjonikas.github.io/whale-club/ after the push.
 - **v0.11.3**: the intro has a score: "tap to begin" so sound may play, a music box year, a note for every word of the truth, silence at the blink, the notes doubling at "compound", the last word resolving on the peak.
 - **v0.12.0**: the brand: every thing wears a bubble (its picture in cream, the rising signature, filled when done, a timer rim for a lock-in) at its card's corner; 48 glyphs of its own, picked from the name in English or Lithuanian, or a monogram; no emoji anywhere (data v7); the interface's icons, the app icon and the favicon in the same hand; brand.html; strong curves, presses, sheets that can be pulled down; the interface audit with its fixes (docs/QUALITY.md).
 - **v0.12.1**: the author's motion review answered: reduced motion keeps fades, toasts leave faster, a stopped lock-in leaves cleanly, the done glow only fades, one press for everything; typographic apostrophes and a next step on the share error.
+- **v0.13.0**: krill, worked out from the days (docs/ECONOMY.md), with the chip and a goal under the title; the dock on a pier: thirty things in four tiers, get it, save for this, hide or show, who wears it; scene things after dark; places (shore 6, sea 8, sky 8), the chest, arranging by drag or by tap and tap, tidy up; a longer shore, a reef and an island on the whale; the postcard keeps the arrangement; data v8. The README rewritten for a stranger with a minute, with a banner.
 
 ## The road to 1.0 (the author's briefs of 2026-10-07)
 
@@ -80,7 +81,7 @@ addition and the first brief disagree, the evening addition wins.
     contrast in the bubble at least 3:1, the clarity test, the postcard
     shows bubbles; screenshots of the first screen with bubbles, the add
     sheet with glyphs, the log with its legend, brand.html.
-- [ ] **0.13.0 krill and the dock, and arranging your sea** (the third
+- [x] **0.13.0 krill and the dock, and arranging your sea** (the third
       evening addition joins it): krill derived from history, purchases
       stored as {itemId, date}; docs/ECONOMY.md; the chip, "+10"; about 30
       cosmetic items in four tiers, "save for this", "who wears it?". And:
@@ -179,7 +180,8 @@ addition and the first brief disagree, the evening addition wins.
 ## Verified
 
 - `npm run lint`, `tsc --noEmit`, `npm run build`: clean.
-- `npm test`: 282 passed, 14 skipped (device-specific), on iPhone 13, Pixel 5 and desktop, then the perf project alone. New in v0.11: the clarity test (fifteen jobs by visible words, two taps each), the two kinds, kept minutes and a dead phone, editing and deleting, the intro.
+- `npm test` (v0.13.0): 403 passed, 48 skipped (device-specific or pure data run once), on iPhone 13, Pixel 5 and desktop, then the perf project alone. New in v0.13: krill (the calibration, the day rules, good weeks, the balance), the dock's catalogue and purchases, places (spots, the chest, swaps, extensions, a long-time scene), arranging by tap and by drag, the dock in the browser, worn things on every creature, and the clarity test's sixteenth job, "move a find".
+- Earlier: `npm test`: 282 passed, 14 skipped (device-specific), on iPhone 13, Pixel 5 and desktop, then the perf project alone. New in v0.11: the clarity test (fifteen jobs by visible words, two taps each), the two kinds, kept minutes and a dead phone, editing and deleting, the intro.
 - Screenshots regenerated for v0.8 and squeezed to WebP (20 to 60 KB each), with a new one of the lab; earlier: the empty first screen, the not-today strip, the thing's sheet with the day chips, a rest day.
 - Known: on a 320px phone the day chips are 37px wide (44px tall); everything from 375px up is 44px both ways.
 
@@ -210,5 +212,5 @@ To try the app across days on a phone: open the menu, tap the version five times
 
 ## For the author to do by hand
 
-1. **Voice**: replace every line marked `TODO-VOICE` in `src/voice.ts`. New in v0.5: `lockIn.broken`, `lockIn.stopped`, `stones.fell`, `stones.waiting`; in v0.6: `restDay`. Keep each under about 40 characters so it fits one row on a 320px phone; `tests/e2e/lines.e2e.ts` checks that. A few tests assert the current strings; change them in the same commit.
+1. **Voice**: replace every line marked `TODO-VOICE` in `src/voice.ts`. New in v0.5: `lockIn.broken`, `lockIn.stopped`, `stones.fell`, `stones.waiting`; in v0.6: `restDay`. In v0.13: `krill.label`, `krill.goal`, `krill.goalReady`, the `dock` lines (`title`, `intro`, `short`, `whoWears`, `wornBy`, `arrived`) and the `arrange` lines (`title`, `hint`, `chestEmpty`, `toChest`, `noRoom`); the dock's thirty names and lines are in src/scene/dock/index.ts, like the finds'. Keep each under about 40 characters so it fits one row on a 320px phone; `tests/e2e/lines.e2e.ts` checks that. A few tests assert the current strings; change them in the same commit.
 2. **On the phone**: add it to the home screen, start a lock-in and lock the phone for a minute, to see "you left. it waited." with your own eyes.

@@ -51,15 +51,15 @@ const spot = (
 /** The sand line, where the shore's things stand (the old finds' y). */
 const SAND = 0.592
 /** The water's edge, a step in front of the sand line: the longer shore's row. */
-const EDGE = 0.606
+const EDGE = 0.616
 /** The sea's two rows: just under the surface, and a step deeper. */
 const SEA_HIGH = 0.628
 const SEA_LOW = 0.668
 /** The reef's row, deeper still, on the coral. */
 const REEF = 0.704
 /** The island's two rows on the whale's back, far away at the horizon. */
-const ISLAND_BACK = 0.507
-const ISLAND_FRONT = 0.534
+const ISLAND_BACK = 0.511
+const ISLAND_FRONT = 0.545
 const ISLAND_DEPTH = 0.78
 
 /**
@@ -104,14 +104,15 @@ const ROOMS: Readonly<Record<Room, readonly Spot[]>> = {
   reef: [0.26, 0.58, 0.42, 0.74, 0.1, 0.9].map((x, i) =>
     spot(`reef-${String(i + 1)}`, 'sea', x, REEF, { room: 'reef' }),
   ),
-  // Six on the island the big whale carries, at the left of the horizon, far away.
+  // Six on the island the big whale carries, at the left of the horizon, far away:
+  // four along its shore and two on the dune behind, between them, so no ring hides another.
   island: (
     [
-      [0.22, ISLAND_FRONT],
-      [0.11, ISLAND_FRONT],
-      [0.33, ISLAND_FRONT],
-      [0.2, ISLAND_BACK],
-      [0.28, ISLAND_BACK],
+      [0.18, ISLAND_FRONT],
+      [0.3, ISLAND_FRONT],
+      [0.06, ISLAND_FRONT],
+      [0.42, ISLAND_FRONT],
+      [0.24, ISLAND_BACK],
       [0.12, ISLAND_BACK],
     ] as const
   ).map(([x, y], i) =>

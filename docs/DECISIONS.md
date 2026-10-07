@@ -837,3 +837,75 @@ is checked) for whoever reads on. The banner is composed by
 the app's own fonts and colours, so it stays in step with them; it is 2:1
 so it also serves as the repository's social preview. The licence names
 its holder, as the author's other projects do.
+
+## 2026-10-08 Krill is worked out from the days; the dock is about three years deep
+
+Nothing earned is stored: krill, like the finds, is a function of the
+history (src/store/krill.ts), so it can never disagree with it, and an
+undone day simply earns less. Only purchases are kept, each with the
+price paid then, so a later price change never rewrites a past purchase.
+The balance never goes below nothing; a done taken back after a purchase
+stops it at zero rather than owing.
+
+The brief asked for a steady person to earn about 2,000 a month and
+25,000 a year, and named four price ranges. The model gives 1,890 and
+22,770 (docs/ECONOMY.md), a little under on purpose: the first-week set
+(0.14) and welcome back (0.15) are still to come, and a reward is easier
+to add than to take back. The four ranges add up to 67,940, about three
+years of steady krill; "a year buys the dock" and the ranges cannot both
+hold, so the ranges stay, because they are what a person feels at the
+dock. A first year buys every small and middling thing and a few large
+ones, and the legendary tier stays a goal for the second year.
+
+## 2026-10-08 Places, the chest, and a late stone
+
+Finds and dock things stand in fixed places (the shore 6, the sea 8, the
+sky 8), taken in the order things were got; when a world is full the next
+one waits in the chest and the line says so. Thirteen finds are the
+scene's weather rather than things (the aurora, the milky way, the song,
+the deep, a ring round the moon): they keep the spot they were drawn for,
+behind everything. Two belong to another (the bees, the cat) and go where
+it goes. A person who never arranges still gets a whole, tidy scene.
+
+The order is by the day a find was reached, which is right unless a stone
+waits: one cracked weeks late would take the place of something already
+standing. When a crack would move anyone, the arrangement as it is gets
+written down first, so the newcomer takes a free place or the chest and
+nothing on screen moves on its own.
+
+Hiding a placed dock thing is putting it in the chest, one idea instead
+of two. The things standing in places and the extensions under them (the
+island, the reef, the sand edge) are left out of the parallax, so a thing
+never slides off the ground it stands on.
+
+## 2026-10-08 Arranging by drag, and by tap and tap
+
+A drag snaps to the nearest place of the thing's own world and swaps with
+whoever stands there; another world's places fade while something is
+held and refuse it. The same move works without dragging: a tap picks a
+thing up, a tap on a ring puts it down. That makes it work from a
+keyboard and with a screen reader (every ring is a button named "a fish,
+place 3" or "empty place 5"), and it is how the clarity test does it.
+The scene holds still while arranging (the ticker is held and every CSS
+motion paused), so a thing does not swim away from under a finger. The
+row and the dock are out of reach: nothing is marked or bought there.
+
+## 2026-10-08 Night things, the krill chip, and three swaps in the dock
+
+The dock's own lines say when its scene things come out: aurora nights,
+the cove glowing, the lanterns lit, Friday's falling stars, a sky whale
+once a night. They keep to that (21:00 to 05:00 on the local clock, like
+the jellyfish), and one bought in daylight shows itself for a few
+seconds, so a purchase is never invisible.
+
+The krill sits under the title, not beside it: on a 390 px phone the
+title, a four-digit balance and the four header buttons do not fit in one
+row with 44 px targets. The star calendar's first row starts lower so a
+star is never under the chip.
+
+The brief's list named a kite, a lighthouse and aurora nights, which the
+finds also have (a kite at 120 days, a lighthouse at 60, the aurora at
+45). They stay, drawn as their own things: the dock's are bought, the
+finds are earned, and few people have both lines. A comet, which was
+not in the brief, is replaced by a moon swing, so the dock adds nothing
+the sky already gives at day 30.

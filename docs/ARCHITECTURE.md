@@ -27,7 +27,11 @@ src/
     lockIn.ts        a lock-in from the dial to the end, and the opening's steps
     opening.ts       runs the end of a session in order; a tap skips to the end
     logSheet.ts      the log: a month, the year, a day
-    sceneData.ts     data to scene: collectibles shown, stones, lanterns, warmth
+    sceneData.ts     data to scene: the arrangement (what stands where), stones, lanterns, warmth
+    dockData.ts      data to dock: the goal and its distance, owned, shown, worn, the rooms
+    dockSheet.ts     the dock: tiers, a thing's page, get it, save for this, hide, who wears it
+    krillChip.ts     the balance under the title, the goal line, the "+10" that rises
+    arrange.ts       arranging: rings for places, drag or tap and tap, the chest, tidy up
     dial.ts          the lock-in dial, 10 to 120 minutes
     wakeLock.ts      the screen kept on during a session
     header.ts        the title and the four buttons
@@ -53,6 +57,9 @@ src/
     particles.ts     bioluminescent drift and the tap bursts
     lanterns.ts      the cove's lanterns on one canvas, a sprite per colour and size
     creatures/       SVG for every world, line and stage: kit.ts and one file per world
+    spots.ts         the places in each world and the extensions', where things stand, moves and swaps
+    dock/            the dock's catalogue (index.ts), its drawings (art.ts), its scene layers
+                     (scene.ts: pier, island whale, reef, aurora nights...) and what creatures wear (wear.ts)
     collectibles/    the sixty collectibles, one list per world, built by build.ts
     draw.ts          small shared drawing helpers: tints, faces, fish, jellies, stems
     art/             the larger collectible drawings, one file per world
@@ -70,6 +77,8 @@ src/
     lab.ts           the lab's storage: which keys are live, the sandbox copy, the offset
     migrate.ts       a strict guard from stored JSON to AppData, by version
     derive.ts        last7, stage, totalDone, stones waiting, found, stars, streak: all arithmetic
+    krill.ts         krill earned, worked out from the days; spent; the balance (docs/ECONOMY.md)
+    dock.ts          what the dock changes in the data: buy, the goal, hidden, who wears it
     dates.ts         local YYYY-MM-DD keys and week arithmetic
   lab/               the lab's screen and its seeded history (see section 10)
     labUi.ts         the bar over every screen and the lab's sheet
@@ -324,3 +333,26 @@ stars and lanterns without storing them or making them tappable,
 `setSilhouette` darkens the whale, `flash` marks a find. The intro is due
 when nothing is stored and `whaleclub:intro` is unset; the lab asks for it
 through session storage across its reload.
+
+## 12. Krill, the dock and places
+
+Krill is never stored. `krillEarned(data, today)` walks the days (dones,
+lock-in minutes, all-done days, good weeks) and `krillBalance` takes away
+what `data.bought` paid. A purchase goes through `withPurchase`, which
+refuses a thing already owned or one the balance does not cover; the
+price comes from the catalogue, never from the store.
+
+Where things stand is `arrangementOf(data)` (app/sceneData.ts): the
+placeable finds and dock things in the order they were got, the places
+there are (`spotsFor(rooms)`), and `placeAll`, which honours each record
+in `data.placement` that is still a free place of the thing's world and
+gives everything else the first free place or the chest. The scene, the
+arranging rings, the Collection's chest and the postcard all read that one
+function, so they cannot disagree. A move (`moveTo`) returns the whole
+arrangement as records, so nothing else shifts after it; "tidy up" deletes
+the records.
+
+To add a dock thing: an entry in src/scene/dock/index.ts (a tier and a
+price inside its range, a kind), a drawing in art.ts, and for a scene
+thing its layer in scene.ts and a line in `Scene.setDock`. To add places:
+a set in src/scene/spots.ts, and its drawing under the things.

@@ -407,7 +407,7 @@
 .dock-edge {
   left: 0;
   right: 0;
-  top: 59.3%;
+  top: 60%;
 }
 
 /* The reef, on the floor of the visible sea. */
@@ -420,8 +420,8 @@
 /* The island on the whale, at the left of the horizon. */
 .dock-island {
   left: 0;
-  top: 48.6%;
-  width: 44%;
+  top: 49.3%;
+  width: 50%;
 }
 
 /* A glowing tide: the water line lit, breathing. */
@@ -630,11 +630,13 @@ body[data-arranging='true'] #app {
 
 /* A place: a soft ring. Taken, a little brighter; held, warm; another
    world's while something is held, faint. */
+/* A far place's ring is smaller, like the thing in it (--depth). */
 .arrange-spot {
   position: absolute;
-  width: calc(48px * var(--scene-scale, 1));
-  height: calc(48px * var(--scene-scale, 1));
-  margin: calc(-24px * var(--scene-scale, 1)) 0 0 calc(-24px * var(--scene-scale, 1));
+  width: calc(48px * var(--scene-scale, 1) * var(--depth, 1));
+  height: calc(48px * var(--scene-scale, 1) * var(--depth, 1));
+  margin: calc(-24px * var(--scene-scale, 1) * var(--depth, 1)) 0 0
+    calc(-24px * var(--scene-scale, 1) * var(--depth, 1));
   border-radius: 50%;
   border: 1.5px dashed rgba(232, 240, 245, 0.38);
   background: rgba(232, 240, 245, 0.04);

@@ -166,12 +166,15 @@ export function birds(): string {
   return `${bird(28, 40, 1.4)}${bird(62, 26, 1)}${bird(70, 56, 1.15)}${bird(44, 66, 0.8)}`
 }
 
-export function comet(): string {
-  return `<path d="M76 24 L 10 84" stroke="#8ef0e4" stroke-width="10" stroke-linecap="round" opacity="0.18"/>
-    <path d="M76 24 L 24 72" stroke="#8ef0e4" stroke-width="5" stroke-linecap="round" opacity="0.35"/>
-    <path d="M76 24 L 42 56" stroke="#fff4d6" stroke-width="2.4" stroke-linecap="round" opacity="0.7"/>
-    <circle cx="76" cy="24" r="16" fill="#8ef0e4" opacity="0.25"/>
-    <circle cx="76" cy="24" r="8" fill="#fff4d6"/>`
+/** A swing hanging from a small crescent moon: a seat on two ropes, a star sitting on it. */
+export function moonSwing(): string {
+  const [defs, moon] = lit('#ffd98a', 0.35, -0.2)
+  return `${defs}
+    <circle cx="50" cy="24" r="26" fill="#ffd98a" opacity="0.12"/>
+    <path d="M40 6 A 20 20 0 1 0 64 36 A 15 15 0 1 1 40 6 Z" fill="${moon}"/>
+    <path d="M38 34 L 34 76 M60 36 L 66 76" stroke="#c9a86a" stroke-width="1.8"/>
+    <rect x="28" y="74" width="44" height="6" rx="3" fill="#a8743f"/>
+    <path d="M50 58 l 3.2 6.6 7.2 1 -5.2 5 1.2 7.2 -6.4 -3.4 -6.4 3.4 1.2 -7.2 -5.2 -5 7.2 -1 Z" fill="#fff4d6" transform="translate(0 -8)"/>`
 }
 
 export function balloon(): string {

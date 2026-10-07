@@ -2,6 +2,51 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.13.0 - 2026-10-08
+
+Krill and the dock, and arranging your sea.
+
+- **Krill**, the one currency: earned, never bought, never lost. Worked
+  out from the days like the finds (10 a thing done, a krill a lock-in
+  minute up to 120 a session, 25 for everything planned done, 50 for a
+  good week); only purchases are stored. A steady person earns about
+  1,900 a month and 23,000 a year; the model is in docs/ECONOMY.md.
+- **The chip** under the title: a drawn krill and the balance, and the one
+  goal being saved for as a thin line ("1,200 to the lighthouse"). A
+  small "+10" rises by it after a tap, and after a session's opening.
+- **The dock**, a pier in the middle of the shore (the chip opens it too):
+  thirty things to look at in four tiers, 150 to 12,000, fixed prices, no
+  chance, no boxes, no timers. A silhouette and a price until it is
+  yours; get it in one tap; save for one; hide or show anything owned. A
+  hat, a scarf or round glasses ask who wears it, and that creature wears
+  it on its card, in a lock-in and on the postcard. Some things change
+  the whole scene: lanterns on the pier, a longer pier, a glowing tide, a
+  small whale that keeps yours company, and after dark aurora nights, the
+  cove glowing, Friday's falling stars, a whale in the sky once a night.
+  The red jacket is never sold.
+- **Places.** Every world has its own: the shore 6, the sea 8, the sky 8.
+  Finds and dock things stand in them, a new one in the first good free
+  place; a full world sends the next to the chest, and the line says so.
+  The scene's weather (the aurora, the milky way, the deep) keeps its own
+  spot behind them.
+- **Arrange**, one word in the Collection: the scene stops and every place
+  shows as a soft ring. Drag a thing to another place of its world and it
+  snaps in, or swaps with whoever stands there; or tap it and tap a ring.
+  Put away into the chest and put out again; tidy up goes back to the
+  automatic places. Nothing is marked or bought while arranging.
+- **Three extensions**: a longer shore (+4 places at the water's edge), a
+  reef (+6 places on the coral, a layer deeper) and an island on the
+  whale (a big whale resting at the horizon with six places on its back).
+  Buying a thing to place, or more room, opens arranging at once, with
+  the thing in hand.
+- The postcard paints your arrangement: the pier, the extensions and
+  everything standing on them.
+- Fixed on the way: drifting finds no longer jump by half their size; the
+  aurora, the deep and the island find no longer draw as hard-edged
+  boxes; a stone cracked late no longer pushes a standing find away.
+- Data version 8: purchases, the goal, what is hidden or worn, and where
+  things stand. Every earlier version opens.
+
 ## 0.12.1 - 2026-10-08
 
 The author's motion review (review-animations), answered.

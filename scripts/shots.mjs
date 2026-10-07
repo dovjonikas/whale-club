@@ -337,6 +337,65 @@ for (const [file, off] of [
   await context.close()
 }
 
+// 0.13, the dock and arranging: the same three things over a longer run, most of
+// a season's krill spent on the island on the whale and a few things to place,
+// some of them standing on the island. At night, so the pier's lanterns are lit.
+{
+  const LONG = 160
+  const longDays = {}
+  for (let i = -LONG; i < 0; i++) {
+    const done = ['run', 'read', 'practice'].filter((id, k) => (i * 3 + k) % 7 !== 0)
+    if (done.length)
+      longDays[key(i)] = done.includes('read')
+        ? { done, minutes: { read: 30 }, sessions: [{ thing: 'read', minutes: 30 }] }
+        : { done, minutes: {} }
+  }
+  // Today: one thing done already and the check-in answered, so no notice covers the sky.
+  longDays[key(0)] = { done: ['run'], minutes: {}, checkin: true }
+  const bought = [
+    ['buoy', -140, 150],
+    ['shells', -130, 150],
+    ['hat', -120, 350],
+    ['dock-lanterns', -100, 1000],
+    ['boat', -80, 1200],
+    ['sandcastle', -60, 300],
+    ['island', -20, 6000],
+  ].map(([item, day, price]) => ({ item, date: key(day), price }))
+  const dockData = {
+    ...data,
+    version: 8,
+    things: things.map((t) => ({ ...t, createdAt: key(-LONG) })),
+    days: longDays,
+    cracked: { run: 120, read: 120, practice: 120 },
+    bought,
+    wears: { hat: 'run' },
+    goal: 'lighthouse',
+    placement: { sandcastle: 'island-1', shells: 'island-2' },
+  }
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.setFixedTime(NOW)
+  await page.addInitScript(
+    (json) => localStorage.setItem('whaleclub:data', json),
+    JSON.stringify(dockData),
+  )
+  await page.goto(base)
+  await page.waitForTimeout(1500)
+  await shot(page, 'iphone-island.png')
+  await page.locator('.krill-chip').click()
+  await page.getByRole('dialog', { name: 'the dock' }).waitFor()
+  await page.waitForTimeout(600)
+  await shot(page, 'iphone-dock.png')
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(400)
+  await page.getByRole('button', { name: 'Collection' }).click()
+  await page.getByRole('button', { name: 'arrange', exact: true }).click()
+  await page.getByRole('button', { name: /^sandcastle, place \d$/ }).click()
+  await page.waitForTimeout(500)
+  await shot(page, 'iphone-arrange.png')
+  await context.close()
+}
+
 // brand.html: the bubble in every state, then the glyphs, at a desktop width.
 {
   const context = await browser.newContext({ viewport: { width: 1100, height: 860 } })
