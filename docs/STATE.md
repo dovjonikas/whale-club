@@ -2,7 +2,7 @@
 
 ## Done
 
-v0.11.3, live at https://dovjonikas.github.io/whale-club/ after the push.
+v0.12.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
 - **v0.1.0 to v0.3.0**: the row, the scene, the sky as a calendar, creatures, PWA, collectibles, the whale, rituals, sound, share; a buddy slot (since removed).
 - **v0.4.0**: postcards instead of a buddy; the phone-wide frame; the install leaf after the first thing; Lighthouse through Edge.
@@ -21,6 +21,7 @@ v0.11.3, live at https://dovjonikas.github.io/whale-club/ after the push.
 - **v0.11.1**: the author's first look answered: the intro paced like music with a small story in the truth beat; a quiet glass under text over the scene; lengths up to ten hours ("other", a stepped dial).
 - **v0.11.2**: the truth beat as a song that climbs: the eyes open on day one, blink at the turn, the stars double at "compound", the first star blooms on the last word with a chord.
 - **v0.11.3**: the intro has a score: "tap to begin" so sound may play, a music box year, a note for every word of the truth, silence at the blink, the notes doubling at "compound", the last word resolving on the peak.
+- **v0.12.0**: the brand: every thing wears a bubble (its picture in cream, the rising signature, filled when done, a timer rim for a lock-in) at its card's corner; 48 glyphs of its own, picked from the name in English or Lithuanian, or a monogram; no emoji anywhere (data v7); the interface's icons, the app icon and the favicon in the same hand; brand.html; strong curves, presses, sheets that can be pulled down; the interface audit with its fixes (docs/QUALITY.md).
 
 ## The road to 1.0 (the author's briefs of 2026-10-07)
 
@@ -42,7 +43,7 @@ addition and the first brief disagree, the evening addition wins.
       per redraw; the log (month, year, day); data v5 with sessions.
 - [x] **0.11.0 two kinds, clear editing, the first minute** (the evening
       addition, its addendum on interruptions, and the log's legend): done.
-- [ ] **0.12.0 the brand and the UI** (the second evening addition), with
+- [x] **0.12.0 the brand and the UI** (the second evening addition), with
       the skills in order (frontend-design, ui-ux-pro-max, emil-design-eng,
       review-animations, web-design-guidelines) and what came from each in
       DECISIONS:

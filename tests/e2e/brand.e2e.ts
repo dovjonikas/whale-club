@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test'
 import { INK, CREAM, inside, monogram } from '../../src/brand/bubble'
 import { COMMON, GLYPHS, GROUPS, LETTER } from '../../src/brand/glyphs'
 import { fold, glyphFor } from '../../src/brand/match'
+import { dayBubble } from '../../src/app/thingMark'
 import { LANTERN_COLORS } from '../../src/app/sceneData'
 import { migrate } from '../../src/store/migrate'
 
@@ -156,4 +157,49 @@ test('things from before 0.12 trade their emoji for its glyph, or their name for
     settings: { sound: true },
   })
   expect(later.things.map((t) => t.icon)).toEqual(['violin', 'read'])
+})
+
+test('the postcard shows every thing in its bubble, filled if it was done that day', () => {
+  const data = migrate({
+    version: 7,
+    things: [
+      {
+        id: 'a',
+        name: 'run',
+        icon: 'run',
+        kind: 'tap',
+        line: 'a',
+        minutes: 15,
+        world: 'sea',
+        createdAt: '2026-09-01',
+        order: 0,
+      },
+      {
+        id: 'b',
+        name: 'violin',
+        icon: 'violin',
+        kind: 'lockIn',
+        line: 'a',
+        minutes: 30,
+        world: 'sky',
+        createdAt: '2026-09-01',
+        order: 1,
+      },
+    ],
+    days: { '2026-10-08': { done: ['a'], minutes: { b: 15 } } },
+    cracked: {},
+    settings: { sound: true },
+  })
+  const [run, violin] = data.things
+  if (!run || !violin) throw new Error('things missing')
+  const done = dayBubble(data, run, '2026-10-08')
+  expect(done).toContain('data-done="true"')
+  expect(done).toContain(`fill="${LANTERN_COLORS[0]}"`)
+  const half = dayBubble(data, violin, '2026-10-08')
+  expect(half).toContain('data-done="false"')
+  expect(half).toContain('bubble-progress')
+  // Half of the ring drawn: the dash offset is half its length.
+  const offset = Number(/bubble-progress[^>]*stroke-dashoffset="([\d.]+)"/.exec(half)?.[1])
+  const ring = Number(/bubble-progress[^>]*stroke-dasharray="([\d.]+)"/.exec(half)?.[1])
+  expect(offset / ring).toBeCloseTo(0.5, 2)
 })

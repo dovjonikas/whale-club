@@ -2,6 +2,56 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.12.0 - 2026-10-08
+
+The brand: every thing wears a bubble, in the app's own sign language.
+
+- **The bubble.** A glass float in the thing's colour, its picture in one
+  cream line, a light arc where the glass catches the moon, and the
+  signature: one tiny bubble rising off the rim. Done, it fills with its
+  colour, the glyph turns dark and the signature pops into three (under
+  300 ms; under reduced motion it only fills). A lock-in's rim is its
+  timer ring. It sits at each card's corner; a waiting stone rests on its
+  edge, so the mark never hides. A done card glows in its thing's colour.
+- **48 glyphs of its own** in six groups (body, mind, craft, home,
+  people, care), drawn by hand on a 24 grid in strokes of 1.75 with round
+  ends, one cream colour, readable at 20 px. A thing's picture is picked
+  from its name as it is typed, in English or Lithuanian ("violin",
+  "smuikas", "run", "bėgimas"), diacritics or not; a name that fits none
+  wears its first letter.
+- **The add sheet** has no emoji any more: a live bubble shows how the
+  card will look, the twelve most common pictures, the first letter, and
+  "more" by group. The thing's sheet has the same field. The starters
+  wear their pictures.
+- **No emoji anywhere.** Lists show a small bubble before a name: the
+  not-today strip, the collection, the log's day, a session. The log's
+  legend shows each thing's bubble.
+- **Data v7**: a thing keeps its picture. Things from before take the
+  glyph their emoji meant, else one from their name, else a monogram; the
+  emoji is kept for the record.
+- **The interface's own icons** in the same hand: header, sheets, the log,
+  the postcard offer.
+- **The app icon**: a whale's tail diving, in a sea glass bubble with the
+  signature; a favicon that holds at 16 px; full-bleed Apple and maskable
+  icons.
+- **brand.html**: the look on one page, drawn by the app's own code.
+- **The postcard** shows every thing in its bubble at its creature's
+  corner, filled if it was done that day; a long name keeps to its column.
+- **Motion**: strong curves as tokens, a press on every pressable, sheets
+  on the iOS drawer curve that leave faster than they come and can be
+  pulled down, hover only on real pointers, nothing growing from zero. A
+  closing sheet stops taking taps at once.
+- **Smoother intro**: no stall on the first tap (the sound is readied
+  behind "tap to begin"), no camera push, no words twitching as their fade
+  ends.
+- **The interface audit** (docs/QUALITY.md): typed names are escaped
+  everywhere, attributes too; a card's week and length reach screen
+  readers; toasts, notices and offers are announced; the session screen,
+  the intro and every redraw keep the focus; on a phone a sheet opens on its
+  title instead of springing the keyboard; an empty name says so by the
+  field; fields and chips have edges at 3:1; every target is 44 px; no text
+  under 11 px; under reduced motion the whale still comes, as a fade.
+
 ## 0.11.3 - 2026-10-07
 
 The intro has a score.
