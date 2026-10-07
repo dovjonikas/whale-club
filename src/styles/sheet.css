@@ -1,6 +1,6 @@
 /* A sheet slides up from the bottom over the scene. There is never a second page. */
 .sheet-scrim {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 10;
   background: var(--scrim);
@@ -13,7 +13,7 @@
 }
 
 .sheet {
-  position: fixed;
+  position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
@@ -31,19 +31,6 @@
 
 .sheet.is-open {
   transform: translate3d(0, 0, 0);
-}
-
-@media (min-width: 900px) {
-  .sheet {
-    left: 50%;
-    right: auto;
-    width: 440px;
-    transform: translate3d(-50%, 100%, 0);
-    border-radius: var(--r) var(--r) 0 0;
-  }
-  .sheet.is-open {
-    transform: translate3d(-50%, 0, 0);
-  }
 }
 
 .sheet-title {
@@ -157,7 +144,7 @@
 
 /* The timer while it runs: the whole screen goes calm. */
 .timer-run {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 9;
   display: grid;
@@ -214,7 +201,7 @@
 
 /* A toast: one line at the top, one tap. */
 .toast {
-  position: fixed;
+  position: absolute;
   top: calc(var(--safe-top) + var(--s3));
   left: 50%;
   z-index: 20;
@@ -253,6 +240,12 @@
 
 .leaf-title {
   font-weight: 700;
+}
+
+.leaf-lead {
+  display: block;
+  margin-top: var(--s1);
+  color: var(--ink-dim);
 }
 
 .leaf ol {
@@ -521,4 +514,67 @@
 
 .buddy-remove {
   margin-top: var(--s3);
+}
+
+/* The install steps: three big rows, an icon each. */
+.install-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s3);
+  counter-reset: step;
+}
+
+.install-steps li {
+  display: grid;
+  grid-template-columns: 56px 1fr;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s3);
+  border-radius: var(--r);
+  background: rgba(2, 4, 9, 0.4);
+  border: 1px solid var(--card-edge);
+  counter-increment: step;
+}
+
+.install-icon {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(62, 242, 224, 0.12);
+}
+
+.install-icon::before {
+  content: counter(step);
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--glow);
+  color: var(--abyss);
+  font-size: var(--t-xs);
+  font-weight: 700;
+}
+
+.install-icon svg {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: var(--glow);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.install-text {
+  font-size: var(--t-md);
+  line-height: 1.3;
 }

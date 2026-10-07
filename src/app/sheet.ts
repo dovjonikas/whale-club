@@ -1,3 +1,5 @@
+import { host } from './host'
+
 /**
  * A bottom sheet over the scene. One at a time, modal, closed by its own
  * button, the scrim or Escape. Focus goes in on open and back to whatever
@@ -68,7 +70,7 @@ export function openSheet(options: SheetOptions): SheetHandle {
   scrim.addEventListener('click', close)
   document.addEventListener('keydown', onKey)
 
-  document.body.append(scrim, sheet)
+  host().append(scrim, sheet)
   app?.setAttribute('inert', '')
   requestAnimationFrame(() => {
     scrim.classList.add('is-open')

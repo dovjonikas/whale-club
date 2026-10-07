@@ -62,7 +62,14 @@ export const voice = {
   ],
   install: {
     ios: 'put it on your home screen', // TODO-VOICE
-    iosSteps: ['tap Share', 'tap Add to Home Screen'],
+    iosLead: 'it works like an app from there. no app store.', // TODO-VOICE
+    iosHow: 'show me how',
+    iosSteps: [
+      'tap the Share button at the bottom of Safari: the square with the arrow.',
+      'scroll the list down and tap Add to Home Screen.',
+      'tap Add in the corner. done: the whale is on your home screen.',
+    ],
+    iosNote: 'next time, open it from the home screen, not from Safari.', // TODO-VOICE
     android: 'put it on your home screen', // TODO-VOICE
     button: 'Install',
     close: 'not now',

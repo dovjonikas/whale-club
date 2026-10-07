@@ -1,6 +1,7 @@
 import { creatureSvg } from '../scene/creatures'
 import type { Line, Stage } from '../store/derive'
 import type { Thing } from '../store/types'
+import { host } from './host'
 import { formatRemaining } from './timer'
 
 export interface TimerRunHandle {
@@ -32,7 +33,7 @@ export function showTimerRun(
     <button type="button" class="timer-stop">stop</button>`
   const clock = overlay.querySelector('.timer-clock')
   overlay.querySelector('.timer-stop')?.addEventListener('click', onStop)
-  document.body.append(overlay)
+  host().append(overlay)
   requestAnimationFrame(() => overlay.classList.add('is-open'))
 
   return {
