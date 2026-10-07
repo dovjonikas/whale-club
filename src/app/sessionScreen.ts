@@ -59,7 +59,10 @@ export function openSessionScreen(
   screen.dataset.away = 'false'
   screen.dataset.time = options.showTime ? 'shown' : 'hidden'
   screen.setAttribute('role', 'dialog')
+  screen.setAttribute('aria-modal', 'true')
   screen.setAttribute('aria-label', `${voice.lockIn.button}: ${thing.name}`)
+  screen.tabIndex = -1
+  const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
   screen.innerHTML = `
     <div class="session-deep" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b><b></b><b></b></div>
     <div class="session-top">
@@ -147,7 +150,15 @@ export function openSessionScreen(
   const app = document.getElementById('app')
   app?.classList.add('is-behind-session')
   app?.setAttribute('inert', '')
-  requestAnimationFrame(() => screen.classList.add('is-open'))
+  requestAnimationFrame(() => {
+    screen.classList.add('is-open')
+    screen.focus({ preventScroll: true })
+  })
+
+  /** A button that goes while it has the focus hands it on, never to the page. */
+  const keepFocus = (leaving: HTMLElement, to: HTMLElement): void => {
+    if (document.activeElement === leaving) (to.hidden ? screen : to).focus({ preventScroll: true })
+  }
 
   return {
     element: screen,
@@ -167,11 +178,14 @@ export function openSessionScreen(
       pauseButton.textContent = on ? voice.lockIn.goOn : voice.lockIn.pause
       // One pause per session: once it is over, the button goes.
       pauseButton.hidden = used && !on
+      if (pauseButton.hidden) keepFocus(pauseButton, stopButton)
       said.textContent = on ? voice.lockIn.paused : used ? voice.lockIn.goingOn : said.textContent
     },
     undoable(on) {
       undoButton.hidden = !on
       stopButton.hidden = on
+      if (on) keepFocus(stopButton, undoButton)
+      else keepFocus(undoButton, stopButton)
     },
     ended() {
       clearTimeout(timeTimer)
@@ -187,6 +201,10 @@ export function openSessionScreen(
       clearTimeout(timeTimer)
       app?.classList.remove('is-behind-session')
       app?.removeAttribute('inert')
+      const back = opener?.isConnected
+        ? opener
+        : app?.querySelector<HTMLElement>('.card-main, .card-add')
+      back?.focus({ preventScroll: true })
       screen.classList.remove('is-open')
       setTimeout(() => {
         screen.remove()

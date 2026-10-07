@@ -25,6 +25,8 @@
   --font-display: 'Fraunces Variable', Georgia, serif;
   --font-body: 'Atkinson Hyperlegible', system-ui, sans-serif;
 
+  /* Only for a count or a tag inside something small (a stone, a tile, a day cell). */
+  --t-2xs: 11px;
   --t-xs: 12px;
   --t-sm: 14px;
   --t-md: 17px;
@@ -55,6 +57,8 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* The edge of a field or a chip: 3:1 on a sheet, so a control can be told from the sheet. */
+  --control-edge: rgba(62, 242, 224, 0.44);
   /* The one stroke of every glyph and icon on the 24 grid (src/brand/icons.ts LINE). */
   --line: 1.75;
   /* A press: how far a control gives under a finger, and how fast. */

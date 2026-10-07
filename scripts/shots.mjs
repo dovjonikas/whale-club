@@ -284,7 +284,7 @@ for (const [file, off] of [
   await context.close()
 }
 
-// The add sheet with its two kinds, and edit mode, on the five weeks.
+// The add sheet with its picture and its two kinds, and edit mode, on the five weeks.
 {
   const context = await browser.newContext({ ...devices['iPhone 13'] })
   const page = await context.newPage()
@@ -300,7 +300,8 @@ for (const [file, off] of [
   await shot(page, 'iphone-edit.png')
   await page.getByRole('button', { name: 'done', exact: true }).click()
   await page.getByRole('button', { name: 'Add a thing' }).click()
-  await page.getByRole('textbox', { name: 'name' }).fill('study')
+  // A name picks its picture as it is typed: the violin shows first, chosen.
+  await page.getByRole('textbox', { name: 'name' }).fill('violin')
   await page.getByRole('dialog').getByRole('button', { name: 'lock in', exact: true }).click()
   await page.waitForTimeout(500)
   await shot(page, 'iphone-add.png')
@@ -332,6 +333,21 @@ for (const [file, off] of [
   await page.getByRole('dialog', { name: 'the lab' }).waitFor()
   await page.waitForTimeout(900)
   await page.screenshot({ path: resolve(out, 'iphone-lab.png') })
+  await context.close()
+}
+
+// brand.html: the bubble in every state, then the glyphs, at a desktop width.
+{
+  const context = await browser.newContext({ viewport: { width: 1100, height: 860 } })
+  const page = await context.newPage()
+  await page.goto(`${base}brand.html`)
+  await page.getByRole('heading', { name: 'Whale Club, the look' }).waitFor()
+  await page.waitForTimeout(600)
+  await page.screenshot({ path: resolve(out, 'brand-states.png') })
+  // The glyphs section at the top of the window.
+  await page.locator('#h-glyphs').evaluate((heading) => heading.scrollIntoView())
+  await page.waitForTimeout(300)
+  await page.screenshot({ path: resolve(out, 'brand-glyphs.png') })
   await context.close()
 }
 

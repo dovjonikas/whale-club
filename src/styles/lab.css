@@ -83,5 +83,4 @@ html[data-lab='true'] #frame {
   padding: 0 var(--s3);
   color: var(--ink-dim);
   font-size: var(--t-xs);
-  opacity: 0.6;
 }

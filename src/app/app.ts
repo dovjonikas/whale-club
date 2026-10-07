@@ -68,10 +68,10 @@ export function startApp(root: HTMLElement, labEntered = false): void {
 
   root.innerHTML = `
     <header class="header"></header>
-    <div class="notice-slot"></div>
+    <div class="notice-slot" aria-live="polite"></div>
     <main class="stage"><div class="onboarding" hidden><p></p><small></small></div></main>
     <div class="bottom">
-      <div class="offer-slot"></div>
+      <div class="offer-slot" aria-live="polite"></div>
       <p class="line"></p>
       <div class="row-tools"><div class="next-slot"></div></div>
       <div class="row" role="group" aria-label="your homework"></div>
@@ -152,6 +152,9 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       showUndo(voice.edit.deleted, voice.edit.undo, () => {
         store.restoreThing(removed)
       })
+      // The card that had the focus is gone: the undo takes it, the nearest way back.
+      if (!document.activeElement?.isConnected || document.activeElement === document.body)
+        document.querySelector<HTMLElement>('.undo-button')?.focus({ preventScroll: true })
     }
     if (!card) {
       go()

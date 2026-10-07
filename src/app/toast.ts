@@ -2,6 +2,28 @@
 import { host } from './host'
 
 let current: HTMLButtonElement | null = null
+let announcer: HTMLElement | null = null
+
+/**
+ * Says a line to a screen reader, politely, through one live region that
+ * is always there: a region created with its text already in it is often
+ * not read at all.
+ */
+export function announce(text: string): void {
+  if (!announcer?.isConnected) {
+    announcer = document.createElement('div')
+    announcer.className = 'visually-hidden'
+    announcer.setAttribute('aria-live', 'polite')
+    announcer.setAttribute('aria-atomic', 'true')
+    host().append(announcer)
+  }
+  const region = announcer
+  // Emptied first, so the same line twice is still said twice.
+  region.textContent = ''
+  window.setTimeout(() => {
+    region.textContent = text
+  }, 50)
+}
 
 export function showToast(text: string, onTap?: () => void): void {
   current?.remove()
@@ -15,6 +37,7 @@ export function showToast(text: string, onTap?: () => void): void {
   })
   host().append(toast)
   current = toast
+  announce(text)
   requestAnimationFrame(() => toast.classList.add('is-open'))
   if (!onTap) setTimeout(hide, 4000)
 }
@@ -38,7 +61,6 @@ export function showUndo(text: string, label: string, onUndo: () => void): void 
   document.querySelector('.undo-toast')?.remove()
   const toast = document.createElement('div')
   toast.className = 'undo-toast'
-  toast.setAttribute('role', 'status')
   toast.innerHTML =
     '<span class="undo-text"></span><button type="button" class="undo-button"></button>'
   const textEl = toast.querySelector('.undo-text')
@@ -58,5 +80,6 @@ export function showUndo(text: string, label: string, onUndo: () => void): void 
     onUndo()
   })
   host().append(toast)
+  announce(`${text} ${label}`)
   requestAnimationFrame(() => toast.classList.add('is-open'))
 }

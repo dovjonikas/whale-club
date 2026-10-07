@@ -201,8 +201,8 @@ export class Row {
               thing,
             ) => `<li class="not-today-item" data-id="${thing.id}" data-world="${thing.world}">
               <span class="not-today-creature">${creatureSvg(thing.world, lineFor(data, thing), stageFor(last7(data, thing.id, today)))}</span>
-              <button type="button" class="not-today-name" aria-label="${voice.days.edit(thing.name)}">${thingMark(thing)}${escapeHtml(thing.name)}</button>
-              <button type="button" class="chip also-today" aria-label="${voice.days.alsoToday}: ${thing.name}">${voice.days.alsoToday}</button>
+              <button type="button" class="not-today-name" aria-label="${escapeHtml(voice.days.edit(thing.name))}">${thingMark(thing)}${escapeHtml(thing.name)}</button>
+              <button type="button" class="chip also-today" aria-label="${escapeHtml(`${voice.days.alsoToday}: ${thing.name}`)}">${voice.days.alsoToday}</button>
             </li>`,
           )
           .join('')}
@@ -210,6 +210,8 @@ export class Row {
     this.strip.querySelector('.not-today-toggle')?.addEventListener('click', () => {
       this.open = !this.open
       this.renderStrip(data, off)
+      // Drawn again, so the new toggle takes the focus the old one had.
+      this.strip.querySelector<HTMLElement>('.not-today-toggle')?.focus({ preventScroll: true })
     })
     this.strip.querySelectorAll<HTMLElement>('.not-today-item').forEach((item) => {
       const thing = this.latest.get(item.dataset.id ?? '')

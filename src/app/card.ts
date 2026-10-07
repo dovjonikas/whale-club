@@ -38,14 +38,14 @@ export function createCard(thing: Thing): HTMLElement {
   card.dataset.id = thing.id
   card.dataset.world = thing.world
   card.innerHTML = `
-    <button type="button" class="card-main" data-world="${thing.world}">
+    <button type="button" class="card-main" data-world="${thing.world}" aria-describedby="card-days-${thing.id}">
       <span class="card-stone" hidden aria-hidden="true"></span>
       <span class="card-mark" aria-hidden="true"></span>
       <span class="creature"></span>
       <span class="card-name"></span>
       <span class="card-length"></span>
       <span class="dots" aria-hidden="true">${'<span class="dot"></span>'.repeat(7)}</span>
-      <span class="visually-hidden card-days"></span>
+      <span class="visually-hidden card-days" id="card-days-${thing.id}"></span>
     </button>
     <button type="button" class="card-edit">
       ${icon('more')}

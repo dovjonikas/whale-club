@@ -102,10 +102,12 @@ export function openLogSheet(store: Store, at?: DateKey): void {
                   )
                   .join('')
                 const more = shown.length > DOTS_SHOWN ? '<b>+</b>' : ''
-                return `<button type="button" class="log-cell" data-date="${date}" data-star="${String(entry.star)}"${date === now ? ' data-today="true"' : ''} aria-label="${dayAria(
-                  date,
-                  entry.done.map((d) => d.name),
-                  entry.sessions.length,
+                return `<button type="button" class="log-cell" data-date="${date}" data-star="${String(entry.star)}"${date === now ? ' data-today="true"' : ''} aria-label="${escapeHtml(
+                  dayAria(
+                    date,
+                    entry.done.map((d) => d.name),
+                    entry.sessions.length,
+                  ),
                 )}">
                   <span class="log-num">${String(n)}</span>
                   <span class="log-star" aria-hidden="true"></span>

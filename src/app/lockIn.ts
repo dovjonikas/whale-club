@@ -229,6 +229,9 @@ export class LockIn {
       () => {
         this.screen = null
         screen.element.remove()
+        document
+          .querySelector<HTMLElement>(`.card[data-id="${thing.id}"] .card-main`)
+          ?.focus({ preventScroll: true })
       },
     )
     // A tap anywhere lands on the end at once.
