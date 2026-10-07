@@ -1,6 +1,7 @@
 import { addDays, fromKey, toKey } from './dates'
 import { counted } from './derive'
-import type { AppData, DateKey } from './types'
+import { LETTER } from '../brand/glyphs'
+import type { AppData, DateKey, Kind } from './types'
 
 /**
  * The arithmetic behind the log, the one view of what has been done: a
@@ -13,21 +14,23 @@ export interface MonthSummary {
   minutes: number
 }
 
+/** A thing as the log names it: enough for its small bubble and its name. */
+export interface Named {
+  id: string
+  name: string
+  icon: string
+  kind: Kind
+  order: number
+}
+
 export interface DayEntry {
   date: DateKey
   /** Things done that day and counted (a star's worth); `manual` when done without the timer. */
-  done: { id: string; name: string; emoji: string; manual: boolean }[]
+  done: (Named & { manual: boolean })[]
   /** Lock-ins that ran to their end, in order: bright, soft (in parts) or dim (left, before 0.11). */
-  sessions: {
-    id: string
-    name: string
-    emoji: string
-    minutes: number
-    left: boolean
-    parts: number
-  }[]
+  sessions: (Named & { minutes: number; left: boolean; parts: number })[]
   /** Lock-in minutes on a thing not done that day: a faint lantern once the day is over. */
-  unfinished: { id: string; name: string; emoji: string; minutes: number }[]
+  unfinished: (Named & { minutes: number })[]
   /** All the minutes locked in that day, stopped ones included. */
   minutes: number
   checkin: boolean
@@ -72,10 +75,16 @@ export function weeksOf(month: MonthKey): (DateKey | null)[][] {
 
 export function dayEntry(data: AppData, date: DateKey): DayEntry {
   const day = data.days[date]
-  const named = (id: string): { id: string; name: string; emoji: string } => {
+  const named = (id: string): Named => {
     const thing = [...data.things, ...(data.retired ?? [])].find((t) => t.id === id)
-    // A thing deleted since keeps its days, without a name to show.
-    return { id, name: thing?.name ?? '…', emoji: thing?.emoji ?? '•' }
+    // A thing deleted since keeps its days; one never known keeps a blank bubble.
+    return {
+      id,
+      name: thing?.name ?? '…',
+      icon: thing?.icon ?? LETTER,
+      kind: thing?.kind ?? 'tap',
+      order: thing?.order ?? 0,
+    }
   }
   const done = (day?.done ?? [])
     .filter((id) => counted(day, id))

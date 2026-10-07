@@ -1,3 +1,4 @@
+import { escapeHtml, thingMark } from './thingMark'
 import { beginningSvg, creatureSvg } from '../scene/creatures'
 import type { Line, Stage } from '../store/derive'
 import type { Thing } from '../store/types'
@@ -94,7 +95,7 @@ export function openSessionScreen(
   const undoButton = q('.session-undo')
   const stopButton = q('.session-stop')
   const pauseButton = q('.session-pause')
-  q('.session-name').textContent = `${thing.emoji} ${thing.name}`
+  q('.session-name').innerHTML = `${thingMark(thing)}${escapeHtml(thing.name)}`
 
   let form = ''
   const grow = (progress: number): void => {

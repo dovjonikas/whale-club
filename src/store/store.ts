@@ -1,3 +1,4 @@
+import { glyphFor } from '../brand/match'
 import { now } from './clock'
 import { dataKey } from './lab'
 import { migrate } from './migrate'
@@ -36,7 +37,8 @@ export class Store {
 
   addThing(input: {
     name: string
-    emoji: string
+    /** A glyph id or "letter"; picked from the name when not given. */
+    icon?: string
     kind?: Kind
     minutes?: number
     days?: readonly boolean[]
@@ -49,7 +51,7 @@ export class Store {
     const thing: Thing = {
       id: newId(),
       name,
-      emoji: input.emoji.trim() || '•',
+      icon: input.icon ?? glyphFor(name),
       kind: input.kind ?? 'tap',
       minutes: input.minutes ?? DEFAULT_MINUTES,
       days: [...(input.days ?? EVERY_DAY)],
@@ -195,10 +197,10 @@ export class Store {
     this.commit({ ...this.data, days: { ...this.data.days, [date]: next } })
   }
 
-  /** The thing's sheet: its name, emoji, lock-in length and weekdays. */
+  /** The thing's sheet: its name, glyph, lock-in length and weekdays. */
   updateThing(
     thingId: string,
-    patch: Partial<Pick<Thing, 'name' | 'emoji' | 'kind' | 'minutes' | 'days'>>,
+    patch: Partial<Pick<Thing, 'name' | 'icon' | 'kind' | 'minutes' | 'days'>>,
   ): void {
     this.commit({
       ...this.data,

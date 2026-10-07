@@ -44,7 +44,7 @@ test('the add sheet asks one question, tap when done or lock in, and a length on
     'true',
   )
   await page.keyboard.press('Escape')
-  await addThing(page, 'practice', { emoji: '🎹', lockIn: true, minutes: 45 })
+  await addThing(page, 'practice', { picture: 'piano', lockIn: true, minutes: 45 })
   await expect(page.locator('.card', { has: card(page, 'practice') })).toContainText('45 min')
   await card(page, 'practice').click()
   await expect(page.getByRole('slider', { name: 'minutes' })).toHaveAttribute('aria-valuenow', '45')
@@ -74,7 +74,7 @@ test('data from before 0.9 loses its mode and every thing gets a lock-in length'
     version: number
     things: Record<string, unknown>[]
   }
-  expect(data.version).toBe(6)
+  expect(data.version).toBe(7)
   expect(data.things.map((t) => t.mode)).toEqual([undefined, undefined])
   expect(data.things.map((t) => t.minutes)).toEqual([15, 25])
 })

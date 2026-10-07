@@ -22,7 +22,7 @@ export function openDial(
   onStart: (minutes: number) => void,
 ): void {
   openSheet({
-    title: `${thing.emoji} ${thing.name}`,
+    title: thing.name,
     build(body, close) {
       let minutes = nearestStop(thing.minutes)
       body.innerHTML = `

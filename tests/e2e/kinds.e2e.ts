@@ -58,7 +58,7 @@ test('data from before 0.11 gets a kind: lock in where most done days had minute
     version: number
     things: { kind: string; minutes: number }[]
   }
-  expect(data.version).toBe(6)
+  expect(data.version).toBe(7)
   expect(data.things.map((t) => t.kind)).toEqual(['lockIn', 'tap'])
   expect(data.things[0]?.minutes).toBe(25)
   await expect(cardOf(page, 'study')).toContainText('25 min')

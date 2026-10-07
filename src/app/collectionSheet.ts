@@ -1,3 +1,4 @@
+import { escapeHtml, thingMark } from './thingMark'
 import { collectibleSvg, collectiblesFor } from '../scene/collectibles'
 import { creatureSvg } from '../scene/creatures'
 import { rarityOf } from '../scene/rarity'
@@ -67,7 +68,7 @@ export function openCollectionSheet(store: Store): void {
           return `<section class="collection-thing">
             <h3 class="collection-title">
               <span class="collection-creature">${creatureSvg(thing.world, line, stage)}</span>
-              <span>${thing.emoji} ${thing.name}</span>
+              <span>${thingMark(thing)}${escapeHtml(thing.name)}</span>
               <span class="collection-total">${String(total)} ${total === 1 ? 'day' : 'days'}</span>
             </h3>
             <ul class="tiles">${tiles}</ul>

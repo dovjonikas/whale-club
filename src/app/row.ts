@@ -1,3 +1,4 @@
+import { escapeHtml, thingMark } from './thingMark'
 import { creatureSvg } from '../scene/creatures'
 import { last7, lineFor, plannedOn, stageFor, waitingTiers, weekDots } from '../store/derive'
 import { todayKey } from '../store/dates'
@@ -200,7 +201,7 @@ export class Row {
               thing,
             ) => `<li class="not-today-item" data-id="${thing.id}" data-world="${thing.world}">
               <span class="not-today-creature">${creatureSvg(thing.world, lineFor(data, thing), stageFor(last7(data, thing.id, today)))}</span>
-              <button type="button" class="not-today-name" aria-label="${voice.days.edit(thing.name)}">${thing.emoji} ${thing.name}</button>
+              <button type="button" class="not-today-name" aria-label="${voice.days.edit(thing.name)}">${thingMark(thing)}${escapeHtml(thing.name)}</button>
               <button type="button" class="chip also-today" aria-label="${voice.days.alsoToday}: ${thing.name}">${voice.days.alsoToday}</button>
             </li>`,
           )

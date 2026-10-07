@@ -1,3 +1,4 @@
+import { escapeHtml, thingMark } from './thingMark'
 import { icon } from '../brand/icons'
 import { fromKey, todayKey } from '../store/dates'
 import {
@@ -168,15 +169,15 @@ export function openLogSheet(store: Store, at?: DateKey): void {
         const items: string[] = []
         for (const d of entry.done)
           items.push(
-            `<li class="log-done"><span class="log-check" aria-hidden="true">✓</span>${d.emoji} ${d.name}${d.manual ? ` · ${voice.log.without}` : ''}</li>`,
+            `<li class="log-done">${thingMark(d, { done: true, manual: d.manual })}${escapeHtml(d.name)}${d.manual ? ` · ${voice.log.without}` : ''}</li>`,
           )
         for (const x of entry.sessions)
           items.push(
-            `<li class="log-session${x.left ? ' is-left' : x.parts > 1 ? ' is-soft' : ''}"><span class="log-lantern" style="--lantern:${color(x.id)}" aria-hidden="true"></span>${x.emoji} ${x.name} · ${voice.log.minutes(x.minutes)}${x.left ? ` · ${voice.log.left}` : x.parts > 1 ? ` · ${voice.log.inParts}` : ''}</li>`,
+            `<li class="log-session${x.left ? ' is-left' : x.parts > 1 ? ' is-soft' : ''}"><span class="log-lantern" style="--lantern:${color(x.id)}" aria-hidden="true"></span>${thingMark(x, { done: true })}${escapeHtml(x.name)} · ${voice.log.minutes(x.minutes)}${x.left ? ` · ${voice.log.left}` : x.parts > 1 ? ` · ${voice.log.inParts}` : ''}</li>`,
           )
         for (const u of entry.unfinished)
           items.push(
-            `<li class="log-session is-left"><span class="log-lantern" style="--lantern:${color(u.id)}" aria-hidden="true"></span>${u.emoji} ${u.name} · ${voice.log.unfinished(u.minutes)}</li>`,
+            `<li class="log-session is-left"><span class="log-lantern" style="--lantern:${color(u.id)}" aria-hidden="true"></span>${thingMark(u)}${escapeHtml(u.name)} · ${voice.log.unfinished(u.minutes)}</li>`,
           )
         if (entry.checkin) items.push(`<li class="log-checkin">${voice.log.checkin}</li>`)
         return `
@@ -257,10 +258,11 @@ function dayAria(date: DateKey, names: string[], lanterns: number): string {
 
 /**
  * The log explains itself, always, in the scene's own words: a star is a
- * day something was done, a lantern is a lock-in finished. Under that, a
- * dot of each lock-in thing's colour with its name (only lock-ins make
- * lanterns; a deleted thing only in a month that has its lanterns), and a
- * line for soft and faint lanterns when the month has them.
+ * day something was done, a lantern is a lock-in finished. Under that,
+ * each lock-in thing's bubble with its name, whose colour is its lanterns'
+ * (only lock-ins make lanterns; a deleted thing only in a month that has
+ * its lanterns), and a line for soft and faint lanterns when the month has
+ * them.
  */
 function legendHtml(
   data: AppData,
@@ -272,10 +274,7 @@ function legendHtml(
     ...(data.retired ?? []).filter((t) => seen.lit.has(t.id)),
   ].sort((a, b) => a.order - b.order)
   const colors = things
-    .map(
-      (t) =>
-        `<span class="legend-thing"><i style="--lantern:${lanternColor(t)}"></i>${t.emoji} ${t.name}</span>`,
-    )
+    .map((t) => `<span class="legend-thing">${thingMark(t)}${escapeHtml(t.name)}</span>`)
     .join('')
   return `<div class="log-legend" data-month="${month}">
     <p><span class="legend-star" aria-hidden="true">★</span>${voice.log.legendStar}</p>

@@ -236,5 +236,5 @@ test('data from before days plans every thing on every day', async ({ page }) =>
   await card(page, 'read').click()
   const data = await stored(page)
   expect(data.things[0]).toMatchObject({ days: [true, true, true, true, true, true, true] })
-  expect((data as unknown as { version: number }).version).toBe(6)
+  expect((data as unknown as { version: number }).version).toBe(7)
 })

@@ -34,7 +34,7 @@ test('the recap says N/7 for the week and never what was missed', async ({ page 
   const data = emptyData()
   data.things = things.map((t) => ({
     ...t,
-    emoji: '•',
+    icon: 'letter',
     kind: 'tap' as const,
     line: 'a' as const,
     minutes: 30,

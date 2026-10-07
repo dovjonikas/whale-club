@@ -28,9 +28,14 @@ export function everyThing(data: AppData): Map<string, Thing> {
   return new Map([...(data.retired ?? []), ...data.things].map((t) => [t.id, t]))
 }
 
+/** The colour of a place in the row: a thing's colour everywhere, by the place it was added at. */
+export function colorAt(order: number): string {
+  return LANTERN_COLORS[order % LANTERN_COLORS.length] ?? LANTERN_COLORS[0]
+}
+
 /** A thing's lantern colour, by its place in the row when it was added. */
 export function lanternColor(thing: Thing | undefined): string {
-  return LANTERN_COLORS[(thing?.order ?? 0) % LANTERN_COLORS.length] ?? '#ffd98a'
+  return colorAt(thing?.order ?? 0)
 }
 
 function sizeFor(minutes: number): 0 | 1 | 2 {

@@ -74,7 +74,7 @@ export async function seed(page: Page, data: SeedData): Promise<void> {
   const current = data.things.some((t) => t.kind !== undefined)
   const lines = new Map<string, number>()
   const payload = {
-    version: data.version ?? (current ? 6 : 3),
+    version: data.version ?? (current ? 7 : 3),
     things: data.things.map((t) => {
       const n = lines.get(t.world) ?? 0
       lines.set(t.world, n + 1)
@@ -96,11 +96,19 @@ export async function seed(page: Page, data: SeedData): Promise<void> {
 export async function addThing(
   page: Page,
   name: string,
-  options: { emoji?: string; lockIn?: boolean; minutes?: number } = {},
+  /** `picture`: a glyph by its label, chosen under "more" (otherwise the name picks it). */
+  options: { picture?: string; lockIn?: boolean; minutes?: number } = {},
 ): Promise<void> {
   await page.getByRole('button', { name: 'Add a thing' }).click()
   await page.getByRole('textbox', { name: 'name' }).fill(name)
-  if (options.emoji) await page.getByRole('button', { name: options.emoji }).click()
+  if (options.picture) {
+    const sheet = page.getByRole('dialog')
+    await sheet.getByRole('button', { name: 'more', exact: true }).click()
+    await sheet
+      .locator('.icon-more')
+      .getByRole('button', { name: options.picture, exact: true })
+      .click()
+  }
   if (options.lockIn) {
     await page.getByRole('button', { name: 'lock in', exact: true }).click()
     if (options.minutes)

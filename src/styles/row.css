@@ -49,11 +49,13 @@
   transform: scale(0.97);
 }
 
-/* A stone waiting: a small dark pebble with a warm crack, at the card's corner. */
+/* A stone waiting: a small dark pebble with a warm crack, resting on the
+   bubble's lower edge, so the thing's mark always shows. */
 .card-stone {
   position: absolute;
-  top: 6px;
-  right: 6px;
+  z-index: 1;
+  top: 30px;
+  right: 26px;
   min-width: 16px;
   height: 14px;
   padding: 0 3px;
@@ -83,10 +85,10 @@
 }
 
 .card[data-done='true'] {
-  border-color: var(--world-color);
+  border-color: var(--thing, var(--world-color));
   box-shadow:
-    0 0 0 1px var(--world-color),
-    0 0 28px var(--world-glow);
+    0 0 0 1px var(--thing, var(--world-color)),
+    0 0 28px color-mix(in srgb, var(--thing, var(--world-color)) 35%, transparent);
 }
 
 .card[data-world='sea'] {
@@ -236,11 +238,8 @@
   }
 }
 
-/* On narrow cards the emoji steps aside for the name, and then the clock icon for the words. */
+/* On narrow cards the name takes the smaller size. */
 @container (max-width: 96px) {
-  .card-emoji {
-    display: none;
-  }
   .card-name {
     font-size: var(--t-xs);
   }
@@ -403,82 +402,20 @@
   position: relative;
 }
 
-/* The mark at the card's corner says what kind of thing it is: an empty
-   ring for a tap thing's check, a timer ring that fills for a lock-in. */
+/* The bubble at the card's corner is the thing's mark (bubble.css): its
+   picture in its colour, filled once done today, a timer ring for a
+   lock-in's rim. */
 .card-mark {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 22px;
-  height: 22px;
-  color: var(--world-color);
+  top: 3px;
+  right: 3px;
+  width: 34px;
+  height: 34px;
 }
 
-.card-stone:not([hidden]) ~ .card-mark {
-  display: none;
-}
-
-.mark-ring {
+.card-mark .bubble {
   width: 100%;
   height: 100%;
-  overflow: visible;
-  transform: rotate(-90deg);
-}
-
-.mark-track {
-  fill: none;
-  stroke: rgba(232, 240, 245, 0.32);
-  stroke-width: 1.6;
-}
-
-.mark-fill {
-  fill: none;
-  stroke: var(--world-color);
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  transition: stroke-dashoffset var(--dur) var(--ease);
-}
-
-.mark-check,
-.mark-hand,
-.mark-clock {
-  fill: none;
-  stroke: var(--abyss);
-  stroke-width: 2.2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  transform: rotate(90deg);
-  transform-origin: 12px 12px;
-  opacity: 0;
-}
-
-.mark-hand {
-  stroke-width: 1.4;
-}
-
-/* A lock-in's ring is a timer: a hand inside it until it is done. */
-.mark-clock {
-  stroke: rgba(232, 240, 245, 0.7);
-  stroke-width: 1.8;
-}
-
-.card[data-kind='lockIn'][data-done='false'] .mark-clock {
-  opacity: 1;
-}
-
-/* A tap thing has no timer: its ring is a checkbox. */
-.card[data-kind='tap'] .mark-fill {
-  display: none;
-}
-
-.card[data-done='true'] .mark-track {
-  fill: var(--world-color);
-  stroke: var(--world-color);
-}
-
-.card[data-done='true'][data-manual='false'] .mark-check,
-.card[data-done='true'][data-manual='true'] .mark-hand {
-  opacity: 1;
 }
 
 /* A lock-in's length under its name; "12/25 · finish" once it is started. */
@@ -495,7 +432,7 @@
 }
 
 .card[data-started='true'] .card-length {
-  color: var(--world-color);
+  color: var(--thing, var(--world-color));
   font-weight: 700;
 }
 

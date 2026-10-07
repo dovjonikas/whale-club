@@ -93,7 +93,7 @@ test('data from before 0.10 turns finished lock-ins into lanterns, dim where lef
     version: number
     days: Record<string, { sessions?: unknown[] }>
   }
-  expect(data.version).toBe(6)
+  expect(data.version).toBe(7)
   expect(data.days[dateKey(-3)]?.sessions).toEqual([{ thing: 't1', minutes: 25 }])
   expect(data.days[dateKey(-2)]?.sessions).toEqual([{ thing: 't1', minutes: 10, left: true }])
   expect(data.days[dateKey(-1)]?.sessions).toBeUndefined()
