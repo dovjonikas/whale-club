@@ -243,3 +243,14 @@ export async function seedPerson(page: Page, person: Person = {}): Promise<void>
     [STORAGE_KEY, JSON.stringify(data)] as const,
   )
 }
+
+/**
+ * Midday today, for a test whose clock runs on through a lock-in: started
+ * at the real time, a fifteen-minute session begun at 23:55 would end on
+ * tomorrow, and "today" would change under the test.
+ */
+export function middayToday(): Date {
+  const noon = new Date()
+  noon.setHours(12, 0, 0, 0)
+  return noon
+}
