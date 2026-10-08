@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import { existsSync, readdirSync } from 'node:fs'
 import { version } from './package.json'
 
 /**
@@ -8,10 +9,20 @@ import { version } from './package.json'
  * service worker cache them forever: a new build is a new set of names, and
  * index.html (never hashed) is precached with a revision instead.
  */
+/**
+ * Art slots: a picture in public/art/<id>.webp (or .png) takes the place of
+ * that find's drawing, with no code changed (docs/ART.md). The list of what
+ * is there is read once at build time, so the app never asks the network
+ * for a picture that does not exist.
+ */
+const ART = existsSync('public/art')
+  ? readdirSync('public/art').filter((name) => /\.(webp|png)$/.test(name))
+  : []
+
 export default defineConfig({
   base: '/whale-club/',
   // The version shows at the bottom of the menu; five taps on it open the lab.
-  define: { __APP_VERSION__: JSON.stringify(version) },
+  define: { __APP_VERSION__: JSON.stringify(version), __ART__: JSON.stringify(ART) },
   build: {
     target: 'es2022',
     sourcemap: false,
@@ -50,7 +61,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,png,svg,woff2}'],
+        globPatterns: ['**/*.{js,css,html,png,svg,woff2,webp}'],
         clientsClaim: true,
         skipWaiting: false,
         navigateFallback: '/whale-club/index.html',

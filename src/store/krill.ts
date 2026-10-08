@@ -21,10 +21,15 @@ export const KRILL = {
   leftShare: 0.5,
   /** Every thing planned that day, done. */
   allDone: 25,
+  /** The first week's set, finished: seven days with something done. Once. */
+  firstWeek: 100,
   /** A week (Monday to Sunday, over) with this share of its planned days done or more. */
   goodWeek: 50,
   goodWeekShare: 0.8,
 } as const
+
+/** The first week's set has a slot for each of its first seven days with something done. */
+export const FIRST_WEEK_DAYS = 7
 
 export interface KrillDay {
   done: number
@@ -76,6 +81,12 @@ export function krillEarned(data: AppData, today: DateKey): number {
     const day = krillOn(data, date)
     total += day.done + day.minutes + day.allDone
   }
+  // The first week's set: seven days with something done, once ever.
+  if (
+    dates.filter((date) => (data.days[date]?.done ?? []).some((id) => counted(data.days[date], id)))
+      .length >= FIRST_WEEK_DAYS
+  )
+    total += KRILL.firstWeek
   // Good weeks: every week that is over, from the first thing's week.
   const first = data.things
     .map((t) => t.createdAt)

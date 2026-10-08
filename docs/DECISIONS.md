@@ -909,3 +909,54 @@ finds also have (a kite at 120 days, a lighthouse at 60, the aurora at
 finds are earned, and few people have both lines. A comet, which was
 not in the brief, is replaced by a moon swing, so the dock adds nothing
 the sky already gives at day 30.
+
+## 2026-10-08 The sky is a path, not a calendar
+
+Seeded a year in the lab, the sky was a net of fifty-two rows of joined
+stars: the calendar was there, the goal was not. The log is the calendar
+now, so the sky can be the goal: each day something was done lights the
+next star of a constellation drawn in the outline of the legendary at its
+end. The whole shape is in the sky, faint and dotted, from the first day,
+so the far goal is seen before it is near; a day lights one star, so the
+progress is seen every day. A missed day takes nothing, a rest day with
+nothing done has no star. Paths are 30, 60, then 100: thirty days of
+showing up is already further than most people go, and a steady person
+finishes about four in a year.
+
+Stars sit closer together in a constellation than a finger is wide, so a
+star's own target is only its spacing (12 px). A tap that misses falls to
+the sky, which opens the month in the log, where the days are; every star
+is still a button for a keyboard and a screen reader.
+
+## 2026-10-08 Rarity is earned
+
+Rarity was a hash of the date: luck, 3 % legendary and 17 % rare, and
+nothing a person did made it more likely. Now a per-thing find is common,
+a rare find comes half way along a constellation, and a legendary only at
+its end; a legendary is never sold. Finds reached before this version keep
+the shine their date gave them (rarity.ts, `EARNED_FROM`), so the change
+takes nothing away and nothing has to be stored.
+
+A legendary always gets a place: in a full world the newest ordinary
+thing gives up its place to it and waits in the chest. A halfway star or
+a legendary is the day's moment, so that day the daily surprise steps
+aside; the same goes for the first week's set, a milestone, and the days
+the sky and the sea keep.
+
+## 2026-10-08 The first year's calendar, the first week's set, art slots
+
+The season follows the real date, northern by default (the settings
+stage brings the south). The sky keeps the great meteor showers on their
+peak nights, the solstices and equinoxes on their usual days, World Ocean
+Day and World Whale Day, and New Year's night; dates within a day of the
+true moment are close enough for a sky that is drawn. All of it is worked
+out from the clock; nothing is fetched.
+
+The first week is a set of seven, a finish line before the long paths,
+because week one is where most people stop (RESEARCH-DOPAMINE). It pays
+100 krill once; with it the steady person's model reads 1,990 a month and
+22,870 a year.
+
+Art slots read the list of pictures at build time, so the app never asks
+the network for one that is not there; a picture inside an SVG would not
+reach a canvas, so the postcard draws a slot's picture directly.

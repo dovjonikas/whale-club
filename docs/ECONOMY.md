@@ -29,7 +29,7 @@ balance stops at zero instead of going into debt.
 | A session that was left, before 0.11                                            | half its minutes       |
 | Every thing planned that day, done                                              | 25                     |
 | A good week: 80 % or more of its planned thing-days done, once the week is over | 50                     |
-| The first week set (0.14)                                                       | 100                    |
+| The first week’s set: the first seven days with something done, once            | 100                    |
 | Welcome back after a break (0.15)                                               | 20                     |
 
 A thing that is not planned on a day (a day off) neither earns nor costs.
@@ -42,14 +42,14 @@ The brief's calibration: three things, one of them a 30-minute lock-in,
 each done four days in five (on different days), aims at about 2,000 a
 month and 25,000 a year.
 
-| Person                        |   A month |     A year | Of the year: dones | minutes | all done | good weeks |
-| ----------------------------- | --------: | ---------: | -----------------: | ------: | -------: | ---------: |
-| Every day                     |     2,750 |     33,625 |             10,950 |  10,950 |    9,125 |      2,600 |
-| **Steady, four days in five** | **1,890** | **22,770** |              8,760 |   8,760 |    3,650 |      1,600 |
-| Two days in three             |     1,200 |     14,590 |              7,300 |   7,290 |        0 |          0 |
+| Person                        |   A month |     A year | Of the year: dones | minutes | all done | good weeks | first week |
+| ----------------------------- | --------: | ---------: | -----------------: | ------: | -------: | ---------: | ---------: |
+| Every day                     |     2,850 |     33,725 |             10,950 |  10,950 |    9,125 |      2,600 |        100 |
+| **Steady, four days in five** | **1,990** | **22,870** |              8,760 |   8,760 |    3,650 |      1,600 |        100 |
+| Two days in three             |     1,300 |     14,690 |              7,300 |   7,290 |        0 |          0 |        100 |
 
 The steady person lands a little under the brief's numbers on purpose:
-the 0.14 first-week bonus and the occasional all-done day push a real year
+welcome back (0.15) and the occasional all-done day push a real year
 toward 25,000, and it is easier to add a reward later than to take one
 back. Someone who shows up two days in three still earns more than half as
 much: the gap is the all-done and good-week bonuses, which reward finishing

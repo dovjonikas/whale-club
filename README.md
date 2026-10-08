@@ -57,7 +57,7 @@ what it costs ([`docs/DECISIONS.md`](docs/DECISIONS.md)).
 
 <table>
   <tr>
-    <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-scene.webp" width="240" alt="The home screen: a night sky of stars laid out as a calendar, a shore with sunflowers, a sea with fish, and three cards with creatures"><br><b>The sea</b><br><sub>Every day you show up is a star. A streak draws a constellation.</sub></td>
+    <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-scene.webp" width="240" alt="The home screen: a night sky with a constellation being lit, a shore with sunflowers, a sea with fish, and three cards with creatures"><br><b>The sea</b><br><sub>Every day you show up is a star in a constellation.</sub></td>
     <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-all-done.webp" width="240" alt="Everything done for the day: the whale surfaces over the horizon and a button offers to send it"><br><b>All done</b><br><sub>The whale surfaces, with one line and one button to send it.</sub></td>
     <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-collection.webp" width="240" alt="The collection: unlocked finds and the silhouettes of the next ones, each with its day"><br><b>The collection</b><br><sub>Sixty finds at 3 to 180 days. The next one is always in sight.</sub></td>
   </tr>
@@ -80,6 +80,11 @@ what it costs ([`docs/DECISIONS.md`](docs/DECISIONS.md)).
     <td align="center" valign="top"><img src="docs/screenshots/iphone-island.webp" width="240" alt="The night scene with an island on a big whale at the horizon, a sandcastle and shells on it, a pier with lit lanterns, a boat and a buoy in the sea, and the krill balance under the title"><br><b>The island on the whale</b><br><sub>Things bought with krill, standing in their places.</sub></td>
     <td align="center" valign="top"><img src="docs/screenshots/iphone-dock.webp" width="240" alt="The dock: the balance in krill, and the small tier, each thing a silhouette with its price until it is yours"><br><b>The dock</b><br><sub>Thirty things to look at, fixed prices, no chance.</sub></td>
     <td align="center" valign="top"><img src="docs/screenshots/iphone-arrange.webp" width="240" alt="Arranging: the scene holds still, every place a soft ring, the sandcastle held, with done, tidy up and the chest"><br><b>Arrange</b><br><sub>Every place a ring. Drag, or tap and tap.</sub></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-constellation.webp" width="240" alt="The night sky: a whale's constellation finished and bright in a corner, a turtle's constellation half lit in the middle, the rest of it faint and dotted"><br><b>The path</b><br><sub>Every day you show up lights a star. The shape is the goal.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-ceremony.webp" width="240" alt="The ceremony: the scene dark, the whale constellation lit, a beam of light, the golden whale, and a plaque with its name and the day it was earned"><br><b>A legendary</b><br><sub>Earned at a constellation's end, never bought.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-year.webp" width="240" alt="A year in the lab: finished constellations around the sky, the cove of lanterns merged into one glow, every thing in its place"><br><b>A year, readable</b><br><sub>Constellations, a glowing cove, everything in its place.</sub></td>
   </tr>
 </table>
 
@@ -106,8 +111,10 @@ And underneath all three: nothing dies. You just missed a day.
 - **One screen.** A night sky above, a sea below, a shore with a garden at the horizon, and the row of your things at the bottom
 - **Two kinds of thing.** "Tap when done" is a checkbox with a creature on it. "Lock in" counts only the minutes its timer saw, and the parts of a day add up: a call, a dead battery or a closed app lose nothing
 - **Days, if you want them.** Every thing is planned every day unless you say otherwise. A day off is never a missed day: the streak walks past it, and a thing done three times a week still grows
-- **Stars are days.** After a few months the sky is the progress report, with no graph needed
-- **Stones and finds.** Sixty finds across three worlds, earned at 3, 7, 14, 21, 30, 45, 60, 90, 120 and 180 days. Some come out rare and a few legendary; that is only the shine
+- **Stars are days.** Each one lights the next star of a constellation; the log keeps the calendar
+- **Stones and finds.** Seventy-eight finds across three worlds, earned at 3, 7, 14, 21, 30, 45, 60, 90, 120, 180, 240, 300 and 365 days
+- **The path to a legendary.** Every day you show up lights the next star of a constellation drawn in the shape of its legendary. Half way brings a rare find, the end a legendary with a ceremony, a plaque and a gold-framed postcard. Rarity is earned, never bought
+- **A first week, and a first year.** The first seven days are a set of their own; days 100, 200 and 365 are quietly kept. The seasons and the sky's real nights (meteor showers, solstices, World Ocean Day) show in the scene
 - **A missed day** dims the scene for a day and says so. That is the whole punishment
 - **The first minute** shows a year in silhouette, then plays the idea as a short piece of music, then asks for one thing. Skip is always there
 - **Krill and the dock.** Every day shown up for earns krill, worked out from the days and never bought. A pier on the shore opens the dock: thirty things to look at in four tiers, fixed prices, no chance, no boxes, no timers. Save for one, and the distance shows under the title
@@ -231,6 +238,7 @@ build and the tests, and never deploy.
 - [`docs/QUALITY.md`](docs/QUALITY.md): the motion and interface audits, with what changed
 - [`docs/COLLECTIBLES.md`](docs/COLLECTIBLES.md): every find, by world, line and day
 - [`docs/ECONOMY.md`](docs/ECONOMY.md): what earns krill, what a steady person makes, what the dock costs
+- [`docs/ART.md`](docs/ART.md): art slots, a picture for any find without touching the code
 - [`docs/RESEARCH-DOPAMINE.md`](docs/RESEARCH-DOPAMINE.md) and [`docs/RESEARCH-SEA.md`](docs/RESEARCH-SEA.md): the research behind the reward design and the daily surprise
 
 ## License
@@ -241,3 +249,7 @@ In one sentence: take it, change it, ship it. Keep the copyright line and
 the license text with any copy you pass on, and take it as it is: there is
 no warranty of any kind. The screenshots are covered too; every one is of a
 seeded sample history, so there is nothing personal in them.
+
+Pictures placed in `public/art` (the art slots, [`docs/ART.md`](docs/ART.md))
+are not covered by the MIT licence: each stays with its author, all rights
+reserved.

@@ -26,7 +26,26 @@ export function collectiblesFor(world: World, line: Line): Collectible[] {
   )
 }
 
+/**
+ * Art slots: the picture made for a find, if public/art has one, by its id
+ * (docs/ART.md). Outside a build (the tests' pure data) there are none.
+ */
+export function artFor(id: string): string | null {
+  const files = typeof __ART__ === 'undefined' ? [] : __ART__
+  const file =
+    files.find((name) => name === `${id}.webp`) ?? files.find((name) => name === `${id}.png`)
+  return file ? `${import.meta.env.BASE_URL}art/${file}` : null
+}
+
+/**
+ * A find, as SVG: its picture in an art slot, or the drawing in code. A
+ * picture's silhouette (a find not found yet) comes from its alpha channel
+ * by the same filter that darkens a drawing.
+ */
 export function collectibleSvg(item: Collectible): string {
+  const art = artFor(item.id)
+  if (art)
+    return `<svg viewBox="0 0 100 100" aria-hidden="true"><image href="${art}" width="100" height="100"/></svg>`
   return `<svg viewBox="0 0 100 100" aria-hidden="true">${item.draw()}</svg>`
 }
 

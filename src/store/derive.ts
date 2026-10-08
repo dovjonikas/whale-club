@@ -11,7 +11,9 @@ export type { Line } from './types'
 /** Creature stage from the last seven days: 0-1, 2-3, 4-5, 6-7 days done. */
 export type Stage = 0 | 1 | 2 | 3
 
-export const UNLOCK_DAYS: readonly number[] = [3, 7, 14, 21, 30, 45, 60, 90, 120, 180]
+export const UNLOCK_DAYS: readonly number[] = [
+  3, 7, 14, 21, 30, 45, 60, 90, 120, 180, 240, 300, 365,
+]
 
 /** Monday is 0, Sunday 6. */
 export function weekday(date: DateKey): number {
