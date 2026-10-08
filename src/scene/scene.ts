@@ -23,7 +23,7 @@ import { shoreSvg } from './shore'
 import { StarField } from './stars'
 import { StoneLayer, type StoneSpec } from './stones'
 import { causticsUrl, grainUrl } from './textures'
-import { ticker } from './ticker'
+import { reducedMotion, ticker } from './ticker'
 import { voice } from '../voice'
 import { sleeperSvg, visitorSvg, whaleSvg, type VisitorKind } from './visitors'
 
@@ -41,6 +41,8 @@ import { sleeperSvg, visitorSvg, whaleSvg, type VisitorKind } from './visitors'
  * which stops while the page is hidden or the scene is off screen.
  */
 const PHONE_WIDTH = 390
+/** The flight's own length is in scene.css (star-flight); this is a backstop if it never ends. */
+const STAR_FLIGHT_MAX_MS = 2000
 /** A night-only dock thing bought in daylight shows itself for this long. */
 const DOCK_PREVIEW_MS = 6000
 /** The sky whale starts across this long after the scene opens in the dark. */
@@ -52,7 +54,6 @@ const HORIZON = 0.58
 
 export interface SceneDays {
   dates: readonly DateKey[]
-  streak: ReadonlySet<DateKey>
   today: DateKey
   label: (date: DateKey) => string
 }
@@ -86,6 +87,7 @@ export class Scene {
   private heldStar: DateKey | null = null
   /** The real lanterns, put back after a preview. */
   private lanternSpecs: readonly LanternSpec[] = []
+  private lanternToday: DateKey | undefined
   /** While the intro shows a year that is not the person's, the real sky waits. */
   private previewing = false
   private readonly skyLayer: HTMLElement
@@ -219,10 +221,51 @@ export class Scene {
     if (star) this.particles.burst('sky', star.x, star.y, 14)
   }
 
+  /**
+   * The day's first done: today's star, held back, rises from `from` (a
+   * point on the page, the card) and flies to its place in the
+   * constellation, where it lights and its line joins (about a second). A
+   * tap anywhere lands it at once; under reduced motion it simply appears.
+   */
+  flyStar(date: DateKey, from: { x: number; y: number }): void {
+    const days = this.days
+    const canvasRect = this.query('canvas.stars').getBoundingClientRect()
+    const target = days ? this.stars.where(days.dates, date) : undefined
+    const sceneRect = this.root.getBoundingClientRect()
+    if (!target || reducedMotion()) {
+      this.revealStar()
+      return
+    }
+    const ratio = canvasRect.width / Math.max(1, this.skyLayer.clientWidth)
+    const to = { x: canvasRect.left + target.x * ratio, y: canvasRect.top + target.y * ratio }
+    const star = document.createElement('div')
+    star.className = 'star-flight'
+    star.setAttribute('aria-hidden', 'true')
+    star.style.left = `${(from.x - sceneRect.left).toFixed(1)}px`
+    star.style.top = `${(from.y - sceneRect.top).toFixed(1)}px`
+    star.style.setProperty('--dx', `${(to.x - from.x).toFixed(1)}px`)
+    star.style.setProperty('--dy', `${(to.y - from.y).toFixed(1)}px`)
+    star.innerHTML = '<i></i>'
+    this.root.append(star)
+    let landed = false
+    const land = (): void => {
+      if (landed) return
+      landed = true
+      document.removeEventListener('pointerdown', land)
+      star.remove()
+      this.revealStar()
+    }
+    star.addEventListener('animationend', land, { once: true })
+    // A tap anywhere lands it: nothing waits on a star.
+    document.addEventListener('pointerdown', land, { once: true })
+    setTimeout(land, STAR_FLIGHT_MAX_MS)
+  }
+
   /** Every lantern in the cove. */
-  setLanterns(specs: readonly LanternSpec[]): void {
+  setLanterns(specs: readonly LanternSpec[], today?: DateKey): void {
     this.lanternSpecs = specs
-    if (!this.previewing) this.lanterns.set(specs)
+    this.lanternToday = today
+    if (!this.previewing) this.lanterns.set(specs, today)
   }
 
   /**
@@ -232,21 +275,20 @@ export class Scene {
   preview(
     year: {
       dates: readonly DateKey[]
-      streak: ReadonlySet<DateKey>
       today: DateKey
       lanterns: readonly LanternSpec[]
     } | null,
   ): void {
     if (year === null) {
       this.previewing = false
-      this.lanterns.set(this.lanternSpecs)
+      this.lanterns.set(this.lanternSpecs, this.lanternToday)
       this.applyDays()
-      if (!this.days) this.stars.setDays([], new Set(), '')
+      if (!this.days) this.stars.setDays([])
       return
     }
     this.previewing = true
     this.starHits.replaceChildren()
-    this.stars.setDays(year.dates, year.streak, year.today)
+    this.stars.setDays(year.dates)
     this.lanterns.set(year.lanterns)
   }
 
@@ -292,7 +334,7 @@ export class Scene {
     if (!days || this.previewing) return
     const held = this.heldStar
     const dates = held === null ? days.dates : days.dates.filter((d) => d !== held)
-    this.stars.setDays(dates, days.streak, days.today)
+    this.stars.setDays(dates)
     this.renderStarHits()
   }
 
@@ -325,7 +367,12 @@ export class Scene {
         element.dataset.rarity = rarity
         element.dataset.weather = String(weather === true)
         // The wrapper stands in its place; the art inside moves, so a drift never shifts the place.
-        element.innerHTML = `<div class="collectible-art">${collectibleSvg(item)}</div>`
+        // A legendary has a shimmer of its own: three small lights that come and go in turn.
+        const shimmer =
+          rarity === 'legendary'
+            ? '<span class="legend-sparkle"></span><span class="legend-sparkle"></span><span class="legend-sparkle"></span>'
+            : ''
+        element.innerHTML = `<div class="collectible-art">${collectibleSvg(item)}</div>${shimmer}`
         this.thingsLayer.append(element)
         this.standAt(element, item.size, at)
         const from = arrivals.get(item.id)

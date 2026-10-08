@@ -1,0 +1,206 @@
+/* The path to a legendary: the ceremony when a constellation is finished,
+   the plaque, the Collection's legendary row, and the gold. */
+
+.ceremony {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s4);
+  padding: calc(var(--safe-top) + var(--s6)) var(--s6) calc(var(--safe-bottom) + var(--s6));
+  text-align: center;
+}
+
+.ceremony-dim {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 4, 9, 0.84);
+  opacity: 0;
+  transition: opacity 600ms var(--ease-out);
+}
+
+.ceremony.is-dark .ceremony-dim {
+  opacity: 1;
+}
+
+/* The constellation, whole and lit, above the dark. */
+.ceremony-stars {
+  position: relative;
+  width: min(72%, 300px);
+  overflow: visible;
+  opacity: 0;
+  transition: opacity 700ms var(--ease-out);
+}
+
+.ceremony.is-lit .ceremony-stars {
+  opacity: 1;
+}
+
+.ceremony-lines line {
+  stroke: var(--star);
+  stroke-width: 0.5;
+  opacity: 0.6;
+}
+
+.ceremony-dots circle {
+  fill: var(--star-pale);
+  filter: drop-shadow(0 0 1.5px var(--star));
+}
+
+/* A beam of light, down from the constellation to where the legendary appears. */
+.ceremony-beam {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 140px;
+  height: 64%;
+  margin-left: -70px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 233, 168, 0) 0%,
+    rgba(255, 233, 168, 0.42) 55%,
+    rgba(255, 233, 168, 0) 100%
+  );
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+  opacity: 0;
+  transition:
+    transform 700ms var(--ease-out),
+    opacity 400ms var(--ease-out);
+}
+
+.ceremony.is-beam .ceremony-beam {
+  transform: scaleY(1);
+  opacity: 1;
+}
+
+.ceremony-find {
+  position: relative;
+  width: 168px;
+  height: 168px;
+  opacity: 0;
+  transform: scale(0.9);
+  filter: drop-shadow(0 0 14px rgba(255, 217, 138, 0.8));
+  transition:
+    opacity 600ms var(--ease-out),
+    transform 700ms var(--ease-out);
+}
+
+.ceremony-find svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.ceremony.is-find .ceremony-find {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* The plaque: its name and the day it was earned. */
+.ceremony-plaque {
+  position: relative;
+  display: grid;
+  gap: var(--s1);
+  padding: var(--s3) var(--s6);
+  border-radius: var(--r);
+  border: 1px solid rgba(255, 217, 138, 0.55);
+  background: linear-gradient(180deg, rgba(255, 217, 138, 0.14), rgba(255, 217, 138, 0.04));
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 500ms var(--ease-out),
+    transform 500ms var(--ease-out);
+}
+
+.ceremony.is-plaque .ceremony-plaque {
+  opacity: 1;
+  transform: none;
+}
+
+.ceremony-kind {
+  margin: 0;
+  font-size: var(--t-2xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--star);
+}
+
+.ceremony-name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  font-weight: 700;
+  color: var(--star-pale);
+}
+
+.ceremony-name:focus {
+  outline: none;
+}
+
+.ceremony-date {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--ink-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.ceremony-actions {
+  display: flex;
+  gap: var(--s2);
+  justify-content: center;
+  margin-top: var(--s3);
+}
+
+.ceremony-actions .button-quiet,
+.ceremony-actions .button-primary {
+  width: auto;
+  height: var(--touch);
+  padding: 0 var(--s4);
+  font-size: var(--t-sm);
+}
+
+/* The Collection's legendary row: larger tiles, a gold edge once earned,
+   and the rare find half way to each, small, under it. */
+.legend-tiles {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.legend-tile {
+  position: relative;
+  padding-bottom: var(--s6);
+}
+
+.legend-tile.is-unlocked {
+  border-color: rgba(255, 217, 138, 0.6);
+  background: linear-gradient(180deg, rgba(255, 217, 138, 0.12), rgba(2, 4, 9, 0.4));
+}
+
+.legend-date {
+  font-size: var(--t-2xs);
+  color: var(--star);
+  line-height: 1.2;
+}
+
+.legend-rare {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-left: -10px;
+}
+
+.legend-rare svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.legend-rare.is-locked {
+  filter: grayscale(1) brightness(0.25) contrast(1.4);
+  opacity: 0.8;
+}

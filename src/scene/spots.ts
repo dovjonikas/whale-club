@@ -135,6 +135,8 @@ export function spotsFor(rooms: ReadonlySet<string>): Spot[] {
 export interface Placeable {
   id: string
   world: SpotWorld
+  /** A legendary: it always gets a place, even when its world is full. */
+  first?: boolean
 }
 
 /**
@@ -163,11 +165,27 @@ export function placeAll(
       taken.add(recorded.id)
     } else waiting.push(item)
   }
-  for (const item of waiting) {
+  // A legendary goes first, and in a full world the newest ordinary thing gives up its place.
+  const ordered = [...waiting.filter((i) => i.first), ...waiting.filter((i) => !i.first)]
+  for (const item of ordered) {
     const free = spots.find((s) => s.world === item.world && !taken.has(s.id))
     if (free) {
       where.set(item.id, free.id)
       taken.add(free.id)
+      continue
+    }
+    const yielding = item.first
+      ? [...items]
+          .reverse()
+          .find(
+            (other) =>
+              other.world === item.world && !other.first && byId.has(where.get(other.id) ?? ''),
+          )
+      : undefined
+    const spot = yielding ? where.get(yielding.id) : undefined
+    if (yielding && spot) {
+      where.set(yielding.id, CHEST)
+      where.set(item.id, spot)
     } else where.set(item.id, CHEST)
   }
   return where

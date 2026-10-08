@@ -1,6 +1,6 @@
-import { addDays, fromKey, weekStart } from '../store/dates'
 import type { DateKey } from '../store/types'
-import { hash, seeded } from './random'
+import { layoutSky, type DayStar, type Ghost, type Link } from './constellations'
+import { seeded } from './random'
 import { reducedMotion, ticker, type FrameHandle } from './ticker'
 
 /**
@@ -14,21 +14,12 @@ import { reducedMotion, ticker, type FrameHandle } from './ticker'
  * twinkles on its own slow sine. Now and then a shooting star crosses the
  * upper sky. Under reduced motion the field is drawn once and holds still.
  *
- * Day-stars are the calendar laid out as a sky: a week is a row, a
- * weekday a column, the first week near the zenith and this week just
- * above the horizon, with a little jitter hashed from the date so it reads
- * as stars rather than as a grid. A streak inside one week is joined into
- * a constellation.
+ * Day-stars are a path, not a calendar (the log is the calendar): each
+ * day something was done lights the next star of the current
+ * constellation, drawn in the outline of the legendary at its end, the way
+ * ahead faint and dotted (src/store/paths.ts, src/scene/constellations.ts).
+ * Finished constellations stay in the sky for good, smaller, around it.
  */
-export interface DayStar {
-  date: DateKey
-  x: number
-  y: number
-  r: number
-  /** Part of a streak: drawn brighter and joined to its neighbours. */
-  linked: boolean
-}
-
 interface FieldStar {
   x: number
   y: number
@@ -51,7 +42,6 @@ interface Shooting {
 
 const FIELD_COUNT = 170
 const BRIGHT_COUNT = 9
-const MIN_ROWS = 6
 const TINTS = ['#fff4d6', '#e8f0f5', '#cfe2ff', '#bff7ee', '#ffe2c4'] as const
 const TWINKLE_FPS = 12
 const SHOOT_FPS = 40
@@ -62,9 +52,9 @@ export class StarField {
   private readonly ctx: CanvasRenderingContext2D
   private field: FieldStar[] = []
   private dayStars: DayStar[] = []
+  private ghosts: Ghost[] = []
+  private links: Link[] = []
   private dates: readonly DateKey[] = []
-  private linked: ReadonlySet<DateKey> = new Set()
-  private today: DateKey = ''
   private width = 0
   private height = 0
   private handle: FrameHandle | null = null
@@ -104,11 +94,9 @@ export class StarField {
     this.draw(performance.now())
   }
 
-  /** Replaces the day-stars. `streakDates` are the ones joined into constellations. */
-  setDays(dates: readonly DateKey[], streakDates: ReadonlySet<DateKey>, today: DateKey): void {
+  /** Replaces the day-stars: every star day, oldest first. */
+  setDays(dates: readonly DateKey[]): void {
     this.dates = dates
-    this.linked = streakDates
-    this.today = today
     this.layout()
     this.draw(performance.now())
   }
@@ -132,33 +120,15 @@ export class StarField {
   }
 
   private layout(): void {
-    const first = this.dates[0]
-    if (first === undefined || !this.today) {
-      this.dayStars = []
-      return
-    }
-    const firstWeek = weekStart(first)
-    const weeks = Math.max(MIN_ROWS, weekIndex(firstWeek, this.today) + 1)
-    const left = 0.08 * this.width
-    const right = 0.92 * this.width
-    // The first row sits under the title and the krill under it (and its goal line), so a
-    // star is never under the chip a finger reaches for.
-    const top = 0.24 * this.height
-    const bottom = 0.88 * this.height
-    const cellW = (right - left) / 7
-    const cellH = (bottom - top) / weeks
-    this.dayStars = this.dates.map((date) => {
-      const random = seeded(hash(date))
-      const column = (fromKey(date).getDay() + 6) % 7
-      const row = weekIndex(firstWeek, date)
-      return {
-        date,
-        x: left + (column + 0.5 + (random() - 0.5) * 0.7) * cellW,
-        y: top + (row + 0.5 + (random() - 0.5) * 0.7) * cellH,
-        r: 1.6 + random() * 1.2,
-        linked: this.linked.has(date),
-      }
-    })
+    const sky = layoutSky(this.dates, this.width, this.height)
+    this.dayStars = sky.stars
+    this.ghosts = sky.ghosts
+    this.links = sky.links
+  }
+
+  /** Where `date`'s star would be if the sky held `dates`, in canvas pixels. */
+  where(dates: readonly DateKey[], date: DateKey): { x: number; y: number } | undefined {
+    return layoutSky(dates, this.width, this.height).stars.find((s) => s.date === date)
   }
 
   private draw(now: number): void {
@@ -185,32 +155,39 @@ export class StarField {
     }
     if (!still) this.drawShooting(now)
 
-    // Constellation lines: consecutive streak days, joined within a week.
-    ctx.globalAlpha = 0.4
+    // The constellations' lines: solid between lit stars, the way ahead dotted and faint.
     ctx.strokeStyle = '#ffd98a'
     ctx.lineWidth = 0.8
-    ctx.beginPath()
-    let previous: DayStar | undefined
-    for (const s of this.dayStars) {
-      const joins =
-        s.linked &&
-        previous?.linked === true &&
-        addDays(previous.date, 1) === s.date &&
-        weekStart(previous.date) === weekStart(s.date)
-      if (joins) ctx.lineTo(s.x, s.y)
-      else ctx.moveTo(s.x, s.y)
-      previous = s
+    for (const lit of [false, true]) {
+      ctx.globalAlpha = lit ? 0.5 : 0.16
+      ctx.setLineDash(lit ? [] : [2, 4])
+      ctx.beginPath()
+      for (const link of this.links) {
+        if (link.lit !== lit) continue
+        ctx.moveTo(link.x1, link.y1)
+        ctx.lineTo(link.x2, link.y2)
+      }
+      ctx.stroke()
     }
-    ctx.stroke()
+    ctx.setLineDash([])
+
+    // The way ahead: faint stars, the halfway one a little larger.
+    ctx.fillStyle = '#e8f0f5'
+    for (const g of this.ghosts) {
+      ctx.globalAlpha = g.half ? 0.5 : 0.26
+      ctx.beginPath()
+      ctx.arc(g.x, g.y, g.half ? 2.2 : 1.2, 0, TAU)
+      ctx.fill()
+    }
 
     for (const s of this.dayStars) {
       const pulse = still ? 0.9 : 0.8 + 0.2 * Math.sin(t * 1.3 + s.x)
-      ctx.globalAlpha = s.linked ? pulse : pulse * 0.75
+      ctx.globalAlpha = s.finished ? pulse * 0.85 : pulse
       ctx.fillStyle = '#ffd98a'
       ctx.shadowColor = '#ffd98a'
-      ctx.shadowBlur = s.linked ? 10 : 5
+      ctx.shadowBlur = s.half ? 14 : s.finished ? 6 : 9
       ctx.beginPath()
-      ctx.arc(s.x, s.y, s.r, 0, TAU)
+      ctx.arc(s.x, s.y, s.half ? s.r * 1.6 : s.r, 0, TAU)
       ctx.fill()
       ctx.shadowBlur = 0
     }
@@ -268,10 +245,4 @@ function sparkle(ctx: CanvasRenderingContext2D, x: number, y: number, r: number)
   ctx.quadraticCurveTo(x - k, y + k, x - r, y)
   ctx.quadraticCurveTo(x - k, y - k, x, y - r)
   ctx.fill()
-}
-
-/** How many weeks after the week starting `firstWeek` the date falls. */
-function weekIndex(firstWeek: DateKey, date: DateKey): number {
-  const ms = fromKey(weekStart(date)).getTime() - fromKey(firstWeek).getTime()
-  return Math.round(ms / (7 * 86_400_000))
 }

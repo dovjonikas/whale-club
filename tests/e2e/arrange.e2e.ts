@@ -138,7 +138,8 @@ test('tidy up forgets every move and the places are automatic again', async ({ p
 test('a full sea: the rest wait in the chest, and a new find says it went there', async ({
   page,
 }) => {
-  // Sea line a has five finds by day 30, line b three by day 14: eight, every place taken.
+  // Sea line a has five finds by day 30, line b three by day 14, and forty days of stars
+  // bring a golden scale and the golden whale: more than the sea's eight places.
   await seedPerson(page, { swim: true, swimCracked: 14 })
   await page.goto('')
   const stone = page
@@ -149,20 +150,22 @@ test('a full sea: the rest wait in the chest, and a new find says it went there'
   await stone.click()
   await expect(page.locator('.line')).toHaveText('no room for a sea turtle. it waits in the chest.')
   await openArranging(page)
-  await expect(page.getByRole('button', { name: 'the chest · 1' })).toBeVisible()
+  await expect(page.getByRole('button', { name: /^the chest · [1-9]$/ })).toBeVisible()
+  // The legendary is never the one in the chest.
+  await expect(ring(page, /^the golden whale, place \d+$/)).toHaveCount(1)
 })
 
 test('buying a thing to place opens arranging with it in hand', async ({ page }) => {
-  // A hundred days of everything: plenty of krill for a buoy.
+  // A hundred days of everything: plenty of krill for a kite, and the sky has room.
   await seedPerson(page, { days: 100 })
   await page.goto('')
   await page.locator('.krill-chip').click()
   const dock = page.getByRole('dialog', { name: 'the dock' })
-  await dock.getByRole('button', { name: 'buoy, 150 krill' }).click()
+  await dock.getByRole('button', { name: 'kite, 250 krill' }).click()
   await dock.getByRole('button', { name: 'get it' }).click()
   await expect(page.getByRole('dialog', { name: 'arrange your sea' })).toBeVisible()
-  await expect(page.locator('.arrange-hint')).toContainText('the buoy is here.')
-  await expect(ring(page, /^buoy, place \d$/)).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.arrange-hint')).toContainText('the kite is here.')
+  await expect(ring(page, /^kite, place \d$/)).toHaveAttribute('aria-pressed', 'true')
 })
 
 test.describe('reduced motion', () => {

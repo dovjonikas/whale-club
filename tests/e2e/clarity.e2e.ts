@@ -187,3 +187,29 @@ test('16. move a find: arrange is in sight within two taps, then the find and it
   ).toBeVisible()
   await tap(button(page, 'done'))
 })
+
+test('17. see how far the legendary is: in sight on the first screen, by name', async ({
+  page,
+}) => {
+  const things = [
+    {
+      id: 'run',
+      name: 'run',
+      world: 'sea' as const,
+      createdAt: dateKey(-12),
+      order: 0,
+      kind: 'tap' as const,
+    },
+  ]
+  const days: Record<string, { done: string[] }> = {}
+  for (let i = -12; i < 0; i++) days[dateKey(i)] = { done: ['run'] }
+  await seed(page, {
+    things,
+    days,
+    cracked: { run: 7 },
+    settings: { installDismissedAt: dateKey(-1) },
+  })
+  await page.goto('')
+  await fromFirstScreen(page)
+  await within2(page.getByRole('button', { name: 'the golden whale: 12 of 30 stars' }))
+})

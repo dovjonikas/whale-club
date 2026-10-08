@@ -17,6 +17,8 @@ export interface LabHooks {
   doAll: () => void
   /** Fills the days before today with a believable history. */
   seed: (days: number) => void
+  /** Lights more stars of the path to a legendary: one, or the rest of this path. */
+  stars: (count: 'one' | 'path') => void
   /** Empties the sandbox: a first open, in the lab. */
   clear: () => void
   /** Empties the sandbox and plays the intro, as on a phone that never had the app. */
@@ -112,6 +114,8 @@ function openLabSheet(hooks: LabHooks): void {
           <button type="button" class="chip" data-lab="seed30">${voice.lab.seed30}</button>
           <button type="button" class="chip" data-lab="seed90">${voice.lab.seed90}</button>
           <button type="button" class="chip" data-lab="seed365">${voice.lab.seed365}</button>
+          <button type="button" class="chip" data-lab="star">${voice.lab.star}</button>
+          <button type="button" class="chip" data-lab="path">${voice.lab.path}</button>
           <button type="button" class="chip" data-lab="clear">${voice.lab.clear}</button>
           <button type="button" class="chip" data-lab="firstOpen">${voice.lab.firstOpen}</button>
         </div>
@@ -145,6 +149,14 @@ function openLabSheet(hooks: LabHooks): void {
         seed90: () => {
           close()
           hooks.seed(90)
+        },
+        star: () => {
+          close()
+          hooks.stars('one')
+        },
+        path: () => {
+          close()
+          hooks.stars('path')
         },
         clear: () => {
           close()

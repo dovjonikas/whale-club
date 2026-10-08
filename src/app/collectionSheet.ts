@@ -3,7 +3,10 @@ import { escapeHtml, thingMark } from './thingMark'
 import { collectibleSvg, collectiblesFor } from '../scene/collectibles'
 import { creatureSvg } from '../scene/creatures'
 import { rarityOf } from '../scene/rarity'
-import { last7, lineFor, reachedOn, stageFor, totalDone } from '../store/derive'
+import { last7, lineFor, reachedOn, stageFor, starDays, totalDone } from '../store/derive'
+import { pathLength, progressOf, reachesOf } from '../store/paths'
+import { LEGENDARIES } from '../scene/legendary'
+import type { AppData } from '../store/types'
 import { todayKey } from '../store/dates'
 import type { Store } from '../store/store'
 import { voice } from '../voice'
@@ -79,13 +82,48 @@ export function openCollectionSheet(store: Store, onArrange?: () => void): void 
       const arrange = onArrange
         ? `<button type="button" class="button-quiet collection-arrange">${icon('chest')}<span>${voice.arrange.open}</span></button>`
         : ''
-      body.innerHTML = arrange + sections.join('')
+      body.innerHTML = arrange + legendaryRow(data) + sections.join('')
       body.querySelector('.collection-arrange')?.addEventListener('click', () => {
         close()
         onArrange?.()
       })
     },
   })
+}
+
+/**
+ * The legendary row: the five of the first year in the order their paths
+ * come, silhouettes until earned, the one being walked with its stars
+ * ("12/30"), and under each, the rare find half way to it. A long goal,
+ * always in sight.
+ */
+function legendaryRow(data: AppData): string {
+  const dates = starDays(data)
+  const reaches = reachesOf(dates)
+  const now = progressOf(dates.length)
+  let before = 0
+  const tiles = LEGENDARIES.map((legendary, path) => {
+    const length = pathLength(path)
+    const reach = reaches[path]
+    const earned = reach?.end !== undefined
+    const caption = earned
+      ? voice.legend.plaque(reach.end ?? '', dates.indexOf(reach.end ?? '') + 1)
+      : path === now.path
+        ? voice.legend.progress(now.lit, length)
+        : voice.legend.ahead(before + length - dates.length)
+    before += length
+    const half = reach?.half !== undefined
+    return `<li class="tile legend-tile ${earned ? 'is-unlocked' : 'is-locked'} ${path === now.path ? 'is-next' : ''}" data-rarity="${earned ? 'legendary' : 'common'}" aria-label="${escapeHtml(`${legendary.name}, ${caption}`)}">
+        <span class="tile-art">${collectibleSvg(legendary.find)}</span>
+        <span class="tile-caption">${escapeHtml(earned ? legendary.name : caption)}</span>
+        ${earned ? `<span class="legend-date">${escapeHtml(caption)}</span>` : ''}
+        <span class="legend-rare ${half ? 'is-unlocked' : 'is-locked'}" aria-label="${escapeHtml(`${legendary.rare.name}${half ? ', found' : ''}`)}">${collectibleSvg(legendary.rare)}</span>
+      </li>`
+  }).join('')
+  return `<section class="collection-thing collection-legendary">
+      <h3 class="collection-title"><span>${voice.legend.title}</span></h3>
+      <ul class="tiles legend-tiles">${tiles}</ul>
+    </section>`
 }
 
 function stoneTile(): string {

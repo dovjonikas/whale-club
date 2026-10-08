@@ -5,11 +5,12 @@ import { StarField } from '../scene/stars'
 import { whaleSvg } from '../scene/visitors'
 import { today } from '../store/clock'
 import { fromKey, todayKey } from '../store/dates'
-import { dayNumber, last7, lineFor, stageFor, starDays, streakDays } from '../store/derive'
+import { dayNumber, last7, lineFor, stageFor, starDays } from '../store/derive'
 import type { AppData, PostcardFormat } from '../store/types'
 import { voice } from '../voice'
 import { BRAND } from './brand'
 import { shownCollectibles } from './sceneData'
+import { LEGENDARIES } from '../scene/legendary'
 import { islandWhaleSvg, pierSvg, reefSvg, shoreEdgeSvg } from '../scene/dock/scene'
 import { shownItems, wornBy } from './dockData'
 import { dressedSvg } from '../scene/dock/wear'
@@ -24,11 +25,13 @@ import { dayBubble } from './thingMark'
  * the scene at the time. Two sizes: a story (1080x1920) and a square
  * (1080x1080). The only thing that leaves the phone is this picture.
  */
-export type MomentKind = 'whale' | 'unlock' | 'recap' | 'stage' | 'sea'
+export type MomentKind = 'whale' | 'unlock' | 'recap' | 'stage' | 'sea' | 'legendary'
 
 export interface Moment {
   kind: MomentKind
   line: string
+  /** A legendary's postcard: which one, and its plaque ("earned on ... · day 30"). */
+  legendary?: { id: string; plaque: string }
 }
 
 const SIZE: Record<PostcardFormat, [number, number]> = {
@@ -43,6 +46,9 @@ const ISLAND_WIDTH = 0.5
 const EDGE_TOP = 0.6
 const REEF_TOP = 0.686
 const SAND_LINE = 0.592
+/** The gold frame of a legendary's card, in px of the card. */
+const FRAME_INSET = 22
+const FRAME_WIDTH = 12
 const PHONE_W = 390
 const PHONE_H = 700
 const SCENE_HORIZON = 0.58
@@ -124,7 +130,7 @@ export async function renderPostcard(
   const stars = new StarField(starCanvas)
   stars.resize(W, horizon, 1)
   const dates = starDays(data)
-  stars.setDays(dates, streakDays(dates), today)
+  stars.setDays(dates)
   ctx.drawImage(starCanvas, 0, 0)
 
   // The shore, then everything unlocked that was on screen.
@@ -156,6 +162,21 @@ export async function renderPostcard(
     )
   }
 
+  // A legendary, large over the horizon: it was earned, and the card says so in gold.
+  const legend =
+    moment.kind === 'legendary' ? LEGENDARIES.find((l) => l.id === moment.legendary?.id) : undefined
+  if (legend) {
+    const size = W * 0.42
+    await drawSvg(
+      ctx,
+      collectibleSvg(legend.find),
+      (W - size) / 2,
+      horizon - size * 0.78,
+      size,
+      size,
+    )
+  }
+
   await Promise.all([
     document.fonts.load(`700 ${layout.lineSize}px "Fraunces Variable"`),
     document.fonts.load(`700 ${layout.captionSize}px "Atkinson Hyperlegible"`),
@@ -179,10 +200,13 @@ export async function renderPostcard(
     year: 'numeric',
   })
   ctx.fillText(
-    `${voice.share.caption(dayNumber(data, today))} · ${date}`,
+    legend && moment.legendary
+      ? moment.legendary.plaque
+      : `${voice.share.caption(dayNumber(data, today))} · ${date}`,
     W / 2,
     H * layout.captionY,
   )
+  if (legend) goldFrame(ctx, W, H)
 
   await drawCreatures(ctx, data, today, W, H * layout.creaturesY, layout)
 
@@ -287,6 +311,20 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number): strin
  * the sand edge, the reef), so a thing placed on them is not left in the
  * air. Drawn at the places the scene has them, through the same mapping.
  */
+/** The legendary card's frame: a gold edge with a fine line inside it, like a plaque. */
+function goldFrame(ctx: CanvasRenderingContext2D, W: number, H: number): void {
+  const gold = ctx.createLinearGradient(0, 0, W, H)
+  gold.addColorStop(0, '#fff1c1')
+  gold.addColorStop(0.45, '#e2a93b')
+  gold.addColorStop(1, '#fff1c1')
+  ctx.strokeStyle = gold
+  ctx.lineWidth = FRAME_WIDTH
+  ctx.strokeRect(FRAME_INSET, FRAME_INSET, W - 2 * FRAME_INSET, H - 2 * FRAME_INSET)
+  ctx.lineWidth = 2
+  const inner = FRAME_INSET + FRAME_WIDTH
+  ctx.strokeRect(inner, inner, W - 2 * inner, H - 2 * inner)
+}
+
 async function drawDock(
   ctx: CanvasRenderingContext2D,
   data: AppData,

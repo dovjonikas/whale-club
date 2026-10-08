@@ -123,20 +123,18 @@ canvas.particles {
   pointer-events: none;
 }
 
+/* A star of a constellation, as a button. The stars of a path sit closer
+   than a finger is wide, so each one's own target is only its spacing; a
+   tap between them falls to the sky, which opens the month in the log,
+   where the days are now. Every star is still a button for a keyboard and
+   a screen reader. */
 .day-star {
   pointer-events: auto;
   position: absolute;
-  width: 28px;
-  height: 28px;
-  margin: -14px 0 0 -14px;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
   border-radius: 50%;
-}
-
-/* The star is small; the finger's target around it is not. */
-.day-star::after {
-  content: '';
-  position: absolute;
-  inset: -8px;
 }
 
 .day-star:focus-visible {
@@ -609,5 +607,48 @@ canvas.lanterns {
   }
   100% {
     opacity: 0;
+  }
+}
+
+/* The day's first done: its star rises from the card and flies to its place
+   in the constellation. The outer element carries the sideways travel at a
+   steady pace and the inner the rise, eased, so the path is an arc. */
+.star-flight {
+  position: absolute;
+  z-index: 6;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  animation: star-flight-x 950ms cubic-bezier(0.45, 0, 0.55, 1) forwards;
+}
+
+.star-flight i {
+  position: absolute;
+  left: -7px;
+  top: -7px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #fff4d6 0 25%,
+    rgba(255, 217, 138, 0.9) 40%,
+    rgba(255, 217, 138, 0) 72%
+  );
+  animation: star-flight-y 950ms var(--ease-out) forwards;
+}
+
+@keyframes star-flight-x {
+  to {
+    transform: translate3d(var(--dx), 0, 0);
+  }
+}
+
+@keyframes star-flight-y {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.6);
+  }
+  100% {
+    transform: translate3d(0, var(--dy), 0) scale(1);
   }
 }
