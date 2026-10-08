@@ -2,6 +2,17 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 1.2.4 - 2026-10-08
+
+- **Rows that look like rows**: in the menu and in settings, the log, how
+  it works, settings, back up and restore are a soft group of rows, each
+  with a small icon in a circle and a chevron, filled rather than outlined
+  so none reads as a field to type in. When the last backup was sits under
+  the group; starting over is apart, quiet and in red.
+- Tests that answer the check-in no longer depend on the hour (an evening
+  run asks for the day's good thing first), and the pause test waits for
+  the screen's next second before reading the time it holds.
+
 ## 1.2.3 - 2026-10-08
 
 - **"after" says what it does**, in one quiet line under it in the thing's

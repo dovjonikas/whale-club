@@ -1,3 +1,4 @@
+import { menuRow } from './menuRow'
 import { noteSaid } from './said'
 import { todayKey } from '../store/dates'
 import { dayNumber, streak } from '../store/derive'
@@ -27,9 +28,11 @@ export function openMenuSheet(
       const day = dayNumber(data, today)
       const run = streak(data, today)
       body.innerHTML = `
-        <button type="button" class="menu-row menu-log">${voice.log.title}</button>
-        <button type="button" class="menu-row menu-how">${voice.howItWorks.title}</button>
-        <button type="button" class="menu-row menu-settings">${voice.settings.open}</button>
+        <div class="row-group">
+          ${menuRow('menu-log', voice.log.title, 'star')}
+          ${menuRow('menu-how', voice.howItWorks.title, 'tail')}
+          ${menuRow('menu-settings', voice.settings.open, 'settings')}
+        </div>
         ${backupStale(data, today) ? `<p class="sheet-note menu-backup">${voice.settings.backupDue}</p>` : ''}
         <ol class="rules">${voice.rules.map((rule) => `<li>${rule}</li>`).join('')}</ol>
         <p class="club-line">${voice.clubLine}</p>

@@ -422,6 +422,8 @@ test('one pause: the creature sleeps, the time stands still, and it is gone once
   await expect(screen).toHaveAttribute('data-state', 'paused')
   await expect(screen.locator('.session-creature')).toHaveClass(/is-asleep/)
   await expect(screen).toContainText('paused. it is asleep.')
+  // One tick first, so the face shows the paused time and not the last second before it.
+  await page.clock.runFor(1500)
   const held = await screen.getByRole('timer').textContent()
   await page.clock.fastForward('02:00')
   await expect(screen.getByRole('timer')).toHaveText(held ?? '')

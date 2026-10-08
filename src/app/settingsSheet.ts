@@ -1,3 +1,4 @@
+import { menuRow } from './menuRow'
 import { now } from '../store/clock'
 import { todayKey } from '../store/dates'
 import type { Store } from '../store/store'
@@ -97,15 +98,17 @@ export function openSettingsSheet(store: Store, on: SettingsHandlers): void {
           ${group(voice.settings.groups.sea, [
             choice('stillSea', voice.settings.still, onOff(s.stillSea === true)),
             `<div class="setting-actions">
-              <button type="button" class="button-quiet setting-backup">${voice.settings.backUp}</button>
-              <button type="button" class="button-quiet setting-restore">${voice.settings.restore}</button>
+              <div class="row-group">
+                ${menuRow('setting-backup', voice.settings.backUp, 'share')}
+                ${menuRow('setting-restore', voice.settings.restore, 'restore')}
+              </div>
+              <p class="sheet-note setting-last">${s.lastBackupAt ? voice.settings.lastBackup(s.lastBackupAt) : voice.settings.never}</p>
               <input type="file" class="setting-file" accept=".json,application/json" hidden />
-              <button type="button" class="button-danger setting-start-over">${voice.settings.startOver}</button>
-            </div>
-            <p class="sheet-note setting-last">${s.lastBackupAt ? voice.settings.lastBackup(s.lastBackupAt) : voice.settings.never}</p>`,
+              ${menuRow('is-danger setting-start-over', voice.settings.startOver, 'undo')}
+            </div>`,
           ])}
           ${group(voice.settings.groups.about, [
-            `<button type="button" class="menu-row setting-how">${voice.howItWorks.title}</button>
+            `<div class="row-group">${menuRow('setting-how', voice.howItWorks.title, 'tail')}</div>
             <p class="sheet-note">${voice.settings.privacy}</p>
             <p class="sheet-note setting-storage">${voice.settings.storage(storageKb(store.get()))}</p>
             <p class="sheet-note">${voice.settings.licence}</p>
