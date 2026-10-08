@@ -141,6 +141,7 @@ export async function stored(page: Page): Promise<{
   days: Record<string, { done: string[]; minutes: Record<string, number>; waited?: string[] }>
   things: { id: string; name: string; minutes?: number }[]
   cracked: Record<string, number>
+  settings: Record<string, unknown>
 }> {
   return page.evaluate(
     (key) => JSON.parse(localStorage.getItem(key) ?? '{}') as Awaited<ReturnType<typeof stored>>,

@@ -3,7 +3,16 @@ import { glyph, LETTER } from '../brand/glyphs'
 import { glyphFor } from '../brand/match'
 import { earnedTier } from './derive'
 import type { AppData, DayRecord, Settings, Thing } from './types'
-import { DEFAULT_MINUTES, emptyData, EVERY_DAY, MAX_MINUTES, MIN_MINUTES } from './types'
+import {
+  DEFAULT_MINUTES,
+  emptyData,
+  EVERY_DAY,
+  MAX_MINUTES,
+  MIN_MINUTES,
+  AFTERS,
+  GOOD_MAX,
+  type After,
+} from './types'
 
 /**
  * Turns whatever was in storage into a valid AppData, or throws.
@@ -200,7 +209,12 @@ function validateThing(raw: unknown): Thing {
     world,
     createdAt,
     order,
+    ...(isAfter(raw.after) ? { after: raw.after } : {}),
   }
+}
+
+function isAfter(value: unknown): value is After {
+  return typeof value === 'string' && (AFTERS as readonly string[]).includes(value)
 }
 
 /**
@@ -237,6 +251,8 @@ function validateDay(raw: unknown): DayRecord {
     }
   }
   if (raw.checkin === true) day.checkin = true
+  if (typeof raw.good === 'string' && raw.good.trim() !== '')
+    day.good = raw.good.trim().slice(0, GOOD_MAX)
   if (Array.isArray(raw.manual)) {
     const manual = raw.manual.filter(isString).filter((id) => day.done.includes(id))
     if (manual.length > 0) day.manual = [...new Set(manual)]
@@ -263,6 +279,8 @@ function validateSettings(raw: unknown): Settings {
   if (typeof raw.installDismissedAt === 'string')
     settings.installDismissedAt = raw.installDismissedAt
   if (typeof raw.lastRecapWeek === 'string') settings.lastRecapWeek = raw.lastRecapWeek
+  if (typeof raw.chapterFrom === 'string') settings.chapterFrom = raw.chapterFrom
+  if (typeof raw.chapterOffered === 'string') settings.chapterOffered = raw.chapterOffered
   // A buddy from v0.3 is dropped here on purpose: the club became postcards.
   if (raw.postcardFormat === 'story' || raw.postcardFormat === 'square')
     settings.postcardFormat = raw.postcardFormat

@@ -1,4 +1,6 @@
-import { addDays, fromKey, lastKeys, weekStart } from './dates'
+import { addDays, lastKeys, weekStart } from './dates'
+import { plannedOn } from './plan'
+import { allQuiet, isQuiet } from './quiet'
 import type { AppData, DateKey, DayRecord, Line, Thing, World } from './types'
 
 /**
@@ -15,22 +17,7 @@ export const UNLOCK_DAYS: readonly number[] = [
   3, 7, 14, 21, 30, 45, 60, 90, 120, 180, 240, 300, 365,
 ]
 
-/** Monday is 0, Sunday 6. */
-export function weekday(date: DateKey): number {
-  return (fromKey(date).getDay() + 6) % 7
-}
-
-/**
- * Whether a thing is planned on a date: its weekday, unless that one day
- * was changed by "also today" or "not today". A day it is not planned on
- * is never a missed day.
- */
-export function plannedOn(data: AppData, thing: Thing, date: DateKey): boolean {
-  const day = data.days[date]
-  if (day?.skip?.includes(thing.id)) return false
-  if (day?.extra?.includes(thing.id)) return true
-  return thing.days[weekday(date)] ?? true
-}
+export { plannedOn, weekday } from './plan'
 
 /** The things planned for a date, in their order. */
 export function plannedThings(data: AppData, date: DateKey): Thing[] {
@@ -64,7 +51,7 @@ export function last7(data: AppData, thingId: string, today: DateKey): number {
   return done
 }
 
-export type Dot = 'done' | 'open' | 'rest'
+export type Dot = 'done' | 'open' | 'rest' | 'quiet' | 'none'
 
 /**
  * The last seven calendar days, oldest first: planned and done, planned
@@ -73,8 +60,11 @@ export type Dot = 'done' | 'open' | 'rest'
 export function weekDots(data: AppData, thingId: string, today: DateKey): Dot[] {
   const thing = data.things.find((t) => t.id === thingId)
   return lastKeys(today, 7).map((date) => {
+    // Before a new chapter, the week's dots are blank: they start fresh.
+    if (data.settings.chapterFrom !== undefined && date < data.settings.chapterFrom) return 'none'
     if (data.days[date]?.done.includes(thingId)) return 'done'
     if (thing && !plannedOn(data, thing, date)) return 'rest'
+    if (thing && isQuiet(data, thing, date, today)) return 'quiet'
     return 'open'
   })
 }
@@ -161,6 +151,8 @@ export function streak(data: AppData, today: DateKey): number {
       continue
     }
     if (i === 0) continue
+    // A day whose misses were all quiet days neither counts nor breaks.
+    if (allQuiet(data, planned, date, today)) continue
     break
   }
   return n
@@ -179,7 +171,9 @@ export function missedYesterday(data: AppData, today: DateKey): boolean {
   const yesterday = addDays(today, -1)
   const planned = plannedThings(data, yesterday).filter((t) => t.createdAt < yesterday)
   if (planned.length === 0) return false
-  return (data.days[yesterday]?.done.length ?? 0) === 0
+  if ((data.days[yesterday]?.done.length ?? 0) > 0) return false
+  // A quiet day is a day off given in advance: the sea does not go quiet for it.
+  return !allQuiet(data, planned, yesterday, today)
 }
 
 /** Day N of whale club: days since the first thing was added, counting from one. */
@@ -236,4 +230,25 @@ export function withoutTimerLeft(data: AppData, today: DateKey): number {
   let used = 0
   for (let i = 0; i < 7; i++) used += data.days[addDays(monday, i)]?.manual?.length ?? 0
   return Math.max(0, WITHOUT_TIMER_PER_WEEK - used)
+}
+
+/** A creature not done on this many of its planned days in a row falls asleep. */
+const SLEEP_AFTER = 2
+
+/**
+ * Whether a thing's creature is asleep: its last planned days before today
+ * went by without it, and today has not woken it yet. Creatures never look
+ * sad or hungry; left alone, they sleep, and wake when their thing is done.
+ */
+export function asleep(data: AppData, thing: Thing, today: DateKey): boolean {
+  if (data.days[today]?.done.includes(thing.id)) return false
+  let missed = 0
+  for (let i = 1; i <= PLANNED_LOOKBACK; i++) {
+    const date = addDays(today, -i)
+    if (date < thing.createdAt) return false
+    if (!plannedOn(data, thing, date)) continue
+    if (data.days[date]?.done.includes(thing.id)) return false
+    if (++missed >= SLEEP_AFTER) return true
+  }
+  return false
 }

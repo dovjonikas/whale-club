@@ -1,8 +1,16 @@
-import { todayKey } from '../store/dates'
+import { today as now } from '../store/clock'
+import { addDays, todayKey } from '../store/dates'
+import { plannedThings } from '../store/derive'
+import type { DateKey } from '../store/types'
+import { GOOD_MAX } from '../store/types'
+import { escapeHtml } from './thingMark'
 import type { Store } from '../store/store'
 import { voice } from '../voice'
 import type { NoticeBuilder } from './notices'
 import type { Sound } from './sound'
+
+/** From this hour the check-in is an evening one, with its one good thing. */
+const EVENING_FROM = 18
 
 /**
  * The daily check-in: call and response, two taps, the same shape every
@@ -32,10 +40,48 @@ export function checkinNotice(store: Store, sound: Sound): NoticeBuilder {
     ask(voice.checkin.question1, voice.checkin.answer1, () => {
       ask(voice.checkin.question2, voice.checkin.answer2, () => {
         store.setCheckin(today)
+        if (now().getHours() >= EVENING_FROM) {
+          evening(card, store, today, dismiss)
+          return
+        }
         card.innerHTML = `<span class="leaf-title">${voice.checkin.after}</span>`
         setTimeout(dismiss, 1200)
       })
     })
     return card
   }
+}
+
+/**
+ * The evening: after the two answers, one optional line, one good thing
+ * about the day, and tomorrow's things to read, nothing to tap. The line
+ * is kept for the day and shown only in the log; skipping is as good as
+ * writing.
+ */
+function evening(card: HTMLElement, store: Store, today: DateKey, dismiss: () => void): void {
+  const tomorrow = plannedThings(store.get(), addDays(today, 1))
+  const ahead =
+    tomorrow.length > 0
+      ? voice.checkin.tomorrow(tomorrow.map((t) => t.name).join(', '))
+      : voice.checkin.tomorrowRest
+  card.innerHTML = `
+    <label class="field good-field">
+      <span class="leaf-title">${voice.checkin.good}</span>
+      <input class="input good-input" type="text" maxlength="${String(GOOD_MAX)}" autocomplete="off" enterkeyhint="done" />
+    </label>
+    <p class="leaf-lead good-tomorrow">${escapeHtml(ahead)}</p>
+    <div class="leaf-actions">
+      <button type="button" class="button-primary good-keep">${voice.checkin.keep}</button>
+      <button type="button" class="button-quiet good-skip">${voice.checkin.skip}</button>
+    </div>`
+  const input = card.querySelector<HTMLInputElement>('.good-input')
+  const keep = (): void => {
+    if (input?.value.trim()) store.setGood(input.value, today)
+    dismiss()
+  }
+  card.querySelector('.good-keep')?.addEventListener('click', keep)
+  input?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') keep()
+  })
+  card.querySelector('.good-skip')?.addEventListener('click', dismiss)
 }

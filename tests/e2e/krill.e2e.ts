@@ -64,6 +64,7 @@ test('a day earns for each thing done, each minute locked in, and for all of it'
     done: 3 * KRILL.done,
     minutes: KRILL.sessionCap,
     allDone: KRILL.allDone,
+    welcome: 0,
   })
   // A session that was left, before 0.11, earns half its minutes.
   data.days[START] = {
@@ -72,7 +73,7 @@ test('a day earns for each thing done, each minute locked in, and for all of it'
     waited: ['violin'],
     sessions: [{ thing: 'violin', minutes: 30, left: true }],
   }
-  expect(krillOn(data, START)).toEqual({ done: 0, minutes: 15, allDone: 0 })
+  expect(krillOn(data, START)).toEqual({ done: 0, minutes: 15, allDone: 0, welcome: 0 })
 })
 
 test('a good week counts only once it is over', () => {
@@ -82,7 +83,7 @@ test('a good week counts only once it is over', () => {
   const days = Object.keys(data.days).filter((d) => d <= midWeek)
   const daily = days.reduce((n, d) => {
     const day = krillOn(data, d)
-    return n + day.done + day.minutes + day.allDone
+    return n + day.done + day.minutes + day.allDone + day.welcome
   }, 0)
   // Only the first week, which is over, adds its 50; the first week’s set (seven days done) its 100.
   expect(before - daily).toBe(KRILL.goodWeek + KRILL.firstWeek)

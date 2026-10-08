@@ -53,7 +53,19 @@ export interface Thing {
   line: Line
   createdAt: DateKey
   order: number
+  /**
+   * What it comes after in the day, if the person said: no clock hours, a
+   * moment. The card shows it, and the row follows the day's order.
+   */
+  after?: After
 }
+
+/** The day's moments a thing can come after, in the order the day has them. */
+export const AFTERS = ['waking', 'coffee', 'work', 'dinner', 'bed'] as const
+export type After = (typeof AFTERS)[number]
+
+/** The evening's one good thing: one line, kept for the day, shown only in the log. */
+export const GOOD_MAX = 120
 
 /**
  * One lock-in that ran to its end. Each is a lantern in the cove for good:
@@ -94,6 +106,8 @@ export interface DayRecord {
    * was dead). They count, with a hand on the card, but leave no lantern.
    */
   manual?: string[]
+  /** One good thing about the day, written at the evening check-in, if it was. */
+  good?: string
 }
 
 export type PostcardFormat = 'story' | 'square'
@@ -119,6 +133,10 @@ export interface Settings {
   showTime?: boolean
   /** Mechanics that have explained themselves once, in one line, and need not again. */
   explained?: string[]
+  /** A new chapter began here: the week's dots start fresh from this day. The sky never does. */
+  chapterFrom?: DateKey
+  /** The day a new chapter was last offered, so it is offered once. */
+  chapterOffered?: DateKey
 }
 
 /** The shape of the saved record; migrate.ts brings every earlier one up to it. */

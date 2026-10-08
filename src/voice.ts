@@ -42,6 +42,12 @@ export const voice = {
     question2: 'how do you feel?',
     answer2: 'happy!!!',
     after: 'noted.', // TODO-VOICE
+    /** The evening's one line, after the two answers: optional. */
+    good: 'one good thing today', // TODO-VOICE
+    keep: 'keep',
+    skip: 'skip',
+    tomorrow: (names: string) => `tomorrow: ${names}`,
+    tomorrowRest: 'tomorrow: a rest day', // TODO-VOICE
   },
   rules: [
     'the first rule of whale club is: you show up.',
@@ -166,6 +172,28 @@ export const voice = {
     meteors: 'a meteor shower tonight. look up.', // TODO-VOICE
     light: 'the sun turns today.', // TODO-VOICE
   },
+  /** A new chapter, offered after a quiet week. */
+  chapter: {
+    title: 'a new chapter?', // TODO-VOICE
+    lead: 'the week’s dots start fresh. the sky keeps everything.', // TODO-VOICE
+    yes: 'new chapter',
+    no: 'not now',
+  },
+  /** "After...": what a thing comes after in the day. No clock hours, ever. */
+  after: {
+    label: 'after',
+    none: 'any time',
+    chips: {
+      waking: 'waking up',
+      coffee: 'coffee',
+      work: 'work',
+      dinner: 'dinner',
+      bed: 'before bed',
+    },
+    /** Under the name on the card. */
+    card: (after: 'waking' | 'coffee' | 'work' | 'dinner' | 'bed') =>
+      after === 'bed' ? 'before bed' : after === 'waking' ? 'after waking up' : `after ${after}`,
+  },
   /** The first week as a set of seven, filled a day at a time. */
   firstWeek: {
     label: (n: number) => `first week: ${String(n)} of 7`,
@@ -279,6 +307,8 @@ export const voice = {
     legendLantern: 'lantern: a lock in you finished',
     legendSoft: 'soft: finished in parts',
     legendDim: 'faint: started, not finished',
+    legendQuiet: 'moon: a quiet day, given in advance',
+    good: 'one good thing',
   },
   /** Krill: the chip by the title, what a day added, and the goal under it. */
   krill: {

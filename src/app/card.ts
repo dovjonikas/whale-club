@@ -20,6 +20,8 @@ export interface CardView {
   waiting: number
   /** What its creature wears from the dock. */
   worn: readonly string[]
+  /** Left alone for a while, its creature sleeps. */
+  asleep: boolean
 }
 
 /**
@@ -45,6 +47,7 @@ export function createCard(thing: Thing): HTMLElement {
       <span class="card-mark" aria-hidden="true"></span>
       <span class="creature"></span>
       <span class="card-name"></span>
+      <span class="card-after" hidden></span>
       <span class="card-length"></span>
       <span class="dots" aria-hidden="true">${'<span class="dot"></span>'.repeat(7)}</span>
       <span class="visually-hidden card-days" id="card-days-${thing.id}"></span>
@@ -86,12 +89,22 @@ export function updateCard(card: HTMLElement, thing: Thing, view: CardView): voi
   card.dataset.done = String(view.done)
   card.dataset.manual = String(view.manual)
   card.dataset.stage = String(view.stage)
+  // Woken by a done: a wave, once.
+  if (card.dataset.asleep === 'true' && !view.asleep) animate(card, 'is-waking')
+  card.dataset.asleep = String(view.asleep)
   button.setAttribute('aria-label', thing.name)
   // A tap thing is a toggle; a lock-in card opens the dial, so it is a plain button.
   if (thing.kind === 'tap') button.setAttribute('aria-pressed', String(view.done))
   else button.removeAttribute('aria-pressed')
   edit(card).setAttribute('aria-label', voice.days.edit(thing.name))
   remove(card).setAttribute('aria-label', voice.edit.deleteThing(thing.name))
+
+  // After...: the moment of the day it comes after, small, under the name.
+  const after = card.querySelector<HTMLElement>('.card-after')
+  if (after) {
+    after.hidden = thing.after === undefined
+    after.textContent = thing.after === undefined ? '' : voice.after.card(thing.after)
+  }
 
   const started = thing.kind === 'lockIn' && !view.done && view.seen > 0
   card.dataset.started = String(started)
@@ -149,11 +162,13 @@ export function updateCard(card: HTMLElement, thing: Thing, view: CardView): voi
   card.querySelectorAll('.dot').forEach((dot, i) => {
     dot.classList.toggle('is-on', view.dots[i] === 'done')
     dot.classList.toggle('is-rest', view.dots[i] === 'rest')
+    dot.classList.toggle('is-quiet', view.dots[i] === 'quiet')
+    dot.classList.toggle('is-none', view.dots[i] === 'none')
     dot.classList.toggle('is-today', i === 6)
   })
   const days = card.querySelector('.card-days')
   const count = view.dots.filter((d) => d === 'done').length
-  const planned = view.dots.filter((d) => d !== 'rest').length
+  const planned = view.dots.filter((d) => d !== 'rest' && d !== 'none').length
   if (days) {
     const state = view.done
       ? voice.card.doneToday

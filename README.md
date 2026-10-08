@@ -115,7 +115,9 @@ And underneath all three: nothing dies. You just missed a day.
 - **Stones and finds.** Seventy-eight finds across three worlds, earned at 3, 7, 14, 21, 30, 45, 60, 90, 120, 180, 240, 300 and 365 days
 - **The path to a legendary.** Every day you show up lights the next star of a constellation drawn in the shape of its legendary. Half way brings a rare find, the end a legendary with a ceremony, a plaque and a gold-framed postcard. Rarity is earned, never bought
 - **A first week, and a first year.** The first seven days are a set of their own; days 100, 200 and 365 are quietly kept. The seasons and the sky's real nights (meteor showers, solstices, World Ocean Day) show in the scene
-- **A missed day** dims the scene for a day and says so. That is the whole punishment
+- **Quiet days, given in advance.** One or two days off a week, depending on how many are planned: a miss inside them is a small moon and changes nothing
+- **A missed day** past them dims the scene for a day and says so. That is the whole punishment
+- **Gentle by design.** A creature left alone sleeps instead of sulking, and wakes with a wave; the first done after a break is a small gift, with no word about the break; after a quiet week a new chapter can start the dots fresh
 - **The first minute** shows a year in silhouette, then plays the idea as a short piece of music, then asks for one thing. Skip is always there
 - **Krill and the dock.** Every day shown up for earns krill, worked out from the days and never bought. A pier on the shore opens the dock: thirty things to look at in four tiers, fixed prices, no chance, no boxes, no timers. Save for one, and the distance shows under the title
 - **Arrange your sea.** Every world has its places; finds and dock things stand in them by themselves, and anyone who wants to can move them, swap them, or put them away in a chest. A longer shore, a reef and an island on a whale add room

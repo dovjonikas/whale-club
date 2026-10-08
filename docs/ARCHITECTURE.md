@@ -31,6 +31,10 @@ src/
     dockData.ts      data to dock: the goal and its distance, owned, shown, worn, the rooms
     dockSheet.ts     the dock: tiers, a thing's page, get it, save for this, hide, who wears it
     krillChip.ts     the balance under the title, the goal line, the "+10" that rises
+    ceremony.ts      a legendary's ceremony: the dark, the lit constellation, the beam, the plaque
+    firstWeek.ts     the first week's set of seven
+    chapter.ts       a new chapter, offered after a quiet week
+    badge.ts         the Android home-screen badge, where it needs no permission
     arrange.ts       arranging: rings for places, drag or tap and tap, the chest, tidy up
     dial.ts          the lock-in dial, 10 to 120 minutes
     wakeLock.ts      the screen kept on during a session
@@ -83,6 +87,8 @@ src/
     derive.ts        last7, stage, totalDone, stones waiting, found, stars, streak: all arithmetic
     krill.ts         krill earned, worked out from the days; spent; the balance (docs/ECONOMY.md)
     paths.ts         the path to a legendary: which star a day is, progress, halfway and end
+    plan.ts          whether a thing is planned on a date (its weekday, and today's exception)
+    quiet.ts         quiet days: the week's freedom, given in advance, and which misses it covers
     dock.ts          what the dock changes in the data: buy, the goal, hidden, who wears it
     dates.ts         local YYYY-MM-DD keys and week arithmetic
   lab/               the lab's screen and its seeded history (see section 10)
