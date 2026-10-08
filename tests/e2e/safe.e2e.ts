@@ -416,6 +416,8 @@ test('at its last stage a creature can be named, once; the name can change in it
   await page.goto('')
   await noRecap(page)
   const ask = page.getByRole('complementary', { name: 'name it?' })
+  // Which creature, and why now: not the thing's name alone, which reads like a label.
+  await expect(ask).toContainText('run grew all the way.')
   await ask.getByRole('textbox', { name: 'its name' }).fill('moby')
   await ask.getByRole('button', { name: 'keep' }).click()
   await expect(ask).toBeHidden()

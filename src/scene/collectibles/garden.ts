@@ -33,7 +33,7 @@ export const GARDEN: readonly Collectible[] = [
     26,
     'none',
     () =>
-      `<path d="M50 95 V 30 M28 48 H 72" stroke="#6b4a2b" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="22" r="11" fill="var(--sand)"/><path d="M36 18 h 28 l -4 -8 h -20 z" fill="#6b4a2b"/>${jacket(50, 42, 30)}${face(50, 22, 0.7)}`,
+      `<path d="M50 95 V 30 M28 48 H 72" stroke="#6b4a2b" stroke-width="4" stroke-linecap="round"/><circle cx="50" cy="22" r="11" fill="var(--sand)"/><path d="M36 18 h 28 l -4 -8 h -20 z" fill="#6b4a2b"/>${jacket(50, 40, 30, 'out')}${face(50, 22, 0.7)}`,
   ),
   garden(
     'a',
