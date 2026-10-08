@@ -1,4 +1,6 @@
 import { escapeHtml, thingMark } from './thingMark'
+import { allQuiet } from '../store/quiet'
+import { plannedThings } from '../store/derive'
 import { icon } from '../brand/icons'
 import { fromKey, todayKey } from '../store/dates'
 import {
@@ -69,6 +71,7 @@ export function openLogSheet(store: Store, at?: DateKey): void {
         // What the month's dots are made of, for the legend under the calendar.
         let soft = false
         let faint = false
+        let quiet = false
         const lit = new Set<string>()
         const weeks = weeksOf(month)
           .map((week) =>
@@ -102,7 +105,9 @@ export function openLogSheet(store: Store, at?: DateKey): void {
                   )
                   .join('')
                 const more = shown.length > DOTS_SHOWN ? '<b>+</b>' : ''
-                return `<button type="button" class="log-cell" data-date="${date}" data-star="${String(entry.star)}"${date === now ? ' data-today="true"' : ''} aria-label="${escapeHtml(
+                const quietDay = !entry.star && allQuiet(data, plannedThings(data, date), date, now)
+                if (quietDay) quiet = true
+                return `<button type="button" class="log-cell" data-date="${date}" data-star="${String(entry.star)}" data-quiet="${String(quietDay)}"${date === now ? ' data-today="true"' : ''} aria-label="${escapeHtml(
                   dayAria(
                     date,
                     entry.done.map((d) => d.name),
@@ -126,7 +131,7 @@ export function openLogSheet(store: Store, at?: DateKey): void {
           <p class="log-summary">${voice.log.summary(summary.stars, summary.lanterns, summary.minutes)}</p>
           <div class="log-weekdays" aria-hidden="true">${voice.days.short.map((d) => `<span>${d}</span>`).join('')}</div>
           <div class="log-grid">${weeks}</div>
-          ${legendHtml(data, month, { soft, faint, lit })}`
+          ${legendHtml(data, month, { soft, faint, lit, quiet })}`
       }
 
       const yearHtml = (year: number, earliest: MonthKey, last: MonthKey): string => {
@@ -182,6 +187,10 @@ export function openLogSheet(store: Store, at?: DateKey): void {
             `<li class="log-session is-left"><span class="log-lantern" style="--lantern:${color(u.id)}" aria-hidden="true"></span>${thingMark(u)}${escapeHtml(u.name)} · ${voice.log.unfinished(u.minutes)}</li>`,
           )
         if (entry.checkin) items.push(`<li class="log-checkin">${voice.log.checkin}</li>`)
+        // The evening's one good thing: kept for the day, and only ever shown here.
+        const good = data.days[date]?.good
+        if (good)
+          items.push(`<li class="log-good"><span>${voice.log.good}</span> ${escapeHtml(good)}</li>`)
         return `
           <div class="log-head">
             <button type="button" class="icon-button log-back" aria-label="${voice.log.back}">${CHEVRON_LEFT}</button>
@@ -269,7 +278,7 @@ function dayAria(date: DateKey, names: string[], lanterns: number): string {
 function legendHtml(
   data: AppData,
   month: MonthKey,
-  seen: { soft: boolean; faint: boolean; lit: ReadonlySet<string> },
+  seen: { soft: boolean; faint: boolean; lit: ReadonlySet<string>; quiet: boolean },
 ): string {
   const things = [
     ...data.things.filter((t) => t.kind === 'lockIn' || seen.lit.has(t.id)),
@@ -283,6 +292,7 @@ function legendHtml(
     <p><span class="legend-lantern" aria-hidden="true"></span>${voice.log.legendLantern}</p>
     ${seen.soft ? `<p><span class="legend-lantern is-soft" aria-hidden="true"></span>${voice.log.legendSoft}</p>` : ''}
     ${seen.faint ? `<p><span class="legend-lantern is-dim" aria-hidden="true"></span>${voice.log.legendDim}</p>` : ''}
+    ${seen.quiet ? `<p><span class="legend-moon" aria-hidden="true"></span>${voice.log.legendQuiet}</p>` : ''}
     ${colors ? `<div class="legend-colors">${colors}</div>` : ''}
   </div>`
 }

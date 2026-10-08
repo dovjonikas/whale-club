@@ -2,6 +2,34 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.15.0 - 2026-10-08
+
+Gentle mechanics: small, each backed by the research.
+
+- **Quiet days.** Every thing has a little freedom each week, given in
+  advance: one day off when it is planned four days or fewer, two from
+  five. A planned day missed inside it is a small moon in the week's dots
+  and in the log, never an empty dot; it breaks no streak and does not dim
+  the sea. Nothing to set.
+- **Welcome back.** The first done after a break of two or more planned
+  days is a small gift, +20 krill and a flash of light, and not a word
+  about the break.
+- **Creatures never look sad.** Left alone for two of their planned days
+  they sleep, eyes closed, breathing slowly; done again, they wake and
+  wave.
+- **A new chapter.** After a quiet week (fewer than two stars), the next
+  Monday or the first of a month offers one: the week's dots start fresh.
+  The sky, the finds and the krill keep everything.
+- **After...** In a thing's sheet, if wanted: after waking up, coffee,
+  work, dinner, or before bed. The card says so, small, under the name,
+  and the row follows the day's order. No clock hours anywhere.
+- **The evening's one good thing.** After 18:00 the check-in ends with one
+  optional line and tomorrow's things to read; the line is kept for the
+  day and shown only in the log.
+- **The badge**, on Android: how many of today's things are left, set as
+  the app goes to the background, cleared when all is done. It never asks
+  for a permission, so there is none on iOS.
+
 ## 0.14.0 - 2026-10-08
 
 The first year, and the path to a legendary.

@@ -960,3 +960,28 @@ because week one is where most people stop (RESEARCH-DOPAMINE). It pays
 Art slots read the list of pictures at build time, so the app never asks
 the network for one that is not there; a picture inside an SVG would not
 reach a canvas, so the postcard draws a slot's picture directly.
+
+## 2026-10-08 Gentle mechanics
+
+Quiet days are freedom given in advance, not a forgiveness asked for after:
+the allowance (one a week up to four planned days, two from five) is
+spent by the week's first misses, with nothing to set or claim, so a
+person never has to decide whether they deserve it. Inside it, a miss is
+a moon and changes nothing; past it, a dot stays empty and nothing more
+happens. The dimmed sea now means a miss past the freedom. It lives in its
+own module (store/quiet.ts); planning moved to store/plan.ts so both it
+and derive can read it without a circle.
+
+Welcome back counts a break in planned days, so a weekend off is no break
+and Monday earns no gift for it; the first day ever is no return. The gift
+says nothing: naming the break would make it the subject.
+
+A creature asleep is the opposite of a sad one: it asks for nothing, and
+the person's return is what wakes it. Eyes closed is the eyes squashed to
+a line, so every creature's own face does it with one rule.
+
+A new chapter is offered, never imposed, once per Monday or first of a
+month after a quiet week; accepted, only the dots begin again. "After" has
+five moments and no hours, and a thing without one sits in the middle of
+the day, so choosing a moment for one thing never reshuffles the others.
+The badge is set only where no permission is needed.

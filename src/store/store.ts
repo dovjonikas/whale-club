@@ -4,8 +4,18 @@ import { withGoal, withHidden, withPurchase, withWearer } from './dock'
 import { dataKey } from './lab'
 import { migrate } from './migrate'
 import { todayKey } from './dates'
-import type { AppData, DateKey, DayRecord, Kind, Line, Settings, Thing, World } from './types'
-import { DEFAULT_MINUTES, emptyData, EVERY_DAY, MAX_THINGS, WORLD_ORDER } from './types'
+import type {
+  AppData,
+  DateKey,
+  DayRecord,
+  Kind,
+  Line,
+  Settings,
+  Thing,
+  World,
+  After,
+} from './types'
+import { DEFAULT_MINUTES, emptyData, EVERY_DAY, GOOD_MAX, MAX_THINGS, WORLD_ORDER } from './types'
 
 /** Where an unreadable record is parked rather than thrown away, next to its own key. */
 const BROKEN_SUFFIX = '.broken'
@@ -201,13 +211,19 @@ export class Store {
   /** The thing's sheet: its name, glyph, lock-in length and weekdays. */
   updateThing(
     thingId: string,
-    patch: Partial<Pick<Thing, 'name' | 'icon' | 'kind' | 'minutes' | 'days'>>,
+    patch: Partial<Pick<Thing, 'name' | 'icon' | 'kind' | 'minutes' | 'days'>> & {
+      /** A moment of the day, or null for none. */
+      after?: After | null
+    },
   ): void {
     this.commit({
       ...this.data,
       things: this.data.things.map((t) => {
         if (t.id !== thingId) return t
-        const next = { ...t, ...patch }
+        const { after, ...rest } = patch
+        const next: Thing = { ...t, ...rest }
+        if (after === null) delete next.after
+        else if (after !== undefined) next.after = after
         if (patch.name !== undefined) next.name = patch.name.trim() || t.name
         if (patch.days) next.days = [...patch.days]
         return next
@@ -246,6 +262,15 @@ export class Store {
     const current = this.data.cracked[thingId] ?? 0
     if (tier <= current) return
     this.commit({ ...this.data, cracked: { ...this.data.cracked, [thingId]: tier } })
+  }
+
+  /** The evening's one good thing for a day; an empty line takes it back. */
+  setGood(text: string, date: DateKey = todayKey()): void {
+    const day: DayRecord = { ...this.day(date) }
+    const line = text.trim().slice(0, GOOD_MAX)
+    if (line) day.good = line
+    else delete day.good
+    this.commit({ ...this.data, days: { ...this.data.days, [date]: day } })
   }
 
   setCheckin(date: DateKey = todayKey()): void {

@@ -933,3 +933,14 @@
   margin-right: 6px;
   vertical-align: -4px;
 }
+
+/* The evening check-in's one line. */
+.good-field {
+  display: grid;
+  gap: var(--s2);
+  width: 100%;
+}
+
+.good-tomorrow {
+  margin: var(--s2) 0 0;
+}

@@ -36,10 +36,16 @@ test('all done says the all-done line', async ({ page }) => {
   await expect(page.locator('.line')).toHaveText('all of it. all the smoke.')
 })
 
-test('a missed day dims the scene and says so, and the first tap lifts it', async ({ page }) => {
+test('a missed day past the week’s quiet days dims the scene and says so, and the first tap lifts it', async ({
+  page,
+}) => {
+  // A Thursday: Monday and Tuesday were the week's two quiet days, so Wednesday is a real miss.
+  const thursday = new Date(2026, 2, 5, 12, 0)
+  await page.clock.setFixedTime(thursday)
   await seed(page, {
-    things: [{ id: 't1', name: 'run', world: 'sea', createdAt: dateKey(-5), order: 0 }],
-    days: { [dateKey(-2)]: { done: ['t1'] } },
+    things: [{ id: 't1', name: 'run', world: 'sea', createdAt: dateKey(-12, thursday), order: 0 }],
+    days: { [dateKey(-4, thursday)]: { done: ['t1'] } },
+    settings: { installDismissedAt: dateKey(-1, thursday), lastRecapWeek: '2026-02-23' },
   })
   await page.goto('')
   await expect(page.locator('.line')).toHaveText('you missed a day. nothing died.')

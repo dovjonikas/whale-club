@@ -2,7 +2,7 @@ import { glyphFor } from '../brand/match'
 import { todayKey } from '../store/dates'
 import { weekday, withoutTimerLeft } from '../store/derive'
 import type { Store } from '../store/store'
-import type { Thing } from '../store/types'
+import { AFTERS, type After, type Thing } from '../store/types'
 import { voice } from '../voice'
 import { daysField } from './daysField'
 import { iconField } from './iconField'
@@ -48,6 +48,16 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
           <div class="icon-slot"></div>
           <div class="kind-slot"></div>
           <div class="days-slot"></div>
+          <div class="field after-field" role="group" aria-label="${voice.after.label}">
+            <span class="field-label">${voice.after.label}</span>
+            <div class="chips">
+              <button type="button" class="chip after-chip" data-after="" aria-pressed="${String(thing.after === undefined)}">${voice.after.none}</button>
+              ${AFTERS.map(
+                (moment) =>
+                  `<button type="button" class="chip after-chip" data-after="${moment}" aria-pressed="${String(thing.after === moment)}">${voice.after.chips[moment]}</button>`,
+              ).join('')}
+            </div>
+          </div>
           <div class="field">
             <span class="field-label">${voice.days.today}</span>
             <div class="chips">
@@ -99,6 +109,17 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
       const days = daysField(thing.days)
       body.querySelector('.days-slot')?.replaceWith(days.element)
 
+      // After: one moment of the day, or none; pressed is chosen.
+      let after: After | null = thing.after ?? null
+      const afterChips = body.querySelectorAll<HTMLButtonElement>('.after-chip')
+      for (const chip of afterChips) {
+        chip.addEventListener('click', () => {
+          const value = chip.dataset.after ?? ''
+          after = value === '' ? null : (value as After)
+          for (const other of afterChips) other.setAttribute('aria-pressed', String(other === chip))
+        })
+      }
+
       // One chip for today's exception: it says what tapping it does, and stays pressed while it holds.
       todayChip.addEventListener('click', () => {
         const pressed = todayChip.getAttribute('aria-pressed') !== 'true'
@@ -136,6 +157,7 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
           kind: kind.kind(),
           minutes: kind.minutes(),
           days: days.value(),
+          after,
         })
         close()
       })

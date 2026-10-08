@@ -26,6 +26,8 @@ import { installNotice, listenForInstallPrompt } from '../pwa/install'
 import { openAddSheet } from './addSheet'
 import { animate } from './card'
 import { checkinNotice } from './checkin'
+import { chapterNotice } from './chapter'
+import { watchBadge } from './badge'
 import { openCollectionSheet } from './collectionSheet'
 import { openDockSheet } from './dockSheet'
 import { openArrange, type ArrangeOptions } from './arrange'
@@ -41,7 +43,7 @@ import { KrillChip } from './krillChip'
 import { firstWeekHtml } from './firstWeek'
 import { eventsAt, seasonOf, yearsSince } from '../scene/calendar'
 import { today as clockNow } from '../store/clock'
-import { FIRST_WEEK_DAYS } from '../store/krill'
+import { FIRST_WEEK_DAYS, krillOn } from '../store/krill'
 import { openLogSheet } from './logSheet'
 import { openMenuSheet } from './menuSheet'
 import { Notices } from './notices'
@@ -255,6 +257,8 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       const newStar = !starDays(store.get()).includes(today)
       if (newStar) scene.holdStar(today)
       const done = store.toggleDone(thing.id)
+      // Back after a break: a flash of light and a little krill, and not a word about the break.
+      if (done && newStar && krillOn(store.get(), today).welcome > 0) scene.glow()
       if (newStar) {
         const rect = card.getBoundingClientRect()
         if (done)
@@ -575,6 +579,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
         postcards.sendNow(moment)
       }),
       checkinNotice(store, sound),
+      chapterNotice(store),
     ])
   }
 
@@ -649,6 +654,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
 
   store.subscribe(render)
   render(store.get())
+  watchBadge(store)
   listenForInstallPrompt(() => {
     notices.render()
   })

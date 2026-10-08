@@ -106,8 +106,11 @@ test('seed 30 days grows the creatures and leaves stones waiting', async ({ page
   expect(Math.max(...stages)).toBeGreaterThan(0)
   await expect(page.locator('.stone').first()).toBeVisible()
   expect(await page.locator('.stone').count()).toBeGreaterThanOrEqual(3)
-  // Yesterday was left empty on purpose: the quiet morning shows.
-  await expect(page.locator('.scene')).toHaveAttribute('data-quiet', 'true')
+  // Yesterday was left empty on purpose: a quiet day (a moon in the dots) inside the
+  // week's freedom, or, past it, the quiet sea.
+  const quietSea = await page.locator('.scene').getAttribute('data-quiet')
+  const moons = await page.locator('.dot.is-quiet').count()
+  expect(quietSea === 'true' || moons > 0).toBe(true)
 })
 
 test('exit brings the real sea back as it was', async ({ page }) => {

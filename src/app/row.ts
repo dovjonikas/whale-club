@@ -1,7 +1,16 @@
 import { escapeHtml, thingMark } from './thingMark'
+import { AFTERS } from '../store/types'
 import { wornBy } from './dockData'
 import { creatureSvg } from '../scene/creatures'
-import { last7, lineFor, plannedOn, stageFor, waitingTiers, weekDots } from '../store/derive'
+import {
+  asleep,
+  last7,
+  lineFor,
+  plannedOn,
+  stageFor,
+  waitingTiers,
+  weekDots,
+} from '../store/derive'
 import { todayKey } from '../store/dates'
 import type { AppData, Thing } from '../store/types'
 import { MAX_THINGS } from '../store/types'
@@ -81,7 +90,7 @@ export class Row {
 
   render(data: AppData): void {
     const today = todayKey()
-    const things = [...data.things].sort((a, b) => a.order - b.order)
+    const things = [...data.things].sort((a, b) => dayRank(a) - dayRank(b) || a.order - b.order)
     const planned = things.filter((t) => plannedOn(data, t, today))
     const off = things.filter((t) => !plannedOn(data, t, today))
     const seen = new Set<string>()
@@ -105,6 +114,7 @@ export class Row {
         line: lineFor(data, thing),
         waiting: waitingTiers(data, thing.id).length,
         worn: wornBy(data, thing.id),
+        asleep: asleep(data, thing, today),
       })
       this.container.append(card)
     }
@@ -226,4 +236,13 @@ export class Row {
       })
     })
   }
+}
+
+/**
+ * Where a thing falls in the day: after waking, after coffee, after work,
+ * after dinner, before bed. A thing with no moment sits in the middle of the
+ * day, between work and dinner, so setting one moment never reshuffles the rest.
+ */
+function dayRank(thing: Thing): number {
+  return thing.after === undefined ? AFTERS.indexOf('work') + 0.5 : AFTERS.indexOf(thing.after)
 }

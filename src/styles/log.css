@@ -298,3 +298,29 @@ button.log-cell {
 .legend-thing .thing-mark {
   margin-right: 0;
 }
+
+/* A quiet day in the month: a small moon where a star would be. */
+.log-cell[data-quiet='true'] .log-star {
+  display: block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: inset -2.5px 0 0 0 rgba(255, 244, 214, 0.8);
+}
+
+.legend-moon {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: var(--s2);
+  border-radius: 50%;
+  box-shadow: inset -2.5px 0 0 0 rgba(255, 244, 214, 0.8);
+  vertical-align: -1px;
+}
+
+/* The evening's one good thing, in its day. */
+.log-good span {
+  color: var(--star);
+  font-size: var(--t-xs);
+}
