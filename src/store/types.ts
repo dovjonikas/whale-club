@@ -119,13 +119,25 @@ export interface Purchase {
   price: number
 }
 
+/**
+ * When a day can end, in hours after midnight: at midnight, or at 3:00 or
+ * 5:00 for someone up late, so a done at 01:30 still belongs to the evening.
+ */
+export const DAY_END_HOURS = [0, 3, 5] as const
+export type DayEnd = (typeof DAY_END_HOURS)[number]
+
+/** A number that is one of the hours a day can end at. */
+export function isDayEnd(hours: unknown): hours is DayEnd {
+  return (DAY_END_HOURS as readonly unknown[]).includes(hours)
+}
+
 export interface Settings {
   sound: boolean
   /** When the install leaf was last closed; it comes back seven days later. */
   installDismissedAt?: DateKey
-  /** The Monday of the last week a recap was shown for. */
+  /** The first day of the last week a recap was shown for. */
   lastRecapWeek?: DateKey
-  /** Chosen the first time a postcard is sent; changed in the menu. */
+  /** Chosen the first time a postcard is sent; changed in settings. */
   postcardFormat?: PostcardFormat
   /** The quiet sea sound during a lock-in. Off unless switched on. */
   sessionSound?: boolean
@@ -137,8 +149,8 @@ export interface Settings {
   chapterFrom?: DateKey
   /** The day a new chapter was last offered, so it is offered once. */
   chapterOffered?: DateKey
-  /** When the day ends, in hours after midnight: 0 (the default), 3 or 5. */
-  dayEndsAt?: 0 | 3 | 5
+  /** When the day ends, in hours after midnight: one of DAY_END_HOURS, 0 by default. */
+  dayEndsAt?: DayEnd
   /** The week's first day: Monday unless the person chose Sunday. */
   weekStartsOn?: 'monday' | 'sunday'
   /** Which half of the world the seasons follow. */
@@ -222,6 +234,11 @@ export function nearestStop(minutes: number): number {
 }
 
 export const WORLD_ORDER: readonly World[] = ['sea', 'sky', 'garden']
+
+/** A value that is one of the three worlds. */
+export function isWorld(value: unknown): value is World {
+  return (WORLD_ORDER as readonly unknown[]).includes(value)
+}
 
 /** Every day of the week on: what a new thing, and every thing from before days, gets. */
 export const EVERY_DAY: readonly boolean[] = [true, true, true, true, true, true, true]

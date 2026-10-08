@@ -5,8 +5,9 @@ import { reducedMotion, ticker, type FrameHandle } from './ticker'
 
 /**
  * The sky's canvas: a deep field of background stars, and over it one
- * warm star for every day the person showed up. The day-stars are the
- * calendar and are data; the field around them is atmosphere.
+ * warm star for every day the person showed up, lit along the current
+ * constellation. The day-stars are data; the field around them is
+ * atmosphere.
  *
  * The field is seeded, so the sky is the same on every open: small stars
  * in a few cool and warm tints, biased towards the zenith, and a handful
@@ -43,6 +44,12 @@ interface Shooting {
 const FIELD_COUNT = 170
 const BRIGHT_COUNT = 9
 const TINTS = ['#fff4d6', '#e8f0f5', '#cfe2ff', '#bff7ee', '#ffe2c4'] as const
+/** The first shooting star comes 6 to 12 s after the sky opens, then one every 9 to 16 s. */
+const SHOOT_FIRST_MS = 6000
+const SHOOT_EVERY_MS = 9000
+const SHOOT_EVERY_SPREAD_MS = 7000
+/** How far a shooting star's head travels, in canvas px, over SHOOT_MS. */
+const SHOOT_TRAVEL_PX = 240
 const TWINKLE_FPS = 12
 const SHOOT_FPS = 40
 const SHOOT_MS = 900
@@ -108,7 +115,7 @@ export class StarField {
 
   start(): void {
     if (this.handle || reducedMotion()) return
-    this.nextShoot = performance.now() + 6000 + this.random() * 6000
+    this.nextShoot = performance.now() + SHOOT_FIRST_MS * (1 + this.random())
     this.handle = ticker.add((now) => {
       this.draw(now)
     }, TWINKLE_FPS)
@@ -205,7 +212,7 @@ export class StarField {
         dy: 0.45 + this.random() * 0.15,
         length: 50 + this.random() * 40,
       }
-      this.nextShoot = now + 9000 + this.random() * 7000
+      this.nextShoot = now + SHOOT_EVERY_MS + this.random() * SHOOT_EVERY_SPREAD_MS
       this.handle?.setFps(SHOOT_FPS)
     }
     const s = this.shooting
@@ -216,7 +223,7 @@ export class StarField {
       this.handle?.setFps(TWINKLE_FPS)
       return
     }
-    const travelled = k * 240
+    const travelled = k * SHOOT_TRAVEL_PX
     const hx = s.x + s.dx * travelled
     const hy = s.y + s.dy * travelled
     const tx = hx - s.dx * s.length

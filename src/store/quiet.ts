@@ -8,8 +8,8 @@ import type { AppData, DateKey, Thing } from './types'
  * five to seven. A planned day missed inside that freedom is a quiet day:
  * a small moon in the week's dots and in the log, never an empty dot, and
  * it breaks no streak. Past the freedom a missed day is an empty dot and
- * nothing more. There is nothing to set: the week (Monday first) spends
- * its freedom on its first misses.
+ * nothing more. There is nothing to set: the week (from its first day, as
+ * set) spends its freedom on its first misses.
  */
 
 /** Planned this many days a week or fewer: one quiet day; more: two. */

@@ -1,10 +1,11 @@
+import { PHONE_WIDTH } from '../scene/phone'
 import { artFor, collectibleSvg, type Collectible } from '../scene/collectibles'
 import { resolveTokens } from '../scene/palette'
 import { shoreSvg } from '../scene/shore'
 import { StarField } from '../scene/stars'
 import { whaleSvg } from '../scene/visitors'
 import { today } from '../store/clock'
-import { fromKey, todayKey } from '../store/dates'
+import { todayKey, writtenDate } from '../store/dates'
 import { dayNumber, last7, lineFor, stageFor, starDays } from '../store/derive'
 import type { AppData, PostcardFormat } from '../store/types'
 import { voice } from '../voice'
@@ -55,7 +56,6 @@ const FRAME_INSET = 22
 /** The milestone whose card is the year's. */
 const YEAR = 365
 const FRAME_WIDTH = 12
-const PHONE_W = 390
 const PHONE_H = 700
 const SCENE_HORIZON = 0.58
 
@@ -131,7 +131,7 @@ export async function renderPostcard(
   ctx.fillStyle = band
   ctx.fillRect(0, horizon, W, (H - horizon) * 0.12)
 
-  // The day-stars: the same calendar the sky draws, at this size.
+  // The day-stars: the same constellation path the sky draws, at this size.
   const starCanvas = document.createElement('canvas')
   const stars = new StarField(starCanvas)
   stars.resize(W, horizon, 1)
@@ -142,7 +142,7 @@ export async function renderPostcard(
   // The shore, then everything unlocked that was on screen.
   const shoreTop = horizon - H * 0.02
   await drawSvg(ctx, shoreSvg(), 0, shoreTop, W, H * (format === 'story' ? 0.06 : 0.07))
-  const scale = Math.min(W / PHONE_W, H / PHONE_H)
+  const scale = Math.min(W / PHONE_WIDTH, H / PHONE_H)
   if ((moment.milestone ?? 0) >= YEAR) paintCove(ctx, data, W, horizon, H)
   await drawDock(ctx, data, W, H, horizon, scale)
   // Where each thing stands now, so the postcard shows the person's own arrangement.
@@ -201,11 +201,7 @@ export async function renderPostcard(
 
   ctx.font = `700 ${layout.captionSize}px "Atkinson Hyperlegible", system-ui, sans-serif`
   ctx.fillStyle = 'rgba(232, 240, 245, 0.75)'
-  const date = fromKey(today).toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
+  const date = writtenDate(today)
   ctx.fillText(
     legend && moment.legendary
       ? moment.legendary.plaque
@@ -342,7 +338,7 @@ function paintCove(
     const random = seeded(hash(`card|${lantern.key}`))
     const x = (0.04 + random() * 0.92) * W
     const y = horizon + (0.03 + Math.pow(random(), 1.5) * 0.16) * (H - horizon)
-    const r = (2 + lantern.size) * (W / PHONE_W)
+    const r = (2 + lantern.size) * (W / PHONE_WIDTH)
     const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 3)
     glow.addColorStop(0, lantern.color)
     glow.addColorStop(1, 'rgba(0, 0, 0, 0)')

@@ -1064,10 +1064,29 @@ falling stars, the beats of the intro's score) stays with the element it
 moves, next to the comment that explains it, because a token used once
 only moves the number away from its reason.
 
-A measured advice is not always a good one: Lighthouse asked for the two
-scene textures in WebP, 0.17.0 did it, and the frame-timing test caught
-the cost on the next full run (the median frame under a year of lanterns
-went from one vsync step to two, with WebP and PNG builds compared side by
-side). The textures are blob URLs made once on the device, so WebP only
-saved memory nobody was short of. They are PNG again; the reason sits in
-the comment above `objectUrl` in `src/scene/textures.ts`.
+Lighthouse asked for the two scene textures in WebP and 0.17.0 did it.
+When the frame test then failed, WebP looked guilty; a first comparison
+seemed to agree, and an interleaved one (PNG and WebP builds taking turns,
+three rounds) showed no difference at all: the test itself was flipping.
+The textures are blob URLs made once on the device and Safari cannot
+encode WebP, so they are PNG again for one format everywhere, and the
+frame test was changed (below).
+
+The review before the tag was a second reading by a separate agent,
+asked only to report, with every claim checked against the code before
+anything changed. What it found that was wrong rather than untidy: the
+new chapter still assumed a Monday, the undo copy of a replaced sea was
+written and never read, version 1 data skipped the step that gives
+things their line, and a find's entrance animation was held forever.
+Each has a test now. Left as they are, on purpose: the two `Line`s (a
+creature's line and the text line on screen) keep their names, as both
+read naturally where they are used; `lineFor` stays as the one way a
+creature's line is asked for.
+
+Two kinds of measurement were told apart. The frame-rate test flipped
+between one and two vsync steps from run to run with nothing changed, so
+WebP textures first looked guilty and were not (an interleaved
+comparison showed no difference; they stay PNG, which Safari makes
+anyway). The test now holds the main thread's work per frame, which is
+the app's own (about 5 ms at full speed), and keeps the frame gaps as
+recorded numbers with a looser bound.

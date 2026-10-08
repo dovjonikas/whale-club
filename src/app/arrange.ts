@@ -1,3 +1,4 @@
+import { PHONE_WIDTH } from '../scene/phone'
 import { icon } from '../brand/icons'
 import { collectibleSvg } from '../scene/collectibles'
 import type { Scene } from '../scene/scene'
@@ -340,7 +341,7 @@ function ringsHtml(now: Arrangement, held: string | null, room: string | undefin
 /** The ring of the held thing's world nearest a point, if one is close enough. */
 function nearest(rings: HTMLElement, x: number, y: number): HTMLElement | null {
   const world = rings.dataset.holding
-  const scale = rings.getBoundingClientRect().width / 390
+  const scale = rings.getBoundingClientRect().width / PHONE_WIDTH
   let best: HTMLElement | null = null
   let distance = SNAP_RADIUS * Math.max(1, scale)
   for (const ring of rings.querySelectorAll<HTMLElement>('.arrange-spot')) {

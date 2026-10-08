@@ -9,6 +9,9 @@ import { voice } from '../voice'
 import type { NoticeBuilder } from './notices'
 import type { Sound } from './sound'
 
+/** How long the thanks stays after the second answer before the leaf goes. */
+const THANKS_MS = 1200
+
 /** From this hour the check-in is an evening one, with its one good thing. */
 const EVENING_FROM = 18
 
@@ -25,7 +28,7 @@ export function checkinNotice(store: Store, sound: Sound): NoticeBuilder {
 
     const card = document.createElement('aside')
     card.className = 'leaf checkin'
-    card.setAttribute('aria-label', 'check-in')
+    card.setAttribute('aria-label', voice.labels.checkin)
     const ask = (question: string, answer: string, then: () => void): void => {
       const focused = card.contains(document.activeElement)
       card.innerHTML = `<span class="leaf-title">${question}</span>
@@ -45,7 +48,7 @@ export function checkinNotice(store: Store, sound: Sound): NoticeBuilder {
           return
         }
         card.innerHTML = `<span class="leaf-title">${voice.checkin.after}</span>`
-        setTimeout(dismiss, 1200)
+        setTimeout(dismiss, THANKS_MS)
       })
     })
     return card

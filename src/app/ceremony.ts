@@ -1,7 +1,6 @@
 import { collectibleSvg } from '../scene/collectibles'
 import { sampleShape } from '../scene/constellations'
 import type { Legendary } from '../scene/legendary'
-import type { Scene } from '../scene/scene'
 import { voice } from '../voice'
 import { host } from './host'
 import { escapeHtml } from './thingMark'
@@ -14,7 +13,7 @@ export interface CeremonyOptions {
   legendary: Legendary
   /** How many stars its constellation has. */
   stars: number
-  /** "earned on 2026-11-12 · day 30". */
+  /** "earned on 12 Nov 2026 · day 30". */
   plaque: string
   onSend: () => void
   onClose: () => void
@@ -28,7 +27,7 @@ export interface CeremonyOptions {
  * Under reduced motion it all simply fades in. "send this" makes its
  * postcard, in a gold frame.
  */
-export function playCeremony(scene: Scene, options: CeremonyOptions): void {
+export function playCeremony(options: CeremonyOptions): void {
   const { legendary } = options
   const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
   const app = document.getElementById('app')
@@ -53,7 +52,6 @@ export function playCeremony(scene: Scene, options: CeremonyOptions): void {
     </div>`
   host().append(root)
   app?.setAttribute('inert', '')
-  scene.root.dataset.ceremony = 'true'
 
   const timers: number[] = []
   const step = (name: string): void => {
@@ -82,7 +80,6 @@ export function playCeremony(scene: Scene, options: CeremonyOptions): void {
     for (const timer of timers) clearTimeout(timer)
     document.removeEventListener('keydown', onKey)
     root.remove()
-    delete scene.root.dataset.ceremony
     app?.removeAttribute('inert')
     if (opener?.isConnected) opener.focus({ preventScroll: true })
     options.onClose()

@@ -86,8 +86,9 @@ export function causticsUrl(): Promise<string> {
 /**
  * A PNG of the canvas as an object URL; empty if the browser cannot encode
  * it. PNG on purpose: WebP (Lighthouse's "modern image formats") was tried
- * in 0.17 and halved the frame rate under a year of lanterns, the texture
- * layers costing more to draw each frame than the bytes it saved.
+ * in 0.17 and measured against it, interleaved: no difference in frames,
+ * and Safari, which cannot encode WebP, makes a PNG anyway. One format
+ * everywhere is the simpler thing to keep.
  */
 function objectUrl(canvas: HTMLCanvasElement): Promise<string> {
   return new Promise((resolve) => {

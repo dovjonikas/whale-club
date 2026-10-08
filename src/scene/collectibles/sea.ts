@@ -2,7 +2,7 @@ import * as art from '../art'
 import { dots, fish, jacket, jelly, pool } from '../draw'
 import { sea, type Collectible } from './build'
 
-/** The sea's twenty finds, line A then line B. */
+/** The sea's twenty-six finds, line A then line B. */
 export const SEA: readonly Collectible[] = [
   // SEA, line A
   sea(

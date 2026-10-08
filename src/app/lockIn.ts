@@ -14,7 +14,15 @@ import type { Postcards } from './postcards'
 import type { Row } from './row'
 import { hasJacket, lanternKey } from './sceneData'
 import { openDial } from './dial'
-import { canUndo, partsOf, seenMs, SessionService, totalMs, type Session } from './session'
+import {
+  canUndo,
+  MINUTE_MS,
+  partsOf,
+  seenMs,
+  SessionService,
+  totalMs,
+  type Session,
+} from './session'
 import { openSessionScreen, type SessionScreen } from './sessionScreen'
 import type { Sound } from './sound'
 import { keepAwake, letSleep } from './wakeLock'
@@ -80,7 +88,7 @@ export class LockIn {
     const done = day?.done.includes(thing.id) ?? false
     const kept = day?.minutes[thing.id] ?? 0
     if (!done && kept > 0 && kept < thing.minutes) {
-      this.begin(thing, { minutes: thing.minutes, baseMs: kept * 60_000 })
+      this.begin(thing, { minutes: thing.minutes, baseMs: kept * MINUTE_MS })
       return
     }
     openDial(
@@ -126,9 +134,9 @@ export class LockIn {
   /** What the timer saw is kept for the session's day, so the next one goes on from it. */
   private keep(session: Session, seen: number): number {
     const { store } = this.deps
-    const own = Math.floor((seen - session.baseMs) / 60_000)
+    const own = Math.floor((seen - session.baseMs) / MINUTE_MS)
     const before = store.get().days[session.date]?.minutes[session.thingId] ?? 0
-    const total = session.extra ? before + own : Math.floor(seen / 60_000)
+    const total = session.extra ? before + own : Math.floor(seen / MINUTE_MS)
     store.keepMinutes(session.thingId, total, session.date)
     return own
   }

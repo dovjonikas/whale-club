@@ -56,7 +56,7 @@ const BASE = '/whale-club/'
 
 export default defineConfig({
   base: BASE,
-  // The version shows at the bottom of the menu; five taps on it open the lab.
+  // The version shows at the bottom of settings; five taps on it open the lab.
   define: { __APP_VERSION__: JSON.stringify(version), __ART__: JSON.stringify(ART) },
   build: {
     target: 'es2022',

@@ -8,10 +8,10 @@ import { SKY } from './sky'
 export type { Collectible, Motion } from './build'
 
 /**
- * Every collectible: what it is, when it unlocks, where it lives in the
- * scene and how it is drawn. One list; the scene, the Collection sheet and
- * the silhouettes all read it. Adding one is adding an entry to its world's file, a line
- * in voice.ts under `unlock`, and a row in docs/COLLECTIBLES.md.
+ * Every collectible: what it is, when it unlocks, its world and how it
+ * is drawn. One list; the scene, the Collection sheet and the silhouettes
+ * all read it. Adding one is adding an entry to its world's file and a row
+ * in docs/COLLECTIBLES.md; its place comes from src/scene/spots.ts.
  *
  * Drawings are inner SVG for a 100x100 box and use the CSS tokens, so the
  * same markup draws on the card, in the sheet and in the share picture

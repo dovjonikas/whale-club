@@ -22,7 +22,6 @@ export const voice = {
   timerEnd: 'time. that counts.', // TODO-VOICE
   allDone: 'all of it. all the smoke.', // TODO-VOICE
   missedDay: 'you missed a day. nothing died.', // TODO-VOICE
-  quietDay: 'quiet so far.', // TODO-VOICE
   weekGood: 'a good week.', // TODO-VOICE
   weekBad: 'a week. there is another one.', // TODO-VOICE
   stageUp: 'it grew.', // TODO-VOICE
@@ -37,7 +36,6 @@ export const voice = {
   shareFailed: 'could not make the picture.', // TODO-VOICE
   /** What to do then, said right after it. */
   shareFailedNext: 'try again in a moment.', // TODO-VOICE
-  starPlaced: 'a star for today.', // TODO-VOICE
   checkin: {
     question1: 'how are you living?',
     answer1: 'good!!!',
@@ -336,6 +334,24 @@ export const voice = {
   },
   /** A day with nothing planned. Calm, no star, nothing missed. */
   restDay: 'nothing planned. rest is part of it.', // TODO-VOICE
+  /**
+   * The names the interface gives its own parts: titles, and what a screen
+   * reader hears for a group or an icon. Moved here word for word.
+   */
+  labels: {
+    row: 'your homework',
+    recap: 'weekly recap',
+    ok: 'ok',
+    checkin: 'check-in',
+    club: 'the club',
+    inARow: (days: number) => `${String(days)} days in a row`,
+    collection: 'collection',
+    sound: 'Sound',
+    collectionButton: 'Collection',
+    menu: 'Menu',
+    stones: 'stones',
+    days: 'your days',
+  },
   /** The menu's one screen: the rules and this. */
   clubLine: 'whale club is you and whoever you send your whale to.',
   postcard: {

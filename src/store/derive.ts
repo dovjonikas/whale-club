@@ -133,9 +133,12 @@ export function starDays(data: AppData): DateKey[] {
  * today (or yesterday, while today is still open). A rest day, with
  * nothing planned, neither counts nor breaks it.
  */
+/** How far back a streak is counted: ten years, a bound rather than a limit anyone reaches. */
+const STREAK_LOOKBACK_DAYS = 3660
+
 export function streak(data: AppData, today: DateKey): number {
   let n = 0
-  for (let i = 0; i < 3660; i++) {
+  for (let i = 0; i < STREAK_LOOKBACK_DAYS; i++) {
     const date = addDays(today, -i)
     const planned = plannedThings(data, date)
     const done = data.days[date]?.done ?? []

@@ -102,7 +102,7 @@ export const MAIN_BOX: Box = { x0: 0.2, y0: 0.42, x1: 0.8, y1: 0.84 }
 /**
  * Where finished constellations stay, in the order they were finished:
  * three across the upper sky, then the two edges, then low over the
- * horizon. After six they go round again, over the oldest, a little fainter.
+ * horizon. After six they go round again, over the oldest.
  */
 export const SLOTS: readonly Box[] = [
   { x0: 0.03, y0: 0.3, x1: 0.31, y1: 0.42 },

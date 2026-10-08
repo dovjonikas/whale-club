@@ -1,13 +1,15 @@
+import { firstDayOfWeek } from '../store/dates'
 import { voice } from '../voice'
 
-/**
- * The one line of planning: seven day chips, Monday first, all on unless
- * the person turns some off. Used by the add sheet and the thing's sheet.
- * Returns the element and a reader for the current choice.
- */
 /** Ids of its own, so a sheet still leaving never shares one with the next. */
 let fieldCount = 0
 
+/**
+ * The one line of planning: seven day chips from the week's first day, all
+ * on unless the person turns some off. Used by the add sheet and the
+ * thing's sheet. Returns the element and a reader for the current choice,
+ * Monday first as the days are stored.
+ */
 export function daysField(initial: readonly boolean[]): {
   element: HTMLElement
   value: () => boolean[]
@@ -19,10 +21,10 @@ export function daysField(initial: readonly boolean[]): {
   field.innerHTML = `
     <span class="field-label" id="${id}">${voice.days.label}</span>
     <div class="day-chips" role="group" aria-labelledby="${id}">
-      ${voice.days.short
+      ${shownOrder()
         .map(
-          (letter, i) =>
-            `<button type="button" class="day-chip" data-day="${String(i)}" aria-label="${voice.days.names[i] ?? ''}" aria-pressed="${String(days[i] ?? true)}">${letter}</button>`,
+          (i) =>
+            `<button type="button" class="day-chip" data-day="${String(i)}" aria-label="${voice.days.names[i] ?? ''}" aria-pressed="${String(days[i] ?? true)}">${voice.days.short[i] ?? ''}</button>`,
         )
         .join('')}
     </div>`
@@ -34,4 +36,14 @@ export function daysField(initial: readonly boolean[]): {
     })
   })
   return { element: field, value: () => [...days] }
+}
+
+/**
+ * The chips in the order the week is seen: Sunday first where the week
+ * starts on Sunday. Each chip keeps its Monday-first index, the order the
+ * days are stored in.
+ */
+function shownOrder(): number[] {
+  const monday = [0, 1, 2, 3, 4, 5, 6]
+  return firstDayOfWeek() === 0 ? [6, ...monday.slice(0, 6)] : monday
 }

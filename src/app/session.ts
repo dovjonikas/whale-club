@@ -12,7 +12,7 @@ import type { DateKey } from '../store/types'
  * GRACE_MS still count (a glance at a message is not leaving) and then the
  * count stops, and it goes on when they come back. If the page goes away
  * altogether (a reload, the app closed, a phone that died), the count
- * stops at the last moment the screen was seen: \`seenUntil\`, written
+ * stops at the last moment the screen was seen: `seenUntil`, written
  * every SEEN_EVERY_MS. Nothing seen is ever lost: an interrupted session's
  * minutes are kept for the day, and the next one goes on from them.
  *
@@ -23,8 +23,10 @@ import type { DateKey } from '../store/types'
  */
 /** Where v0.1 to v0.4 kept a running timer; picked up once and moved. */
 const OLD_KEY = 'whaleclub:timer'
+/** One minute: lengths are kept in minutes, time in ms. */
+export const MINUTE_MS = 60_000
 export const GRACE_MS = 15_000
-export const PAUSE_MS = 5 * 60_000
+export const PAUSE_MS = 5 * MINUTE_MS
 export const UNDO_MS = 10_000
 const TICK_MS = 1000
 const SEEN_EVERY_MS = 5000
@@ -64,7 +66,7 @@ export interface Listeners {
 }
 
 export function totalMs(session: Session): number {
-  return session.minutes * 60_000
+  return session.minutes * MINUTE_MS
 }
 
 /** Everything the timer has seen today for this thing, this session included. */

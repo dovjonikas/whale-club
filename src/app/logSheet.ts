@@ -2,7 +2,7 @@ import { escapeHtml, thingMark } from './thingMark'
 import { allQuiet } from '../store/quiet'
 import { plannedThings } from '../store/derive'
 import { icon } from '../brand/icons'
-import { fromKey, todayKey, firstDayOfWeek } from '../store/dates'
+import { firstDayOfWeek, fromKey, shortDate, todayKey } from '../store/dates'
 import {
   addMonths,
   dayEntry,
@@ -20,8 +20,8 @@ import { openSheet } from './sheet'
 import { swap } from './swap'
 
 /**
- * The log: the one view of what has been done. A month at a time, Monday
- * first, each day with its star, a dot for each lantern; above it the
+ * The log: the one view of what has been done. A month at a time, from
+ * the week's first day, each day with its star, a dot for each lantern; above it the
  * month in one sentence. The title opens the year, twelve small months;
  * a day opens that day. No charts: the sky is the picture, this is the
  * record.
@@ -53,7 +53,6 @@ export function openLogSheet(store: Store, at?: DateKey): void {
       const render = (keep?: string): void => {
         const data = store.get()
         const earliest = firstMonth(data, today)
-        body.dataset.view = view.kind
         if (view.kind === 'month')
           body.innerHTML = monthHtml(view.month, earliest, thisMonth, today)
         else if (view.kind === 'year') body.innerHTML = yearHtml(view.year, earliest, thisMonth)
@@ -260,14 +259,13 @@ const CHEVRON_RIGHT = icon('forward')
 /** Made once: a month of cells would otherwise build a formatter per cell. */
 const MONTH_LONG = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' })
 const MONTH_SHORT = new Intl.DateTimeFormat('en-GB', { month: 'short' })
-const DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
 
 function monthName(month: MonthKey): string {
   return MONTH_LONG.format(fromKey(`${month}-01`))
 }
 
 function dayName(date: DateKey): string {
-  return DAY.format(fromKey(date))
+  return shortDate(date)
 }
 
 function dayAria(date: DateKey, names: string[], lanterns: number): string {

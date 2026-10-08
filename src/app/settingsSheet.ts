@@ -1,6 +1,13 @@
+import { now } from '../store/clock'
 import { todayKey } from '../store/dates'
 import type { Store } from '../store/store'
-import { DEFAULT_MINUTES, emptyData, type AppData, type Settings } from '../store/types'
+import {
+  DAY_END_HOURS,
+  DEFAULT_MINUTES,
+  emptyData,
+  type AppData,
+  type Settings,
+} from '../store/types'
 import { voice } from '../voice'
 import { makeBackup, readBackup, saveBackup, type BackupSummary } from './backup'
 import { openSheet } from './sheet'
@@ -9,6 +16,18 @@ import { announce, showUndo } from './toast'
 
 /** Where the sea is kept while an undo can still bring it back. */
 const UNDO_KEY = 'whaleclub:undo'
+/**
+ * A reopen this soon after a restore or a start over offers the undo
+ * again: the ten seconds plus the time a reload or a reopen takes.
+ */
+const UNDO_REOPEN_MS = 60_000
+
+/** The copy in UNDO_KEY: the sea before, when it was replaced, and what was said. */
+interface UndoCopy {
+  at: number
+  said: string
+  data: AppData
+}
 /** Taps on the version, close together, that open the lab. */
 const LAB_TAPS = 5
 const LAB_TAP_GAP_MS = 2500
@@ -39,11 +58,15 @@ export function openSettingsSheet(store: Store, on: SettingsHandlers): void {
             choice('sessionSound', voice.settings.seaSound, onOff(s.sessionSound === true)),
           ])}
           ${group(voice.settings.groups.days, [
-            choice('dayEndsAt', voice.settings.dayEnds, [
-              ['0', voice.settings.midnight, (s.dayEndsAt ?? 0) === 0],
-              ['3', '3:00', s.dayEndsAt === 3],
-              ['5', '5:00', s.dayEndsAt === 5],
-            ]),
+            choice(
+              'dayEndsAt',
+              voice.settings.dayEnds,
+              DAY_END_HOURS.map((h) => [
+                String(h),
+                h === 0 ? voice.settings.midnight : `${String(h)}:00`,
+                (s.dayEndsAt ?? 0) === h,
+              ]),
+            ),
             choice('weekStartsOn', voice.settings.weekStarts, [
               ['monday', voice.settings.monday, s.weekStartsOn !== 'sunday'],
               ['sunday', voice.settings.sunday, s.weekStartsOn === 'sunday'],
@@ -154,20 +177,16 @@ export async function backUp(store: Store): Promise<void> {
   }
 }
 
+/** What is said for each reason a file is refused. */
+const REFUSED = { newer: 'newer', 'not-ours': 'notOurs', damaged: 'damaged' } as const
+
 async function restore(store: Store, file: File, closeSettings: () => void): Promise<void> {
   const result = await readBackup(await file.text())
   if (!result.ok) {
-    announce(
-      voice.settings[
-        result.reason === 'newer' ? 'newer' : result.reason === 'not-ours' ? 'notOurs' : 'damaged'
-      ],
-    )
+    const said = voice.settings[REFUSED[result.reason]]
+    announce(said)
     const note = document.querySelector('.setting-last')
-    if (note)
-      note.textContent =
-        voice.settings[
-          result.reason === 'newer' ? 'newer' : result.reason === 'not-ours' ? 'notOurs' : 'damaged'
-        ]
+    if (note) note.textContent = said
     return
   }
   closeSettings()
@@ -206,16 +225,21 @@ function askStartOver(store: Store): void {
 /**
  * Replaces the whole sea, keeping the one before in a key of its own for
  * as long as the undo waits, so even a reload in those seconds loses
- * nothing; undo puts it back.
+ * nothing (offerUndoLeft picks it up); undo puts it back.
  */
 function replaceWithUndo(store: Store, next: AppData, said: string): void {
   const before = store.get()
   try {
-    localStorage.setItem(UNDO_KEY, JSON.stringify(before))
+    const copy: UndoCopy = { at: now(), said, data: before }
+    localStorage.setItem(UNDO_KEY, JSON.stringify(copy))
   } catch {
     // No room for the copy: the undo below still holds it in memory.
   }
   store.replace(next)
+  offerUndo(store, said, before)
+}
+
+function offerUndo(store: Store, said: string, before: AppData): void {
   showUndo(
     said,
     voice.settings.undo,
@@ -224,6 +248,28 @@ function replaceWithUndo(store: Store, next: AppData, said: string): void {
     },
     clearUndo,
   )
+}
+
+/**
+ * At start: a copy still there means the app was reloaded or closed while
+ * its undo waited. Within a minute the undo is offered again; after that
+ * the replacement stands and the copy goes.
+ */
+export function offerUndoLeft(store: Store): void {
+  let copy: Partial<UndoCopy> | null = null
+  try {
+    copy = JSON.parse(localStorage.getItem(UNDO_KEY) ?? 'null') as Partial<UndoCopy> | null
+  } catch {
+    copy = null
+  }
+  const fresh =
+    copy !== null &&
+    typeof copy.at === 'number' &&
+    typeof copy.said === 'string' &&
+    Array.isArray(copy.data?.things) &&
+    now() - copy.at < UNDO_REOPEN_MS
+  if (fresh && copy?.data && copy.said !== undefined) offerUndo(store, copy.said, copy.data)
+  else clearUndo()
 }
 
 export function clearUndo(): void {
@@ -284,7 +330,7 @@ function apply(store: Store, sound: Sound, key: string, value: string): void {
       store.setSettings({ sessionSound: value === 'true' })
       return
     case 'dayEndsAt':
-      store.setSettings({ dayEndsAt: value === '3' ? 3 : value === '5' ? 5 : 0 })
+      store.setSettings({ dayEndsAt: DAY_END_HOURS.find((h) => String(h) === value) ?? 0 })
       return
     case 'weekStartsOn':
       store.setSettings({ weekStartsOn: value === 'sunday' ? 'sunday' : 'monday' })

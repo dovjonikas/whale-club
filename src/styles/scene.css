@@ -160,10 +160,6 @@ canvas.particles {
   z-index: 1;
 }
 
-.collectible-art {
-  will-change: transform;
-}
-
 .collectible svg {
   position: static;
   width: 100%;

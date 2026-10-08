@@ -22,7 +22,7 @@ import { openSheet } from './sheet'
  */
 export function openCollectionSheet(store: Store, onArrange?: () => void): void {
   openSheet({
-    title: 'collection',
+    title: voice.labels.collection,
     build(body, close) {
       const data = store.get()
       const today = todayKey()

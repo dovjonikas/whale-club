@@ -2,7 +2,7 @@
 
 ## Done
 
-v0.17.0, live at https://dovjonikas.github.io/whale-club/ after the push.
+v1.0.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
 - **v0.1.0 to v0.3.0**: the row, the scene, the sky as a calendar, creatures, PWA, collectibles, the whale, rituals, sound, share; a buddy slot (since removed).
 - **v0.4.0**: postcards instead of a buddy; the phone-wide frame; the install leaf after the first thing; Lighthouse through Edge.
@@ -23,6 +23,7 @@ v0.17.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 - **v0.11.3**: the intro has a score: "tap to begin" so sound may play, a music box year, a note for every word of the truth, silence at the blink, the notes doubling at "compound", the last word resolving on the peak.
 - **v0.12.0**: the brand: every thing wears a bubble (its picture in cream, the rising signature, filled when done, a timer rim for a lock-in) at its card's corner; 48 glyphs of its own, picked from the name in English or Lithuanian, or a monogram; no emoji anywhere (data v7); the interface's icons, the app icon and the favicon in the same hand; brand.html; strong curves, presses, sheets that can be pulled down; the interface audit with its fixes (docs/QUALITY.md).
 - **v0.12.1**: the author's motion review answered: reduced motion keeps fades, toasts leave faster, a stopped lock-in leaves cleanly, the done glow only fades, one press for everything; typographic apostrophes and a next step on the share error.
+- **v1.0.0**: the first year, whole, for strangers: "how it works" answers the questions a friend asks first; the README with install, questions and a roadmap; a review before the tag (the chapter's week start, the undo after a reload, version 1 data, a find's entrance; dead code, stale comments, named numbers, shared helpers; ARCHITECTURE.md checked against the code); tag v1.0.0 and a GitHub release.
 - **v0.17.0**: polish: iOS startup images, a manifest id, fonts preloaded; type in rem, balanced and tabular; presses that land at once; toasts that wait while they cannot be read; view transitions in the log and the dock; the parked motion and keyboard items; a contrast test; frame timing on a slow CPU; Lighthouse (docs/QUALITY.md).
 - **v0.16.0**: trust and settings: one settings sheet (sound, a day ends at, week start, seasons, show the time, a new thing's length, postcard size, a still sea, about); back up and restore with a checksum and undo, start over with undo, the monthly backup dot, lasting storage asked once.
 - **v0.15.0**: gentle mechanics: quiet days (moons in the dots and the log, no streak broken, no dim), welcome back (+20 krill and a flash, no word), creatures that sleep and wake with a wave, a new chapter after a quiet week, "after..." with the row in the day's order, the evening's one good thing (kept in the log), the Android badge.
@@ -170,8 +171,29 @@ addition and the first brief disagree, the evening addition wins.
 - [x] **0.17.0 polish**: docs/QUALITY.md from the checklist, iOS startup
       images, sheet physics, press states, tokens, 60 fps with 400 lanterns,
       Lighthouse.
-- [ ] **1.0.0**: README rewritten for strangers, "how it works" filled with
+- [x] **1.0.0**: README rewritten for strangers, "how it works" filled with
       the FAQ, tag and GitHub release, a senior review pass.
+
+## The review before 1.0 (2026-10-08)
+
+A senior reading of `src` by a separate agent, report only, every claim
+checked before a change. Fixed: the new chapter's week start, the undo
+after a reload, version 1 data, a find's held entrance (each with a test);
+six unused exports, five unused methods, a sound never played, dead
+styles and attributes; stale comments; numbers named once (phone width,
+minute, day-end hours, shooting stars, shore warmth, the recap's good
+week next to krill's); shared helpers for downloads, dates, the seeded
+order, records and worlds; the interface's names into voice.ts word for
+word; docs/ARCHITECTURE.md rewritten against the code. Left on purpose:
+the two `Line` names and `lineFor` (docs/DECISIONS.md).
+
+## After 1.0
+
+Year two in updates: finds past day 365, new constellations, more for the
+dock. The copy the author still owns is listed in docs/QUALITY.md ("Left
+for polish", the words). The mobile Lighthouse score is held back by the
+first visit building the scene and the intro at once; building the
+intro's later beats on demand is the next step there.
 
 ## How the timer worked before v0.5 (the audit asked for)
 

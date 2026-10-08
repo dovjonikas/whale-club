@@ -18,7 +18,7 @@ export function openMenuSheet(
   const month = todayKey().slice(0, 7)
   if (store.get().settings.backupNudged !== month) store.setSettings({ backupNudged: month })
   openSheet({
-    title: 'the club',
+    title: voice.labels.club,
     build(body) {
       const data = store.get()
       const today = todayKey()
@@ -33,7 +33,7 @@ export function openMenuSheet(
         <p class="club-line">${voice.clubLine}</p>
         <p class="sheet-note">${
           day > 0
-            ? `${voice.share.caption(day)}${run > 1 ? ` · ${String(run)} days in a row` : ''}`
+            ? `${voice.share.caption(day)}${run > 1 ? ` · ${voice.labels.inARow(run)}` : ''}`
             : ''
         }</p>`
       body.querySelector('.menu-log')?.addEventListener('click', on.onLog)

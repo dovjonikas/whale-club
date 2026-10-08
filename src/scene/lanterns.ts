@@ -2,6 +2,7 @@ import { addDays } from '../store/dates'
 import type { DateKey } from '../store/types'
 import { hash, seeded } from './random'
 import { reducedMotion, ticker, type FrameHandle } from './ticker'
+import { PHONE_WIDTH } from './phone'
 
 /**
  * The cove's lanterns: one for every lock-in that ran to its end, kept for
@@ -134,7 +135,7 @@ export class LanternLayer {
   }
 
   private place(): void {
-    const scale = Math.min(Math.max(this.width / 390, 0.8), 1.6)
+    const scale = Math.min(Math.max(this.width / PHONE_WIDTH, 0.8), 1.6)
     const recent = this.specs.filter((spec) => spec.date >= this.recentFrom)
     this.memory = this.specs.length - recent.length
     this.placed = recent.map((spec) => {

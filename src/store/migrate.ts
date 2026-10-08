@@ -12,6 +12,8 @@ import {
   AFTERS,
   GOOD_MAX,
   type After,
+  isDayEnd,
+  isWorld,
 } from './types'
 
 /**
@@ -27,13 +29,15 @@ export function migrate(raw: unknown): AppData {
   if (!isRecord(raw)) throw new Error('not an object')
   switch (raw.version) {
     case 1:
-      return fromV1(raw)
+      // The same road as versions 2 to 4 after it: lanterns from the minutes,
+      // then a kind and a line for every thing.
+      return withKinds(withLanterns(fromV1(raw)))
     case 2:
     case 3:
     case 4:
       // Version 2 had no days and versions 2 and 3 had a mode (tap or timer) and an
-      // optional length; validateThing gives every thing its days and a length,
-      // and leaves the mode behind: since 0.5 every thing can be tapped or locked in.
+      // optional length; validateThing gives every thing its days and a length
+      // and leaves the mode behind, and withKinds gives each a kind from its history.
       // Before version 5 sessions were not kept one by one; lanterns come from the minutes.
       return withKinds(withLanterns(validateV2(raw)))
     case 5:
@@ -185,7 +189,7 @@ function validateThing(raw: unknown): Thing {
   if (typeof id !== 'string' || !id) throw new Error('thing without id')
   if (typeof name !== 'string') throw new Error('thing without name')
   if (emoji !== undefined && typeof emoji !== 'string') throw new Error('bad emoji')
-  if (world !== 'sea' && world !== 'sky' && world !== 'garden') throw new Error('bad world')
+  if (!isWorld(world)) throw new Error('bad world')
   if (typeof createdAt !== 'string') throw new Error('thing without createdAt')
   if (typeof order !== 'number') throw new Error('thing without order')
   const planned =
@@ -281,7 +285,7 @@ function validateSettings(raw: unknown): Settings {
   if (typeof raw.lastRecapWeek === 'string') settings.lastRecapWeek = raw.lastRecapWeek
   if (typeof raw.chapterFrom === 'string') settings.chapterFrom = raw.chapterFrom
   if (typeof raw.chapterOffered === 'string') settings.chapterOffered = raw.chapterOffered
-  if (raw.dayEndsAt === 3 || raw.dayEndsAt === 5) settings.dayEndsAt = raw.dayEndsAt
+  if (isDayEnd(raw.dayEndsAt) && raw.dayEndsAt !== 0) settings.dayEndsAt = raw.dayEndsAt
   if (raw.weekStartsOn === 'sunday') settings.weekStartsOn = 'sunday'
   if (raw.hemisphere === 'south') settings.hemisphere = 'south'
   if (typeof raw.defaultMinutes === 'number' && Number.isFinite(raw.defaultMinutes))
@@ -305,7 +309,8 @@ function validateSettings(raw: unknown): Settings {
   return settings
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
+/** A plain object, as JSON makes one: not null, not an array. */
+export function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 

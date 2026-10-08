@@ -178,3 +178,29 @@ test('what was bought and placed survives a reload, and a malformed part is drop
   expect(data.placement).toEqual({ buoy: 'sea-2' })
   expect(Object.keys(data.days)).toHaveLength(30)
 })
+
+test('data from version 1 gets a kind and a line for every thing, as later versions do', ({
+  isMobile,
+}) => {
+  test.skip(isMobile, 'pure data')
+  const thing = (id: string, order: number) => ({
+    id,
+    name: id,
+    emoji: '•',
+    mode: 'tap',
+    world: 'sea',
+    createdAt: '2026-01-01',
+    order,
+  })
+  const data = migrate({
+    version: 1,
+    things: [thing('swim', 0), thing('row', 1)],
+    days: { '2026-01-02': { done: ['swim', 'row'], minutes: { row: 20 } } },
+    settings: { sound: true },
+  })
+  expect(data.things.map((t) => [t.id, t.line])).toEqual([
+    ['swim', 'a'],
+    ['row', 'b'],
+  ])
+  expect(data.things.find((t) => t.id === 'row')?.kind).toBe('lockIn')
+})

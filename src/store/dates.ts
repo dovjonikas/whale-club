@@ -1,8 +1,8 @@
 import { today } from './clock'
-import type { DateKey } from './types'
+import { isDayEnd, type DateKey } from './types'
 
 /**
- * When the person's day ends, in hours after midnight: 0, 3 or 5. For
+ * When the person's day ends, in hours after midnight (DAY_END_HOURS). For
  * someone who works nights or goes to bed late, a done at 01:30 still
  * belongs to the evening before. Set from the settings by the app; every
  * "today" in the app comes through todayKey, so this is the one place.
@@ -12,7 +12,7 @@ let dayEndsAt = 0
 let weekStartsOn: 0 | 1 = 1
 
 export function setDayEndsAt(hours: number): void {
-  dayEndsAt = hours === 3 || hours === 5 ? hours : 0
+  dayEndsAt = isDayEnd(hours) ? hours : 0
 }
 
 export function setWeekStartsOn(day: 0 | 1): void {
@@ -43,19 +43,30 @@ export function fromKey(key: DateKey): Date {
   return new Date(y ?? 1970, (m ?? 1) - 1, d ?? 1)
 }
 
-/** Made once; a plaque's date as people write it. */
+/** Made once each: a date as people write it, and a day with its weekday. */
 const WRITTEN = new Intl.DateTimeFormat('en-GB', {
   day: 'numeric',
   month: 'short',
   year: 'numeric',
 })
+const SHORT_DAY = new Intl.DateTimeFormat('en-GB', {
+  weekday: 'short',
+  day: 'numeric',
+  month: 'short',
+})
 
 /**
- * A date as people write it ("9 Nov 2026"), for a plaque: it wraps at its
- * spaces in a narrow tile, where "2026-11-09" broke after a hyphen.
+ * A date as people write it ("9 Nov 2026"), for a plaque or a postcard: it
+ * wraps at its spaces in a narrow tile, where "2026-11-09" broke after a
+ * hyphen.
  */
 export function writtenDate(key: DateKey): string {
   return WRITTEN.format(fromKey(key))
+}
+
+/** A day with its weekday ("Tue 3 Nov"), for a star, the log and the lab. */
+export function shortDate(key: DateKey): string {
+  return SHORT_DAY.format(fromKey(key))
 }
 
 export function addDays(key: DateKey, days: number): DateKey {

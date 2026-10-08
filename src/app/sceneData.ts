@@ -14,7 +14,7 @@ import { legendaryFor } from '../scene/legendary'
 import { reachesOf } from '../store/paths'
 import type { LanternSpec } from '../scene/lanterns'
 import type { StoneSpec } from '../scene/stones'
-import { fromKey, todayKey } from '../store/dates'
+import { shortDate, todayKey } from '../store/dates'
 import { foundFor, lineFor, reachedOn, totalDone, waitingTiers, starDays } from '../store/derive'
 import type { AppData, DateKey, Thing, World } from '../store/types'
 import { voice } from '../voice'
@@ -276,11 +276,15 @@ export function stonesFor(data: AppData): StoneSpec[] {
   return specs
 }
 
+/** The shore's light with nothing found in the garden yet, and the finds that bring it to full. */
+const WARMTH_BASE = 0.25
+const WARMTH_FULL_AT = 6
+
 /** The shore glows warmer the more of the garden has been found. */
 export function warmthOf(data: AppData): number {
   const garden = [...everyThing(data).values()].filter((t) => t.world === 'garden')
   const found = garden.reduce((n, t) => n + foundFor(data, t, COLLECTIBLES).length, 0)
-  return 0.25 + Math.min(found, 6) * 0.125
+  return WARMTH_BASE + (Math.min(found, WARMTH_FULL_AT) / WARMTH_FULL_AT) * (1 - WARMTH_BASE)
 }
 
 export function hasJacket(data: AppData): boolean {
@@ -291,11 +295,7 @@ export function hasJacket(data: AppData): boolean {
 
 /** "Tue 3 Nov: run, read" for a star's label and its tap. */
 export function dayLabel(data: AppData, date: DateKey): string {
-  const when = fromKey(date).toLocaleDateString('en-GB', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  })
+  const when = shortDate(date)
   const names = (data.days[date]?.done ?? [])
     .map((id) => data.things.find((t) => t.id === id)?.name)
     .filter((name): name is string => typeof name === 'string')

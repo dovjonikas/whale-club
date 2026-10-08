@@ -8,8 +8,8 @@ import type { Moment } from './postcard'
 
 /**
  * The weekly recap: "5/7." and one line, no graph. The days are the
- * planned ones, so a thing done three days a week is "3/3.", not "3/7.". On a Sunday it is the
- * week so far; on any other day it is last week, the first time the app
+ * planned ones, so a thing done three days a week is "3/3.", not "3/7.". On the week's last
+ * day it is the week so far; on any other day it is last week, the first time the app
  * opens in the new one. It never says what was missed. A week that
  * started before the first thing existed is not recapped: "2/7" for a
  * person who joined on Friday would be a lie.
@@ -35,14 +35,21 @@ export function recapFor(data: AppData, today: DateKey = todayKey()): Recap | nu
   return { week, count, planned: days.length }
 }
 
+/**
+ * The share of planned days that earns "a good week" in the recap. Kinder
+ * than krill's good week (KRILL.goodWeekShare, 0.8, src/store/krill.ts) on
+ * purpose: a kind word should come easier than a reward.
+ */
+const GOOD_WEEK_WORD = 0.7
+
 export function recapNotice(store: Store, onSend: (moment: Moment) => void): NoticeBuilder {
   return (dismiss) => {
     const recap = recapFor(store.get())
     if (!recap) return null
-    const weekLine = recap.count / recap.planned >= 0.7 ? voice.weekGood : voice.weekBad
+    const weekLine = recap.count / recap.planned >= GOOD_WEEK_WORD ? voice.weekGood : voice.weekBad
     const card = document.createElement('aside')
     card.className = 'leaf recap'
-    card.setAttribute('aria-label', 'weekly recap')
+    card.setAttribute('aria-label', voice.labels.recap)
     card.innerHTML = `
       <div>
         <span class="leaf-title recap-count">${recap.count}/${recap.planned}.</span>
@@ -50,7 +57,7 @@ export function recapNotice(store: Store, onSend: (moment: Moment) => void): Not
       </div>
       <div class="leaf-actions">
         <button type="button" class="button-quiet recap-send">${voice.postcard.sendThis}</button>
-        <button type="button" class="button-quiet recap-ok">ok</button>
+        <button type="button" class="button-quiet recap-ok">${voice.labels.ok}</button>
       </div>`
     card.querySelector('.recap-send')?.addEventListener('click', () => {
       onSend({ kind: 'recap', line: `${recap.count}/${recap.planned}. ${weekLine}` })
