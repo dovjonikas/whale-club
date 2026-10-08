@@ -12,6 +12,7 @@ import { voice } from '../voice'
 import { dockByTier } from './dockData'
 import { arrangementOf } from './sceneData'
 import { openSheet } from './sheet'
+import { swap } from './swap'
 import { escapeHtml } from './thingMark'
 import { announce } from './toast'
 
@@ -39,7 +40,9 @@ export function openDockSheet(store: Store, handlers: DockHandlers, start?: stri
         body.innerHTML = listHtml(store.get())
         for (const tile of body.querySelectorAll<HTMLButtonElement>('.dock-tile')) {
           tile.addEventListener('click', () => {
-            page(tile.dataset.item ?? '')
+            swap(body, () => {
+              page(tile.dataset.item ?? '')
+            })
           })
         }
       }
@@ -52,8 +55,10 @@ export function openDockSheet(store: Store, handlers: DockHandlers, start?: stri
         }
         body.innerHTML = pageHtml(store.get(), item)
         on('.dock-back', () => {
-          list()
-          body.querySelector<HTMLElement>(`.dock-tile[data-item="${item.id}"]`)?.focus()
+          swap(body, () => {
+            list()
+            body.querySelector<HTMLElement>(`.dock-tile[data-item="${item.id}"]`)?.focus()
+          })
         })
         on('.dock-get', () => {
           const today = todayKey()

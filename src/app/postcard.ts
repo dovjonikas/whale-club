@@ -37,7 +37,8 @@ export interface Moment {
   milestone?: number
 }
 
-const SIZE: Record<PostcardFormat, [number, number]> = {
+/** Each size in pixels, also the preview's own width and height so it never jumps. */
+export const POSTCARD_SIZE: Record<PostcardFormat, readonly [number, number]> = {
   story: [1080, 1920],
   square: [1080, 1080],
 }
@@ -102,7 +103,7 @@ export async function renderPostcard(
   visibleIds: readonly string[],
   now: Date = today(),
 ): Promise<Blob> {
-  const [W, H] = SIZE[format]
+  const [W, H] = POSTCARD_SIZE[format]
   const layout = LAYOUT[format]
   const canvas = document.createElement('canvas')
   canvas.width = W

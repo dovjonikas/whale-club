@@ -76,7 +76,7 @@
   font-variation-settings:
     'opsz' 144,
     'SOFT' 100;
-  font-size: 56px;
+  font-size: var(--t-dial);
   line-height: 1;
   font-variant-numeric: tabular-nums;
   color: var(--star-pale);
@@ -96,7 +96,8 @@
   display: grid;
   grid-template-rows: auto 1fr auto;
   justify-items: center;
-  padding: calc(var(--safe-top) + var(--s4)) var(--s4) calc(var(--safe-bottom) + var(--s6));
+  padding: calc(var(--safe-top) + var(--s4)) calc(var(--safe-right) + var(--s4))
+    calc(var(--safe-bottom) + var(--s6)) calc(var(--safe-left) + var(--s4));
   overflow: hidden;
   cursor: default;
 }
@@ -119,7 +120,7 @@
 /* Sinking in: the water rises slowly, the mood of the session. */
 .session.is-open .session-deep {
   transform: none;
-  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform var(--dur-session-in) cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Leaving, the screen's own things fade first, so nothing is cut off as it goes. */
@@ -362,7 +363,7 @@
   font-variation-settings:
     'opsz' 144,
     'SOFT' 100;
-  font-size: 48px;
+  font-size: var(--t-ring);
   line-height: 1;
   font-variant-numeric: tabular-nums;
   color: var(--star-pale);

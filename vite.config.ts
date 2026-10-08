@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { existsSync, readdirSync } from 'node:fs'
 import { version } from './package.json'
@@ -19,8 +19,43 @@ const ART = existsSync('public/art')
   ? readdirSync('public/art').filter((name) => /\.(webp|png)$/.test(name))
   : []
 
+/**
+ * The three faces the first screen draws with (the body at 400 and 700, the
+ * display face), preloaded so the words do not arrive in a fallback and
+ * jump. Their built names carry a hash, so they are read from the bundle.
+ */
+const FIRST_FONTS =
+  /(atkinson-hyperlegible-latin-(400|700)-normal|fraunces-latin-full-normal)-.*\.woff2$/
+
+function preloadFonts(base: string): Plugin {
+  return {
+    name: 'whale-club:preload-fonts',
+    apply: 'build',
+    transformIndexHtml: {
+      order: 'post',
+      handler(_html, ctx) {
+        return Object.keys(ctx.bundle ?? {})
+          .filter((name) => FIRST_FONTS.test(name))
+          .map((name) => ({
+            tag: 'link',
+            attrs: {
+              rel: 'preload',
+              as: 'font',
+              type: 'font/woff2',
+              href: base + name,
+              crossorigin: '',
+            },
+            injectTo: 'head' as const,
+          }))
+      },
+    },
+  }
+}
+
+const BASE = '/whale-club/'
+
 export default defineConfig({
-  base: '/whale-club/',
+  base: BASE,
   // The version shows at the bottom of the menu; five taps on it open the lab.
   define: { __APP_VERSION__: JSON.stringify(version), __ART__: JSON.stringify(ART) },
   build: {
@@ -32,6 +67,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    preloadFonts(BASE),
     VitePWA({
       // 'prompt' rather than 'autoUpdate': the new worker waits until the
       // person taps the toast, so a reload never happens mid-tap. If they
@@ -43,6 +79,9 @@ export default defineConfig({
         name: 'Whale Club',
         short_name: 'Whale Club',
         description: 'A habit game about small things that add up.',
+        // A stable identity, so a later change of start_url never makes the
+        // installed app a stranger to the browser.
+        id: '/whale-club/',
         start_url: '/whale-club/',
         scope: '/whale-club/',
         display: 'standalone',
@@ -62,6 +101,9 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,png,svg,woff2,webp}'],
+        // iOS fetches its startup image itself, once, at install: precaching
+        // eleven of them would only slow every first visit.
+        globIgnores: ['splash/**'],
         clientsClaim: true,
         skipWaiting: false,
         navigateFallback: '/whale-club/index.html',

@@ -27,13 +27,22 @@
   --font-display: 'Fraunces Variable', Georgia, serif;
   --font-body: 'Atkinson Hyperlegible', system-ui, sans-serif;
 
+  /* Reading sizes in rem, so a larger text setting in the browser reaches
+     them (at the default 16px: 11, 12, 14, 17, 24, 32, 40). */
   /* Only for a count or a tag inside something small (a stone, a tile, a day cell). */
-  --t-2xs: 11px;
-  --t-xs: 12px;
-  --t-sm: 14px;
-  --t-md: 17px;
-  --t-lg: 24px;
-  --t-xl: 40px;
+  --t-2xs: 0.6875rem;
+  --t-xs: 0.75rem;
+  --t-sm: 0.875rem;
+  --t-md: 1.0625rem;
+  --t-lg: 1.5rem;
+  --t-2xl: 2rem;
+  --t-xl: 2.5rem;
+  /* Sized to a shape, not for reading, so they stay in px: the wordmark,
+     an icon inside its 44px button, the numbers inside the dial's ring. */
+  --t-mark: 22px;
+  --t-icon: 20px;
+  --t-dial: 56px;
+  --t-ring: 48px;
 
   --s1: 4px;
   --s2: 8px;
@@ -63,20 +72,26 @@
   --control-edge: rgba(62, 242, 224, 0.44);
   /* The one stroke of every glyph and icon on the 24 grid (src/brand/icons.ts LINE). */
   --line: 1.75;
-  /* A press: how far a control gives under a finger, and how fast. */
+  /* A press: how far a control gives under a finger (at once), and how fast it lets go. */
   --press-scale: 0.97;
-  --dur-press: 140ms;
+  --dur-press: 180ms;
   /* Sheets come up on the drawer curve and go down faster than they came. */
   --dur-sheet-in: 480ms;
   --dur-sheet-out: 300ms;
   /* A toast leaves faster than it came (it comes in --dur). */
   --dur-toast-out: 180ms;
+  /* A lock-in: the deep water rises over this, the mood of the session. */
+  --dur-session-in: 700ms;
   /* Stopping a lock-in: the deep water goes down this fast, everything on it fading first. */
   --dur-session-out: 600ms;
+  /* The intro's "start light" coming in: soon enough to take over from the words. */
+  --dur-start: 500ms;
   /* A "+10" by the krill: up over this, then gone. A notice, not a celebration. */
   --dur-rise: 700ms;
   /* A thing settling into a place when it is let go, or swapping with another. */
   --dur-snap: 220ms;
+  /* A sheet changing what it shows: a crossfade while it eases to its new height. */
+  --dur-swap: 220ms;
 
   /* Where the sky ends and the sea begins, as a share of the scene's height. */
   --horizon: 58%;

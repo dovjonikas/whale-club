@@ -10,7 +10,9 @@
   display: grid;
   grid-template-rows: auto 1fr auto auto;
   justify-items: center;
-  padding: calc(var(--safe-top) + var(--s4)) var(--s4) calc(var(--safe-bottom) + var(--s8));
+  /* Every edge clears the notch and the rounded corners, in either orientation. */
+  padding: calc(var(--safe-top) + var(--s4)) calc(var(--safe-right) + var(--s4))
+    calc(var(--safe-bottom) + var(--s8)) calc(var(--safe-left) + var(--s4));
   cursor: pointer;
 }
 
@@ -18,7 +20,7 @@
   position: absolute;
   z-index: 3;
   top: calc(var(--safe-top) + var(--s2));
-  right: var(--s2);
+  right: calc(var(--safe-right) + var(--s2));
   min-width: var(--touch);
   height: var(--touch);
   padding: 0 var(--s4);
@@ -31,7 +33,7 @@
 .intro-day {
   position: absolute;
   top: calc(var(--safe-top) + var(--s4));
-  left: var(--s4);
+  left: calc(var(--safe-left) + var(--s4));
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--t-lg);
@@ -160,9 +162,9 @@
   visibility: hidden;
   transform: translate3d(0, 12px, 0);
   transition:
-    opacity 900ms var(--ease-out),
-    transform 900ms var(--ease-out),
-    visibility 0s linear 900ms;
+    opacity var(--dur-start) var(--ease-out),
+    transform var(--dur-start) var(--ease-out),
+    visibility 0s linear var(--dur-start);
 }
 
 .intro[data-beat='start'] .intro-start {
@@ -170,8 +172,8 @@
   visibility: visible;
   transform: none;
   transition:
-    opacity 900ms var(--ease-out),
-    transform 900ms var(--ease-out),
+    opacity var(--dur-start) var(--ease-out),
+    transform var(--dur-start) var(--ease-out),
     visibility 0s;
 }
 
@@ -679,6 +681,7 @@
 }
 
 .intro-begin-title {
+  text-wrap: balance;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: var(--t-lg);

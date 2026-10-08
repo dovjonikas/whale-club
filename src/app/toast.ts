@@ -1,7 +1,16 @@
 /** One line at the top of the screen, one tap. Only one shows at a time. */
 import { host } from './host'
 
+/** How long a plain toast stays, counted only while it can be read. */
+const TOAST_MS = 4000
+/** How long an undo waits, counted the same way. */
+const UNDO_MS = 10_000
+/** A little longer than --dur-toast-out, so the leaving is never cut short. */
+const LEAVE_MS = 300
+
 let current: HTMLButtonElement | null = null
+/** Stops the undo on screen without closing it: a newer one is taking its place. */
+let dropUndo: (() => void) | null = null
 let announcer: HTMLElement | null = null
 
 /**
@@ -25,13 +34,73 @@ export function announce(text: string): void {
   }, 50)
 }
 
+/**
+ * Runs `done` after `ms` of time the line could actually be read: the
+ * count stops while a pointer rests on it, while a keyboard has its focus,
+ * and while the page is hidden, so an undo never runs out behind a finger
+ * or another app. Focus handed over after a tap (a deleted card gives its
+ * focus to the undo) does not count: on a phone it would never run out.
+ * Returns a stop.
+ */
+function readableTimer(el: HTMLElement, ms: number, done: () => void): () => void {
+  let left = ms
+  let started = 0
+  let timer = 0
+  let hovered = false
+  let focused = false
+  const paused = (): boolean => hovered || focused || document.hidden
+  const run = (): void => {
+    if (timer || paused()) return
+    started = performance.now()
+    timer = window.setTimeout(finish, left)
+  }
+  const pause = (): void => {
+    if (!timer) return
+    clearTimeout(timer)
+    timer = 0
+    left = Math.max(0, left - (performance.now() - started))
+  }
+  const update = (): void => {
+    if (paused()) pause()
+    else run()
+  }
+  const on = (event: string, set: () => void): void => {
+    el.addEventListener(event, () => {
+      set()
+      update()
+    })
+  }
+  on('pointerenter', () => (hovered = true))
+  on('pointerleave', () => (hovered = false))
+  el.addEventListener('focusin', (event) => {
+    focused = event.target instanceof Element && event.target.matches(':focus-visible')
+    update()
+  })
+  // Focus moving within the line comes back through focusin at once.
+  on('focusout', () => (focused = false))
+  document.addEventListener('visibilitychange', update)
+  function stop(): void {
+    clearTimeout(timer)
+    timer = 0
+    document.removeEventListener('visibilitychange', update)
+  }
+  function finish(): void {
+    stop()
+    done()
+  }
+  run()
+  return stop
+}
+
 export function showToast(text: string, onTap?: () => void): void {
   current?.remove()
   const toast = document.createElement('button')
   toast.type = 'button'
   toast.className = 'toast'
   toast.textContent = text
+  let stop = (): void => undefined
   toast.addEventListener('click', () => {
+    stop()
     hide()
     onTap?.()
   })
@@ -39,7 +108,7 @@ export function showToast(text: string, onTap?: () => void): void {
   current = toast
   announce(text)
   requestAnimationFrame(() => toast.classList.add('is-open'))
-  if (!onTap) setTimeout(hide, 4000)
+  if (!onTap) stop = readableTimer(toast, TOAST_MS, hide)
 }
 
 function hide(): void {
@@ -47,18 +116,21 @@ function hide(): void {
   if (!toast) return
   current = null
   toast.classList.remove('is-open')
-  setTimeout(() => toast.remove(), 300)
+  setTimeout(() => toast.remove(), LEAVE_MS)
 }
 
-/** How long an undo waits. */
-const UNDO_MS = 10_000
-
 /**
- * A line at the bottom with an "undo" beside it, for ten seconds: the way
- * a delete is taken back, instead of asking first.
+ * A line at the bottom with an "undo" beside it, for ten readable seconds:
+ * the way a delete is taken back, instead of asking first. `onGone` runs
+ * once it closes, undone or not.
  */
-export function showUndo(text: string, label: string, onUndo: () => void): void {
-  document.querySelector('.undo-toast')?.remove()
+export function showUndo(
+  text: string,
+  label: string,
+  onUndo: () => void,
+  onGone?: () => void,
+): void {
+  dropUndo?.()
   const toast = document.createElement('div')
   toast.className = 'undo-toast'
   toast.innerHTML =
@@ -68,13 +140,18 @@ export function showUndo(text: string, label: string, onUndo: () => void): void 
   if (textEl) textEl.textContent = text
   if (button) button.textContent = label
   const close = (): void => {
-    clearTimeout(timer)
+    stop()
     toast.classList.remove('is-open')
     setTimeout(() => {
       toast.remove()
-    }, 300)
+    }, LEAVE_MS)
+    onGone?.()
   }
-  const timer = window.setTimeout(close, UNDO_MS)
+  const stop = readableTimer(toast, UNDO_MS, close)
+  dropUndo = (): void => {
+    stop()
+    toast.remove()
+  }
   button?.addEventListener('click', () => {
     close()
     onUndo()

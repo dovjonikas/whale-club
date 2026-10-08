@@ -5,16 +5,20 @@ import { voice } from '../voice'
  * the person turns some off. Used by the add sheet and the thing's sheet.
  * Returns the element and a reader for the current choice.
  */
+/** Ids of its own, so a sheet still leaving never shares one with the next. */
+let fieldCount = 0
+
 export function daysField(initial: readonly boolean[]): {
   element: HTMLElement
   value: () => boolean[]
 } {
   const days = [...initial]
+  const id = `days-label-${String(++fieldCount)}`
   const field = document.createElement('div')
   field.className = 'field'
   field.innerHTML = `
-    <span class="field-label" id="days-label">${voice.days.label}</span>
-    <div class="day-chips" role="group" aria-labelledby="days-label">
+    <span class="field-label" id="${id}">${voice.days.label}</span>
+    <div class="day-chips" role="group" aria-labelledby="${id}">
       ${voice.days.short
         .map(
           (letter, i) =>

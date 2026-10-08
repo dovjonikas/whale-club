@@ -51,7 +51,7 @@ export function iconField(start: {
   element.className = 'field icon-field'
   element.innerHTML = `
     <div class="icon-head">
-      <span class="icon-preview"></span>
+      <span class="icon-preview" role="img"></span>
       <span class="field-label" id="${id}">${voice.icon.label}</span>
       <span class="icon-auto">${voice.icon.picked}</span>
     </div>
@@ -81,6 +81,8 @@ export function iconField(start: {
   const more = element.querySelector<HTMLElement>('.icon-more')
   const toggle = element.querySelector<HTMLButtonElement>('.icon-more-toggle')
 
+  /** What the extra chip holds now: it is redrawn only when that changes. */
+  let extraIcon = ''
   const show = (): void => {
     if (preview) {
       preview.innerHTML = bubbleSvg({
@@ -89,13 +91,18 @@ export function iconField(start: {
         color: start.color,
         kind: start.kind,
       })
+      // The picture is named, so the one picked from the name can be found by a screen reader too.
+      preview.setAttribute(
+        'aria-label',
+        icon === LETTER ? voice.icon.letter : (glyph(icon)?.label ?? icon),
+      )
     }
     // A picture from the name that is not among the twelve shows first, so the choice is always in sight.
-    if (extra) {
-      extra.innerHTML =
-        icon !== LETTER && !COMMON.includes(icon)
-          ? chip(icon, glyph(icon)?.label ?? icon, glyphSvg(icon))
-          : ''
+    const nextExtra = icon !== LETTER && !COMMON.includes(icon) ? icon : extraIcon
+    // Picking the extra chip itself keeps it: redrawing it would pull it from under the finger and the focus.
+    if (extra && nextExtra !== extraIcon) {
+      extraIcon = nextExtra
+      extra.innerHTML = chip(extraIcon, glyph(extraIcon)?.label ?? extraIcon, glyphSvg(extraIcon))
     }
     element.querySelectorAll('.icon-letter').forEach((letter) => {
       letter.textContent = monogram(name || 'a')

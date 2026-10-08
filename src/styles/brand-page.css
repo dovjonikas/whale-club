@@ -19,6 +19,7 @@
 
 .brand-page h1,
 .brand-page h2 {
+  text-wrap: balance;
   margin: 0;
   font-family: var(--font-display);
   font-weight: 700;

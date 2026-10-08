@@ -47,6 +47,8 @@ const PHONE_WIDTH = 390
 const STAR_FLIGHT_MAX_MS = 2000
 /** A night-only dock thing bought in daylight shows itself for this long. */
 const DOCK_PREVIEW_MS = 6000
+/** Under reduced motion a find does not fly or swell: it fades in where it stays. */
+const FIND_FADE_MS = 300
 /** The sky whale starts across this long after the scene opens in the dark. */
 const SKY_WHALE_WAIT_MS = 20_000
 const NIGHT_FROM = 21
@@ -648,6 +650,15 @@ export class Scene {
 
   /** A find pops out where its stone was, is polished, and settles into its place. */
   private arrive(element: HTMLElement, from: { x: number; y: number }): void {
+    if (reducedMotion()) {
+      // Through the Web Animations API: the stylesheet's reduced-motion rule
+      // cuts every CSS animation short, and this one fade should stay.
+      element.animate([{ opacity: 0 }, { opacity: 1 }], {
+        duration: FIND_FADE_MS,
+        easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
+      })
+      return
+    }
     const rect = this.root.getBoundingClientRect()
     const own = element.getBoundingClientRect()
     const dx = from.x - (own.left - rect.left + own.width / 2)

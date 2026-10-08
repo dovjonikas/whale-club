@@ -91,6 +91,7 @@
     'WONK' 1;
   font-size: var(--t-lg);
   color: var(--star-pale);
+  text-wrap: balance;
 }
 
 .sheet-close {
@@ -182,6 +183,7 @@
 }
 
 .sheet-note {
+  text-wrap: pretty;
   margin: var(--s2) 0 0;
   font-size: var(--t-xs);
   color: var(--ink-dim);
@@ -265,6 +267,7 @@
 
 /* The check-in and the recap share the leaf's shape. */
 .checkin .leaf-title {
+  text-wrap: balance;
   font-family: var(--font-display);
   font-weight: 700;
   font-variation-settings:
@@ -282,8 +285,9 @@
   font-variation-settings:
     'opsz' 144,
     'SOFT' 100;
-  font-size: 32px;
+  font-size: var(--t-2xl);
   line-height: 1;
+  font-variant-numeric: tabular-nums;
   color: var(--star-pale);
 }
 
@@ -307,6 +311,12 @@
   font-weight: 700;
 }
 
+/* A long name wraps inside its own column at 320 px; the count keeps its place. */
+.collection-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .collection-creature {
   width: 36px;
   height: 36px;
@@ -321,8 +331,10 @@
 }
 
 .collection-total {
+  flex-shrink: 0;
   margin-left: auto;
   font-size: var(--t-xs);
+  font-variant-numeric: tabular-nums;
   font-weight: 400;
   color: var(--ink-dim);
 }
@@ -581,6 +593,7 @@
 .postcard-preview {
   display: block;
   width: 100%;
+  height: auto;
   max-height: 55vh;
   object-fit: contain;
   margin-bottom: var(--s4);
@@ -982,4 +995,27 @@
   height: 6px;
   border-radius: 50%;
   background: var(--star);
+}
+
+/* A sheet changing what it shows (src/app/swap.ts): a quick crossfade while
+   it eases to its new height. The page behind takes no part, so the scene
+   stays live under it. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-group(sheet-swap),
+::view-transition-old(sheet-swap),
+::view-transition-new(sheet-swap) {
+  animation-duration: var(--dur-swap);
+  animation-timing-function: var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(sheet-swap),
+  ::view-transition-old(sheet-swap),
+  ::view-transition-new(sheet-swap) {
+    animation: none;
+  }
 }

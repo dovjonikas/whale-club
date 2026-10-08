@@ -11,14 +11,18 @@ body {
   background: var(--abyss);
   color: var(--ink);
   font-family: var(--font-body);
-  font-size: var(--t-sm);
   line-height: 1.4;
   -webkit-text-size-adjust: 100%;
+  /* Light text on the night: the subpixel default draws it heavier than it is. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
 }
 
 body {
+  /* On body, not html: the root keeps the browser's own size, which every rem reads. */
+  font-size: var(--t-sm);
   /* 100dvh so the iPhone's toolbars never leave a gap; 100vh as the fallback. */
   height: 100vh;
   height: 100dvh;
@@ -128,7 +132,7 @@ input {
     'opsz' 144,
     'SOFT' 100,
     'WONK' 1;
-  font-size: 22px;
+  font-size: var(--t-mark);
   letter-spacing: -0.01em;
   color: var(--star-pale);
   white-space: nowrap;
@@ -147,7 +151,7 @@ input {
   place-items: center;
   border-radius: var(--r-pill);
   color: var(--ink-dim);
-  font-size: 20px;
+  font-size: var(--t-icon);
   transition:
     color var(--dur-fast) var(--ease),
     transform var(--dur-press) var(--ease-out);
@@ -224,6 +228,13 @@ input {
   scale: var(--press-scale);
 }
 
+/* The press lands at once and lets go over --dur-press: a finger never waits
+   for the screen to answer it. Only the press itself is instant; the release
+   keeps each control's own curve. Children (a ring, a fill) keep theirs. */
+button:active:not(:disabled) {
+  transition-duration: 0s;
+}
+
 .icon-button svg {
   width: 22px;
   height: 22px;
@@ -288,6 +299,7 @@ input {
 }
 
 .onboarding p {
+  text-wrap: balance;
   margin: 0;
   font-family: var(--font-display);
   font-weight: 600;

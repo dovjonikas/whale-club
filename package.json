@@ -17,6 +17,7 @@
     "format": "prettier --write .",
     "icons": "node scripts/icons.mjs",
     "art:check": "node scripts/art-check.mjs",
+    "splash": "node scripts/splash.mjs",
     "shots": "node scripts/shots.mjs && node scripts/squeeze.mjs && node scripts/hero.mjs && node scripts/squeeze.mjs"
   },
   "dependencies": {

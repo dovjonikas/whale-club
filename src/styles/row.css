@@ -334,6 +334,7 @@
 }
 
 .not-today-count {
+  font-variant-numeric: tabular-nums;
   min-width: 18px;
   padding: 0 6px;
   border-radius: var(--r-pill);
@@ -556,8 +557,9 @@
   animation: hint-in 1.6s var(--ease) both;
 }
 
-.card:has(.card-hint) {
-  animation: card-pulse 1.4s var(--ease) 1;
+/* The pulse is the done glow's own layer, lit and let go: opacity only. */
+.card:has(.card-hint)::after {
+  animation: card-pulse 1.4s var(--ease-out) 1;
 }
 
 @keyframes hint-in {
@@ -574,9 +576,7 @@
 
 @keyframes card-pulse {
   40% {
-    box-shadow:
-      0 0 0 2px var(--world-color),
-      0 0 32px var(--world-glow);
+    opacity: 1;
   }
 }
 
@@ -651,7 +651,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .card-hint,
-  .card:has(.card-hint) {
+  .card:has(.card-hint)::after {
     animation: none;
   }
   .card.is-leaving {

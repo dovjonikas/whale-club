@@ -128,14 +128,23 @@ export function openSessionScreen(
 
   // A tap anywhere that is not a button shows the time for a moment.
   let timeTimer = 0
-  screen.addEventListener('click', (event) => {
+  const glance = (): void => {
     if (options.showTime || screen.dataset.state === 'ended') return
-    if (event.target instanceof Element && event.target.closest('button')) return
     screen.dataset.time = 'shown'
     clearTimeout(timeTimer)
     timeTimer = window.setTimeout(() => {
       screen.dataset.time = 'hidden'
     }, SHOW_TIME_MS)
+  }
+  screen.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('button')) return
+    glance()
+  })
+  // The keyboard's tap: Space or Enter on the screen itself, not on a button.
+  screen.addEventListener('keydown', (event) => {
+    if (event.target !== screen || (event.key !== ' ' && event.key !== 'Enter')) return
+    event.preventDefault()
+    glance()
   })
 
   soundButton.addEventListener('click', () => {

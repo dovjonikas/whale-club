@@ -17,6 +17,7 @@ import type { AppData, DateKey } from '../store/types'
 import { voice } from '../voice'
 import { everyThing, lanternColor } from './sceneData'
 import { openSheet } from './sheet'
+import { swap } from './swap'
 
 /**
  * The log: the one view of what has been done. A month at a time, Monday
@@ -41,12 +42,15 @@ export function openLogSheet(store: Store, at?: DateKey): void {
       const thisMonth = monthOf(today)
       let view: View = at ? { kind: 'day', date: at } : { kind: 'month', month: thisMonth }
 
-      const show = (next: View): void => {
+      /** `keep`: the control to hold the focus on, if it is still there and enabled. */
+      const show = (next: View, keep?: string): void => {
         view = next
-        render()
+        swap(body, () => {
+          render(keep)
+        })
       }
 
-      const render = (): void => {
+      const render = (keep?: string): void => {
         const data = store.get()
         const earliest = firstMonth(data, today)
         body.dataset.view = view.kind
@@ -55,7 +59,9 @@ export function openLogSheet(store: Store, at?: DateKey): void {
         else if (view.kind === 'year') body.innerHTML = yearHtml(view.year, earliest, thisMonth)
         else body.innerHTML = dayHtml(view.date)
         wire()
-        body.querySelector<HTMLElement>('[data-focus]')?.focus()
+        const held = keep ? body.querySelector<HTMLButtonElement>(keep) : null
+        if (held && !held.disabled) held.focus()
+        else body.querySelector<HTMLElement>('[data-focus]')?.focus()
       }
 
       const monthHtml = (
@@ -152,7 +158,7 @@ export function openLogSheet(store: Store, at?: DateKey): void {
                   : `<i${dayEntry(data, date).star ? ' class="is-star"' : ''}></i>`,
               )
               .join('')
-            const name = fromKey(`${month}-01`).toLocaleDateString('en-GB', { month: 'short' })
+            const name = MONTH_SHORT.format(fromKey(`${month}-01`))
             return `<button type="button" class="log-month" data-month="${month}"${open ? '' : ' disabled'} aria-label="${monthName(month)}">
               <span class="log-month-name">${name}</span>
               <span class="log-month-dots" aria-hidden="true">${dots}</span>
@@ -209,10 +215,10 @@ export function openLogSheet(store: Store, at?: DateKey): void {
         if (view.kind === 'month') {
           const month = view.month
           on('.log-prev', () => {
-            show({ kind: 'month', month: addMonths(month, -1) })
+            show({ kind: 'month', month: addMonths(month, -1) }, '.log-prev')
           })
           on('.log-next', () => {
-            show({ kind: 'month', month: addMonths(month, 1) })
+            show({ kind: 'month', month: addMonths(month, 1) }, '.log-next')
           })
           on('.log-title', () => {
             show({ kind: 'year', year: Number(month.slice(0, 4)) })
@@ -225,10 +231,10 @@ export function openLogSheet(store: Store, at?: DateKey): void {
         } else if (view.kind === 'year') {
           const year = view.year
           on('.log-prev-year', () => {
-            show({ kind: 'year', year: year - 1 })
+            show({ kind: 'year', year: year - 1 }, '.log-prev-year')
           })
           on('.log-next-year', () => {
-            show({ kind: 'year', year: year + 1 })
+            show({ kind: 'year', year: year + 1 }, '.log-next-year')
           })
           body.querySelectorAll<HTMLButtonElement>('.log-month').forEach((button) => {
             button.addEventListener('click', () => {
@@ -251,16 +257,17 @@ export function openLogSheet(store: Store, at?: DateKey): void {
 const CHEVRON_LEFT = icon('back')
 const CHEVRON_RIGHT = icon('forward')
 
+/** Made once: a month of cells would otherwise build a formatter per cell. */
+const MONTH_LONG = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' })
+const MONTH_SHORT = new Intl.DateTimeFormat('en-GB', { month: 'short' })
+const DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+
 function monthName(month: MonthKey): string {
-  return fromKey(`${month}-01`).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })
+  return MONTH_LONG.format(fromKey(`${month}-01`))
 }
 
 function dayName(date: DateKey): string {
-  return fromKey(date).toLocaleDateString('en-GB', {
-    weekday: 'short',
-    day: 'numeric',
-    month: 'short',
-  })
+  return DAY.format(fromKey(date))
 }
 
 function dayAria(date: DateKey, names: string[], lanterns: number): string {
