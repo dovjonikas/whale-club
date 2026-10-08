@@ -50,8 +50,9 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
           <div class="icon-slot"></div>
           <div class="kind-slot"></div>
           <div class="days-slot"></div>
-          <div class="field after-field" role="group" aria-label="${voice.after.label}">
+          <div class="field after-field" role="group" aria-label="${voice.after.label}" aria-describedby="after-note-${thing.id}">
             <span class="field-label">${voice.after.label}</span>
+            <p class="sheet-note after-note" id="after-note-${thing.id}">${voice.after.note}</p>
             <div class="chips">
               <button type="button" class="chip after-chip" data-after="" aria-pressed="${String(thing.after === undefined)}">${voice.after.none}</button>
               ${AFTERS.map(
