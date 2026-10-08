@@ -154,6 +154,21 @@ export const voice = {
     back: 'back to the sea',
     watch: 'watch the intro',
   },
+  /** The far goal beside the near one: the legendary at the end of this constellation. */
+  legend: {
+    progress: (lit: number, length: number) => `${String(lit)}/${String(length)}`,
+    label: (name: string, lit: number, length: number) =>
+      `${name}: ${String(lit)} of ${String(length)} stars`,
+    /** The halfway star: a rare find. */
+    half: (name: string) => `half way. ${name}.`, // TODO-VOICE
+    /** The last star: the legendary. */
+    earned: (name: string) => `${name}. earned, not bought.`, // TODO-VOICE
+    plaque: (date: string, day: number) => `earned on ${date} · day ${String(day)}`,
+    title: 'legendary',
+    ahead: (stars: number) => `${String(stars)} stars to go`,
+    later: 'a later constellation',
+    ok: 'ok',
+  },
   /** The goal always in sight: the next find, under the sky. */
   nextFind: (days: number) =>
     days === 1 ? 'next find: tomorrow' : `next find: in ${String(days)} days`,
@@ -317,6 +332,8 @@ export const voice = {
     seed30: 'seed 30 days',
     seed90: 'seed 90 days',
     seed365: 'seed 365 days',
+    star: '+1 star',
+    path: 'finish this path',
     firstOpen: 'first open again',
     clear: 'clear sandbox',
     time: 'time',

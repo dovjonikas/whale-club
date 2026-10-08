@@ -1,6 +1,9 @@
 import { collectibleSvg, collectiblesFor } from '../scene/collectibles'
 import { Scene } from '../scene/scene'
 import { CHEST } from '../scene/spots'
+import { legendaryFor } from '../scene/legendary'
+import { halfwayStar, pathLength, progressOf, reachesOf, type PathProgress } from '../store/paths'
+import { playCeremony } from './ceremony'
 import { todayKey } from '../store/dates'
 import {
   allDoneToday,
@@ -11,12 +14,11 @@ import {
   plannedThings,
   stageFor,
   starDays,
-  streakDays,
 } from '../store/derive'
 import { labOn } from '../store/lab'
 import { Store } from '../store/store'
 import { emptyData } from '../store/types'
-import { seedHistory } from '../lab/seed'
+import { addStars, seedHistory } from '../lab/seed'
 import { enterLabFromMenu, startLabUi } from '../lab/labUi'
 import type { AppData, DateKey, Thing } from '../store/types'
 import { pick, voice } from '../voice'
@@ -58,6 +60,9 @@ import { showUndo } from './toast'
 import { surpriseFor } from './surprise'
 
 const SURPRISE_DELAY_MS = 4000
+/** A path's moment waits for a lock-in screen to go, looking again this often, and not for ever. */
+const SESSION_WAIT_MS = 250
+const SESSION_WAIT_MAX_MS = 20_000
 /** The postcard button waits for the moment's animation to finish. */
 const OFFER_AFTER_WHALE_MS = 2200
 const OFFER_AFTER_FIND_MS = 2800
@@ -239,7 +244,17 @@ export function startApp(root: HTMLElement, labEntered = false): void {
         return
       }
       const before = stageFor(last7(store.get(), thing.id, todayKey()))
+      // The day's first done makes a star: it is held back, to fly up from this card.
+      const today = todayKey()
+      const newStar = !starDays(store.get()).includes(today)
+      if (newStar) scene.holdStar(today)
       const done = store.toggleDone(thing.id)
+      if (newStar) {
+        const rect = card.getBoundingClientRect()
+        if (done)
+          scene.flyStar(today, { x: rect.left + rect.width / 2, y: rect.top + rect.height * 0.35 })
+        else scene.releaseHeld()
+      }
       if (!done) {
         postcards.clearOffer()
         sound.play('untap')
@@ -389,6 +404,76 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     if (bumped) store.setPlacement(Object.fromEntries(now.where))
   }
 
+  /** The path as the last render left it, to notice a halfway star or a finished constellation. */
+  let pathBefore: PathProgress | null = null
+
+  /**
+   * After a star day: half way along the path, a rare find and two bright
+   * notes; at its end, the legendary's ceremony. Both wait for a lock-in's
+   * screen to go, so they happen in the world, not behind the water.
+   */
+  function watchPath(data: AppData): void {
+    const dates = starDays(data)
+    const now = progressOf(dates.length)
+    const before = pathBefore
+    pathBefore = now
+    if (!before) return
+    if (now.path > before.path) {
+      // The day has its moment: the surprise waits for another day.
+      surprisedFor = todayKey()
+      const finished = now.path - 1
+      const date = reachesOf(dates)[finished]?.end ?? todayKey()
+      const day = dates.indexOf(date) + 1
+      afterSession(() => {
+        crown(finished, voice.legend.plaque(date, day))
+      })
+    } else if (now.path === before.path) {
+      const half = halfwayStar(now.length)
+      if (before.lit < half && now.lit >= half) {
+        surprisedFor = todayKey()
+        const rare = legendaryFor(now.path).rare
+        afterSession(() => {
+          sound.play('half')
+          line.say(voice.legend.half(rare.name))
+        })
+      }
+    }
+  }
+
+  /** The legendary of path `index`, arriving, and its gold postcard on request. */
+  function crown(index: number, plaque: string): void {
+    const legendary = legendaryFor(index)
+    sound.play('legendary')
+    playCeremony(scene, {
+      legendary,
+      stars: pathLength(index),
+      plaque,
+      onSend: () => {
+        postcards.sendNow({
+          kind: 'legendary',
+          line: legendary.name,
+          legendary: { id: legendary.id, plaque },
+        })
+      },
+      onClose: () => {
+        line.say(voice.legend.earned(legendary.name))
+      },
+    })
+  }
+
+  /**
+   * Runs `work` once the moment that set it off is over: a beat after the
+   * tap (so the tap's own line and its star go first), then whenever no
+   * lock-in screen or flying star is left on the page.
+   */
+  function afterSession(work: () => void, waited = 0): void {
+    setTimeout(() => {
+      if (document.querySelector('.session, .star-flight') && waited < SESSION_WAIT_MAX_MS)
+        afterSession(work, waited + SESSION_WAIT_MS)
+      else work()
+    }, SESSION_WAIT_MS)
+  }
+
   /** Once a day, after the first thing done: something new in the scene. */
   function maybeSurprise(data: AppData, today: DateKey): void {
     if (surprisedFor === today) return
@@ -410,19 +495,17 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     scene.setEmpty(data.things.length === 0)
     row.render(data)
     krill.render(data, today)
+    watchPath(data)
     scene.setDock(new Set(shownItems(data).map((item) => item.id)), () => {
       openDock()
     })
 
     const stars = starDays(data)
-    scene.setDays(
-      { dates: stars, streak: streakDays(stars), today, label: (date) => dayLabel(data, date) },
-      (date) => {
-        openLogSheet(store, date)
-      },
-    )
+    scene.setDays({ dates: stars, today, label: (date) => dayLabel(data, date) }, (date) => {
+      openLogSheet(store, date)
+    })
 
-    scene.setLanterns(lanternsFor(data))
+    scene.setLanterns(lanternsFor(data), today)
     renderNext(data)
     scene.setCollectibles(shownCollectibles(data), arrivals)
     arrivals.clear()
@@ -444,30 +527,56 @@ export function startApp(root: HTMLElement, labEntered = false): void {
 
   /** The next find's silhouette and the days to it, always in sight; a tap opens the Collection. */
   const nextSlot = query(root, '.next-slot')
+  /**
+   * The goals in sight, under the sky: the near one (the next find, "in 2
+   * days") and the far one (the legendary at the end of this
+   * constellation, "12/30"). Both open the Collection.
+   */
   function renderNext(data: AppData): void {
-    const next = nextFind(data)
-    if (!next) {
+    if (data.things.length === 0) {
       nextSlot.replaceChildren()
       return
     }
-    const text = voice.nextFind(next.days)
-    const button =
-      nextSlot.querySelector<HTMLButtonElement>('.next-find') ?? document.createElement('button')
-    if (!button.isConnected) {
+    const next = nextFind(data)
+    const near = pill('next-find', next !== null)
+    if (next && (near.dataset.item !== next.item.id || near.dataset.days !== String(next.days))) {
+      near.dataset.item = next.item.id
+      near.dataset.days = String(next.days)
+      near.innerHTML = `<span class="next-art" aria-hidden="true">${collectibleSvg(next.item)}</span><span class="next-text"></span>`
+      const label = near.querySelector('.next-text')
+      if (label) label.textContent = voice.nextFind(next.days)
+    }
+    const path = progressOf(starDays(data).length)
+    const legend = legendaryFor(path.path)
+    const far = pill('next-legend', true)
+    const key = `${legend.id}:${String(path.lit)}`
+    if (far.dataset.key !== key) {
+      far.dataset.key = key
+      far.setAttribute('aria-label', voice.legend.label(legend.name, path.lit, path.length))
+      far.innerHTML = `<span class="next-art next-legend-art" aria-hidden="true">${collectibleSvg(legend.find)}</span><span class="next-text">${voice.legend.progress(path.lit, path.length)}</span>`
+    }
+  }
+
+  /** One of the goal buttons, made once and kept; removed when it has nothing to show. */
+  function pill(name: string, shown: boolean): HTMLButtonElement {
+    let button = nextSlot.querySelector<HTMLButtonElement>(`.${name}`)
+    if (!shown) {
+      button?.remove()
+      return button ?? document.createElement('button')
+    }
+    if (!button) {
+      button = document.createElement('button')
       button.type = 'button'
-      button.className = 'next-find'
+      button.className = name
       button.addEventListener('click', () => {
-        openCollectionSheet(store)
+        openCollectionSheet(store, () => {
+          startArrange({})
+        })
       })
-      nextSlot.append(button)
+      if (name === 'next-find') nextSlot.prepend(button)
+      else nextSlot.append(button)
     }
-    if (button.dataset.item !== next.item.id || button.dataset.days !== String(next.days)) {
-      button.dataset.item = next.item.id
-      button.dataset.days = String(next.days)
-      button.innerHTML = `<span class="next-art" aria-hidden="true">${collectibleSvg(next.item)}</span><span class="next-text"></span>`
-      const label = button.querySelector('.next-text')
-      if (label) label.textContent = text
-    }
+    return button
   }
 
   store.subscribe(render)
@@ -521,6 +630,11 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       seed(days) {
         store.replace(seedHistory(store.get(), todayKey(), days))
         pendingFalls.length = 0
+      },
+      stars(count) {
+        const data = store.get()
+        const now = progressOf(starDays(data).length)
+        store.replace(addStars(data, todayKey(), count === 'one' ? 1 : now.length - now.lit))
       },
       clear() {
         store.replace(emptyData())

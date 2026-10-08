@@ -457,8 +457,15 @@
 }
 
 .row-edit,
-.next-find {
+.next-find,
+.next-legend {
   position: relative;
+}
+
+.next-legend::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 .card-delete {
@@ -595,7 +602,14 @@
   display: none;
 }
 
-.next-find {
+.next-slot {
+  display: flex;
+  gap: var(--s2);
+  min-width: 0;
+}
+
+.next-find,
+.next-legend {
   display: inline-flex;
   align-items: center;
   gap: var(--s2);
@@ -632,4 +646,16 @@
   .card.is-leaving {
     transform: none;
   }
+}
+
+/* The far goal: the legendary's outline in gold, and how many stars of its path are lit. */
+.next-legend {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.next-legend-art {
+  filter: brightness(0) invert(0.82) sepia(1) saturate(4) hue-rotate(5deg)
+    drop-shadow(0 0 3px rgba(255, 217, 138, 0.7));
+  opacity: 0.7;
 }

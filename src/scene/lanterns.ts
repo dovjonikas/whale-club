@@ -1,3 +1,4 @@
+import { addDays } from '../store/dates'
 import type { DateKey } from '../store/types'
 import { hash, seeded } from './random'
 import { reducedMotion, ticker, type FrameHandle } from './ticker'
@@ -13,6 +14,11 @@ import { reducedMotion, ticker, type FrameHandle } from './ticker'
  * nothing at all under reduced motion except a redraw when they change.
  * Where each one floats is picked from its date and its place in the day,
  * so it never moves between visits.
+ *
+ * Less noise over a year: the last thirty days' lanterns float on their
+ * own, bright; older ones merge into one soft glow over the cove that
+ * grows with how many there are. Every one is still kept, and the log
+ * shows each of them.
  */
 export interface LanternSpec {
   /** `date:index`, the session's place in the day. */
@@ -41,6 +47,12 @@ const ALPHA: Record<LanternGlow, number> = { bright: 1, soft: 0.62, dim: 0.3 }
 /** Where the cove sits inside the canvas, as fractions of its height (see .lanterns in scene.css). */
 const COVE_TOP = 0.73
 const COVE_DEPTH = 0.23
+/** How many days back a lantern still floats on its own. */
+const RECENT_DAYS = 30
+/** The merged glow's strength: a faint start, then more with every older lantern, up to a cap. */
+const MEMORY_BASE = 0.05
+const MEMORY_PER_LANTERN = 0.0009
+const MEMORY_MAX = 0.42
 
 interface Placed {
   spec: LanternSpec
@@ -64,6 +76,10 @@ export class LanternLayer {
   private height = 0
   private dpr = 1
   private specs: readonly LanternSpec[] = []
+  /** The first day still drawn on its own; "" draws every lantern on its own (the intro's year). */
+  private recentFrom: DateKey = ''
+  /** Older lanterns, merged into the glow. */
+  private memory = 0
 
   constructor(private readonly canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext('2d')
@@ -82,8 +98,10 @@ export class LanternLayer {
     this.place()
   }
 
-  set(specs: readonly LanternSpec[]): void {
+  /** Every lantern; with `today`, the older ones merge into the cove's glow. */
+  set(specs: readonly LanternSpec[], today?: DateKey): void {
     this.specs = specs
+    this.recentFrom = today ? addDays(today, -RECENT_DAYS) : ''
     this.place()
   }
 
@@ -117,7 +135,9 @@ export class LanternLayer {
 
   private place(): void {
     const scale = Math.min(Math.max(this.width / 390, 0.8), 1.6)
-    this.placed = this.specs.map((spec) => {
+    const recent = this.specs.filter((spec) => spec.date >= this.recentFrom)
+    this.memory = this.specs.length - recent.length
+    this.placed = recent.map((spec) => {
       const random = seeded(hash(`lantern|${spec.key}`))
       // Thicker near the surface line, as lights on water bunch towards the far shore.
       const depth = Math.pow(random(), 1.5)
@@ -135,6 +155,8 @@ export class LanternLayer {
     // Far ones first, so the near ones glow over them.
     this.placed.sort((a, b) => a.y - b.y)
     this.canvas.dataset.count = String(this.specs.length)
+    this.canvas.dataset.separate = String(this.placed.length)
+    this.canvas.dataset.memory = String(this.memory)
     this.canvas.dataset.dim = String(this.specs.filter((s) => s.glow === 'dim').length)
     this.canvas.dataset.soft = String(this.specs.filter((s) => s.glow === 'soft').length)
     this.canvas.dataset.held = String(this.held.size)
@@ -143,7 +165,7 @@ export class LanternLayer {
   }
 
   private run(): void {
-    if (reducedMotion() || this.placed.length === 0) {
+    if (reducedMotion() || (this.placed.length === 0 && this.memory === 0)) {
       this.handle?.remove()
       this.handle = null
       return
@@ -158,6 +180,7 @@ export class LanternLayer {
     ctx.clearRect(0, 0, this.width, this.height)
     const t = now / 1000
     const still = reducedMotion()
+    if (this.memory > 0) this.drawMemory()
     for (const lantern of this.placed) {
       const { spec } = lantern
       if (this.held.has(spec.key)) continue
@@ -180,6 +203,29 @@ export class LanternLayer {
       ctx.drawImage(sprite, lantern.x - size / 2, y - size / 2, size, size)
     }
     ctx.globalAlpha = 1
+  }
+
+  /** The older lanterns as one warm glow across the cove, stronger the more there are. */
+  private drawMemory(): void {
+    const { ctx } = this
+    const cx = this.width / 2
+    const cy = (COVE_TOP + COVE_DEPTH * 0.45) * this.height
+    const rx = this.width * 0.62
+    const ry = COVE_DEPTH * this.height * 0.75
+    const strength = Math.min(MEMORY_MAX, MEMORY_BASE + this.memory * MEMORY_PER_LANTERN)
+    ctx.save()
+    ctx.translate(cx, cy)
+    ctx.scale(1, ry / rx)
+    const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, rx)
+    glow.addColorStop(0, `rgba(255, 210, 140, ${strength.toFixed(3)})`)
+    glow.addColorStop(0.6, `rgba(255, 170, 120, ${(strength * 0.4).toFixed(3)})`)
+    glow.addColorStop(1, 'rgba(255, 170, 120, 0)')
+    ctx.globalAlpha = 1
+    ctx.fillStyle = glow
+    ctx.beginPath()
+    ctx.arc(0, 0, rx, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.restore()
   }
 
   /** A lantern drawn once per colour, size and dimness, at the canvas's own pixel density. */

@@ -1,6 +1,6 @@
 import { seeded, hash } from '../scene/random'
 import { addDays } from '../store/dates'
-import { plannedOn, UNLOCK_DAYS, totalDone } from '../store/derive'
+import { counted, plannedOn, UNLOCK_DAYS, totalDone } from '../store/derive'
 import type { AppData, DateKey, DayRecord, Thing } from '../store/types'
 import { EVERY_DAY } from '../store/types'
 
@@ -20,6 +20,8 @@ const DONE_SHARE = 0.8
 const IN_PARTS_SHARE = 0.15
 /** Of the lock-ins not finished, the share with some minutes all the same: a dim lantern. */
 const UNFINISHED_SHARE = 0.4
+/** How far back "+1 star" looks for a day with nothing done: ten years. */
+const MAX_BACK_DAYS = 3650
 
 /** What the lab adds when the sandbox has nothing to seed: three plain things, both kinds. */
 const STARTERS: readonly Omit<Thing, 'createdAt'>[] = [
@@ -108,5 +110,31 @@ export function seedHistory(data: AppData, today: DateKey, days: number): AppDat
     if (keepWaiting !== undefined && (next.cracked[thing.id] ?? 0) < keepWaiting)
       next.cracked[thing.id] = keepWaiting
   }
+  return next
+}
+
+/**
+ * More stars, for the path to a legendary: the latest days before today
+ * with nothing done get every thing done, `count` of them. Things start
+ * early enough to have been there. A lock-in counts as done without its
+ * timer here; the lab is for the sky, not the lanterns.
+ */
+export function addStars(data: AppData, today: DateKey, count: number): AppData {
+  const next: AppData = { ...data, days: { ...data.days } }
+  let added = 0
+  let earliest = today
+  for (let back = 1; added < count && back <= MAX_BACK_DAYS; back++) {
+    const date = addDays(today, -back)
+    const day = next.days[date]
+    if (day?.done.some((id) => counted(day, id))) continue
+    next.days[date] = {
+      done: next.things.map((t) => t.id),
+      minutes: {},
+      manual: next.things.map((t) => t.id),
+    }
+    earliest = date
+    added++
+  }
+  next.things = next.things.map((t) => (t.createdAt > earliest ? { ...t, createdAt: earliest } : t))
   return next
 }

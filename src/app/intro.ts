@@ -5,7 +5,7 @@ import type { Scene } from '../scene/scene'
 import { reducedMotion, ticker, type FrameHandle } from '../scene/ticker'
 import { sleeperSvg } from '../scene/visitors'
 import { addDays, todayKey } from '../store/dates'
-import { last7, reachedOn, stageFor, starDays, streakDays, UNLOCK_DAYS } from '../store/derive'
+import { last7, reachedOn, stageFor, starDays, UNLOCK_DAYS } from '../store/derive'
 import type { AppData, DateKey, World } from '../store/types'
 import { emptyData } from '../store/types'
 import { voice } from '../voice'
@@ -320,7 +320,6 @@ export function playIntro(
     const dates = year.dates.filter((d) => d <= until)
     scene.preview({
       dates,
-      streak: streakDays(dates),
       today: until,
       lanterns: year.lanterns.filter((l) => l.date <= until),
     })

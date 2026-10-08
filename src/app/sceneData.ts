@@ -10,10 +10,12 @@ import { rarityOf, type Rarity } from '../scene/rarity'
 import type { ShownCollectible, Standing } from '../scene/scene'
 import { CHEST, placeAll, spotsFor, type Spot, type SpotWorld } from '../scene/spots'
 import { rooms } from './dockData'
+import { legendaryFor } from '../scene/legendary'
+import { reachesOf } from '../store/paths'
 import type { LanternSpec } from '../scene/lanterns'
 import type { StoneSpec } from '../scene/stones'
 import { fromKey, todayKey } from '../store/dates'
-import { foundFor, lineFor, reachedOn, totalDone, waitingTiers } from '../store/derive'
+import { foundFor, lineFor, reachedOn, totalDone, waitingTiers, starDays } from '../store/derive'
 import type { AppData, DateKey, Thing, World } from '../store/types'
 import { voice } from '../voice'
 
@@ -96,7 +98,10 @@ export interface PlacedThing {
   rarity: Rarity
   /** When it was got: the day its find was reached, or the day it was bought. */
   since: DateKey
-  from: 'find' | 'dock'
+  /** A find, a dock thing, or earned on a path (rare half way, legendary at the end). */
+  from: 'find' | 'dock' | 'path'
+  /** A legendary: placed before anything else. */
+  first?: boolean
 }
 
 /** The whole arrangement: what stands where, the places there are, and the chest. */
@@ -157,10 +162,45 @@ export function placedThings(data: AppData): PlacedThing[] {
   const order = (t: PlacedThing): number =>
     t.from === 'find'
       ? COLLECTIBLES.indexOf(t.item)
-      : COLLECTIBLES.length + DOCK.findIndex((d) => d.id === t.id)
-  return [...fromFinds, ...fromDock].sort(
+      : t.from === 'dock'
+        ? COLLECTIBLES.length + DOCK.findIndex((d) => d.id === t.id)
+        : COLLECTIBLES.length + DOCK.length
+  return [...fromFinds, ...fromDock, ...pathFinds(data)].sort(
     (a, b) => a.since.localeCompare(b.since) || order(a) - order(b),
   )
+}
+
+/**
+ * What the path to a legendary has given: a rare find for each halfway
+ * star reached, the legendary for each constellation finished. After the
+ * fifth the paths go round again; a legendary already earned is not
+ * earned twice.
+ */
+export function pathFinds(data: AppData): PlacedThing[] {
+  const earned = new Map<string, PlacedThing>()
+  for (const reach of reachesOf(starDays(data))) {
+    const legend = legendaryFor(reach.path)
+    if (reach.half && !earned.has(legend.rare.id))
+      earned.set(legend.rare.id, {
+        id: legend.rare.id,
+        world: legend.rare.world,
+        item: legend.rare,
+        rarity: 'rare',
+        since: reach.half,
+        from: 'path',
+      })
+    if (reach.end && !earned.has(legend.find.id))
+      earned.set(legend.find.id, {
+        id: legend.find.id,
+        world: legend.find.world,
+        item: legend.find,
+        rarity: 'legendary',
+        since: reach.end,
+        from: 'path',
+        first: true,
+      })
+  }
+  return [...earned.values()]
 }
 
 export function arrangementOf(data: AppData): Arrangement {
