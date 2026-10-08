@@ -2,6 +2,33 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.16.0 - 2026-10-08
+
+Trust and settings: the sea is never lost.
+
+- **Settings**, one sheet from the menu, each choice one row that takes
+  effect at once: sounds, the sea in a lock in; a day ends at midnight,
+  3:00 or 5:00 (a done at 01:30 then belongs to the evening before); the
+  week starts on Monday or Sunday; the seasons follow the north or the
+  south; show the time; a new thing's length; the postcard size (moved
+  here from the menu); a still sea; and about (how it works, the version,
+  where five taps still open the lab, the storage it takes, one line on
+  privacy, the licence).
+- **A still sea**: the scene's own motion paused, for a quiet screen
+  without asking the whole system for reduced motion. Taps still answer.
+- **Back up and restore**: the whole sea as one JSON file with its data
+  version and a SHA-256 checksum, through the share sheet (an iPhone's
+  "Save to Files") or a download. Restoring says what the file holds
+  before anything changes, and can be undone for ten seconds. A damaged
+  file, a file from a newer version, or a file that is not a backup is
+  refused with a clear word, and nothing changes.
+- **Start over**, with "back up first" beside it and ten seconds of undo;
+  the sea is kept in a key of its own until the undo has passed.
+- **A quiet nudge**: once a month, if the last backup is older than thirty
+  days, a small dot on the menu button and one line inside. No popup.
+- Lasting storage is asked for once, after the first week, where the
+  browser can grant it.
+
 ## 0.15.0 - 2026-10-08
 
 Gentle mechanics: small, each backed by the research.

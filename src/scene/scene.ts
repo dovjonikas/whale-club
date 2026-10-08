@@ -547,7 +547,7 @@ export class Scene {
   /** Arranging: the scene stops (its loop and every CSS motion) and the pier and stars step back. */
   setArranging(on: boolean): void {
     this.root.dataset.arranging = String(on)
-    ticker.hold(on)
+    ticker.hold('arrange', on)
   }
 
   /**
@@ -561,6 +561,16 @@ export class Scene {
     this.root.dataset.newYear = String(events.includes('new-year'))
     this.root.dataset.light = String(events.includes('solstice') || events.includes('equinox'))
     this.root.dataset.seaDay = String(events.includes('ocean-day') || events.includes('whale-day'))
+  }
+
+  /**
+   * A still sea: the scene's own motion paused (the drift, the twinkle, the
+   * swimming), for anyone who wants a quiet screen without asking the whole
+   * system for reduced motion. Taps still answer.
+   */
+  setStill(on: boolean): void {
+    this.root.dataset.still = String(on)
+    ticker.hold('still', on)
   }
 
   /** Where the pier is on screen, for an arrival. */

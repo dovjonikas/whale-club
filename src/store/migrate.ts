@@ -281,6 +281,18 @@ function validateSettings(raw: unknown): Settings {
   if (typeof raw.lastRecapWeek === 'string') settings.lastRecapWeek = raw.lastRecapWeek
   if (typeof raw.chapterFrom === 'string') settings.chapterFrom = raw.chapterFrom
   if (typeof raw.chapterOffered === 'string') settings.chapterOffered = raw.chapterOffered
+  if (raw.dayEndsAt === 3 || raw.dayEndsAt === 5) settings.dayEndsAt = raw.dayEndsAt
+  if (raw.weekStartsOn === 'sunday') settings.weekStartsOn = 'sunday'
+  if (raw.hemisphere === 'south') settings.hemisphere = 'south'
+  if (typeof raw.defaultMinutes === 'number' && Number.isFinite(raw.defaultMinutes))
+    settings.defaultMinutes = Math.min(
+      MAX_MINUTES,
+      Math.max(MIN_MINUTES, Math.round(raw.defaultMinutes)),
+    )
+  if (raw.stillSea === true) settings.stillSea = true
+  if (typeof raw.lastBackupAt === 'string') settings.lastBackupAt = raw.lastBackupAt
+  if (typeof raw.backupNudged === 'string') settings.backupNudged = raw.backupNudged
+  if (raw.persistAsked === true) settings.persistAsked = true
   // A buddy from v0.3 is dropped here on purpose: the club became postcards.
   if (raw.postcardFormat === 'story' || raw.postcardFormat === 'square')
     settings.postcardFormat = raw.postcardFormat

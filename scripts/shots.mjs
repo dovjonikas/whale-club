@@ -167,12 +167,18 @@ for (const { name, options } of targets) {
     await page.getByRole('button', { name: 'send the whale' }).click()
     await page.waitForFunction(() => window.__cards.length === 1)
     await page.getByRole('button', { name: 'Menu' }).click()
-    await page
-      .getByRole('dialog', { name: 'the club' })
-      .getByRole('button', { name: 'square' })
-      .click()
     await page.waitForTimeout(400)
     await shot(page, 'iphone-menu.png')
+    // The postcard size lives in settings: square, for the second card.
+    await page.getByRole('button', { name: 'settings', exact: true }).click()
+    await page
+      .getByRole('dialog', { name: 'settings' })
+      .getByRole('button', { name: 'square' })
+      .click()
+    // Back to the top of the sheet, for the picture.
+    await page.locator('.sheet.is-open').evaluate((sheet) => sheet.scrollTo(0, 0))
+    await page.waitForTimeout(400)
+    await shot(page, 'iphone-settings.png')
     await page.keyboard.press('Escape')
     await page.waitForTimeout(400)
     await page.getByRole('button', { name: 'send the sea' }).click()

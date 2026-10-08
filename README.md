@@ -170,6 +170,7 @@ third-party script. A postcard is the only thing that leaves the phone, and
 only through the share sheet when you send it.
 
 - **Derived, not stored.** Finds, streaks, stars and krill are worked out from the days themselves, so they can never disagree with the history; only what was bought is kept, with its price
+- **Back up and restore.** The whole sea as one JSON file with a checksum, through the share sheet or a download; restoring says what the file holds first and can be undone. A damaged or newer file is refused, and nothing changes
 - **Migrations.** Every earlier version of the data opens in the current app, held by tests. A record that cannot be read is parked beside the real one, never written over
 - **A lab.** A hidden sandbox with a movable clock, for trying a year in a minute, under its own storage key so it never touches real data ([the lab](docs/ARCHITECTURE.md#10-the-lab))
 

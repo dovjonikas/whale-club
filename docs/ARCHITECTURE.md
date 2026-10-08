@@ -35,6 +35,8 @@ src/
     firstWeek.ts     the first week's set of seven
     chapter.ts       a new chapter, offered after a quiet week
     badge.ts         the Android home-screen badge, where it needs no permission
+    settingsSheet.ts settings: one row per choice, back up, restore, start over, about
+    backup.ts        the backup file: its checksum, reading it back, refusing a bad one
     arrange.ts       arranging: rings for places, drag or tap and tap, the chest, tidy up
     dial.ts          the lock-in dial, 10 to 120 minutes
     wakeLock.ts      the screen kept on during a session

@@ -144,9 +144,10 @@ test('?lab=1 opens the lab, says what it is, and the clock moves the date', asyn
   await expect(labSheet(page)).toContainText(`today in the lab: ${when}`)
 })
 
-test('five quick taps on the version in the menu open the lab', async ({ page }) => {
+test('five quick taps on the version, in settings, open the lab', async ({ page }) => {
   await page.goto('')
   await page.getByRole('button', { name: 'Menu' }).click()
+  await page.getByRole('button', { name: 'settings', exact: true }).click()
   const version = page.getByRole('button', { name: /^version \d+\.\d+\.\d+$/ })
   for (let i = 0; i < 4; i++) await version.click()
   await expect(labBar(page)).toHaveCount(0)
