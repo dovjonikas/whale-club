@@ -14,6 +14,7 @@ import {
   type After,
   isDayEnd,
   isWorld,
+  PET_NAME_MAX,
 } from './types'
 
 /**
@@ -214,6 +215,10 @@ function validateThing(raw: unknown): Thing {
     createdAt,
     order,
     ...(isAfter(raw.after) ? { after: raw.after } : {}),
+    ...(typeof raw.petName === 'string' && raw.petName.trim() !== ''
+      ? { petName: raw.petName.trim().slice(0, PET_NAME_MAX) }
+      : {}),
+    ...(raw.nameAsked === true ? { nameAsked: true as const } : {}),
   }
 }
 
@@ -255,6 +260,7 @@ function validateDay(raw: unknown): DayRecord {
     }
   }
   if (raw.checkin === true) day.checkin = true
+  if (raw.notToday === true) day.notToday = true
   if (typeof raw.good === 'string' && raw.good.trim() !== '')
     day.good = raw.good.trim().slice(0, GOOD_MAX)
   if (Array.isArray(raw.manual)) {
@@ -297,6 +303,15 @@ function validateSettings(raw: unknown): Settings {
   if (typeof raw.lastBackupAt === 'string') settings.lastBackupAt = raw.lastBackupAt
   if (typeof raw.backupNudged === 'string') settings.backupNudged = raw.backupNudged
   if (raw.persistAsked === true) settings.persistAsked = true
+  if (isRecord(raw.bottles)) {
+    const bottles: Record<string, string> = {}
+    for (const [from, on] of Object.entries(raw.bottles)) if (isString(on)) bottles[from] = on
+    if (Object.keys(bottles).length > 0) settings.bottles = bottles
+  }
+  for (const key of ['bottleOn', 'heavySaidOn', 'goodAskedOn'] as const) {
+    const value = raw[key]
+    if (isString(value)) settings[key] = value
+  }
   // A buddy from v0.3 is dropped here on purpose: the club became postcards.
   if (raw.postcardFormat === 'story' || raw.postcardFormat === 'square')
     settings.postcardFormat = raw.postcardFormat

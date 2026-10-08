@@ -1,3 +1,7 @@
+import { bottleFor, openBottle } from './bottles'
+import { isLate, openGoodNight } from './lateNight'
+import { nameNotice } from './nameNotice'
+import { isSoft } from '../store/quiet'
 import { noteSaid } from './said'
 import { collectibleSvg, collectiblesFor } from '../scene/collectibles'
 import { Scene } from '../scene/scene'
@@ -15,6 +19,7 @@ import {
   plannedThings,
   stageFor,
   starDays,
+  asleep,
 } from '../store/derive'
 import { labOn } from '../store/lab'
 import { Store } from '../store/store'
@@ -26,7 +31,7 @@ import { pick, voice } from '../voice'
 import { installNotice, listenForInstallPrompt } from '../pwa/install'
 import { openAddSheet } from './addSheet'
 import { animate } from './card'
-import { checkinNotice } from './checkin'
+import { checkinNotice, goodNotice } from './checkin'
 import { chapterNotice } from './chapter'
 import { watchBadge } from './badge'
 import { openCollectionSheet } from './collectionSheet'
@@ -68,6 +73,8 @@ import { showUndo } from './toast'
 import { surpriseFor } from './surprise'
 
 const SURPRISE_DELAY_MS = 4000
+/** How often the scene looks at the clock for the late hours, with the app left open. */
+const LATE_CHECK_MS = 60_000
 /** A path's moment waits for a lock-in screen to go, looking again this often, and not for ever. */
 const SESSION_WAIT_MS = 250
 const SESSION_WAIT_MAX_MS = 20_000
@@ -366,7 +373,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       scene.glow()
     } else if (grew) {
       sound.play('grow')
-      said = voice.stageUp
+      said = thing.petName ? voice.named.grew(thing.petName) : voice.stageUp
     } else {
       sound.play('tap', thing.world)
       said = pick(voice.tap[thing.world], today + thing.id)
@@ -607,16 +614,45 @@ export function startApp(root: HTMLElement, labEntered = false): void {
 
     const nothingToday = (data.days[today]?.done.length ?? 0) === 0
     scene.setQuiet(nothingToday && missedYesterday(data, today))
+    // A safe place: a soft day's rain, late night, the creatures to pet, a bottle.
+    scene.setSoft(isSoft(data, today))
+    scene.setLate(isLate(now, data.settings.dayEndsAt ?? 0), openGoodNight)
+    scene.setPets(
+      [...data.things]
+        .sort((a, b) => a.order - b.order)
+        .map((thing) => ({
+          id: thing.id,
+          world: thing.world,
+          line: thing.line,
+          stage: stageFor(last7(data, thing.id, today)),
+          asleep: asleep(data, thing, today),
+          label: voice.pet.label(thing.petName ?? thing.name),
+        })),
+      () => {
+        sound.play('pet')
+      },
+    )
+    const bottle = bottleFor(data, today)
+    scene.setBottle(bottle !== null, () => {
+      if (bottle) openBottle(store, bottle)
+    })
     root.dataset.rest = String(isRestDay(data, today))
     notices.offer([
       installNotice(store),
       recapNotice(store, (moment) => {
         postcards.sendNow(moment)
       }),
-      checkinNotice(store, sound, (moment) => {
-        postcards.sendNow(moment)
+      checkinNotice(store, sound, {
+        onSend: (moment) => {
+          postcards.sendNow(moment)
+        },
+        onNotToday: (heavy) => {
+          line.say(heavy ? voice.notToday.heavy : voice.notToday.said)
+        },
       }),
+      goodNotice(store),
       chapterNotice(store),
+      nameNotice(store),
     ])
   }
 
@@ -699,6 +735,10 @@ export function startApp(root: HTMLElement, labEntered = false): void {
   })
 
   lockIn.settle()
+  window.setInterval(() => {
+    const data = store.get()
+    scene.setLate(isLate(clockNow(), data.settings.dayEndsAt ?? 0), openGoodNight)
+  }, LATE_CHECK_MS)
 
   /** The first minute: on a first open, from "how it works", or from the lab. */
   function intro(): void {
@@ -715,7 +755,9 @@ export function startApp(root: HTMLElement, labEntered = false): void {
   if ((introDue(store.get()) && !labOn()) || takeIntroRequest()) intro()
 
   const opening = store.get()
-  if (isRestDay(opening, todayKey())) line.say(voice.restDay, { quiet: true })
+  if (isLate(clockNow(), opening.settings.dayEndsAt ?? 0))
+    line.say(voice.late.said, { quiet: true })
+  else if (isRestDay(opening, todayKey())) line.say(voice.restDay, { quiet: true })
   else if (missedYesterday(opening, todayKey())) {
     line.say(voice.missedDay, { quiet: true })
     noteSaid(voice.missedDay)

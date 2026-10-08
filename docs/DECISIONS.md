@@ -1121,3 +1121,41 @@ is the author's call.
 now, because that is where it is wanted and where a tap that shows the
 time for three seconds is easy to miss; both places change the same
 setting, so there is still nothing new to set.
+
+## 2026-10-08 A safe place
+
+"not today" reuses what was there: the things set aside go to the day's
+`skip` list, so the "not today" strip and every count already treat them
+as resting, and the day is marked `notToday`. A miss on that day is quiet
+by definition and is left out when the week counts its own quiet days, so
+saying it never spends a freedom the person did not choose to spend. The
+one thing kept is the smallest: a tap before a lock-in, a short lock-in
+before a long one. The check-in counts as answered; the line for the day
+is not shown on such a day, the soft day's own line is.
+
+"it’s been heavy for a few days" is said in place of the soft line on the
+third "not today" in a row, at most once in seven days, with no link and
+no label: the author's brief, and the gentlest thing an app can do there.
+
+Bottles need written lines, so the evening's one good thing is also
+asked on its own after 18:00 when the check-in came earlier; it is asked
+once a day either way. A line comes back only when it is a week old or
+more ("a while ago" has to be true), not again within a month, and it is
+told by its season when it is from another one and more than two months
+old: no dates and no numbers.
+
+The creatures to pet are drawn in the scene, small, in their worlds, and
+not on the cards: a tap on a card means done, and a pet must never mark
+anything (a sleeping creature, petted, wakes without its day being
+done). Their places are above the line and the row's tools, which cover
+the lower scene on a phone, and under the stones, so a stone waiting (a
+thing to do) is never behind a creature (a thing to enjoy).
+
+Late night is 23:00 to 05:00 of the person's own day: "a day ends at"
+moves both ends, so for someone whose day ends at 5:00 the late hours are
+04:00 to 10:00. The good night screen cannot close a web app (no browser
+lets a page do that); it is a quiet screen that lifts with a tap.
+
+A creature's name is asked the first time it reaches its last stage, once,
+whatever the answer. Lines that say "it" say the name instead in two
+moments: when it grows, and when a lock-in pauses and it sleeps.

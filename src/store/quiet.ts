@@ -10,6 +10,9 @@ import type { AppData, DateKey, Thing } from './types'
  * it breaks no streak. Past the freedom a missed day is an empty dot and
  * nothing more. There is nothing to set: the week (from its first day, as
  * set) spends its freedom on its first misses.
+ *
+ * A day the person called "not today" is quiet whatever it holds: a miss on
+ * it is a moon, and it spends none of the week's freedom.
  */
 
 /** Planned this many days a week or fewer: one quiet day; more: two. */
@@ -26,15 +29,21 @@ function missedOn(data: AppData, thing: Thing, date: DateKey, today: DateKey): b
   return plannedOn(data, thing, date) && !(data.days[date]?.done.includes(thing.id) ?? false)
 }
 
-/** A missed day inside the week's freedom: a moon, not an empty dot. */
+/** A day the person called "not today". */
+export function isSoft(data: AppData, date: DateKey): boolean {
+  return data.days[date]?.notToday === true
+}
+
+/** A missed day inside the week's freedom, or on a soft day: a moon, not an empty dot. */
 export function isQuiet(data: AppData, thing: Thing, date: DateKey, today: DateKey): boolean {
   if (!missedOn(data, thing, date, today)) return false
-  const monday = weekStart(date)
+  if (isSoft(data, date)) return true
+  const start = weekStart(date)
   let misses = 0
   for (let i = 0; i < 7; i++) {
-    const day = addDays(monday, i)
+    const day = addDays(start, i)
     if (day > date) break
-    if (missedOn(data, thing, day, today)) misses++
+    if (!isSoft(data, day) && missedOn(data, thing, day, today)) misses++
   }
   return misses <= quietAllowance(thing)
 }

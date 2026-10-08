@@ -213,3 +213,43 @@ test('17. see how far the legendary is: in sight on the first screen, by name', 
   await fromFirstScreen(page)
   await within2(page.getByRole('button', { name: 'the golden whale: 12 of 30 stars' }))
 })
+
+test('18. say "not today": in sight on the first screen, under the check-in’s answer', async ({
+  page,
+}) => {
+  await page.clock.install({ time: middayToday() })
+  await seed(page, {
+    things: [
+      { id: 'run', name: 'run', world: 'sea', createdAt: dateKey(-3), order: 0, kind: 'tap' },
+    ],
+    days: { [dateKey(-1)]: { done: ['run'] } },
+    settings: { installDismissedAt: dateKey(-1), lastRecapWeek: dateKey(0) },
+  })
+  await page.goto('')
+  await fromFirstScreen(page)
+  const recap = page.getByRole('complementary', { name: 'weekly recap' })
+  if (await recap.isVisible()) await tap(recap.getByRole('button', { name: 'ok' }))
+  const notToday = page
+    .getByRole('complementary', { name: 'check-in' })
+    .getByRole('button', { name: 'not today' })
+  await within2(notToday)
+  await tap(notToday)
+  await expect(page.getByText('just this one?')).toBeVisible()
+})
+
+test('19. pet a creature: in sight on the first screen, by its name', async ({ page }) => {
+  await page.clock.install({ time: middayToday() })
+  await seed(page, {
+    things: [
+      { id: 'run', name: 'run', world: 'sea', createdAt: dateKey(-3), order: 0, kind: 'tap' },
+    ],
+    days: { [dateKey(-1)]: { done: ['run'] }, [dateKey(0)]: { done: [], checkin: true } },
+    settings: { installDismissedAt: dateKey(-1) },
+  })
+  await page.goto('')
+  await fromFirstScreen(page)
+  const recap = page.getByRole('complementary', { name: 'weekly recap' })
+  if (await recap.isVisible()) await tap(recap.getByRole('button', { name: 'ok' }))
+  await within2(button(page, 'pet run'))
+  await tap(button(page, 'pet run'))
+})

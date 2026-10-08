@@ -86,7 +86,18 @@ what it costs ([`docs/DECISIONS.md`](docs/DECISIONS.md)).
     <td align="center" valign="top"><img src="docs/screenshots/iphone-ceremony.webp" width="240" alt="The ceremony: the scene dark, the whale constellation lit, a beam of light, the golden whale, and a plaque with its name and the day it was earned"><br><b>A legendary</b><br><sub>Earned at a constellation's end, never bought.</sub></td>
     <td align="center" valign="top"><img src="docs/screenshots/iphone-year.webp" width="240" alt="A year in the lab: finished constellations around the sky, the cove of lanterns merged into one glow, every thing in its place"><br><b>A year, readable</b><br><sub>Constellations, a glowing cove, everything in its place.</sub></td>
   </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-soft.webp" width="240" alt="A day called not today: a light rain on the water, a warmer light, one card left with the question just this one, the others under the not today strip"><br><b>Not today</b><br><sub>A light rain, one small thing kept, the day still counts.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-bottle.webp" width="240" alt="A bottle opened: you wrote this a while ago, and a good thing written on an evening weeks before"><br><b>A bottle</b><br><sub>An old good thing, back. No dates, no numbers.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-late.webp" width="240" alt="Late at night: the scene darker and warmer, the line late, the sea will be here tomorrow"><br><b>Late</b><br><sub>The moon says good night. Nothing about sleep.</sub></td>
+  </tr>
 </table>
+
+<p align="center">
+  <img src="docs/screenshots/iphone-line.webp" width="240" alt="After the check-in, the line for the day: if you want to improve, be content to be thought foolish and stupid, and under it the name epictetus, with send this and ok">
+  <br>
+  <sub><b>The line for the day.</b> After the check-in, one of twenty lines the author chose, a different one each day.</sub>
+</p>
 
 <p align="center">
   <img src="docs/screenshots/postcard-story.webp" width="240" alt="A postcard in the story size: the night sky, the whale over the horizon, the line of the moment and the day count">
@@ -122,6 +133,7 @@ And underneath all three: nothing dies. You just missed a day.
 - **Krill and the dock.** Every day shown up for earns krill, worked out from the days and never bought. A pier on the shore opens the dock: thirty things to look at in four tiers, fixed prices, no chance, no boxes, no timers. Save for one, and the distance shows under the title
 - **Arrange your sea.** Every world has its places; finds and dock things stand in them by themselves, and anyone who wants to can move them, swap them, or put them away in a chest. A longer shore, a reef and an island on a whale add room
 - **Postcards** of the whale, a new find or a grown creature, ready for the share sheet, with your arrangement on them
+- **A safe place.** "not today" at the check-in keeps one small thing and lets the rest rest, under a light rain, and the day counts as a quiet one. The evening's good things come back in bottles. Your creatures live in the scene too, to pet for nothing. Late at night the moon says good night. A creature that grows all the way can be given a name
 - **Settings, few and plain.** A day can end at 3:00 for someone up late, the week can start on Sunday, the seasons can follow the south, and the sea can hold still. Every choice takes effect at once
 
 <details>

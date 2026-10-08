@@ -52,7 +52,14 @@ src/
     wakeLock.ts      the screen kept on during a session
     header.ts        the title and the four buttons
     notices.ts       one notice above the row at a time
-    checkin.ts, recap.ts   the two rituals, as notice builders
+    checkin.ts, recap.ts   the two rituals, as notice builders; the check-in ends on the line for the day,
+                     and asks for the evening's good thing on its own after an early check-in
+    lines.ts         the twenty lines for the day, walked by the date (docs/LINES.md)
+    said.ts          what the moments said today, so the check-in's line is never said twice
+    notToday.ts      "not today": the one small thing kept, and "it's been heavy" once a week at most
+    bottles.ts       the evening's good things coming back: which one, when, and its "a while ago"
+    lateNight.ts     the late hours of the person's own day, and the good night screen
+    nameNotice.ts    "name it?", once, when a creature first reaches its last stage
     thingSheet.ts    a thing's own sheet: name, picture, how it is done, the seven days, today's exception
     daysField.ts     the seven day chips, shared with the add sheet
     collectionSheet.ts the Collection: found, waiting as a stone, next as a silhouette; arranging
@@ -75,6 +82,8 @@ src/
     stars.ts         the star field (tints, sparkles, a shooting star) and the day-stars
     moon.ts          the moon in its real phase
     stones.ts        the stones waiting to be cracked
+    pets.ts          each thing's creature in its world, to pet (nothing earned) or to wake
+    bottle.ts        the bottle's drawing, and a soft day's rain
     rarity.ts        a find's shine: common since 0.14; a hashed shine only before EARNED_FROM
     random.ts        the seeded generator and the string hash
     particles.ts     bioluminescent drift and the tap bursts
@@ -119,7 +128,7 @@ src/
     krill.ts         krill earned, worked out from the days; spent; the balance (docs/ECONOMY.md)
     paths.ts         the path to a legendary: which star a day is, progress, halfway and end
     plan.ts          whether a thing is planned on a date (its weekday, and today's exception)
-    quiet.ts         quiet days: the week's freedom, given in advance, and which misses it covers
+    quiet.ts         quiet days: the week's freedom, given in advance, which misses it covers, and "not today"
     dock.ts          what the dock changes in the data: buy, the goal, hidden, who wears it
     dates.ts         local YYYY-MM-DD keys, when the day ends, when the week starts, week arithmetic
   lab/               the lab's screen and its seeded history (see section 10)

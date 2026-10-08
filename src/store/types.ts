@@ -58,7 +58,14 @@ export interface Thing {
    * moment. The card shows it, and the row follows the day's order.
    */
   after?: After
+  /** The creature's own name, given when it first reached its last stage, or later in its sheet. */
+  petName?: string
+  /** "name it?" was asked, whatever the answer: it is asked once. */
+  nameAsked?: true
 }
+
+/** A creature's name, kept short enough for a line. */
+export const PET_NAME_MAX = 24
 
 /** The day's moments a thing can come after, in the order the day has them. */
 export const AFTERS = ['waking', 'coffee', 'work', 'dinner', 'bed'] as const
@@ -108,6 +115,11 @@ export interface DayRecord {
   manual?: string[]
   /** One good thing about the day, written at the evening check-in, if it was. */
   good?: string
+  /**
+   * "not today" at the check-in: a soft day. One thing stays on the row,
+   * the rest go to the "not today" strip, and a miss on it is a quiet day.
+   */
+  notToday?: true
 }
 
 export type PostcardFormat = 'story' | 'square'
@@ -165,6 +177,17 @@ export interface Settings {
   backupNudged?: string
   /** Lasting storage was asked for once, after the first week. */
   persistAsked?: boolean
+  /**
+   * Bottles: for each written good thing that came back, the day it did,
+   * by the day it was written. It does not come back again within a month.
+   */
+  bottles?: Record<DateKey, DateKey>
+  /** The day a bottle was last opened: one a day at most. */
+  bottleOn?: DateKey
+  /** The day "it's been heavy" was last said: once a week at most. */
+  heavySaidOn?: DateKey
+  /** The day the evening's one good thing was last asked for: once a day. */
+  goodAskedOn?: DateKey
 }
 
 /** The shape of the saved record; migrate.ts brings every earlier one up to it. */

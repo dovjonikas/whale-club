@@ -27,6 +27,8 @@ import { reducedMotion, ticker } from './ticker'
 import type { Season, SkyEvent } from './calendar'
 import { seasonShoreSvg } from './seasons'
 import { voice } from '../voice'
+import { bottleSvg, rainHtml } from './bottle'
+import { PetLayer, type PetSpec } from './pets'
 import { sleeperSvg, visitorSvg, whaleSvg, type VisitorKind } from './visitors'
 import { PHONE_WIDTH } from './phone'
 
@@ -83,6 +85,8 @@ export interface ShownCollectible {
  * which stops while the page is hidden or the scene is off screen.
  */
 export class Scene {
+  private pets: PetLayer | null = null
+  private onPetTap: ((id: string) => void) | null = null
   readonly root: HTMLElement
   private readonly stars: StarField
   private readonly particles: ParticleField
@@ -152,12 +156,18 @@ export class Scene {
       </div>
       <div class="scene-things" aria-hidden="true"></div>
       <div class="sleeper" aria-hidden="true">${sleeperSvg()}</div>
+      <div class="pets" role="group" aria-label="${voice.labels.pets}"></div>
       <div class="stones" role="group" aria-label="${voice.labels.stones}"></div>
       <button type="button" class="pier"></button>
+      <button type="button" class="bottle" hidden aria-label="${voice.bottle.label}">${bottleSvg()}</button>
       <canvas class="particles" aria-hidden="true"></canvas>
       <div class="scene-glow" aria-hidden="true"></div>
+      <div class="scene-rain" aria-hidden="true">${rainHtml()}</div>
+      <div class="scene-soft" aria-hidden="true"></div>
       <div class="grain" aria-hidden="true"></div>
       <div class="scene-dim" aria-hidden="true"></div>
+      <div class="scene-late" aria-hidden="true"></div>
+      <button type="button" class="moon-hit" hidden aria-label="${voice.late.moon}"></button>
       <div class="star-hits" role="group" aria-label="${voice.labels.days}"></div>`
     parent.prepend(this.root)
 
@@ -588,6 +598,44 @@ export class Scene {
 
   setQuiet(quiet: boolean): void {
     this.root.dataset.quiet = String(quiet)
+  }
+
+  /** A "not today" day: a light rain on the water and a warmer light. Nothing else changes. */
+  setSoft(on: boolean): void {
+    this.root.dataset.soft = String(on)
+  }
+
+  /**
+   * Late at night: the scene a little darker and warmer, and the moon
+   * answers a tap with "good night".
+   */
+  setLate(on: boolean, onMoon: () => void): void {
+    this.root.dataset.late = String(on)
+    const moon = this.query('.moon-hit')
+    moon.hidden = !on
+    moon.onclick = (event) => {
+      event.stopPropagation()
+      onMoon()
+    }
+  }
+
+  /** Each thing's creature in its world, to pet. */
+  setPets(specs: readonly PetSpec[], onPet: (id: string) => void): void {
+    this.pets ??= new PetLayer(this.query('.pets'), (id) => {
+      this.onPetTap?.(id)
+    })
+    this.onPetTap = onPet
+    this.pets.set(specs)
+  }
+
+  /** A bottle at the water's edge, or none; a tap opens it. */
+  setBottle(show: boolean, onOpen: () => void): void {
+    const bottle = this.query('.bottle')
+    bottle.hidden = !show
+    bottle.onclick = (event) => {
+      event.stopPropagation()
+      onOpen()
+    }
   }
 
   /** During a lock-in the sky turns, slowly. */

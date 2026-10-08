@@ -340,6 +340,14 @@ export const voice = {
     save: 'save',
     edit: (name: string) => `edit ${name}`,
   },
+  /** "not today" at the check-in: a soft day, never a missed one. */
+  notToday: {
+    button: 'not today', // TODO-VOICE
+    said: 'okay. one small thing, or none. both count as showing up.', // TODO-VOICE
+    just: 'just this one?', // TODO-VOICE
+    /** After three "not today"s in a row, once a week at most. No links, no labels. */
+    heavy: 'it’s been heavy for a few days. tell someone you trust.', // TODO-VOICE
+  },
   /** A day with nothing planned. Calm, no star, nothing missed. */
   restDay: 'nothing planned. rest is part of it.', // TODO-VOICE
   /**
@@ -359,6 +367,40 @@ export const voice = {
     menu: 'Menu',
     stones: 'stones',
     days: 'your days',
+    pets: 'your creatures', // TODO-VOICE
+  },
+  /** Petting a creature in the scene: nothing earned, nothing said, only its name for a screen reader. */
+  pet: {
+    label: (name: string) => `pet ${name}`, // TODO-VOICE
+  },
+  /** A bottle at the water's edge: an old good thing, back. */
+  bottle: {
+    label: 'a bottle at the water’s edge', // TODO-VOICE
+    title: 'a bottle', // TODO-VOICE
+    /** No dates and no numbers: a while ago, or the season it was. */
+    wrote: (when: string) => `you wrote this ${when}:`, // TODO-VOICE
+    awhile: 'a while ago', // TODO-VOICE
+    season: (season: string) => `back in ${season}`, // TODO-VOICE
+    keep: 'keep it', // TODO-VOICE
+  },
+  /** Late at night, by the person's own day. No rules, no hours of sleep. */
+  late: {
+    said: 'late. the sea will be here tomorrow.', // TODO-VOICE
+    moon: 'the moon. say good night', // TODO-VOICE
+    goodNight: 'good night', // TODO-VOICE
+    wake: 'tap to come back', // TODO-VOICE
+  },
+  /** Lines that say a creature's name, when it has one, in place of "it". */
+  named: {
+    grew: (name: string) => `${name} grew.`, // TODO-VOICE
+    asleep: (name: string) => `paused. ${name} is asleep.`, // TODO-VOICE
+  },
+  /** A creature at its last stage, asked once. */
+  name: {
+    ask: 'name it?', // TODO-VOICE
+    field: 'its name', // TODO-VOICE
+    keep: 'keep', // TODO-VOICE
+    notNow: 'not now', // TODO-VOICE
   },
   /** The menu's one screen: the rules and this. */
   clubLine: lineById('next-to-you').text,

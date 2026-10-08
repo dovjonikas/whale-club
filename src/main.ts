@@ -16,6 +16,7 @@ import './styles/depths.css'
 import './styles/log.css'
 import './styles/intro.css'
 import './styles/lab.css'
+import './styles/safe.css'
 
 import { startApp } from './app/app'
 import { showToast } from './app/toast'

@@ -207,7 +207,8 @@ export function openSessionScreen(
       // One pause per session: once it is over, the button goes.
       pauseButton.hidden = used && !on
       if (pauseButton.hidden) keepFocus(pauseButton, stopButton)
-      said.textContent = on ? voice.lockIn.paused : used ? voice.lockIn.goingOn : said.textContent
+      const asleepLine = thing.petName ? voice.named.asleep(thing.petName) : voice.lockIn.paused
+      said.textContent = on ? asleepLine : used ? voice.lockIn.goingOn : said.textContent
     },
     undoable(on) {
       undoButton.hidden = !on

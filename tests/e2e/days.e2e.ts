@@ -41,7 +41,7 @@ test('a thing off at weekends is not on the first screen on a Saturday, but is u
   await page.goto('')
   await expect(card(page, 'read')).toBeVisible()
   await expect(card(page, 'work out')).toHaveCount(0)
-  const toggle = page.getByRole('button', { name: /not today/ })
+  const toggle = page.locator('.not-today').getByRole('button', { name: /not today/ })
   await expect(toggle).toHaveAttribute('aria-expanded', 'false')
   await toggle.click()
   await expect(toggle).toHaveAttribute('aria-expanded', 'true')
@@ -59,7 +59,10 @@ test('"also today" adds it for today only', async ({ page }) => {
     settings: { installDismissedAt: on(0), lastRecapWeek: on(-12) },
   })
   await page.goto('')
-  await page.getByRole('button', { name: /not today/ }).click()
+  await page
+    .locator('.not-today')
+    .getByRole('button', { name: /not today/ })
+    .click()
   await page.getByRole('button', { name: 'also today: work out' }).click()
   await expect(card(page, 'work out')).toBeVisible()
   await card(page, 'work out').click()
@@ -134,7 +137,10 @@ test('three planned days a week, all done, grow into a whale', async ({ page }) 
     settings: { installDismissedAt: on(0), lastRecapWeek: on(-12) },
   })
   await page.goto('')
-  await page.getByRole('button', { name: /not today/ }).click()
+  await page
+    .locator('.not-today')
+    .getByRole('button', { name: /not today/ })
+    .click()
   // Saturday is off, so the card is in the strip; the creature there is the whale.
   await expect(page.locator('.not-today-item .not-today-creature svg')).toBeAttached()
   await page.getByRole('button', { name: 'also today: swim' }).click()

@@ -10,7 +10,16 @@ import type { World } from '../store/types'
  * or cache, and nothing plays before the person has touched the screen.
  */
 export type SoundKind =
-  'tap' | 'untap' | 'whale' | 'unlock' | 'resume' | 'checkin' | 'grow' | 'half' | 'legendary'
+  | 'tap'
+  | 'untap'
+  | 'whale'
+  | 'unlock'
+  | 'resume'
+  | 'checkin'
+  | 'grow'
+  | 'half'
+  | 'legendary'
+  | 'pet'
 
 export class Sound {
   private ctx: AudioContext | null = null
@@ -137,6 +146,11 @@ export class Sound {
         return
       case 'checkin':
         this.tone(740, 0, 0.08, 0.03, 'square')
+        return
+      // A creature petted: two soft low notes, a purr more than a chime.
+      case 'pet':
+        this.tone(392, 0, 0.22, 0.03, 'sine')
+        this.tone(494, 0.12, 0.26, 0.025, 'sine')
         return
       // The halfway star of a constellation: two bright notes a fifth apart.
       case 'half':

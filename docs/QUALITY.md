@@ -182,6 +182,18 @@ Can wait for the polish stage:
 - `src/styles/session.css:115` the water rises over 0.9 s: try 700 ms with
   fresh eyes.
 
+## 1.2 motion, checked against the same standard before it shipped
+
+| Motion                                       | Values                                                                                                                                                            | Reduced motion                                               |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| A soft day's rain (`safe.css` `.scene-rain`) | eighteen thin drops falling 150 px over 1.3 to 2.2 s, linear (constant motion), six rings on the water, 2.6 s on `--ease-out`; ambient, `transform` and `opacity` | no drops, no rings; the warm light stays                     |
+| The warm light, the late dimming             | an overlay's `opacity`, `--dur-slow`                                                                                                                              | the same: a fade                                             |
+| A pet (`.pet.is-petted`)                     | comes 35 % closer and back in 1 s on `--ease-out`, three bubbles rising 26 px over 1 s, 120 ms apart; a blink of 260 ms through the Web Animations API            | the blink only, which the stylesheet's rule cannot cut short |
+| A creature woken                             | the card's own wave, 900 ms                                                                                                                                       | the blink, eyes open                                         |
+| A creature at rest                           | sea 8 s, sky 6 s, a few px, alternate                                                                                                                             | still                                                        |
+| The bottle                                   | its drawing bobs 3 px, 3.6 s; the button stays still, so a finger finds it                                                                                        | still                                                        |
+| Good night                                   | the quiet screen fades in over `--dur-slow`                                                                                                                       | a fade                                                       |
+
 ## 0.13 motion, checked against the same standard before it shipped
 
 Every new motion, its values, and what reduced motion does with it.
