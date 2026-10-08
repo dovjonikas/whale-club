@@ -181,3 +181,24 @@ Can wait for the polish stage:
   a 300 ms fade would be gentler.
 - `src/styles/session.css:115` the water rises over 0.9 s: try 700 ms with
   fresh eyes.
+
+## 0.13 motion, checked against the same standard before it shipped
+
+Every new motion, its values, and what reduced motion does with it.
+
+| Motion                                                                            | Values                                                                                                                                                               | Reduced motion                              |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| A press on the krill chip, a dock tile, a wearer card, the pier, the tray buttons | `scale(0.97)`, 140 ms, `--ease-out`, one shared press                                                                                                                | the press still shows, without a transition |
+| "+10" by the krill (`dock.css` `.krill-rise`)                                     | transitions, not keyframes, so a second one can catch the first: up 14 px over 700 ms on `--ease-out`, faded out over 400 ms; waits for a session screen to go first | fades only                                  |
+| A thing settling into a place (`.collectible.is-snapping`)                        | FLIP from where it was to its place, `transform` only, 220 ms `--ease-out`; interruptible                                                                            | lands at once                               |
+| A drag                                                                            | follows the finger by `transform` on the wrapper, `scale(1.08)` held, no transition while held                                                                       | the same: a drag is the person's own motion |
+| The ring under a drag (`.is-target`)                                              | `scale(1.14)`, 140 ms                                                                                                                                                | no scale                                    |
+| New places after an extension (`.is-new`)                                         | three breaths, 1.4 s each: rare, once per purchase                                                                                                                   | none                                        |
+| The scene while arranging                                                         | every CSS animation paused, the ticker held                                                                                                                          | (already still)                             |
+| The small whale, aurora nights, the glowing tide                                  | ambient, 24 to 38 s, `transform` and `opacity` only                                                                                                                  | still                                       |
+| Friday's falling stars                                                            | a 9 s cycle per streak, three staggered by 3 s; `transform` and `opacity`                                                                                            | not shown                                   |
+| The sky whale                                                                     | once a night, 70 s across, linear (constant motion)                                                                                                                  | rests in place for a few seconds, then goes |
+
+Why some run longer than 300 ms: none of them answers a tap. The rise is a
+notice beside the number, the scene things are weather, and the snap, the
+one answer to a person, is 220 ms.

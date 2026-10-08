@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test'
 import {
+  middayToday,
   expect,
   test,
   addThing,
@@ -102,7 +103,7 @@ test('a tap on a lock-in card opens the dial and marks nothing', async ({ page }
 })
 
 test('a full session opens the world in order and marks the thing done', async ({ page }) => {
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await lockInThing(page, 'run')
   await addThing(page, 'read')
@@ -136,7 +137,7 @@ test('a full session opens the world in order and marks the thing done', async (
 })
 
 test('a done lock-in card does not undo on a tap; its sheet takes it back', async ({ page }) => {
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await lockInThing(page, 'run')
   await dismissInstallLeaf(page)
@@ -155,7 +156,7 @@ test('a done lock-in card does not undo on a tap; its sheet takes it back', asyn
 })
 
 test('a tap during the opening lands on its end at once', async ({ page }) => {
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await lockInThing(page, 'run')
   await addThing(page, 'read')
@@ -178,7 +179,7 @@ test('a tap during the opening lands on its end at once', async ({ page }) => {
 test('stop keeps what the timer saw, the card offers to finish, and the parts add up', async ({
   page,
 }) => {
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await lockInThing(page, 'run')
   await dismissInstallLeaf(page)
@@ -206,7 +207,7 @@ test('stop keeps what the timer saw, the card offers to finish, and the parts ad
 test('away for longer than 15 seconds: the count stops after the grace and goes on on return', async ({
   page,
 }) => {
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await lockInThing(page, 'run')
   await dismissInstallLeaf(page)
@@ -227,7 +228,7 @@ test('away for longer than 15 seconds: the count stops after the grace and goes 
 })
 
 test('a short look away is not leaving', async ({ page }) => {
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await lockInThing(page, 'run')
   await dismissInstallLeaf(page)
@@ -244,7 +245,7 @@ test('a short look away is not leaving', async ({ page }) => {
 test('a reload keeps the minutes the timer saw, and the card offers to finish', async ({
   page,
 }) => {
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await lockInThing(page, 'run')
   await dismissInstallLeaf(page)
@@ -329,7 +330,7 @@ test('a day that ends short keeps its minutes as a faint lantern, and the next d
 })
 
 test('all done waits for a lock-in that is not finished', async ({ page }) => {
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await addThing(page, 'water')
   await lockInThing(page, 'study')
@@ -348,7 +349,7 @@ test('all done waits for a lock-in that is not finished', async ({ page }) => {
 })
 
 test('the time is hidden, and a tap shows it for three seconds', async ({ page }) => {
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await lockInThing(page, 'run')
   await dismissInstallLeaf(page)
@@ -363,7 +364,7 @@ test('the time is hidden, and a tap shows it for three seconds', async ({ page }
 })
 
 test('undo in the first ten seconds leaves no trace; after that it is stop', async ({ page }) => {
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await lockInThing(page, 'run')
   await dismissInstallLeaf(page)
@@ -383,7 +384,7 @@ test('undo in the first ten seconds leaves no trace; after that it is stop', asy
 test('one pause: the creature sleeps, the time stands still, and it is gone once used', async ({
   page,
 }) => {
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await lockInThing(page, 'run')
   await dismissInstallLeaf(page)
@@ -407,7 +408,7 @@ test('one pause: the creature sleeps, the time stands still, and it is gone once
 test('a pause runs out by itself after five minutes, and being away inside it is not leaving', async ({
   page,
 }) => {
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await lockInThing(page, 'run')
   await dismissInstallLeaf(page)

@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test'
-import { dateKey, expect, seed, test, dismissInstallLeaf } from './helpers'
+import { dateKey, expect, middayToday, seed, test, dismissInstallLeaf } from './helpers'
 
 /**
  * The clarity test. Every everyday job is done through words a person can
@@ -33,7 +33,7 @@ const button = (page: Page, name: string, exact = true) => page.getByRole('butto
 
 test('fifteen everyday jobs, by visible words, each within two taps', async ({ page }) => {
   test.setTimeout(120_000)
-  await page.clock.install()
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
 
   // 1. Add a thing.
