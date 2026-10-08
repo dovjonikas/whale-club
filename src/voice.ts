@@ -398,6 +398,8 @@ export const voice = {
   /** A creature at its last stage, asked once. */
   name: {
     ask: 'name it?', // TODO-VOICE
+    /** Under the question: which creature, and why now. */
+    why: (thing: string) => `${thing} grew all the way.`, // TODO-VOICE
     field: 'its name', // TODO-VOICE
     keep: 'keep', // TODO-VOICE
     notNow: 'not now', // TODO-VOICE

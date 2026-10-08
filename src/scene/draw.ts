@@ -125,8 +125,39 @@ export const sunflower = (x: number, y: number, r: number, withFace = false): st
 export const stem = (x: number, top: number, bottom: number): string =>
   `<path d="M${x} ${bottom} v ${top - bottom}" stroke="#4fa64a" stroke-width="2.6" stroke-linecap="round"/><path d="M${x} ${top + (bottom - top) * 0.55} q -9 -3 -10 -10 q 8 0 10 10 z" fill="#5fbf4a"/>`
 
-/** The red jacket: shaded, with a collar and buttons. */
-export const jacket = (x: number, y: number, w: number): string => {
+/** The jacket's dark seams and the light of its lapels and buttons. */
+const JACKET_SEAM = '#7a1019'
+const JACKET_LIGHT = '#ffd6d9'
+
+/**
+ * The red jacket, seen from the front: a V-neck with its lapels folded
+ * back and a shirt under it, buttons down the front, two pockets and two
+ * sleeves. Drawn in its own frame, 50 units across the shoulders with the
+ * collar at 0, and set at (x, y) at width `w`. `arms`: hanging down, as
+ * the find lies, or straight out, as the scarecrow wears it.
+ */
+export const jacket = (x: number, y: number, w: number, arms: 'down' | 'out' = 'down'): string => {
   const [defs, cloth] = lit('#e63946', 0.25, -0.3)
-  return `${defs}<path d="M${x - w / 2} ${y} q ${w / 2} ${-w * 0.35} ${w} 0 v ${w * 0.52} q ${-w / 2} ${w * 0.12} ${-w} 0 z" fill="${cloth}"/><path d="M${x - w * 0.16} ${y - w * 0.12} l ${w * 0.16} ${w * 0.16} l ${w * 0.16} ${-w * 0.16}" stroke="#ffd6d9" stroke-width="${w * 0.04}" fill="none" opacity="0.8"/><path d="M${x} ${y + w * 0.04} v ${w * 0.46}" stroke="#7a1019" stroke-width="${w * 0.03}" opacity="0.6"/><circle cx="${x}" cy="${y + w * 0.16}" r="${w * 0.03}" fill="#ffd6d9"/><circle cx="${x}" cy="${y + w * 0.3}" r="${w * 0.03}" fill="#ffd6d9"/>`
+  const [sleeveDefs, sleeve] = lit('#d02f3c', 0.2, -0.35)
+  const sleeves =
+    arms === 'down'
+      ? `<path d="M-21 -4 Q -29 2 -34 24 Q -33 30 -27 29 L -19 9 Z" fill="${sleeve}"/>
+         <path d="M21 -4 Q 29 2 34 24 Q 33 30 27 29 L 19 9 Z" fill="${sleeve}"/>
+         <path d="M-34 24 Q -31 27 -27 26 M34 24 Q 31 27 27 26" stroke="${JACKET_LIGHT}" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.8"/>`
+      : `<path d="M-21 -4 L -38 1 L -38 12 L -20 11 Z" fill="${sleeve}"/>
+         <path d="M21 -4 L 38 1 L 38 12 L 20 11 Z" fill="${sleeve}"/>
+         <path d="M-37 1.5 V 11.5 M37 1.5 V 11.5" stroke="${JACKET_LIGHT}" stroke-width="2.4" stroke-linecap="round" opacity="0.8"/>`
+  return `${defs}${sleeveDefs}<g transform="translate(${x} ${y}) scale(${w / 50})">
+    ${sleeves}
+    <path d="M-10 -8 Q -18 -7 -23 -3 L -22 34 Q 0 38 22 34 L 23 -3 Q 18 -7 10 -8 L 0 7 Z" fill="${cloth}"/>
+    <path d="M-10 -8 Q 0 -5 10 -8 L 0 7 Z" fill="#fff4d6"/>
+    <path d="M-10 -8 L 0 7 L -5 13 L -13 -3 Z" fill="#ff7a83"/>
+    <path d="M10 -8 L 0 7 L 5 13 L 13 -3 Z" fill="#ff7a83"/>
+    <path d="M0 7 V 36" stroke="${JACKET_SEAM}" stroke-width="1.4" opacity="0.7"/>
+    <circle cx="2.6" cy="16" r="1.7" fill="${JACKET_LIGHT}"/>
+    <circle cx="2.6" cy="24" r="1.7" fill="${JACKET_LIGHT}"/>
+    <circle cx="2.6" cy="32" r="1.7" fill="${JACKET_LIGHT}"/>
+    <path d="M-18 22 h 9 M9 22 h 9" stroke="${JACKET_SEAM}" stroke-width="1.6" stroke-linecap="round" opacity="0.7"/>
+    <path d="M-20 0 Q -21 16 -20 30" stroke="#fff" stroke-width="2" fill="none" opacity="0.18" stroke-linecap="round"/>
+  </g>`
 }

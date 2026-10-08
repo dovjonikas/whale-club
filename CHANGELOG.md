@@ -2,6 +2,17 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 1.2.1 - 2026-10-08
+
+- **The red jacket, redrawn.** On the whale it is cut to the body's own
+  outline, a short coat with its collar folded back at the front, buttons,
+  a pocket, a hem above the white belly and a red sleeve with a cuff on
+  the fin, where before it was a red patch lying on top. As a find (and on
+  the scarecrow) it is a little jacket seen from the front: sleeves, a
+  V-neck with lapels and a shirt under it, buttons and two pockets.
+- **"name it?"** says which creature and why: "run grew all the way.",
+  where the thing's name alone read like a label.
+
 ## 1.2.0 - 2026-10-08
 
 A safe place: five small things so the app feels like somewhere good to

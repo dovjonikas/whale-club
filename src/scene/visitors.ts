@@ -31,14 +31,7 @@ export function whaleSvg(jacket: boolean): string {
     <path d="M70 89 l 2 4 M86 91.5 l 1 4 M102 92.5 l 0.6 4 M118 92 l 0 4 M134 90 l -0.6 4" stroke="#8fd3da" stroke-width="1.6" stroke-linecap="round"/>
     <path d="M96 84 Q 104 100 92 108 Q 88 96 96 84 Z" fill="#1a6684"/>
     <ellipse cx="110" cy="40" rx="40" ry="7" fill="#fff" opacity="0.16"/>
-    ${
-      jacket
-        ? `<path d="M80 42 Q 112 28 146 40 L 150 74 Q 114 86 78 74 Z" fill="url(#whale-jacket)"/>
-           <path d="M113 34 V 80" stroke="#7a1019" stroke-width="2" opacity="0.6"/>
-           <path d="M106 42 l 7 8 l 7 -8" stroke="#ffd6d9" stroke-width="2" fill="none" opacity="0.7"/>
-           <circle cx="113" cy="58" r="1.8" fill="#ffd6d9"/><circle cx="113" cy="67" r="1.8" fill="#ffd6d9"/>`
-        : ''
-    }
+    ${jacket ? WHALE_JACKET : ''}
     <path d="M150 30 q -4 -14 2 -22 M150 30 q 6 -14 18 -16" stroke="#7ff5ea" stroke-width="3.2" fill="none" stroke-linecap="round"/>
     <circle cx="140" cy="10" r="2.4" fill="#c9fbf5"/><circle cx="172" cy="10" r="2" fill="#c9fbf5"/><circle cx="158" cy="3" r="1.6" fill="#c9fbf5"/><circle cx="133" cy="22" r="1.4" fill="#c9fbf5"/>
     <g class="eyes"><ellipse cx="160" cy="56" rx="4.4" ry="5" fill="#061020"/><circle cx="161.6" cy="54" r="1.6" fill="#fff"/></g>
@@ -46,6 +39,42 @@ export function whaleSvg(jacket: boolean): string {
     <path d="M150 70 q 10 8 22 1" stroke="#061020" stroke-width="2.6" fill="none" stroke-linecap="round"/>
   </svg>`
 }
+
+/** The whale's body, also the jacket's edge: the jacket is cut to it. */
+const WHALE_BODY =
+  'M26 62 C 26 30, 140 22, 182 52 C 194 62, 188 78, 168 86 C 132 98, 64 96, 38 80 C 30 75, 26 69, 26 62 Z'
+
+/**
+ * The red jacket on the whale: a band of red cut to the body's own outline,
+ * so it wraps the whale rather than lying on it; its collar and hem in
+ * shadow where the body turns away, the front open toward the head with a
+ * lapel, buttons down it, a pocket, a sleeve on the fin with a light cuff,
+ * and the same shine along the back as the whale's skin.
+ */
+/** The coat's cut: a curved back, a hem above the belly, the front slanting open toward the head. */
+const COAT = 'M80 0 Q 72 46 79 86 Q 105 93 131 86 Q 128 46 138 0 Z'
+
+const WHALE_JACKET = `
+  <clipPath id="whale-wear"><path d="${WHALE_BODY}"/></clipPath>
+  <clipPath id="whale-coat"><path d="${COAT}"/></clipPath>
+  <g clip-path="url(#whale-wear)">
+    <path d="${COAT}" fill="url(#whale-jacket)"/>
+    <g clip-path="url(#whale-coat)">
+      <path d="${WHALE_BODY}" stroke="#7a1019" stroke-width="7" fill="none" opacity="0.55"/>
+    </g>
+    <path d="M138 22 Q 130 36 129 54 L 117 34 Q 127 27 138 22 Z" fill="#ff7a83"/>
+    <path d="M117 34 L 129 54" stroke="#7a1019" stroke-width="1.2" opacity="0.45"/>
+    <path d="M138 0 Q 128 46 131 86" stroke="#7a1019" stroke-width="1.8" fill="none" opacity="0.6"/>
+    <path d="M80 0 Q 72 46 79 86" stroke="#7a1019" stroke-width="2.4" fill="none" opacity="0.4"/>
+    <path d="M79 86 Q 105 93 131 86" stroke="#7a1019" stroke-width="2.2" fill="none" opacity="0.55"/>
+    <circle cx="128.6" cy="56" r="1.9" fill="#ffd6d9"/>
+    <circle cx="127.8" cy="66" r="1.9" fill="#ffd6d9"/>
+    <circle cx="127.6" cy="76" r="1.9" fill="#ffd6d9"/>
+    <path d="M90 70 h 16" stroke="#7a1019" stroke-width="1.8" stroke-linecap="round" opacity="0.6"/>
+    <ellipse cx="104" cy="38" rx="26" ry="4.5" fill="#fff" opacity="0.2"/>
+  </g>
+  <path d="M96 84 Q 104 100 92 108 Q 88 96 96 84 Z" fill="#d02f3c"/>
+  <path d="M90.5 101.5 Q 95.5 100.5 99.5 97.5" stroke="#ffd6d9" stroke-width="2.4" fill="none" stroke-linecap="round" opacity="0.85"/>`
 
 export type VisitorKind = 'fish' | 'jelly' | 'meteor' | 'turtle' | 'firefly'
 

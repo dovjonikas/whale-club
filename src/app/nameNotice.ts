@@ -32,7 +32,7 @@ export function nameNotice(store: Store): NoticeBuilder {
         <span class="name-creature" aria-hidden="true">${creatureSvg(thing.world, thing.line, LAST_STAGE)}</span>
         <span>
           <span class="leaf-title">${voice.name.ask}</span>
-          <span class="leaf-lead">${escapeHtml(thing.name)}</span>
+          <span class="leaf-lead">${escapeHtml(voice.name.why(thing.name))}</span>
         </span>
       </div>
       <input class="input name-input" type="text" maxlength="${String(PET_NAME_MAX)}" autocomplete="off" enterkeyhint="done" aria-label="${voice.name.field}" />
