@@ -160,6 +160,19 @@ test('how it works can play it again', async ({ page }) => {
   await expect(intro(page)).toBeVisible()
 })
 
+test('how it works answers what a friend asks first', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('whaleclub:intro', 'seen')
+  })
+  await page.goto('')
+  await page.getByRole('button', { name: 'Menu' }).click()
+  await page.getByRole('button', { name: 'how it works' }).click()
+  const sheet = page.getByRole('dialog', { name: 'how it works' })
+  await expect(sheet.locator('.how-faq dt')).toHaveCount(7)
+  await expect(sheet.getByText('is it free?')).toBeAttached()
+  await expect(sheet.getByText('yes. nothing is for sale, ever.')).toBeAttached()
+})
+
 test('the lab can open the app for the first time again', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('whaleclub:intro', 'seen')

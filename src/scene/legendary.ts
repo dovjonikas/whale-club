@@ -443,8 +443,3 @@ export function legendaryFor(index: number): Legendary {
   if (!legendary) throw new Error('no legendaries')
   return legendary
 }
-
-/** Is this find a legendary (drawn bigger, shimmering, placed first)? */
-export function isLegendary(id: string): boolean {
-  return LEGENDARIES.some((l) => l.find.id === id)
-}

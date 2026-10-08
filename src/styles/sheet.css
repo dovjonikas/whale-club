@@ -822,6 +822,27 @@
   font-size: var(--t-md);
 }
 
+/* The questions: each one a line, its answer under it, quieter. */
+.settings-title.how-faq-title {
+  margin-top: var(--s8);
+}
+
+.how-faq {
+  margin: 0;
+}
+
+.how-faq dt {
+  margin-top: var(--s4);
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.how-faq dd {
+  margin: var(--s1) 0 0;
+  color: var(--ink-dim);
+  text-wrap: pretty;
+}
+
 /* "other": hours and minutes, for any length up to ten hours. */
 .length-other {
   display: flex;

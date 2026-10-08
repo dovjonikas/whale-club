@@ -184,10 +184,6 @@ export function dayNumber(data: AppData, today: DateKey): number {
   return Math.max(1, Math.round(ms / 86_400_000) + 1)
 }
 
-export function worldOf(data: AppData, thingId: string): World | undefined {
-  return data.things.find((t) => t.id === thingId)?.world
-}
-
 /**
  * Everything a thing has found: earned by its days, and cracked open. An
  * earned tier whose stone is still waiting is not in the scene yet.
@@ -204,27 +200,10 @@ export function foundFor(
     .map((c) => c.id)
 }
 
-/** Runs of three or more consecutive star days, which the sky joins into constellations. */
-export function streakDays(stars: readonly DateKey[]): Set<DateKey> {
-  const linked = new Set<DateKey>()
-  let run: DateKey[] = []
-  const flush = (): void => {
-    if (run.length >= 3) for (const d of run) linked.add(d)
-    run = []
-  }
-  for (const date of stars) {
-    const previous = run[run.length - 1]
-    if (previous !== undefined && addDays(previous, 1) !== date) flush()
-    run.push(date)
-  }
-  flush()
-  return linked
-}
-
 /** "Did it without the timer", for all things together, in one week. */
 export const WITHOUT_TIMER_PER_WEEK = 2
 
-/** How many times are left this week (Monday to Sunday) to mark a lock-in done without the timer. */
+/** How many times are left this week (from its first day, as set) to mark a lock-in done without the timer. */
 export function withoutTimerLeft(data: AppData, today: DateKey): number {
   const monday = weekStart(today)
   let used = 0

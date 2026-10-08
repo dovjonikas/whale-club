@@ -122,10 +122,6 @@ const ROOMS: Readonly<Record<Room, readonly Spot[]>> = {
 
 export const ROOM_IDS: readonly Room[] = ['longer-shore', 'reef', 'island']
 
-export function isRoom(id: string): id is Room {
-  return (ROOM_IDS as readonly string[]).includes(id)
-}
-
 /** The places there are, with the extensions owned. */
 export function spotsFor(rooms: ReadonlySet<string>): Spot[] {
   return [...BASE, ...ROOM_IDS.filter((room) => rooms.has(room)).flatMap((room) => ROOMS[room])]

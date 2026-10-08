@@ -2,6 +2,22 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 1.0.0 - 2026-10-08
+
+The first year, whole, made ready for strangers. No new mechanic.
+
+- **How it works** in the menu answers the questions a friend asks first:
+  is it free, does it block other apps, can a lock in pause, music while
+  locked in, does it work offline, where is my sea kept, with a friend.
+  Its few lines now include krill.
+- **The README** for a stranger: install on iPhone and Android, the same
+  questions answered, a roadmap (year two comes in updates, and an update
+  never takes away what was earned), and its facts brought up to date
+  (seventy-eight finds to day 365, a dial from five minutes to ten hours,
+  209 scenarios per device, Lighthouse on the live site).
+- **A review before the tag**: exports nothing used were removed, stale
+  comments corrected, and the rule for numbers written down (docs/DECISIONS.md).
+
 ## 0.17.0 - 2026-10-08
 
 Polish: the details that are felt more than seen.

@@ -139,9 +139,3 @@ export function krillSpent(data: AppData): number {
 export function krillBalance(data: AppData, today: DateKey): number {
   return Math.max(0, krillEarned(data, today) - krillSpent(data))
 }
-
-/** What a day added, as one number: the "+10" that rises by the chip. */
-export function krillToday(data: AppData, today: DateKey): number {
-  const day = krillOn(data, today)
-  return day.done + day.minutes + day.allDone + day.welcome
-}
