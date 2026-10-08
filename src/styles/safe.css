@@ -402,3 +402,27 @@
     display: none;
   }
 }
+
+/* The creature's name in its thing's sheet: the creature beside the label. */
+.pet-field-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  margin-bottom: var(--s1);
+}
+
+.pet-field-head .field-label {
+  margin: 0;
+}
+
+.pet-field-art {
+  display: block;
+  flex: none;
+  width: 32px;
+}
+
+.pet-field-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}

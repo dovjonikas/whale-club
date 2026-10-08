@@ -424,7 +424,8 @@ test('at its last stage a creature can be named, once; the name can change in it
   expect((await stored(page)).things[0]).toMatchObject({ petName: 'moby', nameAsked: true })
   await expect(page.getByRole('button', { name: 'pet moby' })).toBeVisible()
   await page.getByRole('button', { name: 'edit run' }).click()
-  const field = page.getByRole('dialog').getByRole('textbox', { name: 'its name' })
+  // Apart from the thing's own name, and called what it is.
+  const field = page.getByRole('dialog').getByRole('textbox', { name: 'the creature’s name' })
   await expect(field).toHaveValue('moby')
   await field.fill('orca')
   await page.getByRole('dialog').getByRole('button', { name: 'save' }).click()
