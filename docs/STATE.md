@@ -32,7 +32,7 @@ v1.0.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
 ## The road to 1.0 (the author's briefs of 2026-10-07)
 
-The first brief is in the author's journal (consistency-game/prompt-6-product.md),
+The first brief is the author's own and is kept outside this repository,
 with two additions sent the same day: a settings sheet (trust) and art
 slots for collectibles (the first year). Two evening additions put new
 stages straight after 0.10.0 (two kinds and the first minute) and after
