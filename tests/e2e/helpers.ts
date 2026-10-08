@@ -186,8 +186,13 @@ export async function clearNotices(page: Page): Promise<void> {
   if (await checkin.isVisible()) {
     await checkin.getByRole('button', { name: 'good!!!' }).click()
     await checkin.getByRole('button', { name: 'happy!!!' }).click()
+    // In the evening the day's one good thing is asked first: skipped here.
+    const ok = checkin.getByRole('button', { name: 'ok' })
+    const skip = checkin.getByRole('button', { name: 'skip' })
+    await expect(ok.or(skip)).toBeVisible()
+    if (await skip.isVisible()) await skip.click()
     // Then the line for the day, until "ok".
-    await checkin.getByRole('button', { name: 'ok' }).click()
+    await ok.click()
     await expect(checkin).toBeHidden()
   }
 }

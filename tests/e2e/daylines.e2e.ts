@@ -2,7 +2,7 @@ import { test as pure, type Page } from '@playwright/test'
 import { dayLine, LINES } from '../../src/app/lines'
 import { addDays, todayKey } from '../../src/store/dates'
 import { voice } from '../../src/voice'
-import { expect, seed, test } from './helpers'
+import { expect, middayToday, seed, test } from './helpers'
 
 /**
  * The line for the day: one after the check-in, chosen by the date, none
@@ -202,6 +202,7 @@ test('a line already said today by a moment is not said again by the check-in', 
 test('every line fits a 320px phone in two rows at most', async ({ page }) => {
   test.skip(test.info().project.name !== 'desktop', 'one viewport is the point')
   await page.setViewportSize({ width: 320, height: 640 })
+  await page.clock.install({ time: middayToday() })
   await seedFor(page, todayKey())
   await page.goto('')
   const checkin = await checkIn(page)

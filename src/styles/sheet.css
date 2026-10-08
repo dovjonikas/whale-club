@@ -1049,9 +1049,22 @@
   margin-bottom: var(--s3);
 }
 
+/* Back up and restore: a group of rows (log.css, .row-group), when the
+   last backup was under it; starting over apart, quiet and in red. */
 .setting-actions {
   display: grid;
+  justify-items: start;
   gap: var(--s2);
+  margin-top: var(--s3);
+}
+
+.setting-actions .row-group {
+  justify-self: stretch;
+  margin-bottom: 0;
+}
+
+.setting-actions .setting-last {
+  margin: 0 0 var(--s1) var(--s3);
 }
 
 /* The month's quiet backup dot on the menu button: no popup, just a dot. */

@@ -1,7 +1,7 @@
 import { dayLine } from '../../src/app/lines'
 import { recapFor } from '../../src/app/recap'
 import { emptyData, EVERY_DAY } from '../../src/store/types'
-import { expect, test, addThing, dateKey, dismissInstallLeaf, seed } from './helpers'
+import { expect, test, addThing, dateKey, dismissInstallLeaf, middayToday, seed } from './helpers'
 
 /**
  * The check-in and the weekly recap: one notice at a time above the row,
@@ -10,6 +10,8 @@ import { expect, test, addThing, dateKey, dismissInstallLeaf, seed } from './hel
 test('the check-in is two taps, then the line for the day, then not asked again today', async ({
   page,
 }) => {
+  // Midday: in the evening the day's one good thing is asked before the line.
+  await page.clock.install({ time: middayToday() })
   await page.goto('')
   await addThing(page, 'run')
   await dismissInstallLeaf(page)
