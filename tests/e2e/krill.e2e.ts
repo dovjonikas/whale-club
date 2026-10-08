@@ -84,8 +84,8 @@ test('a good week counts only once it is over', () => {
     const day = krillOn(data, d)
     return n + day.done + day.minutes + day.allDone
   }, 0)
-  // Only the first week, which is over, adds its 50.
-  expect(before - daily).toBe(KRILL.goodWeek)
+  // Only the first week, which is over, adds its 50; the first week’s set (seven days done) its 100.
+  expect(before - daily).toBe(KRILL.goodWeek + KRILL.firstWeek)
 })
 
 test('buying lowers the balance, and the balance is never below nothing', () => {

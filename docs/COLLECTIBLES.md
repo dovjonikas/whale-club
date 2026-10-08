@@ -7,7 +7,7 @@ Which line a thing gets: the first thing in a world takes line A, the second
 line B.
 
 Unlock tiers are the total number of days the thing was done, ever:
-**3, 7, 14, 21, 30, 45, 60, 90, 120, 180**. Unlocks are computed from the
+**3, 7, 14, 21, 30, 45, 60, 90, 120, 180, 240, 300, 365**: a first year. Unlocks are computed from the
 day records every time the scene draws; nothing is stored, so nothing can
 be lost or corrupted. Locked items show as silhouettes in the Collection
 screen so the next one is always visible. Each unlock plays a small scene in
@@ -28,6 +28,9 @@ the author writes it).
 | 90   | The whale wears the red jacket                                          | A sunken ship with its own bioluminescent glow                                                |
 | 120  | A whale calf that follows the whale                                     | A narwhal, because why not                                                                    |
 | 180  | The whale sings: a slow light pulse travels across the whole sea        | The deep opens: the sea floor drops away and shows a second, darker layer with its own lights |
+| 240  | A sea otter afloat on its back, holding a shell                         | A pufferfish, round when surprised                                                            |
+| 300  | A seal asleep on its rock                                               | A coral, a little taller every year                                                           |
+| 365  | A pod of whales: a year of showing up                                   | An orca, for company                                                                          |
 
 ## SKY
 
@@ -43,6 +46,9 @@ the author writes it).
 | 90   | An astronaut floating by, wearing the red jacket over the suit             | A hot air balloon with the red jacket as its basket          |
 | 120  | A second constellation: a whale drawn in stars                             | A kite that stays up even at night                           |
 | 180  | The sky turns slowly over the night: the stars rotate around the pole star | An eclipse once a week, two seconds long                     |
+| 240  | A small rocket, off somewhere                                              | A cloud with a silver edge, the moon behind it               |
+| 300  | A ringed planet                                                            | A visitor that waves                                         |
+| 365  | A galaxy, a year of stars turning                                          | The morning sun, after a year of nights                      |
 
 ## GARDEN
 
@@ -58,6 +64,25 @@ the author writes it).
 | 90   | A tree, finally tall enough to have a swing                        | A cat on the bench, asleep                           |
 | 120  | Fireflies over the whole garden at night                           | Wind: the whole garden sways together                |
 | 180  | A second shore appears on the other side: the garden has an island | A treehouse in the tree with a window that lights up |
+| 240  | A pond with a frog                                                 | A deer at the edge of the light                      |
+| 300  | A hedgehog out for a walk                                          | A wishing well                                       |
+| 365  | A cottage: a year, and a home                                      | An apple tree                                        |
+
+## On the path to a legendary
+
+Not per thing: every day something was done lights a star of the current
+constellation (src/store/paths.ts). Paths are 30, 60, then 100 stars; half
+way brings a rare find, the end a legendary, earned, never sold.
+
+| Path | Stars | Half way (rare)  | The end (legendary)   |
+| ---- | ----- | ---------------- | --------------------- |
+| 1    | 30    | a golden scale   | the golden whale      |
+| 2    | 60    | a pearl          | the pearl turtle      |
+| 3    | 100   | stardust         | the comet fox         |
+| 4    | 100   | a prism          | the crystal jellyfish |
+| 5    | 100   | a silver feather | the moon heron        |
+
+After the fifth, the paths go round again.
 
 ## Creatures (grow with the last 7 days, not with the total)
 

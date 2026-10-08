@@ -24,6 +24,8 @@ import { StarField } from './stars'
 import { StoneLayer, type StoneSpec } from './stones'
 import { causticsUrl, grainUrl } from './textures'
 import { reducedMotion, ticker } from './ticker'
+import type { Season, SkyEvent } from './calendar'
+import { seasonShoreSvg } from './seasons'
 import { voice } from '../voice'
 import { sleeperSvg, visitorSvg, whaleSvg, type VisitorKind } from './visitors'
 
@@ -117,6 +119,10 @@ export class Scene {
         <div class="dock-aurora" hidden>${auroraSkySvg()}</div>
         <canvas class="stars"></canvas>
         <div class="dock-friday" hidden>${fridayStarsHtml()}</div>
+        <div class="sky-shower" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="sky-fireworks" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="sky-light" aria-hidden="true"></div>
+        <div class="season-flakes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <div class="dock-sky-whale" hidden>${skyWhaleSvg()}</div>
         <div class="moon">${moonSvg(moonPhase(today()))}</div>
       </div>
@@ -134,6 +140,7 @@ export class Scene {
       <canvas class="lanterns" aria-hidden="true"></canvas>
       <div class="dock-under">
         <div class="dock-cove" hidden aria-hidden="true">${glowingCoveSvg()}</div>
+        <div class="season-shore" aria-hidden="true">${seasonShoreSvg()}</div>
         <div class="dock-island" hidden aria-hidden="true">${islandWhaleSvg()}</div>
         <div class="dock-tide" hidden aria-hidden="true"></div>
         <div class="dock-edge" hidden aria-hidden="true">${shoreEdgeSvg()}</div>
@@ -541,6 +548,19 @@ export class Scene {
   setArranging(on: boolean): void {
     this.root.dataset.arranging = String(on)
     ticker.hold(on)
+  }
+
+  /**
+   * The real year: the season dresses the shore (snow, blossom, fallen
+   * leaves, a long summer dusk), and the days the sky and the sea keep
+   * show themselves (src/scene/calendar.ts). Nothing here is stored.
+   */
+  setCalendar(season: Season, events: readonly SkyEvent[]): void {
+    this.root.dataset.season = season
+    this.root.dataset.meteors = String(events.includes('meteors'))
+    this.root.dataset.newYear = String(events.includes('new-year'))
+    this.root.dataset.light = String(events.includes('solstice') || events.includes('equinox'))
+    this.root.dataset.seaDay = String(events.includes('ocean-day') || events.includes('whale-day'))
   }
 
   /** Where the pier is on screen, for an arrival. */

@@ -2,6 +2,52 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.14.0 - 2026-10-08
+
+The first year, and the path to a legendary.
+
+- **Constellations instead of a calendar.** The sky is a path now (the log
+  keeps the calendar): every day something was done lights the next star
+  of a constellation, drawn in the outline of the legendary at its end,
+  the way ahead faint and dotted from the very first day. Paths are 30
+  stars, then 60, then 100; finished ones stay in the sky, smaller. The
+  day's first done sends its star up from the card to its place (about a
+  second; a tap lands it).
+- **A rare find half way, a legendary at the end.** Five legendaries of
+  our own: the golden whale, the pearl turtle, the comet fox, the crystal
+  jellyfish, the moon heron. Bigger than a find, gold or pearl, with a
+  shimmer; never sold, and always given a place. Finishing a path plays a
+  ceremony: the scene darkens, the constellation lights, a beam comes
+  down, and the legendary appears with a plaque ("earned on 2026-11-12 ·
+  day 30"); its postcard has a gold frame. The Collection has a legendary
+  row, silhouettes until earned.
+- **Rarity is earned.** Per-thing finds are common now; a find reached
+  before this version keeps the shine its date gave it.
+- **The goals in sight**: beside the next find, the legendary's outline and
+  "12/30".
+- **Finds to day 365**: tiers at 240, 300 and 365, eighteen new finds (a
+  sea otter, a seal, a pod of whales, a pufferfish, a coral, an orca, a
+  small rocket, a ringed planet, a galaxy, a silver-edged cloud, a
+  visitor, the morning sun, a pond, a hedgehog, a cottage, a deer, a
+  wishing well, an apple tree).
+- **The first week as a set**: seven small silhouettes above the cards,
+  one filled each day something is done; the seventh day finishes it with
+  the whale's song and +100 krill, and the set is gone for good.
+- **The real year**: the season by the date (snow on the sand in winter,
+  blossom in spring, a long summer dusk, fallen leaves in autumn);
+  meteor showers on their nights, the solstices and equinoxes, World
+  Ocean Day and World Whale Day, New Year's night, and the person's own
+  anniversary, each said in place of the day's surprise.
+- **Days 100, 200 and 365** of whale club are quietly kept, each with a
+  card of its own; the 365th's shows the whole cove of lanterns.
+- **Less noise**: the last month's lanterns float on their own and older
+  ones merge into one glow that grows with them; a year in the lab keeps
+  under forty things in the scene.
+- **Art slots**: a picture at `public/art/<id>.webp` takes the place of a
+  find's drawing everywhere, no code changed; `npm run art:check` and
+  docs/ART.md. Pictures there are not MIT.
+- The lab: "+1 star" and "finish this path".
+
 ## 0.13.0 - 2026-10-08
 
 Krill and the dock, and arranging your sea.

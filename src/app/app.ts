@@ -2,7 +2,7 @@ import { collectibleSvg, collectiblesFor } from '../scene/collectibles'
 import { Scene } from '../scene/scene'
 import { CHEST } from '../scene/spots'
 import { legendaryFor } from '../scene/legendary'
-import { halfwayStar, pathLength, progressOf, reachesOf, type PathProgress } from '../store/paths'
+import { halfwayStar, pathLength, progressOf, reachesOf } from '../store/paths'
 import { playCeremony } from './ceremony'
 import { todayKey } from '../store/dates'
 import {
@@ -38,6 +38,10 @@ import { LockIn } from './lockIn'
 import { openHowItWorks } from './howItWorks'
 import { introDue, playIntro } from './intro'
 import { KrillChip } from './krillChip'
+import { firstWeekHtml } from './firstWeek'
+import { eventsAt, seasonOf, yearsSince } from '../scene/calendar'
+import { today as clockNow } from '../store/clock'
+import { FIRST_WEEK_DAYS } from '../store/krill'
 import { openLogSheet } from './logSheet'
 import { openMenuSheet } from './menuSheet'
 import { Notices } from './notices'
@@ -60,6 +64,8 @@ import { showUndo } from './toast'
 import { surpriseFor } from './surprise'
 
 const SURPRISE_DELAY_MS = 4000
+/** The days of whale club (days something was done) that are quietly celebrated. */
+const MILESTONES: readonly number[] = [100, 200, 365]
 /** A path's moment waits for a lock-in screen to go, looking again this often, and not for ever. */
 const SESSION_WAIT_MS = 250
 const SESSION_WAIT_MAX_MS = 20_000
@@ -404,22 +410,48 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     if (bumped) store.setPlacement(Object.fromEntries(now.where))
   }
 
-  /** The path as the last render left it, to notice a halfway star or a finished constellation. */
-  let pathBefore: PathProgress | null = null
+  /** How many stars the last render saw, to notice what the newest one finished. */
+  let starsBefore: number | null = null
 
   /**
-   * After a star day: half way along the path, a rare find and two bright
-   * notes; at its end, the legendary's ceremony. Both wait for a lock-in's
-   * screen to go, so they happen in the world, not behind the water.
+   * After a new star day, in order of rarity: the first week's set
+   * finished, a milestone (day 100, 200, 365), a constellation finished
+   * (its legendary's ceremony) or its halfway star (a rare find). Each
+   * waits for a lock-in's screen and the flying star, so it happens in the
+   * world. A day with one of them skips the daily surprise.
    */
   function watchPath(data: AppData): void {
     const dates = starDays(data)
-    const now = progressOf(dates.length)
-    const before = pathBefore
-    pathBefore = now
-    if (!before) return
-    if (now.path > before.path) {
-      // The day has its moment: the surprise waits for another day.
+    const count = dates.length
+    const before = starsBefore
+    starsBefore = count
+    if (before === null || count <= before) return
+    const was = progressOf(before)
+    const now = progressOf(count)
+    if (before < FIRST_WEEK_DAYS && count >= FIRST_WEEK_DAYS) {
+      surprisedFor = todayKey()
+      afterSession(() => {
+        sound.play('whale')
+        scene.surfaceWhale(hasJacket(store.get()))
+        line.say(voice.firstWeek.done)
+      })
+    }
+    const milestone = MILESTONES.find((day) => before < day && count >= day)
+    if (milestone !== undefined) {
+      surprisedFor = todayKey()
+      afterSession(() => {
+        sound.play('grow')
+        scene.glow()
+        const said = voice.milestone(milestone)
+        line.say(said)
+        postcards.offer(
+          { kind: 'milestone', line: said, milestone },
+          voice.postcard.sendThis,
+          OFFER_AFTER_FIND_MS,
+        )
+      })
+    }
+    if (now.path > was.path) {
       surprisedFor = todayKey()
       const finished = now.path - 1
       const date = reachesOf(dates)[finished]?.end ?? todayKey()
@@ -427,16 +459,13 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       afterSession(() => {
         crown(finished, voice.legend.plaque(date, day))
       })
-    } else if (now.path === before.path) {
-      const half = halfwayStar(now.length)
-      if (before.lit < half && now.lit >= half) {
-        surprisedFor = todayKey()
-        const rare = legendaryFor(now.path).rare
-        afterSession(() => {
-          sound.play('half')
-          line.say(voice.legend.half(rare.name))
-        })
-      }
+    } else if (was.lit < halfwayStar(now.length) && now.lit >= halfwayStar(now.length)) {
+      surprisedFor = todayKey()
+      const rare = legendaryFor(now.path).rare
+      afterSession(() => {
+        sound.play('half')
+        line.say(voice.legend.half(rare.name))
+      })
     }
   }
 
@@ -479,12 +508,34 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     if (surprisedFor === today) return
     if ((data.days[today]?.done.length ?? 0) !== 1) return
     surprisedFor = today
+    // A day the sky or the sea keeps says so, in place of the surprise.
+    const kept = calendarLine(data)
+    if (kept) {
+      setTimeout(() => {
+        line.say(kept, { quiet: true })
+      }, SURPRISE_DELAY_MS)
+      return
+    }
     const surprise = surpriseFor(today)
     setTimeout(() => {
       if (surprise.kind === 'fact') line.say(surprise.text, { quiet: true })
       else if (surprise.kind === 'visitor') scene.visit(surprise.visitor)
       else scene.glow()
     }, SURPRISE_DELAY_MS)
+  }
+
+  /** The line for a day the sky or the sea keeps, the rarest first; none on an ordinary day. */
+  function calendarLine(data: AppData): string | null {
+    const now = clockNow()
+    const first = starDays(data)[0]
+    const events = eventsAt(now, first)
+    if (events.includes('anniversary') && first)
+      return voice.calendar.anniversary(yearsSince(now, first))
+    if (events.includes('ocean-day') || events.includes('whale-day')) return voice.calendar.seaDay
+    if (events.includes('new-year')) return voice.calendar.newYear
+    if (events.includes('meteors')) return voice.calendar.meteors
+    if (events.includes('solstice') || events.includes('equinox')) return voice.calendar.light
+    return null
   }
 
   // --- Render ----------------------------------------------------------------------------------
@@ -496,6 +547,8 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     row.render(data)
     krill.render(data, today)
     watchPath(data)
+    const now = clockNow()
+    scene.setCalendar(seasonOf(now), eventsAt(now, starDays(data)[0]))
     scene.setDock(new Set(shownItems(data).map((item) => item.id)), () => {
       openDock()
     })
@@ -546,7 +599,22 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       const label = near.querySelector('.next-text')
       if (label) label.textContent = voice.nextFind(next.days)
     }
-    const path = progressOf(starDays(data).length)
+    const stars = starDays(data).length
+    // The first week's set comes first; the legendary's path is the goal after it.
+    const week = stars < FIRST_WEEK_DAYS
+    let set = nextSlot.querySelector<HTMLElement>('.first-week')
+    if (week) {
+      pill('next-legend', false)
+      const html = firstWeekHtml(stars)
+      if (set?.getAttribute('aria-label') !== voice.firstWeek.label(stars)) {
+        set?.remove()
+        nextSlot.insertAdjacentHTML('beforeend', html)
+      }
+      return
+    }
+    set?.remove()
+    set = null
+    const path = progressOf(stars)
     const legend = legendaryFor(path.path)
     const far = pill('next-legend', true)
     const key = `${legend.id}:${String(path.lit)}`

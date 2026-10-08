@@ -154,6 +154,23 @@ export const voice = {
     back: 'back to the sea',
     watch: 'watch the intro',
   },
+  /** Days 100, 200 and 365 of whale club (days something was done): a quiet celebration. */
+  milestone: (day: number) =>
+    day >= 365 ? 'a year of whale club.' : `day ${String(day)}. quietly, well done.`, // TODO-VOICE
+  /** The days the sky and the sea keep: said in place of the day's surprise. */
+  calendar: {
+    anniversary: (years: number) =>
+      years === 1 ? 'a year since your first day.' : `${String(years)} years since your first day.`, // TODO-VOICE
+    seaDay: 'the sea’s own day. the whales came up to see.', // TODO-VOICE
+    newYear: 'a new year. the same sea.', // TODO-VOICE
+    meteors: 'a meteor shower tonight. look up.', // TODO-VOICE
+    light: 'the sun turns today.', // TODO-VOICE
+  },
+  /** The first week as a set of seven, filled a day at a time. */
+  firstWeek: {
+    label: (n: number) => `first week: ${String(n)} of 7`,
+    done: 'a first week. the whale sings.', // TODO-VOICE
+  },
   /** The far goal beside the near one: the legendary at the end of this constellation. */
   legend: {
     progress: (lit: number, length: number) => `${String(lit)}/${String(length)}`,

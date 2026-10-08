@@ -1,4 +1,4 @@
-import { collectibleSvg, type Collectible } from '../scene/collectibles'
+import { artFor, collectibleSvg, type Collectible } from '../scene/collectibles'
 import { resolveTokens } from '../scene/palette'
 import { shoreSvg } from '../scene/shore'
 import { StarField } from '../scene/stars'
@@ -9,7 +9,8 @@ import { dayNumber, last7, lineFor, stageFor, starDays } from '../store/derive'
 import type { AppData, PostcardFormat } from '../store/types'
 import { voice } from '../voice'
 import { BRAND } from './brand'
-import { shownCollectibles } from './sceneData'
+import { lanternsFor, shownCollectibles } from './sceneData'
+import { hash, seeded } from '../scene/random'
 import { LEGENDARIES } from '../scene/legendary'
 import { islandWhaleSvg, pierSvg, reefSvg, shoreEdgeSvg } from '../scene/dock/scene'
 import { shownItems, wornBy } from './dockData'
@@ -25,13 +26,15 @@ import { dayBubble } from './thingMark'
  * the scene at the time. Two sizes: a story (1080x1920) and a square
  * (1080x1080). The only thing that leaves the phone is this picture.
  */
-export type MomentKind = 'whale' | 'unlock' | 'recap' | 'stage' | 'sea' | 'legendary'
+export type MomentKind = 'whale' | 'unlock' | 'recap' | 'stage' | 'sea' | 'legendary' | 'milestone'
 
 export interface Moment {
   kind: MomentKind
   line: string
   /** A legendary's postcard: which one, and its plaque ("earned on ... · day 30"). */
   legendary?: { id: string; plaque: string }
+  /** A milestone's card: day 100, 200 or 365 of whale club. */
+  milestone?: number
 }
 
 const SIZE: Record<PostcardFormat, [number, number]> = {
@@ -48,6 +51,8 @@ const REEF_TOP = 0.686
 const SAND_LINE = 0.592
 /** The gold frame of a legendary's card, in px of the card. */
 const FRAME_INSET = 22
+/** The milestone whose card is the year's. */
+const YEAR = 365
 const FRAME_WIDTH = 12
 const PHONE_W = 390
 const PHONE_H = 700
@@ -137,6 +142,7 @@ export async function renderPostcard(
   const shoreTop = horizon - H * 0.02
   await drawSvg(ctx, shoreSvg(), 0, shoreTop, W, H * (format === 'story' ? 0.06 : 0.07))
   const scale = Math.min(W / PHONE_W, H / PHONE_H)
+  if ((moment.milestone ?? 0) >= YEAR) paintCove(ctx, data, W, horizon, H)
   await drawDock(ctx, data, W, H, horizon, scale)
   // Where each thing stands now, so the postcard shows the person's own arrangement.
   const visible = new Set(visibleIds)
@@ -146,7 +152,7 @@ export async function renderPostcard(
     const size = item.size * at.depth * scale
     const y = mapY(at.y, horizon, H)
     const top = at.stand ? y - size : y - size / 2
-    await drawSvg(ctx, collectibleSvg(item), at.x * W - size / 2, top, size, size)
+    await drawFind(ctx, item, at.x * W - size / 2, top, size, size)
   }
 
   if (moment.kind === 'whale') {
@@ -202,11 +208,12 @@ export async function renderPostcard(
   ctx.fillText(
     legend && moment.legendary
       ? moment.legendary.plaque
-      : `${voice.share.caption(dayNumber(data, today))} · ${date}`,
+      : `${voice.share.caption(moment.milestone ?? dayNumber(data, today))} · ${date}`,
     W / 2,
     H * layout.captionY,
   )
   if (legend) goldFrame(ctx, W, H)
+  if (moment.milestone !== undefined) silverFrame(ctx, W, H)
 
   await drawCreatures(ctx, data, today, W, H * layout.creaturesY, layout)
 
@@ -311,6 +318,42 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, width: number): strin
  * the sand edge, the reef), so a thing placed on them is not left in the
  * air. Drawn at the places the scene has them, through the same mapping.
  */
+/** A milestone's frame: a fine pale line, quieter than the legendary's gold. */
+function silverFrame(ctx: CanvasRenderingContext2D, W: number, H: number): void {
+  ctx.strokeStyle = 'rgba(232, 240, 245, 0.7)'
+  ctx.lineWidth = 3
+  ctx.strokeRect(FRAME_INSET, FRAME_INSET, W - 2 * FRAME_INSET, H - 2 * FRAME_INSET)
+}
+
+/**
+ * The year's card shows the whole cove: every lantern there is, as the
+ * scene had them before older ones merged into a glow. Placed by each
+ * lantern's own key, so the same year paints the same cove.
+ */
+function paintCove(
+  ctx: CanvasRenderingContext2D,
+  data: AppData,
+  W: number,
+  horizon: number,
+  H: number,
+): void {
+  for (const lantern of lanternsFor(data)) {
+    const random = seeded(hash(`card|${lantern.key}`))
+    const x = (0.04 + random() * 0.92) * W
+    const y = horizon + (0.03 + Math.pow(random(), 1.5) * 0.16) * (H - horizon)
+    const r = (2 + lantern.size) * (W / PHONE_W)
+    const glow = ctx.createRadialGradient(x, y, 0, x, y, r * 3)
+    glow.addColorStop(0, lantern.color)
+    glow.addColorStop(1, 'rgba(0, 0, 0, 0)')
+    ctx.globalAlpha = lantern.glow === 'dim' ? 0.35 : lantern.glow === 'soft' ? 0.65 : 0.9
+    ctx.fillStyle = glow
+    ctx.beginPath()
+    ctx.arc(x, y, r * 3, 0, Math.PI * 2)
+    ctx.fill()
+  }
+  ctx.globalAlpha = 1
+}
+
 /** The legendary card's frame: a gold edge with a fine line inside it, like a plaque. */
 function goldFrame(ctx: CanvasRenderingContext2D, W: number, H: number): void {
   const gold = ctx.createLinearGradient(0, 0, W, H)
@@ -354,6 +397,31 @@ async function drawDock(
     pierWidth,
     (long ? 64 : 44) * unit,
   )
+}
+
+/** A find on the card: its art slot's picture as an image, or its drawing as SVG. */
+async function drawFind(
+  ctx: CanvasRenderingContext2D,
+  item: Collectible,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): Promise<void> {
+  const art = artFor(item.id)
+  if (!art) {
+    await drawSvg(ctx, collectibleSvg(item), x, y, width, height)
+    return
+  }
+  const image = new Image()
+  image.src = art
+  try {
+    await image.decode()
+    ctx.drawImage(image, x, y, width, height)
+  } catch {
+    // A picture that will not load: the drawing stands in, as everywhere else.
+    await drawSvg(ctx, collectibleSvg(item), x, y, width, height)
+  }
 }
 
 async function drawSvg(

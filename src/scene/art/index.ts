@@ -2,3 +2,4 @@
 export * from './sea'
 export * from './sky'
 export * from './garden'
+export * from './year'

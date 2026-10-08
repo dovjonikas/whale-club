@@ -58,6 +58,10 @@ src/
     lanterns.ts      the cove's lanterns on one canvas, a sprite per colour and size
     creatures/       SVG for every world, line and stage: kit.ts and one file per world
     spots.ts         the places in each world and the extensions', where things stand, moves and swaps
+    legendary.ts     the five legendaries and their rare finds: shapes, drawings
+    constellations.ts the stars spread along a legendary's outline, and the sky's layout of every path
+    calendar.ts      the season from the date, and the nights and days the sky and the sea keep
+    seasons.ts       the shore's dress for each season
     dock/            the dock's catalogue (index.ts), its drawings (art.ts), its scene layers
                      (scene.ts: pier, island whale, reef, aurora nights...) and what creatures wear (wear.ts)
     collectibles/    the sixty collectibles, one list per world, built by build.ts
@@ -78,6 +82,7 @@ src/
     migrate.ts       a strict guard from stored JSON to AppData, by version
     derive.ts        last7, stage, totalDone, stones waiting, found, stars, streak: all arithmetic
     krill.ts         krill earned, worked out from the days; spent; the balance (docs/ECONOMY.md)
+    paths.ts         the path to a legendary: which star a day is, progress, halfway and end
     dock.ts          what the dock changes in the data: buy, the goal, hidden, who wears it
     dates.ts         local YYYY-MM-DD keys and week arithmetic
   lab/               the lab's screen and its seeded history (see section 10)
@@ -356,3 +361,19 @@ To add a dock thing: an entry in src/scene/dock/index.ts (a tier and a
 price inside its range, a kind), a drawing in art.ts, and for a scene
 thing its layer in scene.ts and a line in `Scene.setDock`. To add places:
 a set in src/scene/spots.ts, and its drawing under the things.
+
+## 13. The path to a legendary
+
+`starDays(data)` is the path, oldest first. `placeStars` gives each day
+its path and star; `progressOf(count)` the current path and how far
+along it is; `reachesOf` the days a path's halfway and last stars were
+lit. The sky draws `layoutSky(dates)` (constellations.ts): finished paths
+in their slots, the current one in the middle with its faint way ahead.
+`pathFinds` (app/sceneData.ts) turns the reaches into a rare find and a
+legendary, which join the arrangement like any find, a legendary first.
+The app's `watchPath` notices, after a render, what the newest star
+finished (the first week's set, a milestone, a halfway star, a path) and
+plays it once the world is clear.
+
+To add a legendary: an entry in src/scene/legendary.ts with its shape (a
+few strokes in a 100 by 60 box), its drawing and its rare find.

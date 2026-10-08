@@ -396,6 +396,64 @@ for (const [file, off] of [
   await context.close()
 }
 
+// 0.14, the path to a legendary: the same three things done every day for a
+// run of days, at night. 75 days: the golden whale's constellation finished
+// in its corner, the turtle's half lit. 29 days and one tap: the ceremony.
+async function pathScene(days, file, after) {
+  const pathDays = {}
+  for (let i = -days; i < 0; i++)
+    pathDays[key(i)] = { done: ['run', 'read', 'practice'], minutes: {} }
+  // Today the check-in is answered, so no notice covers the sky.
+  pathDays[key(0)] = { done: [], minutes: {}, checkin: true }
+  const pathData = {
+    ...data,
+    version: 8,
+    things: things.map((t) => ({ ...t, kind: 'tap', createdAt: key(-days) })),
+    days: pathDays,
+    cracked: { run: 60, read: 60, practice: 60 },
+  }
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.setFixedTime(NOW)
+  await page.addInitScript(
+    (json) => localStorage.setItem('whaleclub:data', json),
+    JSON.stringify(pathData),
+  )
+  await page.goto(base)
+  await page.waitForTimeout(1500)
+  if (after) await after(page)
+  await shot(page, file)
+  await context.close()
+}
+await pathScene(75, 'iphone-constellation.png')
+await pathScene(29, 'iphone-ceremony.png', async (page) => {
+  await page.getByRole('button', { name: 'run', exact: true }).click()
+  await page.getByRole('dialog', { name: 'the golden whale' }).waitFor()
+  await page.waitForTimeout(3200)
+})
+
+// A year, readable: the lab's own 365 days, as anyone can make them.
+{
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.setFixedTime(NOW)
+  await page.addInitScript(
+    (json) => localStorage.setItem('whaleclub:data', json),
+    JSON.stringify(data),
+  )
+  await page.goto(`${base}?lab=1`)
+  await page
+    .getByRole('dialog', { name: 'the lab' })
+    .getByRole('button', { name: 'seed 365 days' })
+    .click()
+  await page.waitForTimeout(3500)
+  // The year's moments (a ceremony, a milestone) are for living through, not for this picture.
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(600)
+  await shot(page, 'iphone-year.png')
+  await context.close()
+}
+
 // brand.html: the bubble in every state, then the glyphs, at a desktop width.
 {
   const context = await browser.newContext({ viewport: { width: 1100, height: 860 } })

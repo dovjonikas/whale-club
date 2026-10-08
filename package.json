@@ -1,6 +1,6 @@
 {
   "name": "whale-club",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "private": true,
   "type": "module",
   "description": "A habit game about small things that add up. Show up, the scene fills, collectibles unlock.",
@@ -16,6 +16,7 @@
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
     "icons": "node scripts/icons.mjs",
+    "art:check": "node scripts/art-check.mjs",
     "shots": "node scripts/shots.mjs && node scripts/squeeze.mjs && node scripts/hero.mjs && node scripts/squeeze.mjs"
   },
   "dependencies": {
