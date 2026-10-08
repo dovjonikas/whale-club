@@ -1042,3 +1042,24 @@ A plaque's date is written the way people write it ("9 Nov 2026"), on the
 ceremony, in the Collection and on the gold postcard alike. In the
 Collection's narrow tile "2026-11-09" broke after a hyphen into two
 halves; the words of the line are unchanged, only the date inside it.
+
+## 2026-10-08 1.0: what the release is, and the review before it
+
+1.0 is the first year, whole: everything from day one to day 365, the
+dock, the paths and their legendaries, settings, back up and restore. It
+adds no new mechanic; it is the same app made ready for strangers. The
+README answers the questions a stranger asks first (free, other apps,
+pause, music, offline, a new phone, a friend), and the app's "how it
+works" sheet answers the same ones in its own voice, so a friend who got
+only the link needs nobody to explain it.
+
+The review before the tag looked for dead code, comments that no longer
+tell the truth, misleading names, duplicated helpers and numbers without
+a name. Six exports nothing used were removed (among them `streakDays`,
+from the sky that was a calendar before the paths). The rule for numbers,
+written down so it stays one rule: a duration or threshold that answers a
+person (a press, a sheet, a toast, an undo, a grace period) is a named
+token or constant; choreography (an ambient sway of 21 s, the stagger of
+falling stars, the beats of the intro's score) stays with the element it
+moves, next to the comment that explains it, because a token used once
+only moves the number away from its reason.

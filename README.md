@@ -59,10 +59,10 @@ what it costs ([`docs/DECISIONS.md`](docs/DECISIONS.md)).
   <tr>
     <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-scene.webp" width="240" alt="The home screen: a night sky with a constellation being lit, a shore with sunflowers, a sea with fish, and three cards with creatures"><br><b>The sea</b><br><sub>Every day you show up is a star in a constellation.</sub></td>
     <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-all-done.webp" width="240" alt="Everything done for the day: the whale surfaces over the horizon and a button offers to send it"><br><b>All done</b><br><sub>The whale surfaces, with one line and one button to send it.</sub></td>
-    <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-collection.webp" width="240" alt="The collection: unlocked finds and the silhouettes of the next ones, each with its day"><br><b>The collection</b><br><sub>Sixty finds at 3 to 180 days. The next one is always in sight.</sub></td>
+    <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-collection.webp" width="240" alt="The collection: unlocked finds and the silhouettes of the next ones, each with its day"><br><b>The collection</b><br><sub>Seventy-eight finds, day 3 to day 365. The next one is always in sight.</sub></td>
   </tr>
   <tr>
-    <td align="center" valign="top"><img src="docs/screenshots/iphone-dial.webp" width="240" alt="The lock-in dial set to 30 minutes"><br><b>Lock in</b><br><sub>Turn the dial, from 10 to 120 minutes.</sub></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-dial.webp" width="240" alt="The lock-in dial set to 30 minutes"><br><b>Lock in</b><br><sub>Turn the dial, from five minutes to ten hours.</sub></td>
     <td align="center" valign="top"><img src="docs/screenshots/iphone-session.webp" width="240" alt="A lock-in session: deep water, the creature inside a slow ring, the time hidden"><br><b>Deep water</b><br><sub>Only the creature and a slow ring. The time hides until you tap.</sub></td>
     <td align="center" valign="top"><img src="docs/screenshots/iphone-opening.webp" width="240" alt="The end of a session: the world comes back and a new lantern comes down into the cove"><br><b>Coming back up</b><br><sub>The world returns in order and leaves a lantern in the cove.</sub></td>
   </tr>
@@ -122,6 +122,7 @@ And underneath all three: nothing dies. You just missed a day.
 - **Krill and the dock.** Every day shown up for earns krill, worked out from the days and never bought. A pier on the shore opens the dock: thirty things to look at in four tiers, fixed prices, no chance, no boxes, no timers. Save for one, and the distance shows under the title
 - **Arrange your sea.** Every world has its places; finds and dock things stand in them by themselves, and anyone who wants to can move them, swap them, or put them away in a chest. A longer shore, a reef and an island on a whale add room
 - **Postcards** of the whale, a new find or a grown creature, ready for the share sheet, with your arrangement on them
+- **Settings, few and plain.** A day can end at 3:00 for someone up late, the week can start on Sunday, the seasons can follow the south, and the sea can hold still. Every choice takes effect at once
 
 <details>
 <summary><strong>The longer list</strong></summary>
@@ -162,17 +163,51 @@ The plan and its critique are in [`docs/brand/BRAND.md`](docs/brand/BRAND.md).
   <img src="docs/screenshots/brand-glyphs.webp" width="400" alt="brand.html: the glyphs by group, each in its bubble and at 20 px">
 </p>
 
+## Install
+
+It is a web app that installs like any other app, with no store in between.
+
+- **iPhone:** open [the app](https://dovjonikas.github.io/whale-club/) in Safari, tap Share, then Add to Home Screen
+- **Android:** open it in Chrome and tap Install (or Add to Home screen in the menu)
+- **A computer:** it runs in the browser as it is, in a phone-wide frame
+
+Once installed it opens full screen, works with no network at all, and
+the next open after an update is the new version.
+
 ## Your data
 
 Everything lives in `localStorage` on the device, as one versioned JSON
-object. Nothing is sent anywhere: there is no backend, no analytics and no
-third-party script. A postcard is the only thing that leaves the phone, and
-only through the share sheet when you send it.
+object. Nothing is sent anywhere: there is no account, no backend, no
+analytics, no ads and no third-party script, and nothing is for sale. The
+only things that ever leave the phone are the postcards you send and the
+backup you save, both through your own share sheet.
 
 - **Derived, not stored.** Finds, streaks, stars and krill are worked out from the days themselves, so they can never disagree with the history; only what was bought is kept, with its price
 - **Back up and restore.** The whole sea as one JSON file with a checksum, through the share sheet or a download; restoring says what the file holds first and can be undone. A damaged or newer file is refused, and nothing changes
 - **Migrations.** Every earlier version of the data opens in the current app, held by tests. A record that cannot be read is parked beside the real one, never written over
 - **A lab.** A hidden sandbox with a movable clock, for trying a year in a minute, under its own storage key so it never touches real data ([the lab](docs/ARCHITECTURE.md#10-the-lab))
+
+## Questions
+
+**Is it free?** Yes. Nothing is for sale, ever: no ads, no subscription, no
+currency to buy.
+
+**Does it block other apps?** No. A lock-in keeps the screen on; lay the
+phone down and leave it.
+
+**Can I pause a lock-in?** Once per session, for up to five minutes.
+
+**Can I listen to music?** Start it before you lock in. Away from the app
+for more than fifteen seconds, the count waits until you are back; nothing
+is lost.
+
+**Does it work offline?** Yes, all of it, after the first open.
+
+**Where is my data, and how do I move to a new phone?** Only on your phone.
+Back up your sea from the settings and restore the file on the new one.
+
+**Can I use it with a friend?** Send them your whale. Each of you keeps your
+own sea; there are no accounts to connect.
 
 ## Under the hood
 
@@ -203,15 +238,15 @@ The map of the whole thing, and how to add a world or a find, is
 Nothing ships on a feeling. A push to `main` deploys only when lint, the
 type check, the build and every test pass.
 
-| What              | How                                                                                                                                                                                                                                                         |
-| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Browser tests** | 110+ Playwright scenarios against the production build, each run on an iPhone 13, a Pixel 5 and a 1366x768 desktop: the first minute, a lock-in left and resumed, a phone with no network, a phone that died mid-session, a deploy taking over an open page |
-| **Frame timing**  | A year of lanterns measured alone, after the device runs, so it is not sharing the machine                                                                                                                                                                  |
-| **Lighthouse**    | Mobile 98 performance, 100 accessibility, 100 best practices, 100 SEO; desktop 100 across the board (v0.8.0, median of three runs)                                                                                                                          |
-| **Accessibility** | Audited against the Web Interface Guidelines: names on every control, focus kept and returned by every sheet and the session screen, a live region for what changes, 44 px targets, reduced motion                                                          |
-| **Motion**        | Reviewed against a written standard for curves, durations, interruptibility and origin, with what changed in [`docs/QUALITY.md`](docs/QUALITY.md)                                                                                                           |
-| **Data**          | Data from every earlier version migrates, and malformed parts are dropped one by one without losing a day                                                                                                                                                   |
-| **Code**          | ESLint and Prettier on everything; the clock is read in one file only, enforced by a lint rule                                                                                                                                                              |
+| What              | How                                                                                                                                                                                                                                                                           |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Browser tests** | 209 Playwright scenarios against the production build, each run on an iPhone 13, a Pixel 5 and a 1366x768 desktop: the first minute, a lock-in left and resumed, a phone with no network, a phone that died mid-session, a deploy taking over an open page, a backup restored |
+| **Frame timing**  | A year of lanterns (595) measured alone, after the device runs: a median frame of 16.7 ms, and 33.2 ms with the CPU slowed four times, both held as tests                                                                                                                     |
+| **Lighthouse**    | Mobile 98 performance, 100 accessibility, 100 best practices, 100 SEO; desktop 100 across the board (v0.8.0, median of three runs)                                                                                                                                            |
+| **Accessibility** | Audited against the Web Interface Guidelines: names on every control, focus kept and returned by every sheet and the session screen, a live region for what changes, 44 px targets, reduced motion; every colour pair that carries words is tested for contrast               |
+| **Motion**        | Reviewed against a written standard for curves, durations, interruptibility and origin, with what changed in [`docs/QUALITY.md`](docs/QUALITY.md)                                                                                                                             |
+| **Data**          | Data from every earlier version migrates, and malformed parts are dropped one by one without losing a day                                                                                                                                                                     |
+| **Code**          | ESLint and Prettier on everything; the clock is read in one file only, enforced by a lint rule                                                                                                                                                                                |
 
 ## Run locally
 
@@ -230,6 +265,13 @@ Requires Node 22 or newer. Deploying is a push to `main`:
 builds, tests and publishes `dist/` to GitHub Pages. Pull requests get the
 build and the tests, and never deploy.
 
+## Roadmap
+
+1.0 is the first year, whole: finds to day 365, five legendaries on their
+paths, the dock, settings, back up and restore. Year two comes in updates:
+finds past day 365, new constellations, more for the dock. An update adds;
+it never takes away anything already earned.
+
 ## Docs
 
 - [`docs/STATE.md`](docs/STATE.md): where the project is, and what comes next
@@ -238,7 +280,7 @@ build and the tests, and never deploy.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md): the harder calls, and what each one costs
 - [`docs/DESIGN.md`](docs/DESIGN.md): colours, type, layout, the signature moment
 - [`docs/brand/BRAND.md`](docs/brand/BRAND.md): the bubble, the glyphs, the app icon
-- [`docs/QUALITY.md`](docs/QUALITY.md): the motion and interface audits, with what changed
+- [`docs/QUALITY.md`](docs/QUALITY.md): the motion and interface audits and the polish pass, with what changed and how it was checked
 - [`docs/COLLECTIBLES.md`](docs/COLLECTIBLES.md): every find, by world, line and day
 - [`docs/ECONOMY.md`](docs/ECONOMY.md): what earns krill, what a steady person makes, what the dock costs
 - [`docs/ART.md`](docs/ART.md): art slots, a picture for any find without touching the code

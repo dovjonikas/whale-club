@@ -14,10 +14,6 @@ export function setOffsetDays(days: number): void {
   offsetDays = Math.trunc(days)
 }
 
-export function offsetInDays(): number {
-  return offsetDays
-}
-
 /**
  * Milliseconds since the epoch, moved by the offset. Calendar days, not
  * 24-hour blocks, so a jump across a daylight saving change still lands

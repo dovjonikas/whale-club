@@ -277,8 +277,26 @@ export const voice = {
       'add your few things.', // TODO-VOICE
       'tap when done, or lock in.', // TODO-VOICE
       'the scene grows with the days you show up.', // TODO-VOICE
+      'krill buys things for your sea.', // TODO-VOICE
       'nothing dies.', // TODO-VOICE
     ],
+    /** What a friend who got the link asks first, each answered in a line. */
+    questions: 'questions', // TODO-VOICE
+    faq: [
+      ['is it free?', 'yes. nothing is for sale, ever.'], // TODO-VOICE
+      ['does it block other apps?', 'no. lay the phone down; the screen stays on.'], // TODO-VOICE
+      ['can a lock in pause?', 'once, for up to five minutes.'], // TODO-VOICE
+      [
+        'music while locked in?',
+        'start it before you lock in. away for more than 15 seconds, the count waits until you are back.',
+      ], // TODO-VOICE
+      ['does it work offline?', 'yes, all of it.'], // TODO-VOICE
+      [
+        'where is my sea kept?',
+        'only on this phone. for a new one: back up in settings, restore it there.',
+      ], // TODO-VOICE
+      ['with a friend?', 'send them your whale. each of you keeps your own sea.'], // TODO-VOICE
+    ] as const satisfies readonly (readonly [string, string])[],
   },
   lockIn: {
     button: 'lock in',
