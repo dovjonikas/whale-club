@@ -234,11 +234,15 @@
   transition: opacity var(--dur-slow) var(--ease);
 }
 
+/* The two choices of a session, in words: keep the time in sight, the sea's sound. */
 .session-top {
   justify-self: end;
+  display: flex;
+  gap: var(--s2);
 }
 
-.session-sound {
+.session-sound,
+.session-time-toggle {
   font-size: var(--t-xs);
 }
 

@@ -13,6 +13,9 @@ import type { DateKey } from './types'
  */
 export const PATH_LENGTHS: readonly number[] = [30, 60, 100]
 
+/** The days of whale club (days something was done) that are quietly celebrated. */
+export const MILESTONES: readonly number[] = [100, 200, 365]
+
 /** How many stars path `index` (0 first) has. */
 export function pathLength(index: number): number {
   return PATH_LENGTHS[Math.min(index, PATH_LENGTHS.length - 1)] ?? 100

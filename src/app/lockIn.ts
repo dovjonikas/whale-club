@@ -153,6 +153,9 @@ export class LockIn {
       worn: wornBy(data, thing.id),
       sound: data.settings.sessionSound === true,
       showTime: data.settings.showTime === true,
+      onShowTime: (on) => {
+        store.setSettings({ showTime: on })
+      },
       onSound: (on) => {
         store.setSettings({ sessionSound: on })
         sound.setSea(on)

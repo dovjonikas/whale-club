@@ -48,7 +48,7 @@ test('a missed day past the week’s quiet days dims the scene and says so, and 
     settings: { installDismissedAt: dateKey(-1, thursday), lastRecapWeek: '2026-02-23' },
   })
   await page.goto('')
-  await expect(page.locator('.line')).toHaveText('you missed a day. nothing died.')
+  await expect(page.locator('.line')).toHaveText('fall seven times, stand up eight.')
   await expect(page.locator('.scene')).toHaveAttribute('data-quiet', 'true')
   await card(page, 'run').click()
   await expect(page.locator('.scene')).toHaveAttribute('data-quiet', 'false')

@@ -24,7 +24,6 @@ const LINES: string[] = [
   voice.stageUp,
   voice.unlock(longestName),
   voice.shareDone,
-  voice.checkin.after,
   voice.stones.fell,
   voice.lockIn.left,
   voice.lockIn.broken,

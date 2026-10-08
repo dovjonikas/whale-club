@@ -1090,3 +1090,34 @@ comparison showed no difference; they stay PNG, which Safari makes
 anyway). The test now holds the main thread's work per frame, which is
 the app's own (about 5 ms at full speed), and keeps the frame gaps as
 recorded numbers with a looser bound.
+
+## 2026-10-08 A line for the day
+
+The lines live in their own file (src/app/lines.ts) rather than voice.ts:
+a moment that says one takes it from there, so each line is written once
+and the check-in can tell when a moment has already said it. What a
+moment said is kept for the day in a key of its own, outside the sea's
+data (it is a courtesy, not history), together with what can be foreseen:
+a missed day, a new chapter offered after the check-in, the milestone the
+day's first star would reach.
+
+A line a moment already said is replaced by the one half a cycle away.
+That line then comes twice in its cycle; any replacement must repeat
+somewhere, and half a cycle is where it is least noticed. On the many days
+no moment says a line, the walk is exact: twenty days, twenty lines.
+
+The check-in no longer goes away by itself after the answers: a line is
+there to be read, so it stays until "ok" or "send this". The line takes
+the whole width of the leaf and its two buttons sit under it, so the
+longest line is two rows on a 320 px phone and most are one.
+
+The new chapter's lead was the line explaining it ("the week's dots start
+fresh. the sky keeps everything."); the author's brief replaces it with a
+line of the day. The button still says "new chapter", and "how it works"
+and the log keep the rest; the reassurance is the one thing lost, and it
+is the author's call.
+
+"show the time" was a setting already. It is on the lock-in screen too
+now, because that is where it is wanted and where a tap that shows the
+time for three seconds is easy to miss; both places change the same
+setting, so there is still nothing new to set.

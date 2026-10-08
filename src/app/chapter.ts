@@ -1,3 +1,4 @@
+import { noteSaid } from './said'
 import { addDays, fromKey, todayKey, weekStart } from '../store/dates'
 import { starDays } from '../store/derive'
 import type { Store } from '../store/store'
@@ -31,6 +32,7 @@ export function chapterNotice(store: Store): NoticeBuilder {
   return (dismiss) => {
     const today = todayKey()
     if (!chapterDue(store.get(), today)) return null
+    noteSaid(voice.chapter.lead, today)
     const card = document.createElement('aside')
     card.className = 'leaf chapter'
     card.setAttribute('aria-label', voice.chapter.title)

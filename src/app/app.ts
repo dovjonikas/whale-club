@@ -1,8 +1,9 @@
+import { noteSaid } from './said'
 import { collectibleSvg, collectiblesFor } from '../scene/collectibles'
 import { Scene } from '../scene/scene'
 import { CHEST } from '../scene/spots'
 import { legendaryFor } from '../scene/legendary'
-import { halfwayStar, pathLength, progressOf, reachesOf } from '../store/paths'
+import { halfwayStar, pathLength, progressOf, reachesOf, MILESTONES } from '../store/paths'
 import { playCeremony } from './ceremony'
 import { setDayEndsAt, setWeekStartsOn, todayKey, writtenDate } from '../store/dates'
 import {
@@ -67,8 +68,6 @@ import { showUndo } from './toast'
 import { surpriseFor } from './surprise'
 
 const SURPRISE_DELAY_MS = 4000
-/** The days of whale club (days something was done) that are quietly celebrated. */
-const MILESTONES: readonly number[] = [100, 200, 365]
 /** A path's moment waits for a lock-in screen to go, looking again this often, and not for ever. */
 const SESSION_WAIT_MS = 250
 const SESSION_WAIT_MAX_MS = 20_000
@@ -457,6 +456,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
         scene.glow()
         const said = voice.milestone(milestone)
         line.say(said)
+        noteSaid(said)
         postcards.offer(
           { kind: 'milestone', line: said, milestone },
           voice.postcard.sendThis,
@@ -613,7 +613,9 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       recapNotice(store, (moment) => {
         postcards.sendNow(moment)
       }),
-      checkinNotice(store, sound),
+      checkinNotice(store, sound, (moment) => {
+        postcards.sendNow(moment)
+      }),
       chapterNotice(store),
     ])
   }
@@ -714,7 +716,10 @@ export function startApp(root: HTMLElement, labEntered = false): void {
 
   const opening = store.get()
   if (isRestDay(opening, todayKey())) line.say(voice.restDay, { quiet: true })
-  else if (missedYesterday(opening, todayKey())) line.say(voice.missedDay, { quiet: true })
+  else if (missedYesterday(opening, todayKey())) {
+    line.say(voice.missedDay, { quiet: true })
+    noteSaid(voice.missedDay)
+  }
 
   // --- The lab (only ever on in the sandbox; see src/store/lab.ts) ------------------------------
 

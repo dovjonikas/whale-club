@@ -1,3 +1,4 @@
+import { noteSaid } from './said'
 import { glyphFor } from '../brand/match'
 import { todayKey } from '../store/dates'
 import { weekday, withoutTimerLeft } from '../store/derive'
@@ -74,6 +75,8 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
                          ${left > 0 ? '' : `<p class="sheet-note">${voice.without.used}</p>`}
                          <div class="without-ask" hidden>
                            <p class="without-question">${voice.without.question(thing.minutes)}</p>
+                           <p class="without-truth">${voice.without.truth.text}</p>
+                           <p class="without-truth-by">${voice.without.truth.by ?? ''}</p>
                            <div class="chips">
                              <button type="button" class="chip without-yes">${voice.without.yes}</button>
                              <button type="button" class="chip without-no">${voice.without.no}</button>
@@ -129,6 +132,7 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
 
       const ask = body.querySelector<HTMLElement>('.without-ask')
       body.querySelector('.without-timer')?.addEventListener('click', () => {
+        noteSaid(voice.without.truth.text)
         if (ask) ask.hidden = false
         body.querySelector<HTMLElement>('.without-yes')?.focus()
       })

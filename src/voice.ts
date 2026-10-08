@@ -5,7 +5,12 @@
  * their own lines; nothing else in the code holds a sentence. Where a key
  * holds a list, one entry is picked per day so a tap does not always say
  * the same thing. Keep lines short: the line slot is one row on a phone.
+ *
+ * The lines for the day live in src/app/lines.ts; a moment that says one
+ * of them takes it from there, so each is written once.
  */
+import { lineById } from './app/lines'
+
 export const voice = {
   /** The empty first screen, above the example. */
   firstOpen: 'simple things. add one.', // TODO-VOICE
@@ -21,9 +26,9 @@ export const voice = {
   timerStart: 'timer running. nobody is coming.', // TODO-VOICE
   timerEnd: 'time. that counts.', // TODO-VOICE
   allDone: 'all of it. all the smoke.', // TODO-VOICE
-  missedDay: 'you missed a day. nothing died.', // TODO-VOICE
+  missedDay: lineById('seven-eight').text,
   weekGood: 'a good week.', // TODO-VOICE
-  weekBad: 'a week. there is another one.', // TODO-VOICE
+  weekBad: lineById('still-moving').text,
   stageUp: 'it grew.', // TODO-VOICE
   unlock: (name: string) => `new: ${name}.`, // TODO-VOICE
   collection: {
@@ -41,7 +46,6 @@ export const voice = {
     answer1: 'good!!!',
     question2: 'how do you feel?',
     answer2: 'happy!!!',
-    after: 'noted.', // TODO-VOICE
     /** The evening's one line, after the two answers: optional. */
     good: 'one good thing today', // TODO-VOICE
     keep: 'keep',
@@ -133,6 +137,8 @@ export const voice = {
     noLine: 'okay. the timer is waiting.', // TODO-VOICE
     used: 'used both this week.', // TODO-VOICE
     undoToday: 'not done today after all',
+    /** Under the question, small: the one honest thing it asks. */
+    truth: lineById('dont-lie'),
   },
   /** Each mechanic says what it is, once, the first time it shows. */
   explain: {
@@ -162,7 +168,9 @@ export const voice = {
   },
   /** Days 100, 200 and 365 of whale club (days something was done): a quiet celebration. */
   milestone: (day: number) =>
-    day >= 365 ? 'a year of whale club.' : `day ${String(day)}. quietly, well done.`, // TODO-VOICE
+    day >= 365
+      ? 'look back sometimes. you came a long way. respect yourself.'
+      : lineById('day-one').text,
   /** The days the sky and the sea keep: said in place of the day's surprise. */
   calendar: {
     anniversary: (years: number) =>
@@ -227,7 +235,7 @@ export const voice = {
   /** A new chapter, offered after a quiet week. */
   chapter: {
     title: 'a new chapter?', // TODO-VOICE
-    lead: 'the week’s dots start fresh. the sky keeps everything.', // TODO-VOICE
+    lead: lineById('while-we-can').text,
     yes: 'new chapter',
     no: 'not now',
   },
@@ -353,7 +361,7 @@ export const voice = {
     days: 'your days',
   },
   /** The menu's one screen: the rules and this. */
-  clubLine: 'whale club is you and whoever you send your whale to.',
+  clubLine: lineById('next-to-you').text,
   postcard: {
     sendWhale: 'send the whale',
     sendThis: 'send this',

@@ -171,6 +171,9 @@ test('the evening check-in asks for one good thing, and the log keeps it', async
   await expect(page.getByText('tomorrow: run, read')).toBeVisible()
   await page.getByRole('textbox', { name: 'one good thing today' }).fill('the sea was calm')
   await page.getByRole('button', { name: 'keep' }).click()
+  // The line for the day comes after the evening's line, as after any check-in.
+  await expect(page.locator('.checkin .day-line')).toBeVisible()
+  await page.getByRole('button', { name: 'ok' }).click()
   const today = dateKey(0)
   expect((await stored(page)).days[today]).toMatchObject({
     good: 'the sea was calm',

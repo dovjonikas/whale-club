@@ -196,6 +196,28 @@ for (const { name, options } of targets) {
   await context.close()
 }
 
+// The line for the day, after the check-in (an evening one: the good thing skipped).
+{
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.setFixedTime(NOW)
+  const unchecked = JSON.parse(JSON.stringify(data))
+  delete unchecked.days[key(0)].checkin
+  await page.addInitScript(
+    (json) => localStorage.setItem('whaleclub:data', json),
+    JSON.stringify(unchecked),
+  )
+  await page.goto(base)
+  const checkin = page.getByRole('complementary', { name: 'check-in' })
+  await checkin.getByRole('button', { name: 'good!!!' }).click()
+  await checkin.getByRole('button', { name: 'happy!!!' }).click()
+  await checkin.getByRole('button', { name: 'skip' }).click()
+  await checkin.locator('.day-line').waitFor()
+  await page.waitForTimeout(600)
+  await shot(page, 'iphone-line.png')
+  await context.close()
+}
+
 // The moments of v0.5 on the iPhone: the stone, its crack, the dial, a session.
 {
   const context = await browser.newContext({ ...devices['iPhone 13'] })

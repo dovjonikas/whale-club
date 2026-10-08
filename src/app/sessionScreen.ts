@@ -30,6 +30,8 @@ export interface SessionOptions {
   sound: boolean
   showTime: boolean
   onSound: (on: boolean) => void
+  /** The time kept in sight, or hidden again: the same choice as in settings, made here. */
+  onShowTime: (on: boolean) => void
   onStop: () => void
   onUndo: () => void
   onPause: () => void
@@ -72,6 +74,7 @@ export function openSessionScreen(
   screen.innerHTML = `
     <div class="session-deep" aria-hidden="true"><i></i><i></i><i></i><b></b><b></b><b></b><b></b></div>
     <div class="session-top">
+      <button type="button" class="chip session-time-toggle" aria-pressed="${String(options.showTime)}">${voice.settings.showTime}</button>
       <button type="button" class="chip session-sound" aria-pressed="${String(options.sound)}">${voice.lockIn.seaSound}</button>
     </div>
     <div class="session-centre">
@@ -101,6 +104,7 @@ export function openSessionScreen(
   const clock = q('.session-clock')
   const said = q('.session-line')
   const soundButton = q('.session-sound')
+  const timeButton = q('.session-time-toggle')
   const undoButton = q('.session-undo')
   const stopButton = q('.session-stop')
   const pauseButton = q('.session-pause')
@@ -126,10 +130,12 @@ export function openSessionScreen(
     ring?.style.setProperty('stroke-dashoffset', (100 - Math.min(1, progress) * 100).toFixed(2))
   }
 
-  // A tap anywhere that is not a button shows the time for a moment.
+  // A tap anywhere that is not a button shows the time for a moment; "show
+  // the time" keeps it in sight, for this session and the next.
+  let alwaysTime = options.showTime
   let timeTimer = 0
   const glance = (): void => {
-    if (options.showTime || screen.dataset.state === 'ended') return
+    if (alwaysTime || screen.dataset.state === 'ended') return
     screen.dataset.time = 'shown'
     clearTimeout(timeTimer)
     timeTimer = window.setTimeout(() => {
@@ -147,6 +153,13 @@ export function openSessionScreen(
     glance()
   })
 
+  timeButton.addEventListener('click', () => {
+    alwaysTime = timeButton.getAttribute('aria-pressed') !== 'true'
+    timeButton.setAttribute('aria-pressed', String(alwaysTime))
+    clearTimeout(timeTimer)
+    screen.dataset.time = alwaysTime ? 'shown' : 'hidden'
+    options.onShowTime(alwaysTime)
+  })
   soundButton.addEventListener('click', () => {
     const on = soundButton.getAttribute('aria-pressed') !== 'true'
     soundButton.setAttribute('aria-pressed', String(on))
