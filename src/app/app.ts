@@ -4,7 +4,7 @@ import { CHEST } from '../scene/spots'
 import { legendaryFor } from '../scene/legendary'
 import { halfwayStar, pathLength, progressOf, reachesOf } from '../store/paths'
 import { playCeremony } from './ceremony'
-import { todayKey } from '../store/dates'
+import { setDayEndsAt, setWeekStartsOn, todayKey, writtenDate } from '../store/dates'
 import {
   allDoneToday,
   isRestDay,
@@ -31,7 +31,6 @@ import { watchBadge } from './badge'
 import { openCollectionSheet } from './collectionSheet'
 import { openDockSheet } from './dockSheet'
 import { backupStale, clearUndo, openSettingsSheet } from './settingsSheet'
-import { setDayEndsAt, setWeekStartsOn } from '../store/dates'
 import { openArrange, type ArrangeOptions } from './arrange'
 import { shownItems } from './dockData'
 import type { DockItem } from '../scene/dock'
@@ -471,7 +470,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       const date = reachesOf(dates)[finished]?.end ?? todayKey()
       const day = dates.indexOf(date) + 1
       afterSession(() => {
-        crown(finished, voice.legend.plaque(date, day))
+        crown(finished, voice.legend.plaque(writtenDate(date), day))
       })
     } else if (was.lit < halfwayStar(now.length) && now.lit >= halfwayStar(now.length)) {
       surprisedFor = todayKey()

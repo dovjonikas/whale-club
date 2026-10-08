@@ -597,10 +597,18 @@ export function playIntro(
     // audio is made ready, so the tap only has to start it.
     overlay.dataset.beat = 'gate'
     scene.setEmpty(false)
-    q('.intro-begin').focus({ preventScroll: true })
+    // After the first frame: a focus now would force the whole first
+    // layout inside the startup script, one long task instead of two.
+    const begin = q('.intro-begin')
+    requestAnimationFrame(() => {
+      begin.focus({ preventScroll: true })
+    })
     later(WARM_MS, () => {
       options.sound.prepare()
-      Score.warm(options.sound)
+      // The score's buffers in a task of their own, so neither task is a long one.
+      later(0, () => {
+        Score.warm(options.sound)
+      })
     })
     return
   }

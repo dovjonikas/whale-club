@@ -183,6 +183,11 @@
   font-size: var(--t-2xs);
   color: var(--star);
   line-height: 1.2;
+  text-wrap: balance;
+}
+
+.legend-day {
+  white-space: nowrap;
 }
 
 .legend-rare {

@@ -83,11 +83,22 @@ export function causticsUrl(): Promise<string> {
   return objectUrl(canvas)
 }
 
-/** A PNG of the canvas as an object URL; empty if the browser cannot encode it. */
+/** WebP keeps both tiles a fraction of a PNG's size, and the grain under it is unchanged to the eye. */
+const QUALITY = 0.9
+
+/**
+ * The canvas as an object URL, WebP where the browser can encode it; a
+ * browser that cannot (Safari) hands back a PNG by itself. Empty if it
+ * cannot encode at all.
+ */
 function objectUrl(canvas: HTMLCanvasElement): Promise<string> {
   return new Promise((resolve) => {
-    canvas.toBlob((blob) => {
-      resolve(blob ? URL.createObjectURL(blob) : '')
-    }, 'image/png')
+    canvas.toBlob(
+      (blob) => {
+        resolve(blob ? URL.createObjectURL(blob) : '')
+      },
+      'image/webp',
+      QUALITY,
+    )
   })
 }
