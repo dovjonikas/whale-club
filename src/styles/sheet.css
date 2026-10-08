@@ -239,6 +239,31 @@
   color: var(--ink-dim);
 }
 
+/* The line for the day after the check-in: quieter and smaller than the
+   questions, one row on a phone or two, the name of who said it under. */
+.day-line {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.day-line-by {
+  margin: var(--s1) 0 0;
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+}
+
+/* The line takes the whole width, the two quiet buttons a row under it. */
+.leaf.is-line {
+  grid-template-columns: 1fr;
+}
+
+.leaf.is-line .leaf-actions {
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
 .leaf ol {
   margin: var(--s1) 0 0;
   padding-left: 18px;
@@ -739,8 +764,22 @@
 }
 
 .without-question {
-  margin: var(--s2) 0;
+  margin: var(--s2) 0 var(--s1);
   color: var(--ink);
+}
+
+/* Under the timer's question, small: the one honest thing it asks. */
+.without-truth {
+  margin: 0;
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+  text-wrap: balance;
+}
+
+.without-truth-by {
+  margin: 0 0 var(--s2);
+  font-size: var(--t-2xs);
+  color: var(--ink-dim);
 }
 
 .without-ask[hidden] {

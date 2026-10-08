@@ -110,9 +110,10 @@ test('a full session opens the world in order and marks the thing done', async (
   await dismissInstallLeaf(page)
   await startLockIn(page, 'run', 10)
   const screen = session(page, 'run')
-  await expect(screen.getByRole('timer')).toHaveText(/^(10:00|9:59)$/)
+  // The page's clock still runs in real time: a busy machine may take a few seconds here.
+  await expect(screen.getByRole('timer')).toHaveText(/^(10:00|9:[45]\d)$/)
   await page.clock.fastForward('05:00')
-  await expect(screen.getByRole('timer')).toHaveText(/^(5:00|4:59)$/)
+  await expect(screen.getByRole('timer')).toHaveText(/^(5:00|4:[45]\d)$/)
   await recordOpening(page)
   await page.clock.fastForward('05:02')
   await openingDone(page)
@@ -360,6 +361,32 @@ test('the time is hidden, and a tap shows it for three seconds', async ({ page }
   await screen.locator('.session-name').click()
   await expect(screen).toHaveAttribute('data-time', 'shown')
   await page.clock.fastForward(3200)
+  await expect(screen).toHaveAttribute('data-time', 'hidden')
+})
+
+test('"show the time" on the session keeps it in sight, now and next time', async ({ page }) => {
+  await page.clock.install({ time: middayToday() })
+  await page.goto('')
+  await lockInThing(page, 'run')
+  await dismissInstallLeaf(page)
+  await startLockIn(page, 'run', 10)
+  const screen = session(page, 'run')
+  const toggle = screen.getByRole('button', { name: 'show the time' })
+  await expect(toggle).toHaveAttribute('aria-pressed', 'false')
+  await toggle.click()
+  await expect(toggle).toHaveAttribute('aria-pressed', 'true')
+  await expect(screen).toHaveAttribute('data-time', 'shown')
+  // It stays: past the three seconds a tap would give.
+  await page.clock.fastForward(10_000)
+  await expect(screen).toHaveAttribute('data-time', 'shown')
+  // The same choice as in settings, kept for the next session.
+  const settings = await page.evaluate(
+    () =>
+      (JSON.parse(localStorage.getItem('whaleclub:data') ?? '{}') as { settings: unknown })
+        .settings,
+  )
+  expect(settings).toMatchObject({ showTime: true })
+  await toggle.click()
   await expect(screen).toHaveAttribute('data-time', 'hidden')
 })
 

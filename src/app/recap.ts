@@ -1,3 +1,4 @@
+import { noteSaid } from './said'
 import { addDays, isLastDayOfWeek, lastKeys, todayKey, weekStart } from '../store/dates'
 import { plannedThings, starDays } from '../store/derive'
 import type { Store } from '../store/store'
@@ -47,6 +48,7 @@ export function recapNotice(store: Store, onSend: (moment: Moment) => void): Not
     const recap = recapFor(store.get())
     if (!recap) return null
     const weekLine = recap.count / recap.planned >= GOOD_WEEK_WORD ? voice.weekGood : voice.weekBad
+    noteSaid(weekLine)
     const card = document.createElement('aside')
     card.className = 'leaf recap'
     card.setAttribute('aria-label', voice.labels.recap)

@@ -38,9 +38,9 @@ on the device. There is no account, no server and no tracking.
 
 ## Why it exists
 
-> the app has to be a system-building start for people, the first easy step to go towards the life they desire, and this has to help them as much as it can. it's like being a beginner in the gym: you can start light, but you stay consistent and results show.
+> I made Whale Club to be a first easy step: the start of a system for the life you want, and it should help with that as much as it can.
 >
-> (the author's principle for the app)
+> It’s like being a beginner in the gym. You start light, you stay consistent, and the results show.
 
 Most habit apps run on loss: a streak that breaks, a red day, a pet that
 dies. That works until the first bad week, and then it is the reason to
@@ -133,7 +133,7 @@ And underneath all three: nothing dies. You just missed a day.
 - "Did it without the timer" is there twice a week, and asks honestly
 - The first time each mechanic appears it explains itself in one line, once
 - A daily surprise after the first thing done: a sea fact, a visitor crossing the scene, a glow. Never the same one until the pool is spent
-- A check-in once a day, two taps, silly on purpose
+- A check-in once a day, two taps, silly on purpose, then the line for the day: twenty the author chose, one a day, none again until all have had theirs ([`docs/LINES.md`](docs/LINES.md))
 - A weekly recap: "5/7." and one line. Never what was missed
 - The whale surfaces when everything is done; from day 90 it wears the red jacket
 - Sound behind a tap gate, synthesised in the browser with no audio files, and one button to mute it
@@ -282,6 +282,7 @@ it never takes away anything already earned.
 - [`docs/brand/BRAND.md`](docs/brand/BRAND.md): the bubble, the glyphs, the app icon
 - [`docs/QUALITY.md`](docs/QUALITY.md): the motion and interface audits and the polish pass, with what changed and how it was checked
 - [`docs/COLLECTIBLES.md`](docs/COLLECTIBLES.md): every find, by world, line and day
+- [`docs/LINES.md`](docs/LINES.md): the line for the day, each one's source, and the moments that say them
 - [`docs/ECONOMY.md`](docs/ECONOMY.md): what earns krill, what a steady person makes, what the dock costs
 - [`docs/ART.md`](docs/ART.md): art slots, a picture for any find without touching the code
 - [`docs/RESEARCH-DOPAMINE.md`](docs/RESEARCH-DOPAMINE.md) and [`docs/RESEARCH-SEA.md`](docs/RESEARCH-SEA.md): the research behind the reward design and the daily surprise

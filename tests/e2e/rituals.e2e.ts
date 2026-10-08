@@ -1,3 +1,4 @@
+import { dayLine } from '../../src/app/lines'
 import { recapFor } from '../../src/app/recap'
 import { emptyData, EVERY_DAY } from '../../src/store/types'
 import { expect, test, addThing, dateKey, dismissInstallLeaf, seed } from './helpers'
@@ -6,7 +7,9 @@ import { expect, test, addThing, dateKey, dismissInstallLeaf, seed } from './hel
  * The check-in and the weekly recap: one notice at a time above the row,
  * each asked once, neither ever counting what was missed.
  */
-test('the check-in is two taps, then noted, then not asked again today', async ({ page }) => {
+test('the check-in is two taps, then the line for the day, then not asked again today', async ({
+  page,
+}) => {
   await page.goto('')
   await addThing(page, 'run')
   await dismissInstallLeaf(page)
@@ -15,7 +18,8 @@ test('the check-in is two taps, then noted, then not asked again today', async (
   await checkin.getByRole('button', { name: 'good!!!' }).click()
   await expect(checkin).toContainText('how do you feel?')
   await checkin.getByRole('button', { name: 'happy!!!' }).click()
-  await expect(checkin).toContainText('noted.')
+  await expect(checkin.locator('.day-line')).toHaveText(dayLine(dateKey(0)).text)
+  await checkin.getByRole('button', { name: 'ok' }).click()
   await expect(checkin).toBeHidden()
   await page.reload()
   await expect(page.getByRole('complementary', { name: 'check-in' })).toBeHidden()
@@ -67,6 +71,6 @@ test('the menu is the club: three rules, one sentence, the day count', async ({ 
   const sheet = page.getByRole('dialog', { name: 'the club' })
   await expect(sheet.getByRole('list').first().getByRole('listitem')).toHaveCount(3)
   await expect(sheet).toContainText('the first rule of whale club is: you show up.')
-  await expect(sheet).toContainText('whale club is you and whoever you send your whale to.')
+  await expect(sheet).toContainText('if you get there one day, who do you want next to you?')
   await expect(sheet).toContainText('day 5 of whale club')
 })

@@ -1,3 +1,4 @@
+import { noteSaid } from './said'
 import { todayKey } from '../store/dates'
 import { dayNumber, streak } from '../store/derive'
 import type { Store } from '../store/store'
@@ -20,6 +21,7 @@ export function openMenuSheet(
   openSheet({
     title: voice.labels.club,
     build(body) {
+      noteSaid(voice.clubLine)
       const data = store.get()
       const today = todayKey()
       const day = dayNumber(data, today)

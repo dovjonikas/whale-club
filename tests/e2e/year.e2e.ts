@@ -122,7 +122,7 @@ test('day 100 of whale club: a quiet celebration and a card of its own', async (
   await seedPerson(page, { days: 99, cracked: 90 })
   await page.goto('')
   await page.getByRole('button', { name: 'run', exact: true }).click()
-  await expect(page.locator('.line')).toHaveText('day 100. quietly, well done.')
+  await expect(page.locator('.line')).toHaveText('compare day one with today.')
   await expect(page.locator('.offer-slot').getByRole('button', { name: 'send this' })).toBeVisible({
     timeout: 15_000,
   })

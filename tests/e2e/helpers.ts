@@ -179,6 +179,8 @@ export async function clearNotices(page: Page): Promise<void> {
   if (await checkin.isVisible()) {
     await checkin.getByRole('button', { name: 'good!!!' }).click()
     await checkin.getByRole('button', { name: 'happy!!!' }).click()
+    // Then the line for the day, until "ok".
+    await checkin.getByRole('button', { name: 'ok' }).click()
     await expect(checkin).toBeHidden()
   }
 }

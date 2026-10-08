@@ -32,6 +32,8 @@ export type MomentKind = 'whale' | 'unlock' | 'recap' | 'stage' | 'sea' | 'legen
 export interface Moment {
   kind: MomentKind
   line: string
+  /** Who said the line, when it was not the author: drawn small under it. */
+  by?: string
   /** A legendary's postcard: which one, and its plaque ("earned on ... · day 30"). */
   legendary?: { id: string; plaque: string }
   /** A milestone's card: day 100, 200 or 365 of whale club. */
@@ -58,6 +60,8 @@ const YEAR = 365
 const FRAME_WIDTH = 12
 const PHONE_H = 700
 const SCENE_HORIZON = 0.58
+/** The room a name under the line takes, in rows of the caption's size. */
+const BY_ROWS = 1.6
 
 interface Layout {
   horizon: number
@@ -196,8 +200,17 @@ export async function renderPostcard(
   ctx.font = `700 ${layout.lineSize}px "Fraunces Variable", Georgia, serif`
   const lines = wrap(ctx, moment.line, W - 160)
   const lineHeight = layout.lineSize * 1.15
-  const firstY = H * layout.lineY - (lines.length - 1) * lineHeight
+  // A name under the line lifts the line by one row of the caption's size.
+  const byStep = moment.by ? layout.captionSize * BY_ROWS : 0
+  const lastY = H * layout.lineY - byStep
+  const firstY = lastY - (lines.length - 1) * lineHeight
   lines.forEach((text, i) => ctx.fillText(text, W / 2, firstY + i * lineHeight))
+  if (moment.by) {
+    ctx.font = `400 ${layout.captionSize}px "Atkinson Hyperlegible", system-ui, sans-serif`
+    ctx.fillStyle = 'rgba(255, 217, 138, 0.85)'
+    ctx.fillText(moment.by, W / 2, lastY + byStep)
+    ctx.fillStyle = '#fff4d6'
+  }
 
   ctx.font = `700 ${layout.captionSize}px "Atkinson Hyperlegible", system-ui, sans-serif`
   ctx.fillStyle = 'rgba(232, 240, 245, 0.75)'

@@ -2,6 +2,32 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 1.1.0 - 2026-10-08
+
+A line for the day.
+
+- **After the check-in, the line for the day**, in place of "noted.":
+  quieter than the questions, one row on a phone or two, the same all
+  day and another tomorrow. Twenty lines the author chose, walked in one
+  fixed order as the sea facts are, so none comes back until all have had
+  their day. The author's own carry no name; the others carry theirs in
+  lowercase, from public-domain translations (docs/LINES.md). An evening
+  check-in shows it after the one good thing.
+- **"send this"** beside the line: a postcard of the whale with the line,
+  and the name under it where there is one.
+- **Moments say the author's lines**: a missed day "fall seven times,
+  stand up eight."; a quiet week "not perfect. still moving."; days 100
+  and 200 "compare day one with today."; day 365 "look back sometimes. you
+  came a long way. respect yourself."; a new chapter "one day you might
+  not get to try this. let’s do it while we can."; the club line "if you
+  get there one day, who do you want next to you?"; and under the timer's
+  question, small, "above all, don’t lie to yourself." (dostoevsky). A
+  line a moment says that day is not said again by the check-in.
+- **"show the time"** on the lock-in screen itself, next to "sea sound":
+  the time stays in sight, for this session and the next (the same
+  choice as in settings, now where it is needed).
+- **The README's "Why it exists"** in the author's own words.
+
 ## 1.0.0 - 2026-10-08
 
 The first year, whole, made ready for strangers. No new mechanic.
