@@ -419,10 +419,6 @@
   color: var(--star-pale);
 }
 
-.rules-note {
-  margin-top: var(--s6);
-}
-
 /* The install steps: three big rows, an icon each. */
 .install-steps {
   list-style: none;
@@ -490,10 +486,6 @@
   margin: var(--s6) 0 0;
   font-size: var(--t-md);
   color: var(--ink);
-}
-
-.menu-format {
-  margin-top: var(--s6);
 }
 
 /* The recap: text on its own row, so a 320px phone keeps the line on one. */

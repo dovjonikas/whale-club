@@ -28,25 +28,14 @@ import type { Season, SkyEvent } from './calendar'
 import { seasonShoreSvg } from './seasons'
 import { voice } from '../voice'
 import { sleeperSvg, visitorSvg, whaleSvg, type VisitorKind } from './visitors'
+import { PHONE_WIDTH } from './phone'
 
-/**
- * The scene behind everything. Back to front: the sky (a nebula of slow
- * colour, the star canvas, the moon in its real phase), the sea, the shore
- * with the warm light of its sunflowers, the collectibles and visitors,
- * the stones waiting to be cracked, the particle canvas.
- *
- * It knows nothing about things or days. The app tells it what to show
- * (`setDays`, `setCollectibles`, `setStones`, `setWarmth`, `setQuiet`,
- * `setSession`) and when to react (`burst`, `surfaceWhale`, `visit`); it
- * draws. Day-stars also get a button each, so a star can be tapped or
- * reached with a keyboard. All motion by script runs on the one ticker,
- * which stops while the page is hidden or the scene is off screen.
- */
-const PHONE_WIDTH = 390
 /** The flight's own length is in scene.css (star-flight); this is a backstop if it never ends. */
 const STAR_FLIGHT_MAX_MS = 2000
 /** A night-only dock thing bought in daylight shows itself for this long. */
 const DOCK_PREVIEW_MS = 6000
+/** Under reduced motion the sky whale rests in the sky this long instead of crossing. */
+const SKY_WHALE_REST_MS = 6000
 /** Under reduced motion a find does not fly or swell: it fades in where it stays. */
 const FIND_FADE_MS = 300
 /** The sky whale starts across this long after the scene opens in the dark. */
@@ -80,6 +69,19 @@ export interface ShownCollectible {
   weather?: boolean
 }
 
+/**
+ * The scene behind everything. Back to front: the sky (a nebula of slow
+ * colour, the star canvas, the moon in its real phase), the sea, the shore
+ * with the warm light of its sunflowers, the collectibles and visitors,
+ * the stones waiting to be cracked, the particle canvas.
+ *
+ * It knows nothing about things or days. The app tells it what to show
+ * (`setDays`, `setCollectibles`, `setStones`, `setWarmth`, `setQuiet`,
+ * `setSession`) and when to react (`burst`, `surfaceWhale`, `visit`); it
+ * draws. Day-stars also get a button each, so a star can be tapped or
+ * reached with a keyboard. All motion by script runs on the one ticker,
+ * which stops while the page is hidden or the scene is off screen.
+ */
 export class Scene {
   readonly root: HTMLElement
   private readonly stars: StarField
@@ -97,7 +99,6 @@ export class Scene {
   private readonly skyLayer: HTMLElement
   private readonly starHits: HTMLElement
   private readonly thingsLayer: HTMLElement
-  private readonly stopParallax: () => void
   private readonly observer: ResizeObserver
   private days: SceneDays | null = null
   private shown = new Set<string>()
@@ -151,13 +152,13 @@ export class Scene {
       </div>
       <div class="scene-things" aria-hidden="true"></div>
       <div class="sleeper" aria-hidden="true">${sleeperSvg()}</div>
-      <div class="stones" role="group" aria-label="stones"></div>
+      <div class="stones" role="group" aria-label="${voice.labels.stones}"></div>
       <button type="button" class="pier"></button>
       <canvas class="particles" aria-hidden="true"></canvas>
       <div class="scene-glow" aria-hidden="true"></div>
       <div class="grain" aria-hidden="true"></div>
       <div class="scene-dim" aria-hidden="true"></div>
-      <div class="star-hits" role="group" aria-label="your days"></div>`
+      <div class="star-hits" role="group" aria-label="${voice.labels.days}"></div>`
     parent.prepend(this.root)
 
     this.skyLayer = this.query('.sky')
@@ -177,7 +178,8 @@ export class Scene {
     })
     // The star buttons are left out of the parallax: at depth 0.25 the canvas
     // drifts two pixels at most, and a button that keeps moving is one a finger misses.
-    this.stopParallax = startParallax([this.skyLayer, this.query('.shore'), this.query('.sea')])
+    // The scene lives as long as the app, so its parallax is never stopped.
+    startParallax([this.skyLayer, this.query('.shore'), this.query('.sea')])
 
     ticker.observe(this.root)
     this.observer = new ResizeObserver(() => {
@@ -386,7 +388,17 @@ export class Scene {
         this.standAt(element, item.size, at)
         const from = arrivals.get(item.id)
         if (from) this.arrive(element, from)
-        else if (!firstRender && !this.shown.has(item.id)) element.classList.add('is-new')
+        else if (!firstRender && !this.shown.has(item.id)) {
+          const fresh = element
+          fresh.classList.add('is-new')
+          // Let go once it has landed: a finished entrance held "forwards" keeps a
+          // layer and a style pass for every find, every frame, for good.
+          fresh.addEventListener('animationend', function landed(event) {
+            if (event.target !== fresh || event.animationName !== 'unlock') return
+            fresh.classList.remove('is-new')
+            fresh.removeEventListener('animationend', landed)
+          })
+        }
       } else this.standAt(element, item.size, at)
       this.shown.add(item.id)
     }
@@ -430,17 +442,11 @@ export class Scene {
     )
   }
 
-  /** Where a collectible is on screen, for a burst. */
-  collectibleRect(id: string): DOMRect | undefined {
-    return this.thingsLayer.querySelector(`[data-id="${id}"]`)?.getBoundingClientRect()
-  }
-
   /** The warm light from the shore: brighter the more the garden holds, 0 to 1. */
   setWarmth(level: number): void {
     this.root.style.setProperty('--warmth', Math.max(0, Math.min(1, level)).toFixed(2))
   }
 
-  /** Nothing added yet: the small whale sleeps at the water line. */
   /**
    * The dock in the scene: the pier (its length and its lanterns), the
    * extensions that add places, and what changes the whole scene. Some
@@ -523,11 +529,11 @@ export class Scene {
       whale.hidden = false
       whale.classList.add('is-crossing')
       // Reduced motion: it rests in the sky a while instead of crossing, then goes.
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      if (reducedMotion()) {
         setTimeout(() => {
           whale.classList.remove('is-crossing')
           whale.hidden = true
-        }, DOCK_PREVIEW_MS)
+        }, SKY_WHALE_REST_MS)
         return
       }
       whale.addEventListener(
@@ -575,11 +581,7 @@ export class Scene {
     ticker.hold('still', on)
   }
 
-  /** Where the pier is on screen, for an arrival. */
-  pierRect(): DOMRect {
-    return this.query('.pier').getBoundingClientRect()
-  }
-
+  /** Nothing added yet: the small whale sleeps at the water line. */
   setEmpty(empty: boolean): void {
     this.root.dataset.empty = String(empty)
   }
@@ -614,7 +616,7 @@ export class Scene {
     this.glow()
     whale.addEventListener('animationend', () => whale.remove(), { once: true })
     const rect = this.root.getBoundingClientRect()
-    this.burst('sea', rect.left + rect.width * 0.5, rect.top + rect.height * 0.58)
+    this.burst('sea', rect.left + rect.width * 0.5, rect.top + rect.height * HORIZON)
   }
 
   /** A brief brightening of the water. */
@@ -634,18 +636,6 @@ export class Scene {
     visitor.innerHTML = visitorSvg(kind)
     this.thingsLayer.append(visitor)
     visitor.addEventListener('animationend', () => visitor.remove(), { once: true })
-  }
-
-  get starCanvas(): HTMLCanvasElement {
-    return canvas(this.query('canvas.stars'))
-  }
-
-  destroy(): void {
-    this.observer.disconnect()
-    this.stopParallax()
-    this.stars.stop()
-    this.particles.stop()
-    this.root.remove()
   }
 
   /** A find pops out where its stone was, is polished, and settles into its place. */

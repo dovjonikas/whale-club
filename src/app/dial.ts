@@ -4,6 +4,14 @@ import { LENGTH_STOPS, MAX_MINUTES, MIN_MINUTES, nearestStop, type Thing } from 
 import { voice } from '../voice'
 import { openSheet } from './sheet'
 
+/** Pixels of wheel or trackpad travel that make one stop (a mouse notch is about 100). */
+const WHEEL_STOP = 60
+/** The ring leaves a gap at the top so the ends do not meet. */
+const SWEEP_DEG = 330
+/** The ring's radius and centre in its 240 box. */
+const R = 96
+const C = 120
+
 /**
  * The lock-in dial: how long, chosen by turning a ring with a finger (or
  * dragging round it, or the arrow keys, or a mouse wheel), from five
@@ -11,13 +19,6 @@ import { openSheet } from './sheet'
  * stops (LENGTH_STOPS), not the minutes, so the short lengths people pick
  * most have the most room. It opens on the last length chosen.
  */
-/** The ring leaves a gap at the top so the ends do not meet. */
-/** Pixels of wheel or trackpad travel that make one stop (a mouse notch is about 100). */
-const WHEEL_STOP = 60
-const SWEEP_DEG = 330
-const R = 96
-const C = 120
-
 export function openDial(
   thing: Thing,
   look: { line: Line; stage: Stage; worn?: readonly string[] },

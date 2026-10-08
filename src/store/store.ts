@@ -75,7 +75,7 @@ export class Store {
     return thing
   }
 
-  /** Replaces everything at once. Only the lab does this, and only to its own sandbox. */
+  /** Replaces everything at once: the lab's sandbox, a restored backup, starting over, and their undo. */
   replace(data: AppData): void {
     this.commit(data)
   }
@@ -114,13 +114,9 @@ export class Store {
     const done = isDone ? day.done.filter((id) => id !== thingId) : [...day.done, thingId]
     this.commit({
       ...this.data,
-      days: { ...this.data.days, [date]: withWaited({ ...day, done }, thingId, false) },
+      days: { ...this.data.days, [date]: withoutWaited({ ...day, done }, thingId) },
     })
     return !isDone
-  }
-
-  isDone(thingId: string, date: DateKey = todayKey()): boolean {
-    return this.data.days[date]?.done.includes(thingId) ?? false
   }
 
   /**
@@ -323,9 +319,9 @@ export class Store {
   }
 }
 
-function withWaited(day: DayRecord, thingId: string, waited: boolean): DayRecord {
-  const others = (day.waited ?? []).filter((id) => id !== thingId)
-  const list = waited ? [...others, thingId] : others
+/** A tap on a thing clears its mark from data before 0.11, when a left session waited. */
+function withoutWaited(day: DayRecord, thingId: string): DayRecord {
+  const list = (day.waited ?? []).filter((id) => id !== thingId)
   const next: DayRecord = { ...day }
   delete next.waited
   return list.length > 0 ? { ...next, waited: list } : next

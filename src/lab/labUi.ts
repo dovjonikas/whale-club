@@ -1,5 +1,5 @@
 import { openSheet } from '../app/sheet'
-import { todayKey, fromKey } from '../store/dates'
+import { shortDate, todayKey } from '../store/dates'
 import { enterLab, LAB_PARAM, labOffset, labOn, leaveLab, setLabOffset } from '../store/lab'
 import { voice } from '../voice'
 
@@ -95,11 +95,7 @@ function openLabSheet(hooks: LabHooks): void {
     title: voice.lab.title,
     build(body, close) {
       const offset = labOffset()
-      const when = fromKey(todayKey()).toLocaleDateString('en-GB', {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short',
-      })
+      const when = shortDate(todayKey())
       body.innerHTML = `
         <p class="lab-note">${voice.lab.note}</p>
         <p class="sheet-note lab-today">${voice.lab.today(when)} · ${voice.lab.bar(offset).replace('lab · ', '')}</p>

@@ -160,6 +160,27 @@ test('back up, start over, restore: the same sea, and start over can be undone',
   expect(after.days).toEqual(original.days)
 })
 
+test('a reload during the undo loses nothing: the undo is offered again', async ({ page }) => {
+  await seed(page, {
+    things: [run],
+    days: { [dateKey(-1)]: { done: ['run'] } },
+    settings: { installDismissedAt: dateKey(-1) },
+  })
+  await page.goto('')
+  const sheet = await openSettings(page)
+  await sheet.getByRole('button', { name: 'start over' }).click()
+  await page
+    .getByRole('dialog', { name: 'this clears your sea on this phone' })
+    .getByRole('button', { name: 'start over' })
+    .click()
+  await expect(page.locator('.card')).toHaveCount(0)
+  await page.reload()
+  await expect(page.locator('.card')).toHaveCount(0)
+  await page.getByRole('button', { name: 'undo' }).click()
+  await expect(card(page, 'run')).toBeVisible()
+  expect(await page.evaluate(() => localStorage.getItem('whaleclub:undo'))).toBeNull()
+})
+
 test('a damaged file is refused with a clear word, and nothing changes', async ({ page }) => {
   await seed(page, { things: [run], days: {}, settings: { installDismissedAt: dateKey(-1) } })
   await page.goto('')

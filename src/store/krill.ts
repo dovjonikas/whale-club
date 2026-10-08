@@ -27,7 +27,7 @@ export const KRILL = {
   welcomeAfter: 2,
   /** The first week's set, finished: seven days with something done. Once. */
   firstWeek: 100,
-  /** A week (Monday to Sunday, over) with this share of its planned days done or more. */
+  /** A week (first day to last, as set, and over) with this share of its planned days done or more. */
   goodWeek: 50,
   goodWeekShare: 0.8,
 } as const

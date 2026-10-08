@@ -14,12 +14,33 @@ The first year, whole, made ready for strangers. No new mechanic.
   questions answered, a roadmap (year two comes in updates, and an update
   never takes away what was earned), and its facts brought up to date
   (seventy-eight finds to day 365, a dial from five minutes to ten hours,
-  209 scenarios per device, Lighthouse on the live site).
+  211 scenarios per device, Lighthouse on the live site).
 - **The scene's textures are PNG again.** 0.17.0 made them WebP on
-  Lighthouse's advice; measured, it doubled the median frame under a year
-  of lanterns (16.7 to 33.3 ms), so the bytes are not worth it.
-- **A review before the tag**: exports nothing used were removed, stale
-  comments corrected, and the rule for numbers written down (docs/DECISIONS.md).
+  Lighthouse's advice; measured against PNG, interleaved, it made no
+  difference to the frames, and Safari makes a PNG anyway, so one format
+  everywhere.
+- **The frame test holds what the app controls**: the main thread's work
+  per frame (about 5 ms at full speed). The frame gaps in headless
+  Chromium flip between one and two vsync steps with the machine, so they
+  are recorded with a looser bound.
+- **Fixed in the review before the tag**:
+  - a new chapter is offered on the week's first day as set, not always
+    on a Monday, and the day chips start on that day too;
+  - a reload during the ten seconds of undo after a restore or a start
+    over offers the undo again, as 0.16 promised (it was written, never
+    read);
+  - data from version 1 gets a kind and a line for every thing, as data
+    from versions 2 to 5 already did;
+  - a find's entrance lets go when it lands, instead of holding a layer
+    for good.
+- **Tidied in the same review**: dead methods, a sound never played,
+  unused lines and styles removed; comments that had stopped telling the
+  truth corrected (the sky as a calendar, Monday as the only first day);
+  numbers that answer a person named once (the phone the scene is drawn
+  for, a minute, the hours a day can end, the shooting stars, the shore's
+  warmth); one download, one date format, one seeded order, one world
+  type; the interface's own names moved into voice.ts word for word.
+  docs/ARCHITECTURE.md checked file by file against the code.
 
 ## 0.17.0 - 2026-10-08
 

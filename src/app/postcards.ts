@@ -1,3 +1,4 @@
+import { download } from './download'
 import { icon } from '../brand/icons'
 import type { Scene } from '../scene/scene'
 import { todayKey } from '../store/dates'
@@ -193,15 +194,4 @@ function openPreview(file: File, moment: Moment, format: PostcardFormat): void {
       setTimeout(() => URL.revokeObjectURL(url), 10_000)
     },
   })
-}
-
-function download(file: File): void {
-  const url = URL.createObjectURL(file)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = file.name
-  document.body.append(link)
-  link.click()
-  link.remove()
-  setTimeout(() => URL.revokeObjectURL(url), 10_000)
 }

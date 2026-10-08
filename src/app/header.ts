@@ -25,16 +25,16 @@ export function renderHeader(
       <div class="krill-slot"></div>
     </div>
     <div class="header-actions">
-      <button type="button" class="icon-button" data-action="sound" aria-label="Sound" aria-pressed="${String(!muted)}">
+      <button type="button" class="icon-button" data-action="sound" aria-label="${voice.labels.sound}" aria-pressed="${String(!muted)}">
         ${icon('sound')}
       </button>
-      <button type="button" class="icon-button" data-action="collection" aria-label="Collection">
+      <button type="button" class="icon-button" data-action="collection" aria-label="${voice.labels.collectionButton}">
         ${icon('star')}
       </button>
       <button type="button" class="icon-button" data-action="send" aria-label="${voice.postcard.sendSea}">
         ${icon('share')}
       </button>
-      <button type="button" class="icon-button" data-action="menu" aria-label="Menu">
+      <button type="button" class="icon-button" data-action="menu" aria-label="${voice.labels.menu}">
         ${icon('menu')}
       </button>
     </div>`

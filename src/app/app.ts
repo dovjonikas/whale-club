@@ -30,7 +30,7 @@ import { chapterNotice } from './chapter'
 import { watchBadge } from './badge'
 import { openCollectionSheet } from './collectionSheet'
 import { openDockSheet } from './dockSheet'
-import { backupStale, clearUndo, openSettingsSheet } from './settingsSheet'
+import { backupStale, offerUndoLeft, openSettingsSheet } from './settingsSheet'
 import { openArrange, type ArrangeOptions } from './arrange'
 import { shownItems } from './dockData'
 import type { DockItem } from '../scene/dock'
@@ -95,7 +95,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       <div class="offer-slot" aria-live="polite"></div>
       <p class="line"></p>
       <div class="row-tools"><div class="next-slot"></div></div>
-      <div class="row" role="group" aria-label="your homework"></div>
+      <div class="row" role="group" aria-label="${voice.labels.row}"></div>
       <div class="not-today" hidden></div>
     </div>`
 
@@ -486,7 +486,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
   function crown(index: number, plaque: string): void {
     const legendary = legendaryFor(index)
     sound.play('legendary')
-    playCeremony(scene, {
+    playCeremony({
       legendary,
       stars: pathLength(index),
       plaque,
@@ -642,7 +642,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     const stars = starDays(data).length
     // The first week's set comes first; the legendary's path is the goal after it.
     const week = stars < FIRST_WEEK_DAYS
-    let set = nextSlot.querySelector<HTMLElement>('.first-week')
+    const set = nextSlot.querySelector<HTMLElement>('.first-week')
     if (week) {
       pill('next-legend', false)
       const html = firstWeekHtml(stars)
@@ -653,7 +653,6 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       return
     }
     set?.remove()
-    set = null
     const path = progressOf(stars)
     const legend = legendaryFor(path.path)
     const far = pill('next-legend', true)
@@ -687,8 +686,8 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     return button
   }
 
-  // An undo copy left by a reload during the undo's seconds is past its time now.
-  clearUndo()
+  // A restore or a start over whose undo was still waiting when the app went.
+  offerUndoLeft(store)
   store.subscribe(render)
   store.subscribe(askToPersist)
   render(store.get())

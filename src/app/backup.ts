@@ -1,3 +1,5 @@
+import { isRecord } from '../store/migrate'
+import { download } from './download'
 import { migrate } from '../store/migrate'
 import { DATA_VERSION, type AppData, type DateKey } from '../store/types'
 
@@ -104,18 +106,5 @@ export async function saveBackup(text: string, name: string): Promise<void> {
       if (error instanceof DOMException && error.name === 'AbortError') throw error
     }
   }
-  const url = URL.createObjectURL(file)
-  const link = document.createElement('a')
-  link.href = url
-  link.download = name
-  document.body.append(link)
-  link.click()
-  link.remove()
-  setTimeout(() => {
-    URL.revokeObjectURL(url)
-  }, 1000)
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
+  download(file)
 }

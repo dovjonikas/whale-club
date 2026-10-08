@@ -1,3 +1,5 @@
+import type { World } from '../store/types'
+
 /**
  * Places: where the finds and the dock's things stand. Every world has a
  * fixed set (the shore 6, the sea 8, the sky 8), and the three extensions
@@ -13,7 +15,8 @@
  * Limited places are on purpose: a full world is a reason to arrange, put
  * something away, or save for more room.
  */
-export type SpotWorld = 'sea' | 'sky' | 'garden'
+/** The worlds that have places: all three. */
+export type SpotWorld = World
 export type Room = 'longer-shore' | 'reef' | 'island'
 
 export interface Spot {

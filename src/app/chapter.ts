@@ -1,4 +1,4 @@
-import { addDays, fromKey, todayKey } from '../store/dates'
+import { addDays, fromKey, todayKey, weekStart } from '../store/dates'
 import { starDays } from '../store/derive'
 import type { Store } from '../store/store'
 import type { AppData, DateKey } from '../store/types'
@@ -10,7 +10,7 @@ const QUIET_WEEK_STARS = 2
 
 /**
  * A new chapter: after a quiet week (fewer than two stars in the seven days
- * before), the next Monday or the first of a month offers to start the
+ * before), the week's next first day (as set) or the first of a month offers to start the
  * week's dots fresh. Once each time; "not now" lets it go. The sky, the
  * finds, the krill and the log keep everything: only the dots begin again.
  */
@@ -20,7 +20,7 @@ export function chapterDue(data: AppData, today: DateKey = todayKey()): boolean 
   // A whole week has to have gone by, or there is nothing to start again from.
   if (first === undefined || first > addDays(today, -7)) return false
   const date = fromKey(today)
-  if (date.getDay() !== 1 && date.getDate() !== 1) return false
+  if (weekStart(today) !== today && date.getDate() !== 1) return false
   const stars = new Set(starDays(data))
   let count = 0
   for (let i = 1; i <= 7; i++) if (stars.has(addDays(today, -i))) count++

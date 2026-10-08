@@ -2,7 +2,7 @@ import * as art from '../art'
 import { dots, star5, veil } from '../draw'
 import { sky, type Collectible } from './build'
 
-/** The sky's twenty finds, line A then line B. */
+/** The sky's twenty-six finds, line A then line B. */
 export const SKY: readonly Collectible[] = [
   // SKY, line A
   sky(

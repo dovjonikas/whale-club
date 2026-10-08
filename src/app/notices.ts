@@ -1,6 +1,6 @@
 /**
  * One notice above the row at a time: the install leaf, the weekly recap,
- * the check-in. Each is offered in that order and the first that applies
+ * the check-in, the new chapter. Each is offered in that order and the first that applies
  * takes the slot; the next appears when it is dismissed. A screen with
  * three cards stacked above the row is a screen where the row is below
  * the fold.

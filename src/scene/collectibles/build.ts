@@ -11,7 +11,11 @@ export interface Collectible {
   name: string
   /** One short line for the Collection sheet. */
   hint: string
-  /** Where it sits in the scene, as fractions of width and height. */
+  /**
+   * Where it sits, as fractions of width and height: read for weather,
+   * which floats free, and for the intro's glimpses. Everything else stands
+   * in a place of its world (src/scene/spots.ts).
+   */
   x: number
   y: number
   /** Width in px on a 390px-wide phone; scaled with the viewport. */

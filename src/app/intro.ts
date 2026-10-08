@@ -1,3 +1,4 @@
+import { BRAND } from './brand'
 import { seedHistory } from '../lab/seed'
 import { collectiblesFor } from '../scene/collectibles'
 import { beginningSvg, creatureSvg } from '../scene/creatures'
@@ -219,7 +220,7 @@ export function playIntro(
   const overlay = document.createElement('section')
   overlay.className = 'intro'
   overlay.setAttribute('role', 'dialog')
-  overlay.setAttribute('aria-label', 'whale club')
+  overlay.setAttribute('aria-label', BRAND.name)
   overlay.dataset.calf = 'asleep'
   overlay.dataset.lids = 'open'
   overlay.innerHTML = `

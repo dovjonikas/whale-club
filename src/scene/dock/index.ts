@@ -1,3 +1,4 @@
+import type { World } from '../../store/types'
 import type { Collectible, Motion } from '../collectibles'
 import * as art from './art'
 
@@ -26,7 +27,7 @@ import * as art from './art'
 export type Tier = 'small' | 'middling' | 'large' | 'legendary'
 export type DockKind = 'place' | 'wear' | 'scene' | 'room'
 /** The worlds a placed thing can stand in: the shore is the garden's sand. */
-export type PlaceWorld = 'sea' | 'sky' | 'garden'
+export type PlaceWorld = World
 
 export interface DockItem {
   id: string

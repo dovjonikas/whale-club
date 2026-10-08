@@ -2,7 +2,7 @@ import * as art from '../art'
 import { dots, face, jacket, stem, sunflower } from '../draw'
 import { garden, type Collectible } from './build'
 
-/** The garden's twenty finds, line A then line B. */
+/** The garden's twenty-six finds, line A then line B. */
 export const GARDEN: readonly Collectible[] = [
   // GARDEN, line A
   garden('a', 3, 'garden-a-sprout', 'a sprout', 'on the shore', 0.12, 14, 'sway', art.sprout),

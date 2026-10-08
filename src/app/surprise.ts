@@ -1,3 +1,4 @@
+import { seeded } from '../scene/random'
 import type { VisitorKind } from '../scene/visitors'
 import { fromKey } from '../store/dates'
 import type { DateKey } from '../store/types'
@@ -36,14 +37,7 @@ export function surpriseFor(date: DateKey): Surprise {
 
 /** Fisher-Yates with a fixed seed, so the order is the same on every device. */
 function shuffle<T>(items: T[], seed: number): T[] {
-  let a = seed >>> 0
-  const random = (): number => {
-    a = (a + 0x6d2b79f5) >>> 0
-    let t = a
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
+  const random = seeded(seed)
   for (let i = items.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1))
     const x = items[i]
