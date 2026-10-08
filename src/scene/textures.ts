@@ -83,22 +83,16 @@ export function causticsUrl(): Promise<string> {
   return objectUrl(canvas)
 }
 
-/** WebP keeps both tiles a fraction of a PNG's size, and the grain under it is unchanged to the eye. */
-const QUALITY = 0.9
-
 /**
- * The canvas as an object URL, WebP where the browser can encode it; a
- * browser that cannot (Safari) hands back a PNG by itself. Empty if it
- * cannot encode at all.
+ * A PNG of the canvas as an object URL; empty if the browser cannot encode
+ * it. PNG on purpose: WebP (Lighthouse's "modern image formats") was tried
+ * in 0.17 and halved the frame rate under a year of lanterns, the texture
+ * layers costing more to draw each frame than the bytes it saved.
  */
 function objectUrl(canvas: HTMLCanvasElement): Promise<string> {
   return new Promise((resolve) => {
-    canvas.toBlob(
-      (blob) => {
-        resolve(blob ? URL.createObjectURL(blob) : '')
-      },
-      'image/webp',
-      QUALITY,
-    )
+    canvas.toBlob((blob) => {
+      resolve(blob ? URL.createObjectURL(blob) : '')
+    }, 'image/png')
   })
 }

@@ -15,6 +15,9 @@ The first year, whole, made ready for strangers. No new mechanic.
   never takes away what was earned), and its facts brought up to date
   (seventy-eight finds to day 365, a dial from five minutes to ten hours,
   209 scenarios per device, Lighthouse on the live site).
+- **The scene's textures are PNG again.** 0.17.0 made them WebP on
+  Lighthouse's advice; measured, it doubled the median frame under a year
+  of lanterns (16.7 to 33.3 ms), so the bytes are not worth it.
 - **A review before the tag**: exports nothing used were removed, stale
   comments corrected, and the rule for numbers written down (docs/DECISIONS.md).
 

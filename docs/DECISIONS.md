@@ -1063,3 +1063,11 @@ token or constant; choreography (an ambient sway of 21 s, the stagger of
 falling stars, the beats of the intro's score) stays with the element it
 moves, next to the comment that explains it, because a token used once
 only moves the number away from its reason.
+
+A measured advice is not always a good one: Lighthouse asked for the two
+scene textures in WebP, 0.17.0 did it, and the frame-timing test caught
+the cost on the next full run (the median frame under a year of lanterns
+went from one vsync step to two, with WebP and PNG builds compared side by
+side). The textures are blob URLs made once on the device, so WebP only
+saved memory nobody was short of. They are PNG again; the reason sits in
+the comment above `objectUrl` in `src/scene/textures.ts`.
