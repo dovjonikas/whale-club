@@ -43,11 +43,15 @@ expensive (`.scene-dim` overlay at `opacity: 0.4`).
 | Display | **Fraunces**, weight 900, optical size 144, `WONK` on | Soft, heavy, a bit silly: a whale with a face, not a bank. Used only for the title and the three rules |
 | Body    | **Atkinson Hyperlegible**                             | Clean, clearly not Inter, reads at 13px on a phone                                                     |
 
-Both self-hosted as woff2 under `public/fonts/` (the app works offline, so
-no Google Fonts request at runtime). Sizes: `--t-xs` 12px (week dots'
-labels, captions), `--t-sm` 14px (cards, lines), `--t-md` 17px (sheets),
-`--t-lg` 24px (a rule), `--t-xl` 40px (the title). Four sizes on any one
-screen at most.
+Both self-hosted as woff2, bundled from the `@fontsource` packages (Latin
+subsets only) and preloaded, so the app works offline and makes no Google
+Fonts request. Reading sizes are in rem, so a larger text setting in the
+browser reaches them; at the default 16px: `--t-2xs` 11px (a count inside
+a stone, a tile, a day cell), `--t-xs` 12px (labels, captions), `--t-sm`
+14px (cards, lines), `--t-md` 17px (sheets), `--t-lg` 24px (a rule),
+`--t-2xl` 32px (a recap's number), `--t-xl` 40px (the title). Numbers
+sized to a shape (the wordmark, an icon in its button, the dial's
+minutes) stay in px. Four sizes on any one screen at most.
 
 ## Layout (iPhone 390x844, portrait)
 
@@ -78,10 +82,12 @@ is the app.
 
 Tap a card: the creature jumps (transform), the world's particles burst
 (bubbles / star dust / petals, canvas), the line changes. Second tap undoes.
-Long press (500ms): the timer sheet (15 / 30 / 60 / custom).
+A lock-in thing has its own visible "lock in" button that opens the dial;
+nothing hides behind a long press.
 
-Sheets (add a thing, timer, collection, rules, buddy) slide up from the
-bottom, `role="dialog"`, scrim over the scene, never a second page.
+Sheets (add a thing, a thing's own sheet, the dial, the collection, the
+log, the dock, settings, how it works) slide up from the bottom,
+`role="dialog"`, scrim over the scene, never a second page.
 
 ## Motion
 
@@ -102,8 +108,10 @@ app is quiet so that this one moment is loud. From day 90 the whale wears
 the red jacket, the only red pixel in the whole scene.
 
 The second signature, the one that makes the share PNG: the sky is the
-calendar. A month of showing up is a sky full of stars, and a person reads
-their own consistency without a single number.
+path. Every day of showing up lights the next star of a constellation
+drawn in the shape of its legendary, and a person reads their own
+consistency without a single number. (Until 0.14 the sky was a calendar
+of stars; the log keeps the calendar now.)
 
 ## What this is not
 

@@ -5,6 +5,11 @@
   "type": "module",
   "description": "A habit game about small things that add up. Show up, the scene fills, collectibles unlock.",
   "license": "MIT",
+  "homepage": "https://dovjonikas.github.io/whale-club/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dovjonikas/whale-club.git"
+  },
   "engines": {
     "node": ">=22"
   },

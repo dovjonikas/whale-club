@@ -242,5 +242,12 @@ The "left for polish" lists above are answered here.
 Lighthouse 12.8.2 through Edge, on the live site before this release
 (v0.16.0): mobile performance 73 (FCP 2.5 s, LCP 2.5 s, TBT 880 ms, CLS
 0); accessibility, best practices and SEO 100; desktop 100 in all four.
-On the 0.17 build served locally: mobile performance 86 (TBT 340 ms). The
-numbers after this release are in the README.
+On the 0.17 build served locally: mobile performance 86 (TBT 340 ms).
+
+After the release, on the live site (v0.17.0), median of three runs:
+mobile performance 85 (runs 86, 85 and 68; FCP 1.7 s, LCP 2.7 s, TBT 437
+ms, CLS 0), accessibility, best practices and SEO 100; desktop 100 in all
+four (FCP 0.4 s, LCP 0.6 s, TBT 34 ms). What is left on mobile is the
+first visit's own work (the scene and the intro built at once, on a CPU
+slowed four times); the next step would be building the intro's later
+beats on demand.
