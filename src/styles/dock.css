@@ -604,10 +604,14 @@ body[data-arranging='true'] #app {
   visibility: hidden;
 }
 
-/* The scene stops: every motion in it holds where it is. */
+/* The scene stops: every motion in it holds where it is. The same for a
+   still sea, the person's own choice in the settings. */
 .scene[data-arranging='true'] *,
 .scene[data-arranging='true'] *::before,
-.scene[data-arranging='true'] *::after {
+.scene[data-arranging='true'] *::after,
+.scene[data-still='true'] *,
+.scene[data-still='true'] *::before,
+.scene[data-still='true'] *::after {
   animation-play-state: paused !important;
 }
 

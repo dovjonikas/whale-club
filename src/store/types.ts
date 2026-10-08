@@ -137,6 +137,22 @@ export interface Settings {
   chapterFrom?: DateKey
   /** The day a new chapter was last offered, so it is offered once. */
   chapterOffered?: DateKey
+  /** When the day ends, in hours after midnight: 0 (the default), 3 or 5. */
+  dayEndsAt?: 0 | 3 | 5
+  /** The week's first day: Monday unless the person chose Sunday. */
+  weekStartsOn?: 'monday' | 'sunday'
+  /** Which half of the world the seasons follow. */
+  hemisphere?: 'north' | 'south'
+  /** The lock-in length a new thing starts with. */
+  defaultMinutes?: number
+  /** A still sea: the scene's own motion paused, for anyone who wants it so. */
+  stillSea?: boolean
+  /** When the sea was last backed up to a file. */
+  lastBackupAt?: DateKey
+  /** The month the backup dot was last seen on the menu, so it shows once a month. */
+  backupNudged?: string
+  /** Lasting storage was asked for once, after the first week. */
+  persistAsked?: boolean
 }
 
 /** The shape of the saved record; migrate.ts brings every earlier one up to it. */

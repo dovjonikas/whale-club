@@ -1,4 +1,4 @@
-import { addDays, fromKey, toKey } from './dates'
+import { addDays, fromKey, toKey, firstDayOfWeek } from './dates'
 import { counted } from './derive'
 import { LETTER } from '../brand/glyphs'
 import type { AppData, DateKey, Kind } from './types'
@@ -59,13 +59,13 @@ export function daysOf(month: MonthKey): DateKey[] {
 }
 
 /**
- * The month laid out in weeks, Monday first: null where a week reaches
+ * The month laid out in weeks, from the week's first day (Monday unless the person chose Sunday): null where a week reaches
  * into the month before or after.
  */
 export function weeksOf(month: MonthKey): (DateKey | null)[][] {
   const days = daysOf(month)
   const first = days[0] ?? `${month}-01`
-  const lead = (fromKey(first).getDay() + 6) % 7
+  const lead = (fromKey(first).getDay() - firstDayOfWeek() + 7) % 7
   const cells: (DateKey | null)[] = [...(Array(lead).fill(null) as null[]), ...days]
   while (cells.length % 7 !== 0) cells.push(null)
   const weeks: (DateKey | null)[][] = []

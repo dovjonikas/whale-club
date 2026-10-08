@@ -30,6 +30,8 @@ import { chapterNotice } from './chapter'
 import { watchBadge } from './badge'
 import { openCollectionSheet } from './collectionSheet'
 import { openDockSheet } from './dockSheet'
+import { backupStale, clearUndo, openSettingsSheet } from './settingsSheet'
+import { setDayEndsAt, setWeekStartsOn } from '../store/dates'
 import { openArrange, type ArrangeOptions } from './arrange'
 import { shownItems } from './dockData'
 import type { DockItem } from '../scene/dock'
@@ -134,12 +136,20 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       },
       onMenu() {
         openMenuSheet(store, {
-          onLab: enterLabFromMenu,
           onLog: () => {
             openLogSheet(store)
           },
           onHow: () => {
             openHowItWorks(intro)
+          },
+          onSettings: () => {
+            openSettingsSheet(store, {
+              sound,
+              onHow: () => {
+                openHowItWorks(intro)
+              },
+              onLab: enterLabFromMenu,
+            })
           },
         })
       },
@@ -542,9 +552,27 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     return null
   }
 
+  /** The person's own clock and week, before anything asks what day it is. */
+  function applySettings(data: AppData): void {
+    setDayEndsAt(data.settings.dayEndsAt ?? 0)
+    setWeekStartsOn(data.settings.weekStartsOn === 'sunday' ? 0 : 1)
+  }
+
+  /**
+   * Lasting storage, asked for once after the first week, where the
+   * browser can grant it: the sea is then not cleared to make room.
+   */
+  function askToPersist(data: AppData): void {
+    if (data.settings.persistAsked || starDays(data).length < FIRST_WEEK_DAYS) return
+    if (!('storage' in navigator) || typeof navigator.storage.persist !== 'function') return
+    store.setSettings({ persistAsked: true })
+    navigator.storage.persist().catch(() => undefined)
+  }
+
   // --- Render ----------------------------------------------------------------------------------
 
   function render(data: AppData): void {
+    applySettings(data)
     const today = todayKey()
     onboarding.hidden = data.things.length > 0
     scene.setEmpty(data.things.length === 0)
@@ -552,7 +580,15 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     krill.render(data, today)
     watchPath(data)
     const now = clockNow()
-    scene.setCalendar(seasonOf(now), eventsAt(now, starDays(data)[0]))
+    scene.setCalendar(
+      seasonOf(now, data.settings.hemisphere ?? 'north'),
+      eventsAt(now, starDays(data)[0]),
+    )
+    scene.setStill(data.settings.stillSea === true)
+    // The month's quiet backup dot, on the menu button, until the menu has been opened.
+    query(root, '.header [data-action="menu"]').dataset.due = String(
+      backupStale(data, today) && data.settings.backupNudged !== today.slice(0, 7),
+    )
     scene.setDock(new Set(shownItems(data).map((item) => item.id)), () => {
       openDock()
     })
@@ -652,7 +688,10 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     return button
   }
 
+  // An undo copy left by a reload during the undo's seconds is past its time now.
+  clearUndo()
   store.subscribe(render)
+  store.subscribe(askToPersist)
   render(store.get())
   watchBadge(store)
   listenForInstallPrompt(() => {

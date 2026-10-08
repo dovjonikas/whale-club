@@ -83,7 +83,7 @@ test('a cracked stone offers to send this, in the size chosen before', async ({ 
   expect(first).toMatchObject({ width: 1080, height: 1080 })
 })
 
-test('the header sends the sea any time, and the menu changes the size', async ({ page }) => {
+test('the header sends the sea any time, and settings change the size', async ({ page }) => {
   await mockShare(page)
   await seed(page, {
     things: [{ id: 't1', name: 'run', world: 'sea', createdAt: dateKey(-3), order: 0 }],
@@ -95,8 +95,9 @@ test('the header sends the sea any time, and the menu changes the size', async (
   await expect.poll(() => shared(page)).toHaveLength(1)
 
   await page.getByRole('button', { name: 'Menu' }).click()
+  await page.getByRole('button', { name: 'settings', exact: true }).click()
   await page
-    .getByRole('dialog', { name: 'the club' })
+    .getByRole('dialog', { name: 'settings' })
     .getByRole('button', { name: 'square' })
     .click()
   await page.keyboard.press('Escape')

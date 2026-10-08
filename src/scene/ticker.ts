@@ -27,8 +27,12 @@ export class Ticker {
   private raf = 0
   private visible = !document.hidden
   private onScreen = true
-  /** Held still on purpose: arranging stops the scene so a thing holds still under a finger. */
-  private held = false
+  /**
+   * Why the loop is held still on purpose, if it is: arranging (a thing
+   * holds still under a finger) and a still sea (the person's own choice).
+   * Each lets go of its own hold only.
+   */
+  private readonly holds = new Set<string>()
 
   constructor() {
     document.addEventListener('visibilitychange', () => {
@@ -48,8 +52,9 @@ export class Ticker {
     }).observe(element)
   }
 
-  hold(on: boolean): void {
-    this.held = on
+  hold(reason: string, on: boolean): void {
+    if (on) this.holds.add(reason)
+    else this.holds.delete(reason)
     this.update()
   }
 
@@ -69,7 +74,7 @@ export class Ticker {
   }
 
   private update(): void {
-    const run = this.visible && this.onScreen && !this.held && this.jobs.size > 0
+    const run = this.visible && this.onScreen && this.holds.size === 0 && this.jobs.size > 0
     if (run && !this.raf) this.raf = requestAnimationFrame(this.loop)
     if (!run && this.raf) {
       cancelAnimationFrame(this.raf)

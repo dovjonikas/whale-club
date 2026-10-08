@@ -944,3 +944,42 @@
 .good-tomorrow {
   margin: var(--s2) 0 0;
 }
+
+/* Settings: groups of one-line choices. */
+.settings-group + .settings-group {
+  margin-top: var(--s6);
+}
+
+.settings-title {
+  margin: 0 0 var(--s2);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  color: var(--ink-dim);
+}
+
+.setting {
+  display: grid;
+  gap: var(--s1);
+  margin-bottom: var(--s3);
+}
+
+.setting-actions {
+  display: grid;
+  gap: var(--s2);
+}
+
+/* The month's quiet backup dot on the menu button: no popup, just a dot. */
+.icon-button[data-due='true'] {
+  position: relative;
+}
+
+.icon-button[data-due='true']::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--star);
+}

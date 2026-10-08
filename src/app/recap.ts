@@ -1,4 +1,4 @@
-import { addDays, isSunday, lastKeys, todayKey, weekStart } from '../store/dates'
+import { addDays, isLastDayOfWeek, lastKeys, todayKey, weekStart } from '../store/dates'
 import { plannedThings, starDays } from '../store/derive'
 import type { Store } from '../store/store'
 import type { AppData, DateKey } from '../store/types'
@@ -24,7 +24,7 @@ export interface Recap {
 
 export function recapFor(data: AppData, today: DateKey = todayKey()): Recap | null {
   const thisWeek = weekStart(today)
-  const week = isSunday(today) ? thisWeek : addDays(thisWeek, -7)
+  const week = isLastDayOfWeek(today) ? thisWeek : addDays(thisWeek, -7)
   if (data.settings.lastRecapWeek === week) return null
   const first = data.things.map((t) => t.createdAt).sort()[0]
   if (first === undefined || first > week) return null

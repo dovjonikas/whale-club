@@ -57,7 +57,10 @@ export function openAddSheet(
 
       const form = body.querySelector<HTMLFormElement>('form')
       const nameInput = body.querySelector<HTMLInputElement>('input[name=name]')
-      const kind = kindField({ kind: 'tap', minutes: DEFAULT_MINUTES })
+      const kind = kindField({
+        kind: 'tap',
+        minutes: store.get().settings.defaultMinutes ?? DEFAULT_MINUTES,
+      })
       const picture = iconField({
         icon: LETTER,
         name: '',

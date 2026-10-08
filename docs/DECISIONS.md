@@ -985,3 +985,28 @@ month after a quiet week; accepted, only the dots begin again. "After" has
 five moments and no hours, and a thing without one sits in the middle of
 the day, so choosing a moment for one thing never reshuffles the others.
 The badge is set only where no permission is needed.
+
+## 2026-10-08 Settings, and a sea that is never lost
+
+The settings sheet has only the groups the brief allows (sound, days, lock
+in, postcards, your sea, about) and nothing that would turn the app into
+a control panel: no themes, fonts, languages, notifications or accounts.
+Every choice applies at once. One addition: a still sea, from the
+interface audit (the always-moving scene had no pause of its own, WCAG's
+"pause, stop, hide"); it pauses the scene the way arranging does, and the
+ticker now keeps a hold per reason so the two never undo each other.
+
+"A day ends at" is applied in the one place every "today" comes from
+(store/dates.ts, todayKey), so nothing else had to learn about it; the
+week's first day likewise lives in weekStart, which the recap, the good
+weeks, quiet days and the log all use.
+
+A backup is the data itself with a checksum of it, so a file cut short or
+edited by hand is caught before it can replace anything; a newer version's
+file is refused rather than guessed at. Restoring and starting over keep
+the sea before in a key of its own for the ten seconds of undo, so even a
+reload in those seconds loses nothing; the next start clears the copy.
+
+The about section leaves out the line "built with Claude Code" that the
+first brief listed: on 2026-10-08 the author asked for the public writing
+to keep to the work itself (the contributors list shows who helped).

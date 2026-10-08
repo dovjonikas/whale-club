@@ -1,9 +1,34 @@
 import { today } from './clock'
 import type { DateKey } from './types'
 
+/**
+ * When the person's day ends, in hours after midnight: 0, 3 or 5. For
+ * someone who works nights or goes to bed late, a done at 01:30 still
+ * belongs to the evening before. Set from the settings by the app; every
+ * "today" in the app comes through todayKey, so this is the one place.
+ */
+let dayEndsAt = 0
+/** The first day of a week: 1 Monday (the default), 0 Sunday. */
+let weekStartsOn: 0 | 1 = 1
+
+export function setDayEndsAt(hours: number): void {
+  dayEndsAt = hours === 3 || hours === 5 ? hours : 0
+}
+
+export function setWeekStartsOn(day: 0 | 1): void {
+  weekStartsOn = day
+}
+
+export function firstDayOfWeek(): 0 | 1 {
+  return weekStartsOn
+}
+
 /** Today on the local clock. The app never thinks in UTC; a day is the person's day. */
 export function todayKey(now: Date = today()): DateKey {
-  return toKey(now)
+  if (now.getHours() >= dayEndsAt) return toKey(now)
+  const evening = new Date(now)
+  evening.setDate(evening.getDate() - 1)
+  return toKey(evening)
 }
 
 export function toKey(date: Date): DateKey {
@@ -31,13 +56,14 @@ export function lastKeys(today: DateKey, n: number): DateKey[] {
   return keys
 }
 
-/** The Monday of the week `key` falls in. Weeks start on Monday here. */
+/** The first day of the week `key` falls in: a Monday, or a Sunday if the person said so. */
 export function weekStart(key: DateKey): DateKey {
   const date = fromKey(key)
-  const offset = (date.getDay() + 6) % 7
+  const offset = (date.getDay() - weekStartsOn + 7) % 7
   return addDays(key, -offset)
 }
 
-export function isSunday(key: DateKey): boolean {
-  return fromKey(key).getDay() === 0
+/** The last day of its week: a Sunday, or a Saturday when weeks start on Sunday. */
+export function isLastDayOfWeek(key: DateKey): boolean {
+  return fromKey(key).getDay() === (weekStartsOn + 6) % 7
 }

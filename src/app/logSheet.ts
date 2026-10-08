@@ -2,7 +2,7 @@ import { escapeHtml, thingMark } from './thingMark'
 import { allQuiet } from '../store/quiet'
 import { plannedThings } from '../store/derive'
 import { icon } from '../brand/icons'
-import { fromKey, todayKey } from '../store/dates'
+import { fromKey, todayKey, firstDayOfWeek } from '../store/dates'
 import {
   addMonths,
   dayEntry,
@@ -129,7 +129,9 @@ export function openLogSheet(store: Store, at?: DateKey): void {
             <button type="button" class="icon-button log-next" aria-label="${voice.log.next}"${month >= last ? ' disabled' : ''}>${CHEVRON_RIGHT}</button>
           </div>
           <p class="log-summary">${voice.log.summary(summary.stars, summary.lanterns, summary.minutes)}</p>
-          <div class="log-weekdays" aria-hidden="true">${voice.days.short.map((d) => `<span>${d}</span>`).join('')}</div>
+          <div class="log-weekdays" aria-hidden="true">${weekdayLetters()
+            .map((d) => `<span>${d}</span>`)
+            .join('')}</div>
           <div class="log-grid">${weeks}</div>
           ${legendHtml(data, month, { soft, faint, lit, quiet })}`
       }
@@ -295,4 +297,10 @@ function legendHtml(
     ${seen.quiet ? `<p><span class="legend-moon" aria-hidden="true"></span>${voice.log.legendQuiet}</p>` : ''}
     ${colors ? `<div class="legend-colors">${colors}</div>` : ''}
   </div>`
+}
+
+/** The weekday letters over the month, starting on the week's first day. */
+function weekdayLetters(): readonly string[] {
+  const letters = voice.days.short
+  return firstDayOfWeek() === 0 ? [...letters.slice(6), ...letters.slice(0, 6)] : letters
 }

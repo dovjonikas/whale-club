@@ -1,5 +1,5 @@
 import { test as pure } from '@playwright/test'
-import { addDays, isSunday, weekStart } from '../../src/store/dates'
+import { addDays, isLastDayOfWeek, weekStart } from '../../src/store/dates'
 import { asleep, missedYesterday, streak, weekDots } from '../../src/store/derive'
 import { KRILL, krillOn } from '../../src/store/krill'
 import { isQuiet, quietAllowance } from '../../src/store/quiet'
@@ -159,7 +159,7 @@ test('the evening check-in asks for one good thing, and the log keeps it', async
   await page.clock.setFixedTime(evening)
   // Last week's recap already seen, so the check-in is the notice in sight.
   const today0 = dateKey(0)
-  const recapWeek = isSunday(today0) ? weekStart(today0) : addDays(weekStart(today0), -7)
+  const recapWeek = isLastDayOfWeek(today0) ? weekStart(today0) : addDays(weekStart(today0), -7)
   await seed(page, {
     things: [run, read],
     days: {},

@@ -172,6 +172,58 @@ export const voice = {
     meteors: 'a meteor shower tonight. look up.', // TODO-VOICE
     light: 'the sun turns today.', // TODO-VOICE
   },
+  /** Settings: one sheet, each choice one row, taking effect at once. */
+  settings: {
+    title: 'settings',
+    open: 'settings',
+    groups: {
+      sound: 'sound',
+      days: 'days',
+      lockIn: 'lock in',
+      postcards: 'postcards',
+      sea: 'your sea',
+      about: 'about',
+    },
+    on: 'on',
+    off: 'off',
+    sounds: 'sounds',
+    seaSound: 'the sea, in a lock in',
+    dayEnds: 'a day ends at',
+    midnight: 'midnight',
+    weekStarts: 'week starts on',
+    monday: 'Monday',
+    sunday: 'Sunday',
+    seasons: 'seasons',
+    north: 'north',
+    south: 'south',
+    showTime: 'show the time',
+    length: 'length for new things',
+    size: 'size',
+    still: 'a still sea',
+    backUp: 'back up',
+    restore: 'restore',
+    startOver: 'start over',
+    lastBackup: (date: string) => `last backed up ${date}`,
+    never: 'not backed up yet',
+    backupDone: 'backed up.',
+    backupDue: 'time for a backup', // TODO-VOICE
+    restoreAsk: 'replace your sea with this?',
+    restoreWhat: (things: number, days: number, first?: string, last?: string) =>
+      `${String(things)} ${things === 1 ? 'thing' : 'things'}, ${String(days)} ${days === 1 ? 'day' : 'days'} with something done${first && last ? `, ${first} to ${last}` : ''}.`,
+    restoreYes: 'replace',
+    cancel: 'cancel',
+    restored: 'restored.',
+    damaged: 'this file is damaged. nothing changed.',
+    newer: 'this backup is from a newer whale club. update, then try again.',
+    notOurs: 'this is not a whale club backup. nothing changed.',
+    startOverAsk: 'this clears your sea on this phone',
+    backUpFirst: 'back up first',
+    cleared: 'your sea is clear.', // TODO-VOICE
+    undo: 'undo',
+    storage: (kb: number) => `${String(kb)} KB on this phone`,
+    privacy: 'nothing leaves this phone unless you send it.',
+    licence: 'the code is free to use: MIT licence.',
+  },
   /** A new chapter, offered after a quiet week. */
   chapter: {
     title: 'a new chapter?', // TODO-VOICE
