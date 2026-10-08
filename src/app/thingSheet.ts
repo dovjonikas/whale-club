@@ -3,7 +3,7 @@ import { glyphFor } from '../brand/match'
 import { todayKey } from '../store/dates'
 import { weekday, withoutTimerLeft } from '../store/derive'
 import type { Store } from '../store/store'
-import { AFTERS, type After, type Thing } from '../store/types'
+import { AFTERS, type After, type Thing, PET_NAME_MAX } from '../store/types'
 import { voice } from '../voice'
 import { daysField } from './daysField'
 import { iconField } from './iconField'
@@ -46,6 +46,14 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
             <span class="field-label">${voice.add.name}</span>
             <input class="input" name="name" type="text" maxlength="24" autocomplete="off" enterkeyhint="done" />
           </label>
+          ${
+            thing.petName !== undefined || thing.nameAsked
+              ? `<label class="field">
+                  <span class="field-label">${voice.name.field}</span>
+                  <input class="input pet-name" name="pet" type="text" maxlength="${String(PET_NAME_MAX)}" autocomplete="off" enterkeyhint="done" />
+                </label>`
+              : ''
+          }
           <div class="icon-slot"></div>
           <div class="kind-slot"></div>
           <div class="days-slot"></div>
@@ -91,6 +99,8 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
         </form>`
 
       const form = body.querySelector<HTMLFormElement>('form')
+      const petField = body.querySelector<HTMLInputElement>('.pet-name')
+      if (petField) petField.value = thing.petName ?? ''
       const name = body.querySelector<HTMLInputElement>('input[name=name]')
       const todayChip = body.querySelector<HTMLButtonElement>('.today-chip')
       if (!form || !name || !todayChip) return
@@ -163,6 +173,8 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
           days: days.value(),
           after,
         })
+        const pet = form.querySelector<HTMLInputElement>('.pet-name')
+        if (pet) store.setPetName(thing.id, pet.value)
         close()
       })
     },

@@ -41,6 +41,8 @@ export interface SeedThing {
   /** Monday first; absent means every day. */
   days?: boolean[]
   kind?: 'tap' | 'lockIn'
+  nameAsked?: boolean
+  petName?: string
 }
 
 export interface SeedData {
@@ -56,6 +58,8 @@ export interface SeedData {
       skip?: string[]
       sessions?: { thing: string; minutes: number; left?: true; parts?: number }[]
       manual?: string[]
+      good?: string
+      notToday?: boolean
     }
   >
   /** Per thing, the highest tier already cracked. Absent: every earned stone is still waiting. */
@@ -138,7 +142,10 @@ export async function setHidden(page: Page, hidden: boolean): Promise<void> {
 
 /** What the app has stored, read back from the page. */
 export async function stored(page: Page): Promise<{
-  days: Record<string, { done: string[]; minutes: Record<string, number>; waited?: string[] }>
+  days: Record<
+    string,
+    { done: string[]; minutes: Record<string, number>; waited?: string[]; skip?: string[] }
+  >
   things: { id: string; name: string; minutes?: number }[]
   cracked: Record<string, number>
   settings: Record<string, unknown>

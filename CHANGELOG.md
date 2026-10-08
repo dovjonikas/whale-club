@@ -2,6 +2,37 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 1.2.0 - 2026-10-08
+
+A safe place: five small things so the app feels like somewhere good to
+come back to. No new settings, no notifications, no guilt.
+
+- **"not today"**, small, under the check-in's first answer. The sea
+  softens (a light rain on the water, a warmer light), one line is said,
+  and the row keeps one small thing with "just this one?"; the rest rest
+  under the "not today" strip. Such a day is a quiet day, never a missed
+  one, and spends none of the week's quiet days. Three in a row, once a
+  week at most: "it’s been heavy for a few days. tell someone you trust."
+- **Bottles**: the evening's good things come back. On a "not today" day,
+  or once a week when five or more were written, a bottle washes up on
+  the sand; opened, it says "you wrote this a while ago:" (or "back in
+  spring") and the line. One a day at most; the same line not again
+  within a month; none written, no bottle. If the check-in came before
+  18:00, the evening asks for its one good thing on its own, once.
+- **Pet your creature**: each thing's creature lives in its world in the
+  scene too. A tap brings it a little closer, it blinks, a few bubbles
+  rise, a soft sound. Nothing earned, nothing counted. One asleep on a
+  quiet day wakes and waves. Under reduced motion, a blink.
+- **Late at night** (23:00 to 05:00, moved by "a day ends at"): the scene
+  a little darker and warmer, "late. the sea will be here tomorrow.", and
+  a tap on the moon says good night: the whale falls asleep and the app
+  rests on a quiet screen until a tap.
+- **A name**: when a creature first reaches its last stage, "name it?",
+  once, with "not now". The name shows in the thing's sheet, where it can
+  change, and now and then a line says it instead of "it".
+- **Cleaner cards that ask for a word** ("one good thing today", "name
+  it?"): one column, the field the full width, the buttons in a row.
+
 ## 1.1.0 - 2026-10-08
 
 A line for the day.

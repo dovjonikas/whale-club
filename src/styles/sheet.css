@@ -1007,7 +1007,28 @@
 }
 
 .good-tomorrow {
-  margin: var(--s2) 0 0;
+  margin: 0;
+  font-size: var(--t-xs);
+}
+
+/* A card that asks for a word (the good thing, a name): one column, the
+   field the full width, the buttons in one row at the right, the main
+   one at the edge. */
+.leaf.is-form {
+  grid-template-columns: 1fr;
+  gap: var(--s2);
+}
+
+/* The card's own gap spaces it; a field keeps no margin of its own here. */
+.leaf.is-form .field {
+  margin: 0;
+}
+
+.leaf.is-form .leaf-actions {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--s2);
 }
 
 /* Settings: groups of one-line choices. */

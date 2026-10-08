@@ -63,6 +63,9 @@ const things = [
 ]
 
 // A believable five weeks: most days, not all, and a stronger last week.
+// Asked already: no "name it?" over the pictures.
+for (const thing of things) thing.nameAsked = true
+
 const days = {}
 for (let i = -34; i <= 0; i++) {
   const done = []
@@ -116,6 +119,8 @@ const data = {
     postcardFormat: 'story',
     // The things have explained themselves already: the pictures show the usual lines.
     explained: ['yours', 'firstStar', 'stone', 'lantern', 'kept'],
+    // Tonight's good thing was asked already: no card over the sky.
+    goodAskedOn: key(0),
   },
 }
 
@@ -478,7 +483,58 @@ await pathScene(29, 'iphone-ceremony.png', async (page) => {
   // The year's moments (a ceremony, a milestone) are for living through, not for this picture.
   await page.keyboard.press('Escape')
   await page.waitForTimeout(600)
+  const nameIt = page.getByRole('complementary', { name: 'name it?' })
+  if (await nameIt.isVisible()) await nameIt.getByRole('button', { name: 'not now' }).click()
+  await page.waitForTimeout(400)
   await shot(page, 'iphone-year.png')
+  await context.close()
+}
+
+// 1.2, a safe place: a "not today" day with its light rain, the bottle it
+// brings back, and the sea late at night.
+{
+  const soft = JSON.parse(JSON.stringify(data))
+  const goods = {
+    [key(-12)]: 'the sea was calm',
+    [key(-26)]: 'a long walk by the water',
+    [key(-33)]: 'tea with a friend',
+  }
+  for (const [date, good] of Object.entries(goods))
+    soft.days[date] = { ...(soft.days[date] ?? { done: [], minutes: {} }), good }
+  soft.days[key(0)] = { done: [], minutes: {} }
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.setFixedTime(NOW)
+  await page.addInitScript(
+    (json) => localStorage.setItem('whaleclub:data', json),
+    JSON.stringify(soft),
+  )
+  await page.goto(base)
+  await page
+    .getByRole('complementary', { name: 'check-in' })
+    .getByRole('button', { name: 'not today' })
+    .click()
+  await page.waitForTimeout(1800)
+  await shot(page, 'iphone-soft.png')
+  await page.locator('.bottle').click()
+  await page.getByRole('dialog', { name: 'a bottle' }).waitFor()
+  await page.waitForTimeout(600)
+  await shot(page, 'iphone-bottle.png')
+  await context.close()
+}
+{
+  const late = new Date(NOW)
+  late.setHours(23, 40)
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.setFixedTime(late)
+  await page.addInitScript(
+    (json) => localStorage.setItem('whaleclub:data', json),
+    JSON.stringify(data),
+  )
+  await page.goto(base)
+  await page.waitForTimeout(1800)
+  await shot(page, 'iphone-late.png')
   await context.close()
 }
 

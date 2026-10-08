@@ -1,0 +1,404 @@
+/* A safe place (1.2): a soft day's rain, late night, a bottle, the creatures
+   to pet, the good night screen. Transform and opacity only; under reduced
+   motion the light stays and the movement goes. */
+
+/* "not today" under the check-in's first answer: small, but a real target. */
+.checkin-not-today {
+  min-height: var(--touch);
+  padding: 0 var(--s2);
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* The one card a "not today" day keeps asks, quietly, if it is enough. */
+.card-just {
+  position: absolute;
+  left: 50%;
+  top: 36px;
+  z-index: 3;
+  width: max-content;
+  max-width: 160px;
+  padding: var(--s1) var(--s3);
+  transform: translateX(-50%);
+  border-radius: var(--r-pill);
+  background: var(--float-bg);
+  border: 1px solid var(--float-edge);
+  color: var(--star-pale);
+  font-size: var(--t-xs);
+  pointer-events: none;
+}
+
+/* A soft day: a light rain over the water, rings where it lands, a warmer light. */
+.scene-rain {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease);
+}
+
+.scene[data-soft='true'] .scene-rain {
+  opacity: 1;
+}
+
+.scene-rain i {
+  position: absolute;
+  left: var(--x);
+  top: calc(var(--horizon) - 22%);
+  width: 1.5px;
+  height: 14px;
+  border-radius: 1px;
+  background: linear-gradient(rgba(200, 236, 255, 0), rgba(200, 236, 255, 0.55));
+  opacity: 0;
+  animation: rain-fall var(--t) linear var(--d) infinite;
+}
+
+@keyframes rain-fall {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-6px, calc(var(--rain-drop, 150px) * var(--scene-scale, 1)), 0);
+    opacity: 0;
+  }
+}
+
+.scene-rain b {
+  position: absolute;
+  left: var(--x);
+  top: calc(var(--horizon) + 2%);
+  width: 22px;
+  height: 6px;
+  margin-left: -11px;
+  border-radius: 50%;
+  border: 1px solid rgba(200, 236, 255, 0.45);
+  opacity: 0;
+  animation: rain-ring 2.6s var(--ease-out) var(--d) infinite;
+}
+
+@keyframes rain-ring {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+.scene-soft {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(
+    90% 40% at 50% var(--horizon),
+    rgba(255, 196, 140, 0.16),
+    rgba(255, 196, 140, 0) 70%
+  );
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease);
+}
+
+.scene[data-soft='true'] .scene-soft {
+  opacity: 1;
+}
+
+/* Late at night: a little darker, a little warmer. */
+.scene-late {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(80% 50% at 50% 70%, rgba(255, 170, 100, 0.07), rgba(255, 170, 100, 0)),
+    rgba(2, 4, 9, 0.3);
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease);
+}
+
+.scene[data-late='true'] .scene-late {
+  opacity: 1;
+}
+
+/* The moon answers late at night: a target over it, the size of a finger. */
+.moon-hit {
+  position: absolute;
+  z-index: 3;
+  right: calc(10% - 4px);
+  top: calc(18% - 4px);
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  pointer-events: auto;
+}
+
+.moon-hit[hidden] {
+  display: none;
+}
+
+/* A bottle at the water's edge, bobbing. */
+.bottle {
+  position: absolute;
+  z-index: 3;
+  right: 12%;
+  /* On the sand to the right: a long line wraps short on the left, so the
+     bottle stays in sight under it; the line lets taps through. */
+  top: calc(var(--horizon) - 5%);
+  width: calc(48px * var(--scene-scale, 1));
+  min-width: var(--touch);
+  min-height: var(--touch);
+  padding: 0;
+  pointer-events: auto;
+}
+
+.bottle[hidden] {
+  display: none;
+}
+
+.bottle svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  animation: bottle-bob 3.6s ease-in-out infinite;
+}
+
+@keyframes bottle-bob {
+  50% {
+    transform: translate3d(0, 3px, 0) rotate(4deg);
+  }
+}
+
+/* The creatures, each in its world: a finger-sized target around a small drawing.
+   Before the stones in the markup, at the same level, so a stone waiting (a
+   thing to do) is always above a creature (a thing to enjoy). */
+.pets {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.scene[data-arranging='true'] .pets,
+.scene[data-silhouette='true'] .pets {
+  visibility: hidden;
+}
+
+.pet {
+  position: absolute;
+  left: calc(var(--x) * 100%);
+  top: calc(var(--y) * 100%);
+  width: calc(44px * var(--scene-scale, 1));
+  min-width: var(--touch);
+  min-height: var(--touch);
+  padding: 0;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+/* The garden's stand on the sand. */
+.pet[data-world='garden'] {
+  transform: translate(-50%, -100%);
+}
+
+.pet-art {
+  display: block;
+  transition: transform 360ms var(--ease-out);
+}
+
+.pet-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pet .eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pet[data-world='sea'] .pet-art {
+  animation: pet-swim 8s ease-in-out infinite;
+}
+
+.pet[data-world='sky'] .pet-art {
+  animation: pet-float 6s ease-in-out infinite;
+}
+
+@keyframes pet-swim {
+  50% {
+    transform: translate3d(5px, -2px, 0);
+  }
+}
+
+@keyframes pet-float {
+  50% {
+    transform: translate3d(0, -4px, 0);
+  }
+}
+
+/* Asleep, as on its card: eyes shut, breathing slow. */
+.pet[data-asleep='true'] .eyes {
+  transform: scaleY(0.14);
+}
+
+.pet[data-asleep='true'] .pet-art {
+  transform-origin: 50% 80%;
+  animation: sleep-breathe 4.8s ease-in-out infinite;
+}
+
+/* Petted: it comes a little closer, and back. */
+.pet.is-petted .pet-art {
+  animation: pet-closer 1s var(--ease-out);
+}
+
+@keyframes pet-closer {
+  35% {
+    transform: translate3d(0, -4px, 0) scale(1.35);
+  }
+  100% {
+    transform: none;
+  }
+}
+
+/* Woken: a wave, as a card's creature waves when it is done again. */
+.pet.is-waking .pet-art {
+  transform-origin: 50% 90%;
+  animation: wake-wave 900ms var(--ease-out);
+}
+
+.pet-bubble {
+  position: absolute;
+  left: calc(40% + var(--i) * 10%);
+  top: 20%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px solid rgba(214, 252, 240, 0.8);
+  pointer-events: none;
+  animation: pet-bubble 1s var(--ease-out) calc(var(--i) * 120ms) both;
+}
+
+@keyframes pet-bubble {
+  from {
+    transform: translate3d(0, 0, 0) scale(0.6);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(calc((var(--i) - 1) * 6px), -26px, 0) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Good night: the app's quiet screen. Dark, the whale asleep, one line. */
+.goodnight {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--s4);
+  padding: calc(var(--safe-top) + var(--s4)) calc(var(--safe-right) + var(--s4))
+    calc(var(--safe-bottom) + var(--s4)) calc(var(--safe-left) + var(--s4));
+  background: radial-gradient(70% 50% at 50% 55%, #071228, #010205 70%);
+  color: var(--ink-dim);
+  text-align: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease);
+}
+
+.goodnight.is-open {
+  opacity: 1;
+}
+
+.goodnight-whale {
+  width: 160px;
+  opacity: 0.85;
+}
+
+.goodnight-whale svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.goodnight-line {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--t-lg);
+  color: var(--star-pale);
+}
+
+.goodnight-wake {
+  margin: 0;
+  font-size: var(--t-xs);
+}
+
+/* The bottle's sheet: what was written, as it was written. */
+.bottle-note {
+  margin: 0 0 var(--s4);
+  padding: var(--s3) var(--s4);
+  border-radius: var(--r);
+  background: rgba(255, 244, 214, 0.08);
+  border: 1px solid rgba(255, 244, 214, 0.2);
+  color: var(--star-pale);
+  font-size: var(--t-md);
+  text-wrap: pretty;
+}
+
+/* "name it?": the creature beside the question and the thing's name. */
+.name-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+
+.name-head .leaf-lead {
+  margin-top: 0;
+}
+
+.name-leaf .name-creature {
+  display: block;
+  flex: none;
+  width: 44px;
+}
+
+.name-leaf .name-creature svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-rain i,
+  .scene-rain b {
+    display: none;
+  }
+  .bottle svg,
+  .pet .pet-art,
+  .pet.is-petted .pet-art,
+  .pet.is-waking .pet-art,
+  .pet[data-asleep='true'] .pet-art {
+    animation: none;
+  }
+  .pet-bubble {
+    display: none;
+  }
+}

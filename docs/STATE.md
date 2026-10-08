@@ -2,7 +2,7 @@
 
 ## Done
 
-v1.1.0, live at https://dovjonikas.github.io/whale-club/ after the push.
+v1.2.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
 - **v0.1.0 to v0.3.0**: the row, the scene, the sky as a calendar, creatures, PWA, collectibles, the whale, rituals, sound, share; a buddy slot (since removed).
 - **v0.4.0**: postcards instead of a buddy; the phone-wide frame; the install leaf after the first thing; Lighthouse through Edge.
@@ -23,6 +23,7 @@ v1.1.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 - **v0.11.3**: the intro has a score: "tap to begin" so sound may play, a music box year, a note for every word of the truth, silence at the blink, the notes doubling at "compound", the last word resolving on the peak.
 - **v0.12.0**: the brand: every thing wears a bubble (its picture in cream, the rising signature, filled when done, a timer rim for a lock-in) at its card's corner; 48 glyphs of its own, picked from the name in English or Lithuanian, or a monogram; no emoji anywhere (data v7); the interface's icons, the app icon and the favicon in the same hand; brand.html; strong curves, presses, sheets that can be pulled down; the interface audit with its fixes (docs/QUALITY.md).
 - **v0.12.1**: the author's motion review answered: reduced motion keeps fades, toasts leave faster, a stopped lock-in leaves cleanly, the done glow only fades, one press for everything; typographic apostrophes and a next step on the share error.
+- **v1.2.0**: a safe place: "not today" (a soft day: rain, one thing kept, quiet not missed; "it’s been heavy" once after three), bottles that bring back the evening's good things (and the evening's ask on its own after an early check-in), creatures to pet in the scene, late night with the moon's good night, a creature's name; cleaner cards that ask for a word.
 - **v1.1.0**: a line for the day after the check-in (twenty, the author's, docs/LINES.md), "send this" with the line, the author's lines in their moments, "show the time" on the lock-in screen, the README's "Why it exists" in the author's words.
 - **v1.0.0**: the first year, whole, for strangers: "how it works" answers the questions a friend asks first; the README with install, questions and a roadmap; a review before the tag (the chapter's week start, the undo after a reload, version 1 data, a find's entrance; dead code, stale comments, named numbers, shared helpers; ARCHITECTURE.md checked against the code); tag v1.0.0 and a GitHub release.
 - **v0.17.0**: polish: iOS startup images, a manifest id, fonts preloaded; type in rem, balanced and tabular; presses that land at once; toasts that wait while they cannot be read; view transitions in the log and the dock; the parked motion and keyboard items; a contrast test; frame timing on a slow CPU; Lighthouse (docs/QUALITY.md).

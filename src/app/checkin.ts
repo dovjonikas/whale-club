@@ -9,6 +9,7 @@ import type { Store } from '../store/store'
 import { voice } from '../voice'
 import { chapterDue } from './chapter'
 import { dayLine, type DayLine } from './lines'
+import { sayNotToday } from './notToday'
 import type { NoticeBuilder } from './notices'
 import type { Moment } from './postcard'
 import { saidToday } from './said'
@@ -16,20 +17,23 @@ import { announce } from './toast'
 import type { Sound } from './sound'
 
 /** From this hour the check-in is an evening one, with its one good thing. */
-const EVENING_FROM = 18
+export const EVENING_FROM = 18
 
 /**
  * The daily check-in: call and response, two taps, the same shape every
  * day. A silly ritual rather than a question; the answers are the only
  * buttons. Answered once a day, kept in `days[date].checkin`. After it,
  * the line for the day (src/app/lines.ts), with "send this" for a postcard
- * of the whale and the line.
+ * of the whale and the line. Under the first answer, small, "not today":
+ * a soft day (src/app/notToday.ts), with nothing more asked.
  */
-export function checkinNotice(
-  store: Store,
-  sound: Sound,
-  onSend: (moment: Moment) => void,
-): NoticeBuilder {
+export interface CheckinHandlers {
+  onSend: (moment: Moment) => void
+  /** "not today" was said; `heavy` when it is the third day in a row and may be named. */
+  onNotToday: (heavy: boolean) => void
+}
+
+export function checkinNotice(store: Store, sound: Sound, on: CheckinHandlers): NoticeBuilder {
   return (dismiss) => {
     const today = todayKey()
     const data = store.get()
@@ -38,30 +42,49 @@ export function checkinNotice(
     const card = document.createElement('aside')
     card.className = 'leaf checkin'
     card.setAttribute('aria-label', voice.labels.checkin)
-    const ask = (question: string, answer: string, then: () => void): void => {
+    const ask = (
+      question: string,
+      answer: string,
+      then: () => void,
+      notToday?: () => void,
+    ): void => {
       const focused = card.contains(document.activeElement)
       card.innerHTML = `<span class="leaf-title">${question}</span>
-        <div class="leaf-actions"><button type="button" class="button-primary">${answer}</button></div>`
-      const button = card.querySelector('button')
+        <div class="leaf-actions">
+          <button type="button" class="button-primary checkin-answer">${answer}</button>
+          ${notToday ? `<button type="button" class="checkin-not-today">${voice.notToday.button}</button>` : ''}
+        </div>`
+      card.querySelector('.checkin-not-today')?.addEventListener('click', () => notToday?.())
+      const button = card.querySelector<HTMLButtonElement>('.checkin-answer')
       button?.addEventListener('click', () => {
         sound.play('checkin')
         then()
       })
       if (focused) button?.focus({ preventScroll: true })
     }
-    ask(voice.checkin.question1, voice.checkin.answer1, () => {
-      ask(voice.checkin.question2, voice.checkin.answer2, () => {
-        // Worked out before the answer is kept: a new chapter offered after
-        // the check-in is seen coming while the day is still unchecked.
-        const line = dayLine(today, spokenToday(store.get(), today))
-        store.setCheckin(today)
-        const showLine = (): void => {
-          dayLineCard(card, line, onSend, dismiss)
-        }
-        if (now().getHours() >= EVENING_FROM) evening(card, store, today, showLine)
-        else showLine()
-      })
-    })
+    const soft = (): void => {
+      const { heavy } = sayNotToday(store, today)
+      dismiss()
+      on.onNotToday(heavy)
+    }
+    ask(
+      voice.checkin.question1,
+      voice.checkin.answer1,
+      () => {
+        ask(voice.checkin.question2, voice.checkin.answer2, () => {
+          // Worked out before the answer is kept: a new chapter offered after
+          // the check-in is seen coming while the day is still unchecked.
+          const line = dayLine(today, spokenToday(store.get(), today))
+          store.setCheckin(today)
+          const showLine = (): void => {
+            dayLineCard(card, line, on.onSend, dismiss)
+          }
+          if (now().getHours() >= EVENING_FROM) evening(card, store, today, showLine)
+          else showLine()
+        })
+      },
+      soft,
+    )
     return card
   }
 }
@@ -72,7 +95,9 @@ export function checkinNotice(
  * is kept for the day and shown only in the log; skipping is as good as
  * writing. Either way the line for the day comes next.
  */
-function evening(card: HTMLElement, store: Store, today: DateKey, then: () => void): void {
+export function evening(card: HTMLElement, store: Store, today: DateKey, then: () => void): void {
+  store.setSettings({ goodAskedOn: today })
+  card.classList.add('is-form')
   const tomorrow = plannedThings(store.get(), addDays(today, 1))
   const ahead =
     tomorrow.length > 0
@@ -147,4 +172,24 @@ function spokenToday(data: AppData, today: DateKey): Set<string> {
   const next = MILESTONES.find((day) => day === before + 1)
   if (next !== undefined) spoken.add(voice.milestone(next))
   return spoken
+}
+
+/**
+ * The evening's one good thing, asked on its own when the check-in was
+ * answered earlier in the day: a small card after 18:00, once, with keep
+ * and skip. So the bottles always have something to come back from.
+ */
+export function goodNotice(store: Store): NoticeBuilder {
+  return (dismiss) => {
+    const today = todayKey()
+    const data = store.get()
+    const day = data.days[today]
+    if (now().getHours() < EVENING_FROM) return null
+    if (!day?.checkin || day.good || data.settings.goodAskedOn === today) return null
+    const card = document.createElement('aside')
+    card.className = 'leaf checkin good-leaf'
+    card.setAttribute('aria-label', voice.checkin.good)
+    evening(card, store, today, dismiss)
+    return card
+  }
 }

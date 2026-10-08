@@ -116,6 +116,8 @@ export class Row {
         worn: wornBy(data, thing.id),
         asleep: asleep(data, thing, today),
       })
+      // A "not today" day: the one thing left on the row asks, quietly, if it is enough.
+      justThisOne(card, day?.notToday === true && !day.done.includes(thing.id))
       this.container.append(card)
     }
 
@@ -245,4 +247,15 @@ export class Row {
  */
 function dayRank(thing: Thing): number {
   return thing.after === undefined ? AFTERS.indexOf('work') + 0.5 : AFTERS.indexOf(thing.after)
+}
+
+/** The small question over the one card a "not today" day keeps. */
+function justThisOne(card: HTMLElement, on: boolean): void {
+  const tag = card.querySelector('.card-just')
+  if (on && !tag) {
+    const just = document.createElement('span')
+    just.className = 'card-just'
+    just.textContent = voice.notToday.just
+    card.append(just)
+  } else if (!on) tag?.remove()
 }

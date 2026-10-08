@@ -15,7 +15,15 @@ import type {
   World,
   After,
 } from './types'
-import { DEFAULT_MINUTES, emptyData, EVERY_DAY, GOOD_MAX, MAX_THINGS, WORLD_ORDER } from './types'
+import {
+  DEFAULT_MINUTES,
+  emptyData,
+  EVERY_DAY,
+  GOOD_MAX,
+  MAX_THINGS,
+  WORLD_ORDER,
+  PET_NAME_MAX,
+} from './types'
 
 /** Where an unreadable record is parked rather than thrown away, next to its own key. */
 const BROKEN_SUFFIX = '.broken'
@@ -267,6 +275,49 @@ export class Store {
     if (line) day.good = line
     else delete day.good
     this.commit({ ...this.data, days: { ...this.data.days, [date]: day } })
+  }
+
+  /**
+   * "not today": the day turns soft. Every planned thing not done yet goes
+   * to the "not today" strip except `keep`, the one small thing offered;
+   * the check-in counts as answered.
+   */
+  setNotToday(planned: readonly string[], keep: string | null, date: DateKey = todayKey()): void {
+    const day = this.day(date)
+    const skip = new Set(day.skip ?? [])
+    for (const id of planned) if (id !== keep && !day.done.includes(id)) skip.add(id)
+    const next: DayRecord = { ...day, checkin: true, notToday: true }
+    if (skip.size > 0) next.skip = [...skip]
+    this.commit({ ...this.data, days: { ...this.data.days, [date]: next } })
+  }
+
+  /** A bottle opened: what came back, and when, so it does not come back within a month. */
+  openBottle(writtenOn: DateKey, date: DateKey = todayKey()): void {
+    const bottles = { ...(this.data.settings.bottles ?? {}), [writtenOn]: date }
+    this.setSettings({ bottles, bottleOn: date })
+  }
+
+  /** A creature's name, or none: the sheet can take it away again. */
+  setPetName(thingId: string, name: string): void {
+    const clean = name.trim().slice(0, PET_NAME_MAX)
+    this.commit({
+      ...this.data,
+      things: this.data.things.map((t) => {
+        if (t.id !== thingId) return t
+        const next: Thing = { ...t, nameAsked: true }
+        if (clean) next.petName = clean
+        else delete next.petName
+        return next
+      }),
+    })
+  }
+
+  /** "name it?" was answered with "not now": it is not asked again. */
+  setNameAsked(thingId: string): void {
+    this.commit({
+      ...this.data,
+      things: this.data.things.map((t) => (t.id === thingId ? { ...t, nameAsked: true } : t)),
+    })
   }
 
   setCheckin(date: DateKey = todayKey()): void {
