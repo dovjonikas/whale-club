@@ -242,6 +242,8 @@ export const voice = {
   /** "After...": what a thing comes after in the day. No clock hours, ever. */
   after: {
     label: 'after',
+    /** Under the label: what choosing one does. No clock hours, no reminders. */
+    note: 'what it comes after in your day. the card says it, and the row follows your day’s order.', // TODO-VOICE
     none: 'any time',
     chips: {
       waking: 'waking up',

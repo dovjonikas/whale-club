@@ -2,6 +2,12 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 1.2.3 - 2026-10-08
+
+- **"after" says what it does**, in one quiet line under it in the thing's
+  sheet: what it comes after in your day; the card says it, and the row
+  follows your day's order. No clock hours and no reminders, as before.
+
 ## 1.2.2 - 2026-10-08
 
 - **The creature's name has its own place** in the thing's sheet: further
