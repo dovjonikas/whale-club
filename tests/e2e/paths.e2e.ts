@@ -4,7 +4,7 @@ import { LEGENDARIES, legendaryFor } from '../../src/scene/legendary'
 import { EARNED_FROM, rarityOf } from '../../src/scene/rarity'
 import { CHEST, placeAll } from '../../src/scene/spots'
 import { layoutSky, sampleShape } from '../../src/scene/constellations'
-import { addDays } from '../../src/store/dates'
+import { addDays, writtenDate } from '../../src/store/dates'
 import { starDays } from '../../src/store/derive'
 import { halfwayStar, pathLength, placeStars, progressOf, reachesOf } from '../../src/store/paths'
 import { emptyData, EVERY_DAY, type AppData } from '../../src/store/types'
@@ -176,7 +176,9 @@ test('the thirtieth star: the ceremony, its plaque, and the legendary in the sce
   await expect(ceremony).toBeVisible()
   // A tap anywhere goes straight to the end.
   await ceremony.click({ position: { x: 20, y: 20 } })
-  await expect(ceremony.locator('.ceremony-date')).toHaveText(`earned on ${dateKey(0)} · day 30`)
+  await expect(ceremony.locator('.ceremony-date')).toHaveText(
+    `earned on ${writtenDate(dateKey(0))} · day 30`,
+  )
   await ceremony.getByRole('button', { name: 'ok' }).click()
   await expect(ceremony).toBeHidden()
   await expect(page.locator('.collectible[data-id="legend-whale"]')).toHaveAttribute(
@@ -187,7 +189,9 @@ test('the thirtieth star: the ceremony, its plaque, and the legendary in the sce
   // The Collection keeps it in its own row, with the day it was earned.
   await page.getByRole('button', { name: 'Collection' }).click()
   await expect(
-    page.getByRole('listitem', { name: `the golden whale, earned on ${dateKey(0)} · day 30` }),
+    page.getByRole('listitem', {
+      name: `the golden whale, earned on ${writtenDate(dateKey(0))} · day 30`,
+    }),
   ).toBeVisible()
   await expect(page.getByRole('listitem', { name: 'the pearl turtle, 0/60' })).toBeVisible()
 })

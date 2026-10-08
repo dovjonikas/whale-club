@@ -2,6 +2,39 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 0.17.0 - 2026-10-08
+
+Polish: the details that are felt more than seen.
+
+- **Launch**: iOS startup images for eleven iPhone sizes (`npm run splash`),
+  so a launch from the home screen no longer flashes white; a stable
+  manifest id; the first screen's three font files preloaded.
+- **Type**: reading sizes in rem, so a larger text setting reaches them;
+  antialiased light-on-dark text; balanced headings; tabular figures on
+  every count.
+- **Presses** land at once and let go over 180 ms.
+- **Toasts and undo** count only time they can be read: not under a
+  resting pointer, not under keyboard focus, not while the app is hidden.
+- **Sheets**: the log and the dock change view with a short crossfade
+  (a view transition), skipped under reduced motion.
+- **Postcards**: "making the postcard…" while one is still painting; the
+  preview keeps its size while it loads.
+- **Motion**: the first card's hint pulses its glow's opacity, not a
+  shadow; "start light" in 500 ms; the water rises in 700 ms; under
+  reduced motion a find fades in instead of appearing at once.
+- **Keyboard and screen readers**: paging the log keeps the focus on the
+  arrow; Escape skips the intro; Space or Enter shows the time in a lock
+  in and skips the opening; a find not reached yet keeps its name; field
+  ids of their own; the kind's line is read as its description; the icon
+  picker's preview is named and its extra chip stays under the finger.
+- **Layout**: a legendary's date written as people write it ("9 Nov 2026"),
+  so it no longer breaks in its tile; safe areas on every edge of the intro
+  and the session; days still to come in the log at 3:1; a long name wraps
+  in the collection.
+- **Checks**: a contrast test for every pair of colours that carries
+  words; frame timing on a CPU slowed four times; Lighthouse on the live
+  site (docs/QUALITY.md).
+
 ## 0.16.0 - 2026-10-08
 
 Trust and settings: the sea is never lost.

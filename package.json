@@ -1,6 +1,6 @@
 {
   "name": "whale-club",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "private": true,
   "type": "module",
   "description": "A habit game about small things that add up. Show up, the scene fills, collectibles unlock.",

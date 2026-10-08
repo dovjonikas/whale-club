@@ -1010,3 +1010,35 @@ reload in those seconds loses nothing; the next start clears the copy.
 The about section leaves out the line "built with Claude Code" that the
 first brief listed: on 2026-10-08 the author asked for the public writing
 to keep to the work itself (the contributors list shows who helped).
+
+## 2026-10-08 Polish: what changed and what was left as it is
+
+Toasts pause while a keyboard holds their focus, but not when the focus
+was handed to them after a tap: a deleted card gives its focus to "undo"
+(the nearest way back), and on a phone that undo would otherwise never
+run out. `:focus-visible` tells the two apart.
+
+The view transition names only the sheet, and only while it swaps. A
+named child inside the sheet's scroll would be drawn unclipped over the
+page for the length of the transition, and a sheet still leaving would
+share the name and cancel it.
+
+Reading sizes moved to rem; the wordmark, an icon in its 44 px button and
+the numbers inside the dial's ring stay in px, because they are sized to
+a shape, not for reading, and would overflow it at a larger text setting.
+
+Left as they are: the chips and the week dots keep their short colour
+change (a press is answered by the scale, the colour says the new state,
+and both are cheap); the stone's crack keeps drawing by
+`stroke-dashoffset` (a few short paths, once per stone, seen rarely).
+
+Frame timing on a CPU slowed four times: two vsync steps (about 30 fps)
+for a year of lanterns, in headless Chromium, which paints in software. A
+phone paints on its GPU; every running animation was checked to be
+transform or opacity only, so nothing is left on the main thread that a
+GPU would not take. The test holds the line at under three steps.
+
+A plaque's date is written the way people write it ("9 Nov 2026"), on the
+ceremony, in the Collection and on the gold postcard alike. In the
+Collection's narrow tile "2026-11-09" broke after a hyphen into two
+halves; the words of the line are unchanged, only the date inside it.

@@ -7,7 +7,7 @@ import { last7, lineFor, reachedOn, stageFor, starDays, totalDone } from '../sto
 import { pathLength, progressOf, reachesOf } from '../store/paths'
 import { LEGENDARIES } from '../scene/legendary'
 import type { AppData } from '../store/types'
-import { todayKey } from '../store/dates'
+import { todayKey, writtenDate } from '../store/dates'
 import type { Store } from '../store/store'
 import { voice } from '../voice'
 import { openSheet } from './sheet'
@@ -97,6 +97,11 @@ export function openCollectionSheet(store: Store, onArrange?: () => void): void 
  * ("12/30"), and under each, the rare find half way to it. A long goal,
  * always in sight.
  */
+/** "day 30" on one line in a narrow tile: the number never wraps away from its word. */
+function keepTogether(html: string): string {
+  return html.replace(/day (\d+)/g, '<span class="legend-day">day $1</span>')
+}
+
 function legendaryRow(data: AppData): string {
   const dates = starDays(data)
   const reaches = reachesOf(dates)
@@ -107,7 +112,7 @@ function legendaryRow(data: AppData): string {
     const reach = reaches[path]
     const earned = reach?.end !== undefined
     const caption = earned
-      ? voice.legend.plaque(reach.end ?? '', dates.indexOf(reach.end ?? '') + 1)
+      ? voice.legend.plaque(writtenDate(reach.end ?? ''), dates.indexOf(reach.end ?? '') + 1)
       : path === now.path
         ? voice.legend.progress(now.lit, length)
         : voice.legend.ahead(before + length - dates.length)
@@ -116,7 +121,7 @@ function legendaryRow(data: AppData): string {
     return `<li class="tile legend-tile ${earned ? 'is-unlocked' : 'is-locked'} ${path === now.path ? 'is-next' : ''}" data-rarity="${earned ? 'legendary' : 'common'}" aria-label="${escapeHtml(`${legendary.name}, ${caption}`)}">
         <span class="tile-art">${collectibleSvg(legendary.find)}</span>
         <span class="tile-caption">${escapeHtml(earned ? legendary.name : caption)}</span>
-        ${earned ? `<span class="legend-date">${escapeHtml(caption)}</span>` : ''}
+        ${earned ? `<span class="legend-date">${keepTogether(escapeHtml(caption))}</span>` : ''}
         <span class="legend-rare ${half ? 'is-unlocked' : 'is-locked'}" aria-label="${escapeHtml(`${legendary.rare.name}${half ? ', found' : ''}`)}">${collectibleSvg(legendary.rare)}</span>
       </li>`
   }).join('')

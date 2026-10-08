@@ -43,6 +43,21 @@ export function fromKey(key: DateKey): Date {
   return new Date(y ?? 1970, (m ?? 1) - 1, d ?? 1)
 }
 
+/** Made once; a plaque's date as people write it. */
+const WRITTEN = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+})
+
+/**
+ * A date as people write it ("9 Nov 2026"), for a plaque: it wraps at its
+ * spaces in a narrow tile, where "2026-11-09" broke after a hyphen.
+ */
+export function writtenDate(key: DateKey): string {
+  return WRITTEN.format(fromKey(key))
+}
+
 export function addDays(key: DateKey, days: number): DateKey {
   const date = fromKey(key)
   date.setDate(date.getDate() + days)
