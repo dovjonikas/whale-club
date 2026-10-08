@@ -1007,7 +1007,7 @@ file is refused rather than guessed at. Restoring and starting over keep
 the sea before in a key of its own for the ten seconds of undo, so even a
 reload in those seconds loses nothing; the next start clears the copy.
 
-The about section leaves out the line "built with Claude Code" that the
+The about section leaves out the credit line for the tools that the
 first brief listed: on 2026-10-08 the author asked for the public writing
 to keep to the work itself (the contributors list shows who helped).
 
