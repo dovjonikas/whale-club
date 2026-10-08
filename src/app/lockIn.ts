@@ -240,8 +240,12 @@ export class LockIn {
           ?.focus({ preventScroll: true })
       },
     )
-    // A tap anywhere lands on the end at once.
+    // A tap anywhere lands on the end at once; on a keyboard, Escape, Space or Enter.
     screen.element.addEventListener('click', () => {
+      opening.skip()
+    })
+    screen.element.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' && event.key !== ' ' && event.key !== 'Enter') return
       opening.skip()
     })
     opening.start()

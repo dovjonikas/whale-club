@@ -17,7 +17,11 @@ export interface KindField {
   minutes: () => number
 }
 
+/** Ids of their own, so a sheet still leaving never shares one with the next. */
+let fieldCount = 0
+
 export function kindField(start: { kind: Kind; minutes: number }): KindField {
+  const n = String(++fieldCount)
   let kind = start.kind
   let minutes = start.minutes || DEFAULT_MINUTES
   let custom = !LENGTHS.includes(minutes)
@@ -25,20 +29,20 @@ export function kindField(start: { kind: Kind; minutes: number }): KindField {
   const element = document.createElement('div')
   element.className = 'field kind-field'
   element.innerHTML = `
-    <span class="field-label" id="kind-label">${voice.kind.question}</span>
-    <div class="kind-choices" role="group" aria-labelledby="kind-label">
+    <span class="field-label" id="kind-label-${n}">${voice.kind.question}</span>
+    <div class="kind-choices" role="group" aria-labelledby="kind-label-${n}">
       <button type="button" class="kind-choice" data-kind="tap">
         <span class="kind-title">${voice.kind.tap}</span>
-        <span class="kind-line">${voice.kind.tapLine}</span>
+        <span class="kind-line" id="kind-tap-line-${n}">${voice.kind.tapLine}</span>
       </button>
       <button type="button" class="kind-choice" data-kind="lockIn">
         <span class="kind-title">${voice.kind.lockIn}</span>
-        <span class="kind-line">${voice.kind.lockInLine}</span>
+        <span class="kind-line" id="kind-lockIn-line-${n}">${voice.kind.lockInLine}</span>
       </button>
     </div>
     <div class="kind-length">
-      <span class="field-label" id="length-label">${voice.kind.length}</span>
-      <div class="chips" role="group" aria-labelledby="length-label">
+      <span class="field-label" id="length-label-${n}">${voice.kind.length}</span>
+      <div class="chips" role="group" aria-labelledby="length-label-${n}">
         ${LENGTHS.map((m) => `<button type="button" class="chip" data-minutes="${String(m)}">${voice.card.length(m)}</button>`).join('')}
         <button type="button" class="chip" data-other>${voice.kind.other}</button>
       </div>
@@ -76,7 +80,10 @@ export function kindField(start: { kind: Kind; minutes: number }): KindField {
   }
   element.querySelectorAll<HTMLButtonElement>('[data-kind]').forEach((choice) => {
     const title = choice.querySelector('.kind-title')?.textContent ?? ''
+    // Named by its title; the line under it is its description, read after.
     choice.setAttribute('aria-label', title)
+    const line = choice.querySelector('.kind-line')
+    if (line?.id) choice.setAttribute('aria-describedby', line.id)
     choice.addEventListener('click', () => {
       kind = choice.dataset.kind === 'lockIn' ? 'lockIn' : 'tap'
       show()

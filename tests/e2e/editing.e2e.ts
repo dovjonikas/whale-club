@@ -1,5 +1,15 @@
 import type { Page } from '@playwright/test'
-import { expect, test, addThing, card, dateKey, dismissInstallLeaf, seed, stored } from './helpers'
+import {
+  expect,
+  test,
+  addThing,
+  card,
+  dateKey,
+  dismissInstallLeaf,
+  middayToday,
+  seed,
+  stored,
+} from './helpers'
 
 /**
  * Changing and deleting, in plain sight: a word, "edit", over the row; in
@@ -110,4 +120,41 @@ test('a thing added after a delete fills the gap in the worlds and keeps the oth
   await addThing(page, 'water')
   await expect(cardOf(page, 'water')).toHaveAttribute('data-world', 'sky')
   await expect(cardOf(page, 'practice')).toHaveAttribute('data-world', 'garden')
+})
+
+test('undo counts only readable time: not while held, not while the page is hidden', async ({
+  page,
+  isMobile,
+}) => {
+  await page.clock.install({ time: middayToday() })
+  await seed(page, {
+    things: [{ id: 't1', name: 'run', world: 'sea', createdAt: dateKey(-10), order: 0 }],
+    days: {},
+  })
+  await page.goto('')
+  await dismissInstallLeaf(page)
+  await page.getByRole('button', { name: 'edit', exact: true }).click()
+  await page.getByRole('button', { name: 'delete run' }).click()
+  const undo = page.getByRole('button', { name: 'undo' })
+  await expect(undo).toBeVisible()
+  // Hidden: another app in front. Ten minutes pass and the undo still waits.
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { value: true, configurable: true })
+    document.dispatchEvent(new Event('visibilitychange'))
+  })
+  await page.clock.runFor('10:00')
+  await expect(undo).toBeVisible()
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { value: false, configurable: true })
+    document.dispatchEvent(new Event('visibilitychange'))
+  })
+  if (!isMobile) {
+    // A pointer resting on it holds it too.
+    await undo.hover()
+    await page.clock.runFor('00:30')
+    await expect(undo).toBeVisible()
+    await page.mouse.move(0, 0)
+  }
+  await page.clock.runFor('00:11')
+  await expect(undo).toBeHidden()
 })

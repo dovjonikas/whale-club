@@ -30,6 +30,8 @@ export const voice = {
   collection: {
     empty: 'nothing yet. add a thing.', // TODO-VOICE
     next: (days: number) => (days === 1 ? 'in 1 day' : `in ${days} days`),
+    /** A find not reached yet, for a screen reader: its name stays a surprise, as its picture does. */
+    locked: 'a find still to come', // TODO-VOICE
   },
   shareDone: 'picture saved.', // TODO-VOICE
   shareFailed: 'could not make the picture.', // TODO-VOICE
@@ -330,6 +332,8 @@ export const voice = {
     format: 'postcards',
     preview: 'your postcard',
     send: 'send',
+    /** While a postcard is still being painted after the tap. */
+    making: 'making the postcard…', // TODO-VOICE
   },
   update: 'new version. tap to reload',
   share: {

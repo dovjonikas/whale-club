@@ -61,7 +61,7 @@ export function openCollectionSheet(store: Store, onArrange?: () => void): void 
                   : `<span class="tile-rarity" data-rarity="${rarity}">${voice.stones[rarity]}</span>`
               const label = found
                 ? `${item.name}, found${rarity === 'common' ? '' : `, ${voice.stones[rarity]}`}`
-                : `${earned ? 'a stone' : item.name}, ${caption}`
+                : `${earned ? 'a stone' : voice.collection.locked}, ${caption}`
               return `<li class="tile ${state} ${isNext ? 'is-next' : ''}" data-rarity="${rarity}" aria-label="${label}">
                 <span class="tile-art">${earned && !found ? stoneTile() : collectibleSvg(item)}</span>
                 <span class="tile-caption">${caption}</span>
@@ -72,7 +72,7 @@ export function openCollectionSheet(store: Store, onArrange?: () => void): void 
           return `<section class="collection-thing">
             <h3 class="collection-title">
               <span class="collection-creature">${creatureSvg(thing.world, line, stage)}</span>
-              <span>${thingMark(thing)}${escapeHtml(thing.name)}</span>
+              <span class="collection-name">${thingMark(thing)}${escapeHtml(thing.name)}</span>
               <span class="collection-total">${String(total)} ${total === 1 ? 'day' : 'days'}</span>
             </h3>
             <ul class="tiles">${tiles}</ul>

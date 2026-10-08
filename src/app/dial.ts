@@ -12,6 +12,8 @@ import { openSheet } from './sheet'
  * most have the most room. It opens on the last length chosen.
  */
 /** The ring leaves a gap at the top so the ends do not meet. */
+/** Pixels of wheel or trackpad travel that make one stop (a mouse notch is about 100). */
+const WHEEL_STOP = 60
 const SWEEP_DEG = 330
 const R = 96
 const C = 120
@@ -75,8 +77,9 @@ export function openDial(
         set(LENGTH_STOPS[Math.max(0, Math.min(LENGTH_STOPS.length - 1, i))] ?? minutes)
       }
 
+      // Read once per press: the dial does not move while a finger turns it.
+      let rect = new DOMRect()
       const fromPointer = (event: PointerEvent): void => {
-        const rect = dial.getBoundingClientRect()
         const dx = event.clientX - (rect.left + rect.width / 2)
         const dy = event.clientY - (rect.top + rect.height / 2)
         // 0 degrees at the top, clockwise; the gap at the top snaps to the nearer end.
@@ -89,16 +92,27 @@ export function openDial(
       }
       dial.addEventListener('pointerdown', (event) => {
         dial.setPointerCapture(event.pointerId)
+        rect = dial.getBoundingClientRect()
         fromPointer(event)
       })
       dial.addEventListener('pointermove', (event) => {
         if (dial.hasPointerCapture(event.pointerId)) fromPointer(event)
       })
+      // A wheel's notch is one stop; a trackpad sends many small deltas (and
+      // keeps sending after the fingers lift), so they are gathered first.
+      let wheel = 0
       dial.addEventListener(
         'wheel',
         (event) => {
           event.preventDefault()
-          step(event.deltaY < 0 ? 1 : -1)
+          wheel +=
+            event.deltaMode === WheelEvent.DOM_DELTA_PIXEL
+              ? event.deltaY
+              : event.deltaY * WHEEL_STOP
+          while (Math.abs(wheel) >= WHEEL_STOP) {
+            step(wheel < 0 ? 1 : -1)
+            wheel -= Math.sign(wheel) * WHEEL_STOP
+          }
         },
         { passive: false },
       )

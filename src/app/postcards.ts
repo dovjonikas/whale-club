@@ -6,7 +6,7 @@ import type { Store } from '../store/store'
 import type { PostcardFormat } from '../store/types'
 import { voice } from '../voice'
 import type { Line } from './line'
-import { renderPostcard, type Moment } from './postcard'
+import { POSTCARD_SIZE, renderPostcard, type Moment } from './postcard'
 import { openSheet } from './sheet'
 import { showToast } from './toast'
 
@@ -21,6 +21,8 @@ import { showToast } from './toast'
  * sheet with its own send button, which is a fresh tap.
  */
 const OFFER_FOR_MS = 20_000
+/** A postcard not ready by then says it is being made, so the tap is seen. */
+const MAKING_AFTER_MS = 150
 
 export class Postcards {
   private offerTimer = 0
@@ -84,17 +86,25 @@ export class Postcards {
   private send(moment: Moment, prepared: Record<PostcardFormat, () => Promise<Blob>>): void {
     const chosen = this.store.get().settings.postcardFormat
     if (chosen) {
-      void this.deliver(prepared[chosen](), moment)
+      void this.deliver(prepared[chosen](), moment, chosen)
       return
     }
     openFormatSheet((format) => {
       this.store.setSettings({ postcardFormat: format })
-      void this.deliver(prepared[format](), moment)
+      void this.deliver(prepared[format](), moment, format)
     })
   }
 
-  private async deliver(pending: Promise<Blob>, moment: Moment): Promise<void> {
+  private async deliver(
+    pending: Promise<Blob>,
+    moment: Moment,
+    format: PostcardFormat,
+  ): Promise<void> {
     let file: File
+    const said = this.line.current()
+    const slow = window.setTimeout(() => {
+      this.line.say(voice.postcard.making, { quiet: true })
+    }, MAKING_AFTER_MS)
     try {
       const blob = await pending
       file = new File([blob], `whale-club-day-${dayNumber(this.store.get(), todayKey())}.png`, {
@@ -103,9 +113,12 @@ export class Postcards {
     } catch {
       showToast(`${voice.shareFailed} ${voice.shareFailedNext}`)
       return
+    } finally {
+      clearTimeout(slow)
+      if (this.line.current() === voice.postcard.making) this.line.say(said)
     }
     const result = await share(file)
-    if (result === 'refused') openPreview(file, moment)
+    if (result === 'refused') openPreview(file, moment, format)
     else if (result === 'downloaded') this.line.say(voice.shareDone)
   }
 }
@@ -157,13 +170,14 @@ function openFormatSheet(onChoose: (format: PostcardFormat) => void): void {
 }
 
 /** The fallback when the share sheet refused: the picture, and a fresh tap to send it. */
-function openPreview(file: File, moment: Moment): void {
+function openPreview(file: File, moment: Moment, format: PostcardFormat): void {
   const url = URL.createObjectURL(file)
+  const [width, height] = POSTCARD_SIZE[format]
   openSheet({
     title: voice.postcard.preview,
     build(body, close) {
       body.innerHTML = `
-        <img class="postcard-preview" alt="" />
+        <img class="postcard-preview" alt="" width="${String(width)}" height="${String(height)}" />
         <button type="button" class="button-primary">${voice.postcard.send}</button>`
       const image = body.querySelector('img')
       if (image) {

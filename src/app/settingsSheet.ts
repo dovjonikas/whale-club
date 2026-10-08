@@ -216,15 +216,15 @@ function replaceWithUndo(store: Store, next: AppData, said: string): void {
     // No room for the copy: the undo below still holds it in memory.
   }
   store.replace(next)
-  showUndo(said, voice.settings.undo, () => {
-    store.replace(before)
-    clearUndo()
-  })
-  setTimeout(clearUndo, UNDO_WINDOW_MS)
+  showUndo(
+    said,
+    voice.settings.undo,
+    () => {
+      store.replace(before)
+    },
+    clearUndo,
+  )
 }
-
-/** How long the undo waits (toast.ts's own wait), and the copy with it. */
-const UNDO_WINDOW_MS = 10_000
 
 export function clearUndo(): void {
   try {

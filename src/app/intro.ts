@@ -567,9 +567,16 @@ export function playIntro(
   }
 
   // skip: on to the first step; from the first step, out.
-  q('.intro-skip').addEventListener('click', () => {
+  const skip = (): void => {
     if (beat === 'start') end('skip')
     else go('start')
+  }
+  q('.intro-skip').addEventListener('click', skip)
+  // Escape is the keyboard's "skip", as it closes a sheet.
+  overlay.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return
+    event.preventDefault()
+    skip()
   })
   q('.intro-start').addEventListener('click', () => {
     end('start')
