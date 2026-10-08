@@ -1,7 +1,8 @@
 import { noteSaid } from './said'
 import { glyphFor } from '../brand/match'
+import { creatureSvg } from '../scene/creatures'
 import { todayKey } from '../store/dates'
-import { weekday, withoutTimerLeft } from '../store/derive'
+import { last7, stageFor, weekday, withoutTimerLeft } from '../store/derive'
 import type { Store } from '../store/store'
 import { AFTERS, type After, type Thing, PET_NAME_MAX } from '../store/types'
 import { voice } from '../voice'
@@ -46,14 +47,6 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
             <span class="field-label">${voice.add.name}</span>
             <input class="input" name="name" type="text" maxlength="24" autocomplete="off" enterkeyhint="done" />
           </label>
-          ${
-            thing.petName !== undefined || thing.nameAsked
-              ? `<label class="field">
-                  <span class="field-label">${voice.name.field}</span>
-                  <input class="input pet-name" name="pet" type="text" maxlength="${String(PET_NAME_MAX)}" autocomplete="off" enterkeyhint="done" />
-                </label>`
-              : ''
-          }
           <div class="icon-slot"></div>
           <div class="kind-slot"></div>
           <div class="days-slot"></div>
@@ -73,6 +66,19 @@ export function openThingSheet(store: Store, thing: Thing, on: ThingSheetHandler
               <button type="button" class="chip today-chip" aria-pressed="${String(changed)}">${usual ? voice.days.notToday : voice.days.alsoToday}</button>
             </div>
           </div>
+          ${
+            // The creature's own name, once it has been asked: down here, with its
+            // picture, so it is never read as a second name for the thing.
+            thing.petName !== undefined || thing.nameAsked
+              ? `<label class="field pet-field">
+                  <span class="pet-field-head">
+                    <span class="pet-field-art" aria-hidden="true">${creatureSvg(thing.world, thing.line, stageFor(last7(data, thing.id, today)))}</span>
+                    <span class="field-label">${voice.name.label}</span>
+                  </span>
+                  <input class="input pet-name" name="pet" type="text" maxlength="${String(PET_NAME_MAX)}" autocomplete="off" enterkeyhint="done" />
+                </label>`
+              : ''
+          }
           ${
             thing.kind === 'lockIn'
               ? `<div class="field without-field">

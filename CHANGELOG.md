@@ -2,6 +2,12 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 1.2.2 - 2026-10-08
+
+- **The creature's name has its own place** in the thing's sheet: further
+  down, with the creature beside it and the label "the creature’s name",
+  where right under the thing's own name it read as the same question twice.
+
 ## 1.2.1 - 2026-10-08
 
 - **The red jacket, redrawn.** On the whale it is cut to the body's own

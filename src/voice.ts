@@ -401,6 +401,8 @@ export const voice = {
     /** Under the question: which creature, and why now. */
     why: (thing: string) => `${thing} grew all the way.`, // TODO-VOICE
     field: 'its name', // TODO-VOICE
+    /** In the thing's sheet, apart from the thing's own name, with the creature beside it. */
+    label: 'the creature’s name', // TODO-VOICE
     keep: 'keep', // TODO-VOICE
     notNow: 'not now', // TODO-VOICE
   },
