@@ -1159,3 +1159,57 @@ lets a page do that); it is a quiet screen that lifts with a tap.
 A creature's name is asked the first time it reaches its last stage, once,
 whatever the answer. Lines that say "it" say the name instead in two
 moments: when it grows, and when a lock-in pauses and it sleeps.
+
+## 2026-10-09 One card for every notice
+
+Seven notices had grown seven layouts: two columns here, a stacked column
+there, three title styles, buttons a row away from their words. They are
+one component now (`src/app/leaf.ts`, `src/styles/leaf.css`), and the
+callers only say what goes in it. The order of the actions is the
+component's, not the caller's: quiet words, a soft pill, the bright
+primary at the right edge, where the thumb is. A card has one primary at
+most; a card that only acknowledges something ends on a soft "ok" pill,
+so every card still has a clear end. A note that belongs to the footer
+(who said the line, what tomorrow holds) sits on its left, which is what
+made the line for the day and the good thing short.
+
+## 2026-10-09 The club: the display face for the title only
+
+The author's direction, taken almost as it was: the day count under the
+title, the rows, air, a small mark and the rules at reading size, the
+club's line last. Two choices of our own: the rules keep their numbers
+(they are an order, first to third, so the numbers say something true),
+and the part every rule repeats ("the first rule of whale club is:") is
+quieter than the rule itself, so the eye lands on "you show up." The
+words are the author's and are not changed or cut; only their colour is.
+"the rules" is a new label, marked TODO-VOICE.
+
+## 2026-10-09 The before pictures were retaken at 390 × 844
+
+Playwright's iPhone 13 is 390 × 664: Safari with its bars. The brief asks
+for 390 × 844, the app on the home screen, so the audit uses that, and the
+before set was taken again from a build of v1.2.4 served on its own port,
+so every pair compares like with like.
+
+## 2026-10-09 The bottle keeps above the row on a short phone
+
+On a 568 px phone the line, the goals and the row cover the whole shore,
+and the bottle lay under the line's glass. The bottom block's height is
+read by a ResizeObserver (after layout, so nothing is forced) into
+`--ui-h`, and the bottle stays above it there. On taller phones it has
+not moved. The creatures to pet stay where they are: they are for
+enjoying, and peeking out from under the glass costs nothing.
+
+## 2026-10-09 What the research changed in the brief
+
+The brief's shortlist was a to e; the research (docs/IDEAS.md) kept a, c
+and e and put the whale's night swim in place of b ("breathe first"): a
+companion that goes away and comes back with a story is the most praised
+thing in its field, and the author's first morning is when it pays off.
+"Breathe first" is good and small, and is first in line for the author to
+choose, with the letter to later (d), whose payoff is weeks away.
+
+The brief's example for the month's tide ("on days you ran, you said
+good!!! more often") cannot be true: the check-in's two answers are fixed
+and always happy. The tide says only what the data can carry, and leaves a
+card out rather than invent one.

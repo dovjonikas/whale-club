@@ -48,9 +48,8 @@ subsets only) and preloaded, so the app works offline and makes no Google
 Fonts request. Reading sizes are in rem, so a larger text setting in the
 browser reaches them; at the default 16px: `--t-2xs` 11px (a count inside
 a stone, a tile, a day cell), `--t-xs` 12px (labels, captions), `--t-sm`
-14px (cards, lines), `--t-md` 17px (sheets), `--t-lg` 24px (a rule),
-`--t-2xl` 32px (a recap's number), `--t-xl` 40px (the title). Numbers
-sized to a shape (the wordmark, an icon in its button, the dial's
+14px (cards, lines), `--t-md` 17px (sheets), `--t-lg` 24px (a sheet's title, the week's number),
+`--t-xl` 40px (the title). Numbers sized to a shape (the wordmark, an icon in its button, the dial's
 minutes) stay in px. Four sizes on any one screen at most.
 
 ## Layout (iPhone 390x844, portrait)

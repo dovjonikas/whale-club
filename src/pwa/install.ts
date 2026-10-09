@@ -3,6 +3,7 @@ import { addDays, todayKey } from '../store/dates'
 import type { Store } from '../store/store'
 import { voice } from '../voice'
 import { openInstallSheet } from './installSheet'
+import { leafCard, leafHtml, onAction } from '../app/leaf'
 
 /**
  * The install leaf: a small card above the row that offers to put the app
@@ -44,23 +45,24 @@ export function installNotice(store: Store): NoticeBuilder {
     const prompt = deferred
     if (!iphone && !prompt) return null
 
-    const leaf = document.createElement('aside')
-    leaf.className = 'leaf'
-    leaf.setAttribute('aria-label', 'install')
-    leaf.innerHTML = `
-      <div>
-        <span class="leaf-title">${iphone ? voice.install.ios : voice.install.android}</span>
-        ${iphone ? `<span class="leaf-lead">${voice.install.iosLead}</span>` : ''}
-      </div>
-      <div class="leaf-actions">
-        <button type="button" class="button-primary leaf-install">${iphone ? voice.install.iosHow : voice.install.button}</button>
-        <button type="button" class="button-quiet leaf-close">${voice.install.close}</button>
-      </div>`
-    leaf.querySelector('.leaf-close')?.addEventListener('click', () => {
+    const leaf = leafCard('install', 'install-leaf')
+    leaf.innerHTML = leafHtml({
+      title: iphone ? voice.install.ios : voice.install.android,
+      ...(iphone ? { lead: voice.install.iosLead } : {}),
+      actions: [
+        { label: voice.install.close, name: 'leaf-close', kind: 'quiet' },
+        {
+          label: iphone ? voice.install.iosHow : voice.install.button,
+          name: 'leaf-install',
+          kind: 'primary',
+        },
+      ],
+    })
+    onAction(leaf, 'leaf-close', () => {
       store.setSettings({ installDismissedAt: todayKey() })
       dismiss()
     })
-    leaf.querySelector('.leaf-install')?.addEventListener('click', () => {
+    onAction(leaf, 'leaf-install', () => {
       if (!prompt) {
         openInstallSheet()
         return

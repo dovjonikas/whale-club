@@ -23,7 +23,7 @@
   overflow-y: auto;
   padding: var(--s4) calc(var(--safe-right) + var(--s4)) calc(var(--safe-bottom) + var(--s4))
     calc(var(--safe-left) + var(--s4));
-  border-radius: 22px 22px 0 0;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
   background:
     radial-gradient(120% 60% at 50% 0%, rgba(62, 242, 224, 0.08), transparent 60%),
     linear-gradient(180deg, #0d2042, #081530 40%);
@@ -117,7 +117,7 @@
   width: 100%;
   height: var(--touch);
   padding: 0 var(--s3);
-  border-radius: 10px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--control-edge);
   background: rgba(2, 4, 9, 0.5);
   font-size: var(--t-md);
@@ -200,7 +200,7 @@
   background: var(--star-pale);
   color: var(--abyss);
   font-weight: 700;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-float);
   transform: translate3d(-50%, -140%, 0);
   transition: transform var(--dur-toast-out) var(--ease-out);
 }
@@ -208,118 +208,6 @@
 .toast.is-open {
   transform: translate3d(-50%, 0, 0);
   transition-duration: var(--dur);
-}
-
-/* The install leaf: a small card above the row, closable. */
-.leaf {
-  max-width: 520px;
-  margin: 0 auto var(--s3);
-  padding-left: calc(var(--safe-left) + var(--s4));
-  padding-right: calc(var(--safe-right) + var(--s4));
-  box-sizing: border-box;
-  width: calc(100% - 2 * var(--s4));
-  padding: var(--s3) var(--s4);
-  border-radius: var(--r);
-  background: var(--card);
-  border: 1px solid var(--control-edge);
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: var(--s2) var(--s3);
-  align-items: center;
-  font-size: var(--t-sm);
-}
-
-.leaf-title {
-  font-weight: 700;
-}
-
-.leaf-lead {
-  display: block;
-  margin-top: var(--s1);
-  color: var(--ink-dim);
-}
-
-/* The line for the day after the check-in: quieter and smaller than the
-   questions, one row on a phone or two, the name of who said it under. */
-.day-line {
-  margin: 0;
-  font-size: var(--t-sm);
-  color: var(--ink);
-  text-wrap: balance;
-}
-
-.day-line-by {
-  margin: var(--s1) 0 0;
-  font-size: var(--t-xs);
-  color: var(--ink-dim);
-}
-
-/* The line takes the whole width, the two quiet buttons a row under it. */
-.leaf.is-line {
-  grid-template-columns: 1fr;
-}
-
-.leaf.is-line .leaf-actions {
-  flex-direction: row;
-  justify-content: flex-end;
-}
-
-.leaf ol {
-  margin: var(--s1) 0 0;
-  padding-left: 18px;
-  color: var(--ink-dim);
-}
-
-.leaf-actions {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s1);
-}
-
-.leaf .button-primary {
-  width: auto;
-  height: var(--touch);
-  padding: 0 var(--s4);
-  font-size: var(--t-sm);
-}
-
-.leaf .button-quiet {
-  width: auto;
-  min-width: var(--touch);
-  height: var(--touch);
-  padding: 0 var(--s2);
-}
-
-/* The check-in and the recap share the leaf's shape. */
-.checkin .leaf-title {
-  text-wrap: balance;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-variation-settings:
-    'opsz' 72,
-    'SOFT' 100,
-    'WONK' 1;
-  font-size: var(--t-md);
-  color: var(--star-pale);
-}
-
-.recap-count {
-  display: block;
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-variation-settings:
-    'opsz' 144,
-    'SOFT' 100;
-  font-size: var(--t-2xl);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  color: var(--star-pale);
-}
-
-.recap-line {
-  display: block;
-  margin-top: var(--s1);
-  color: var(--ink-dim);
 }
 
 /* The Collection: per thing, ten tiles, locked ones as silhouettes. */
@@ -369,7 +257,8 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  /* minmax(0, …): a tile never pushes its column wider than a fifth. */
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--s2);
 }
 
@@ -379,15 +268,15 @@
   align-items: center;
   gap: var(--s1);
   padding: var(--s2) var(--s1);
-  border-radius: 10px;
+  border-radius: var(--r-sm);
   background: rgba(2, 4, 9, 0.4);
   border: 1px solid transparent;
   text-align: center;
 }
 
 .tile-art {
-  width: 44px;
-  height: 44px;
+  width: min(44px, 100%);
+  aspect-ratio: 1;
   display: grid;
   place-items: center;
 }
@@ -423,25 +312,65 @@
   color: var(--star);
 }
 
-/* The club: the rules and one sentence. */
+/* A small mark over a group: what the rows under it are. One look for
+   every group in a sheet (settings, the rules, the questions). */
+.eyebrow {
+  margin: 0 0 var(--s3);
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+}
+
+/* The club (src/app/menuSheet.ts): which day, the way in, the rules, and
+   a line to end on. Calm: one display line (the title), reading sizes
+   under it, and air between the parts instead of boxes. */
+.club-day {
+  margin: calc(-1 * var(--s2)) 0 var(--s4);
+  font-size: var(--t-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-dim);
+}
+
+/* A note that belongs to the rows above it, lined up with their icons. */
+.row-note {
+  margin: calc(-1 * var(--s1)) 0 0 var(--s3);
+}
+
+.rules-block {
+  margin-top: var(--s8);
+}
+
+/* The rules: an order, so numbered; the words at reading size, the part
+   every rule repeats quieter than the rule. */
 .rules {
   margin: 0;
   padding: 0;
   list-style: none;
+  counter-reset: rule;
   display: grid;
-  gap: var(--s4);
+  gap: var(--s3);
 }
 
 .rules li {
-  font-family: var(--font-display);
-  font-weight: 900;
-  font-variation-settings:
-    'opsz' 144,
-    'SOFT' 100,
-    'WONK' 1;
-  font-size: var(--t-lg);
-  line-height: 1.2;
-  color: var(--star-pale);
+  counter-increment: rule;
+  display: grid;
+  grid-template-columns: var(--s6) 1fr;
+  font-size: var(--t-md);
+  line-height: 1.4;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.rules li::before {
+  content: counter(rule);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--glow);
+}
+
+.rule-lead {
+  color: var(--ink-dim);
 }
 
 /* The install steps: three big rows, an icon each. */
@@ -472,7 +401,7 @@
   height: 56px;
   display: grid;
   place-items: center;
-  border-radius: 14px;
+  border-radius: var(--r);
   background: rgba(62, 242, 224, 0.12);
 }
 
@@ -507,20 +436,14 @@
   line-height: 1.3;
 }
 
+/* The club's line: last, after a hairline, quiet, like a signature. */
 .club-line {
-  margin: var(--s6) 0 0;
-  font-size: var(--t-md);
-  color: var(--ink);
-}
-
-/* The recap: text on its own row, so a 320px phone keeps the line on one. */
-.recap {
-  grid-template-columns: 1fr;
-}
-
-.recap .leaf-actions {
-  flex-direction: row;
-  justify-content: flex-end;
+  margin: var(--s8) 0 0;
+  padding-top: var(--s4);
+  border-top: 1px solid rgba(232, 240, 245, 0.08);
+  font-size: var(--t-sm);
+  color: var(--ink-dim);
+  text-wrap: pretty;
 }
 
 /* The postcard button: one, after a moment, warm. */
@@ -614,7 +537,7 @@
   max-height: 55vh;
   object-fit: contain;
   margin-bottom: var(--s4);
-  border-radius: 10px;
+  border-radius: var(--r-sm);
 }
 
 /* A stone waiting in the Collection, and the small mark a rare find carries. */
@@ -634,7 +557,7 @@
   position: absolute;
   top: 4px;
   right: 4px;
-  padding: 0 5px;
+  padding: 0 var(--s1);
   border-radius: var(--r-pill);
   font-size: var(--t-2xs);
   font-weight: 700;
@@ -661,7 +584,7 @@
 
 .day-chip {
   height: var(--touch);
-  border-radius: 12px;
+  border-radius: var(--r-sm);
   border: 1px solid var(--control-edge);
   background: rgba(2, 4, 9, 0.4);
   color: var(--ink-dim);
@@ -802,7 +725,7 @@
   background: var(--star-pale);
   color: var(--abyss);
   font-size: var(--t-sm);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-float);
   transform: translate3d(-50%, 160%, 0);
   transition: transform var(--dur-toast-out) var(--ease-out);
 }
@@ -845,16 +768,13 @@
   color: var(--ink);
 }
 
-.how-rules {
-  margin-bottom: var(--s6);
-}
-
-.how-rules li {
-  font-size: var(--t-md);
+/* After the rules, the intro again, as a row like the menu's. */
+.how-watch-group {
+  margin-top: var(--s6);
 }
 
 /* The questions: each one a line, its answer under it, quieter. */
-.settings-title.how-faq-title {
+.how-faq-title {
   margin-top: var(--s8);
 }
 
@@ -995,52 +915,20 @@
 .starter-glyph {
   width: 18px;
   height: 18px;
-  margin-right: 6px;
+  margin-right: var(--s1);
   vertical-align: -4px;
 }
 
-/* The evening check-in's one line. */
+/* The evening check-in's one line: its question is the field's label. */
 .good-field {
   display: grid;
   gap: var(--s2);
   width: 100%;
 }
 
-.good-tomorrow {
-  margin: 0;
-  font-size: var(--t-xs);
-}
-
-/* A card that asks for a word (the good thing, a name): one column, the
-   field the full width, the buttons in one row at the right, the main
-   one at the edge. */
-.leaf.is-form {
-  grid-template-columns: 1fr;
-  gap: var(--s2);
-}
-
-/* The card's own gap spaces it; a field keeps no margin of its own here. */
-.leaf.is-form .field {
-  margin: 0;
-}
-
-.leaf.is-form .leaf-actions {
-  flex-direction: row-reverse;
-  justify-content: flex-start;
-  align-items: center;
-  gap: var(--s2);
-}
-
 /* Settings: groups of one-line choices. */
 .settings-group + .settings-group {
   margin-top: var(--s6);
-}
-
-.settings-title {
-  margin: 0 0 var(--s2);
-  font-size: var(--t-sm);
-  font-weight: 700;
-  color: var(--ink-dim);
 }
 
 .setting {
@@ -1065,6 +953,11 @@
 
 .setting-actions .setting-last {
   margin: 0 0 var(--s1) var(--s3);
+}
+
+/* Start over, apart: its icon on the same line as the icons above it. */
+.setting-actions .menu-row.is-danger {
+  padding-left: var(--s3);
 }
 
 /* The month's quiet backup dot on the menu button: no popup, just a dot. */
@@ -1093,7 +986,10 @@
 
 ::view-transition-group(sheet-swap),
 ::view-transition-old(sheet-swap),
-::view-transition-new(sheet-swap) {
+::view-transition-new(sheet-swap),
+::view-transition-group(leaf-swap),
+::view-transition-old(leaf-swap),
+::view-transition-new(leaf-swap) {
   animation-duration: var(--dur-swap);
   animation-timing-function: var(--ease-out);
 }
@@ -1101,7 +997,10 @@
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(sheet-swap),
   ::view-transition-old(sheet-swap),
-  ::view-transition-new(sheet-swap) {
+  ::view-transition-new(sheet-swap),
+  ::view-transition-group(leaf-swap),
+  ::view-transition-old(leaf-swap),
+  ::view-transition-new(leaf-swap) {
     animation: none;
   }
 }

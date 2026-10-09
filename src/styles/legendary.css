@@ -166,7 +166,7 @@
 /* The Collection's legendary row: larger tiles, a gold edge once earned,
    and the rare find half way to each, small, under it. */
 .legend-tiles {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .legend-tile {
@@ -179,14 +179,11 @@
   background: linear-gradient(180deg, rgba(255, 217, 138, 0.12), rgba(2, 4, 9, 0.4));
 }
 
+/* An earned legendary's day, short: the whole plaque is the tile's label. */
 .legend-date {
   font-size: var(--t-2xs);
+  font-variant-numeric: tabular-nums;
   color: var(--star);
-  line-height: 1.2;
-  text-wrap: balance;
-}
-
-.legend-day {
   white-space: nowrap;
 }
 

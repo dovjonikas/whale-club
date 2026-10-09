@@ -6,6 +6,7 @@ import { PET_NAME_MAX } from '../store/types'
 import { voice } from '../voice'
 import type { NoticeBuilder } from './notices'
 import { escapeHtml } from './thingMark'
+import { leafCard, leafHtml, onAction } from './leaf'
 
 /** The last stage a creature grows to (src/store/derive.ts, stageFor). */
 const LAST_STAGE = 3
@@ -24,22 +25,17 @@ export function nameNotice(store: Store): NoticeBuilder {
       (t) => !t.nameAsked && stageFor(last7(data, t.id, today)) === LAST_STAGE,
     )
     if (!thing) return null
-    const card = document.createElement('aside')
-    card.className = 'leaf name-leaf is-form'
-    card.setAttribute('aria-label', voice.name.ask)
-    card.innerHTML = `
-      <div class="name-head">
-        <span class="name-creature" aria-hidden="true">${creatureSvg(thing.world, thing.line, LAST_STAGE)}</span>
-        <span>
-          <span class="leaf-title">${voice.name.ask}</span>
-          <span class="leaf-lead">${escapeHtml(voice.name.why(thing.name))}</span>
-        </span>
-      </div>
-      <input class="input name-input" type="text" maxlength="${String(PET_NAME_MAX)}" autocomplete="off" enterkeyhint="done" aria-label="${voice.name.field}" />
-      <div class="leaf-actions">
-        <button type="button" class="button-primary name-keep">${voice.name.keep}</button>
-        <button type="button" class="button-quiet name-later">${voice.name.notNow}</button>
-      </div>`
+    const card = leafCard(voice.name.ask, 'name-leaf')
+    card.innerHTML = leafHtml({
+      art: creatureSvg(thing.world, thing.line, LAST_STAGE),
+      title: voice.name.ask,
+      lead: escapeHtml(voice.name.why(thing.name)),
+      body: `<input class="input name-input" type="text" maxlength="${String(PET_NAME_MAX)}" autocomplete="off" enterkeyhint="done" aria-label="${voice.name.field}" />`,
+      actions: [
+        { label: voice.name.notNow, name: 'name-later', kind: 'quiet' },
+        { label: voice.name.keep, name: 'name-keep', kind: 'primary' },
+      ],
+    })
     const input = card.querySelector<HTMLInputElement>('.name-input')
     const keep = (): void => {
       const name = input?.value.trim() ?? ''
@@ -47,11 +43,11 @@ export function nameNotice(store: Store): NoticeBuilder {
       else store.setNameAsked(thing.id)
       dismiss()
     }
-    card.querySelector('.name-keep')?.addEventListener('click', keep)
+    onAction(card, 'name-keep', keep)
     input?.addEventListener('keydown', (event) => {
       if (event.key === 'Enter') keep()
     })
-    card.querySelector('.name-later')?.addEventListener('click', () => {
+    onAction(card, 'name-later', () => {
       store.setNameAsked(thing.id)
       dismiss()
     })

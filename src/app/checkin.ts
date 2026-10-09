@@ -5,6 +5,8 @@ import { MILESTONES } from '../store/paths'
 import type { AppData, DateKey } from '../store/types'
 import { GOOD_MAX } from '../store/types'
 import { escapeHtml } from './thingMark'
+import { leafCard, leafHtml, onAction } from './leaf'
+import { swap } from './swap'
 import type { Store } from '../store/store'
 import { voice } from '../voice'
 import { chapterDue } from './chapter'
@@ -39,9 +41,7 @@ export function checkinNotice(store: Store, sound: Sound, on: CheckinHandlers): 
     const data = store.get()
     if (data.things.length === 0 || data.days[today]?.checkin) return null
 
-    const card = document.createElement('aside')
-    card.className = 'leaf checkin'
-    card.setAttribute('aria-label', voice.labels.checkin)
+    const card = leafCard(voice.labels.checkin, 'checkin')
     const ask = (
       question: string,
       answer: string,
@@ -49,14 +49,33 @@ export function checkinNotice(store: Store, sound: Sound, on: CheckinHandlers): 
       notToday?: () => void,
     ): void => {
       const focused = card.contains(document.activeElement)
-      card.innerHTML = `<span class="leaf-title">${question}</span>
-        <div class="leaf-actions">
-          <button type="button" class="button-primary checkin-answer">${answer}</button>
-          ${notToday ? `<button type="button" class="checkin-not-today">${voice.notToday.button}</button>` : ''}
-        </div>`
-      card.querySelector('.checkin-not-today')?.addEventListener('click', () => notToday?.())
+      swap(card, () => {
+        draw(question, answer, then, focused, notToday)
+      })
+    }
+    const draw = (
+      question: string,
+      answer: string,
+      then: () => void,
+      focused: boolean,
+      notToday?: () => void,
+    ): void => {
+      card.innerHTML = leafHtml({
+        title: question,
+        actions: [
+          ...(notToday
+            ? [{ label: voice.notToday.button, name: 'checkin-not-today', kind: 'quiet' as const }]
+            : []),
+          { label: answer, name: 'checkin-answer', kind: 'primary' },
+        ],
+      })
+      if (notToday) onAction(card, 'checkin-not-today', notToday)
       const button = card.querySelector<HTMLButtonElement>('.checkin-answer')
+      // The next question comes a frame later, inside the swap: a quick second tap is not a second answer.
+      let answered = false
       button?.addEventListener('click', () => {
+        if (answered) return
+        answered = true
         sound.play('checkin')
         then()
       })
@@ -77,9 +96,14 @@ export function checkinNotice(store: Store, sound: Sound, on: CheckinHandlers): 
           const line = dayLine(today, spokenToday(store.get(), today))
           store.setCheckin(today)
           const showLine = (): void => {
-            dayLineCard(card, line, on.onSend, dismiss)
+            swap(card, () => {
+              dayLineCard(card, line, on.onSend, dismiss)
+            })
           }
-          if (now().getHours() >= EVENING_FROM) evening(card, store, today, showLine)
+          if (now().getHours() >= EVENING_FROM)
+            swap(card, () => {
+              evening(card, store, today, showLine)
+            })
           else showLine()
         })
       },
@@ -97,39 +121,40 @@ export function checkinNotice(store: Store, sound: Sound, on: CheckinHandlers): 
  */
 export function evening(card: HTMLElement, store: Store, today: DateKey, then: () => void): void {
   store.setSettings({ goodAskedOn: today })
-  card.classList.add('is-form')
   const tomorrow = plannedThings(store.get(), addDays(today, 1))
   const ahead =
     tomorrow.length > 0
       ? voice.checkin.tomorrow(tomorrow.map((t) => t.name).join(', '))
       : voice.checkin.tomorrowRest
-  card.innerHTML = `
-    <label class="field good-field">
+  card.innerHTML = leafHtml({
+    body: `<label class="field good-field">
       <span class="leaf-title">${voice.checkin.good}</span>
       <input class="input good-input" type="text" maxlength="${String(GOOD_MAX)}" autocomplete="off" enterkeyhint="done" />
-    </label>
-    <p class="leaf-lead good-tomorrow">${escapeHtml(ahead)}</p>
-    <div class="leaf-actions">
-      <button type="button" class="button-primary good-keep">${voice.checkin.keep}</button>
-      <button type="button" class="button-quiet good-skip">${voice.checkin.skip}</button>
-    </div>`
+    </label>`,
+    note: escapeHtml(ahead),
+    actions: [
+      { label: voice.checkin.skip, name: 'good-skip', kind: 'quiet' },
+      { label: voice.checkin.keep, name: 'good-keep', kind: 'primary' },
+    ],
+  })
   const input = card.querySelector<HTMLInputElement>('.good-input')
   const keep = (): void => {
     if (input?.value.trim()) store.setGood(input.value, today)
     then()
   }
-  card.querySelector('.good-keep')?.addEventListener('click', keep)
+  onAction(card, 'good-keep', keep)
   input?.addEventListener('keydown', (event) => {
     if (event.key === 'Enter') keep()
   })
-  card.querySelector('.good-skip')?.addEventListener('click', then)
+  onAction(card, 'good-skip', then)
 }
 
 /**
  * The line for the day, quieter than the questions: the words, the name
- * of whoever said them if it was not the author, "send this" for a
- * postcard of the whale with the line, and "ok". It stays until one of the
- * two: a line is there to be read.
+ * of whoever said them if it was not the author (on the footer's left, so
+ * the card is no taller for it), "send this" for a postcard of the whale
+ * with the line, and "ok". It stays until one of the two: a line is there
+ * to be read.
  */
 function dayLineCard(
   card: HTMLElement,
@@ -138,24 +163,21 @@ function dayLineCard(
   dismiss: () => void,
 ): void {
   const focused = card.contains(document.activeElement)
-  card.classList.add('is-line')
-  card.innerHTML = `
-    <div>
-      <p class="day-line">${line.text}</p>
-      ${line.by ? `<p class="day-line-by">${line.by}</p>` : ''}
-    </div>
-    <div class="leaf-actions">
-      <button type="button" class="button-quiet day-line-send">${voice.postcard.sendThis}</button>
-      <button type="button" class="button-quiet day-line-ok">${voice.labels.ok}</button>
-    </div>`
+  card.innerHTML = leafHtml({
+    body: `<p class="leaf-quote day-line">${line.text}</p>`,
+    ...(line.by ? { note: `<span class="quote-by day-line-by">${line.by}</span>` } : {}),
+    actions: [
+      { label: voice.postcard.sendThis, name: 'day-line-send', kind: 'quiet' },
+      { label: voice.labels.ok, name: 'day-line-ok', kind: 'soft' },
+    ],
+  })
   announce(line.by ? `${line.text} ${line.by}` : line.text)
-  card.querySelector('.day-line-send')?.addEventListener('click', () => {
+  onAction(card, 'day-line-send', () => {
     onSend({ kind: 'whale', line: line.text, ...(line.by ? { by: line.by } : {}) })
     dismiss()
   })
-  const ok = card.querySelector<HTMLButtonElement>('.day-line-ok')
-  ok?.addEventListener('click', dismiss)
-  if (focused) ok?.focus({ preventScroll: true })
+  onAction(card, 'day-line-ok', dismiss)
+  if (focused) card.querySelector<HTMLElement>('.day-line-ok')?.focus({ preventScroll: true })
 }
 
 /**
@@ -186,9 +208,7 @@ export function goodNotice(store: Store): NoticeBuilder {
     const day = data.days[today]
     if (now().getHours() < EVENING_FROM) return null
     if (!day?.checkin || day.good || data.settings.goodAskedOn === today) return null
-    const card = document.createElement('aside')
-    card.className = 'leaf checkin good-leaf'
-    card.setAttribute('aria-label', voice.checkin.good)
+    const card = leafCard(voice.checkin.good, 'checkin good-leaf')
     evening(card, store, today, dismiss)
     return card
   }

@@ -28,14 +28,13 @@
   --font-body: 'Atkinson Hyperlegible', system-ui, sans-serif;
 
   /* Reading sizes in rem, so a larger text setting in the browser reaches
-     them (at the default 16px: 11, 12, 14, 17, 24, 32, 40). */
+     them (at the default 16px: 11, 12, 14, 17, 24, 40). */
   /* Only for a count or a tag inside something small (a stone, a tile, a day cell). */
   --t-2xs: 0.6875rem;
   --t-xs: 0.75rem;
   --t-sm: 0.875rem;
   --t-md: 1.0625rem;
   --t-lg: 1.5rem;
-  --t-2xl: 2rem;
   --t-xl: 2.5rem;
   /* Sized to a shape, not for reading, so they stay in px: the wordmark,
      an icon inside its 44px button, the numbers inside the dial's ring. */
@@ -51,7 +50,11 @@
   --s6: 24px;
   --s8: 32px;
 
+  /* Three corners: a control inside something (a field, a tile, a chip),
+     a card, a sheet. Round things are 50%, pills --r-pill. */
+  --r-sm: 10px;
   --r: 14px;
+  --r-lg: 22px;
   --r-pill: 999px;
   --touch: 44px;
   /* The width of the phone frame on screens wider than a phone. */
@@ -92,6 +95,8 @@
   --dur-snap: 220ms;
   /* A sheet changing what it shows: a crossfade while it eases to its new height. */
   --dur-swap: 220ms;
+  /* What floats over everything (a toast, an undo) casts this. */
+  --shadow-float: 0 8px 30px rgba(0, 0, 0, 0.5);
 
   /* Where the sky ends and the sea begins, as a share of the scene's height. */
   --horizon: 58%;
