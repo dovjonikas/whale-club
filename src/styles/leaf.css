@@ -150,6 +150,13 @@
   text-wrap: pretty;
 }
 
+/* On a 320 px phone the longest line still takes two rows at most. */
+@media (max-width: 359px) {
+  .leaf-quote {
+    font-size: var(--t-sm);
+  }
+}
+
 /* Who said it: the same everywhere a line has an author. */
 .quote-by::before {
   content: '— ';
