@@ -346,3 +346,28 @@ bottle's lift is a position, not an animation. Approved.
 | Press on the new buttons              | The shared press: down at once, back over 180 ms                       | As every other control                                                                                                                                                     |
 
 Approved.
+
+## On the live site (1.3.0)
+
+Checked on https://dovjonikas.github.io/whale-club/ at a phone's size,
+390 × 844, after the deploy:
+
+- **What's new** opens on the first open of a person who had the app
+  before, with a "try it" for each of its five cards; settings say v1.3.0.
+- **The update toast**: a page kept open while the next deploy landed
+  noticed the new worker when it came back to the front, showed "new
+  version. tap to reload", and one tap reloaded it into the new version.
+  The picture showed one more finding, fixed in the same push:
+
+| #   | Where (v1.3.0)             | What was wrong                                                                                                                                              | Why it matters                              | Fix                                                |
+| --- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | -------------------------------------------------- |
+| 24  | `src/styles/sheet.css:200` | The update toast, placed with `left: 50%` and no width, could only be half the frame wide: "new version. tap to reload" broke onto two lines over the title | A two-line pill over the title looks broken | Its own width (`max-content`), at most the frame's |
+
+**Lighthouse**, through Edge, median of three runs: mobile performance 76
+(FCP 1.8 s, LCP 2.7 s, TBT 0.8 s, CLS 0), accessibility, best practices
+and SEO 100; desktop performance 98, the rest 100. Below 0.17's 85, so the
+two builds were measured side by side, served locally and interleaved,
+three runs each: v1.2.4 scored 74, 68 and 73, v1.3.0 scored 74, 68 and 73.
+Tonight's work costs nothing measurable; the difference since 0.17 came
+with the 1.0 to 1.2 features, and the first visit's work (the scene and the
+intro built at once) is still the place to win it back.
