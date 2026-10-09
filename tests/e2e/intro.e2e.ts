@@ -1,3 +1,4 @@
+import { NEWS_KEY, NEWS_VERSION } from '../../src/app/news'
 import { expect, test, type Page } from '@playwright/test'
 import { dateKey, seed } from './helpers'
 
@@ -186,9 +187,14 @@ test('the lab can open the app for the first time again', async ({ page }) => {
 })
 
 test('the next find is always in sight, with the Collection count', async ({ page }) => {
-  await page.addInitScript(() => {
-    localStorage.setItem('whaleclub:intro', 'seen')
-  })
+  // A person from before: the intro seen, and this version's what's new too (it is not the point here).
+  await page.addInitScript(
+    ([key, version]) => {
+      localStorage.setItem('whaleclub:intro', 'seen')
+      localStorage.setItem(key, version)
+    },
+    [NEWS_KEY, NEWS_VERSION] as const,
+  )
   await seed(page, {
     things: [{ id: 't1', name: 'run', world: 'sea', createdAt: dateKey(-2), order: 0 }],
     days: { [dateKey(-1)]: { done: ['t1'] } },

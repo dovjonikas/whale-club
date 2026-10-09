@@ -37,6 +37,12 @@ professional pass, research into what people love in apps near this one
   picture, one line and "try it", which goes straight there. Afterwards it
   is in how it works. A first open never shows it.
 
+### Found after the deploy
+
+- The live site, checked at 390 × 844: what's new and the update toast work; the toast's words now stay on one line (it was half the frame wide and broke over the title).
+- The line for the day keeps to two rows on a 320 px phone (14 px there, 17 px from 360 px).
+- A find's case sits up under the back arrow.
+
 ### A professional pass
 
 - **One card for every notice.** The check-in, the line for the day, the

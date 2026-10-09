@@ -202,6 +202,10 @@
   top: calc(var(--safe-top) + var(--s3));
   left: 50%;
   z-index: 20;
+  /* Its own width, not what is left of the frame after left: 50%, which wrapped
+     "new version. tap to reload" onto two lines over the title. */
+  width: max-content;
+  max-width: calc(100% - 2 * var(--s4));
   padding: var(--s3) var(--s4);
   border-radius: var(--r-pill);
   background: var(--star-pale);

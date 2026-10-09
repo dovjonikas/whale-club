@@ -207,6 +207,14 @@ order, records and worlds; the interface's names into voice.ts word for
 word; docs/ARCHITECTURE.md rewritten against the code. Left on purpose:
 the two `Line` names and `lineFor` (docs/DECISIONS.md).
 
+## After 1.3
+
+The mobile Lighthouse score is 76 on the live site (0.17 had 85); 1.3.0
+measured the same as 1.2.4 side by side, so the cost came with the 1.0 to
+1.2 features. The first visit builds the scene and the intro at once;
+building the intro's later beats on demand is the step to take
+(docs/QUALITY.md, "On the live site").
+
 ## After 1.0
 
 Year two in updates: finds past day 365, new constellations, more for the
