@@ -188,6 +188,10 @@ export interface Settings {
   heavySaidOn?: DateKey
   /** The day the evening's one good thing was last asked for: once a day. */
   goodAskedOn?: DateKey
+  /** The day the whale's night swim was last told: once a morning. */
+  swimOn?: DateKey
+  /** The month (YYYY-MM) the month's tide was last offered in: once a month. */
+  tideOffered?: string
 }
 
 /** The shape of the saved record; migrate.ts brings every earlier one up to it. */

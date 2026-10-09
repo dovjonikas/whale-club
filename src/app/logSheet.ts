@@ -18,6 +18,8 @@ import { voice } from '../voice'
 import { everyThing, lanternColor } from './sceneData'
 import { openSheet } from './sheet'
 import { swap } from './swap'
+import { tideFor } from '../store/tide'
+import { monthName as tideMonthName } from './tide'
 
 /**
  * The log: the one view of what has been done. A month at a time, from
@@ -34,7 +36,12 @@ type View =
 /** A day shows at most this many lantern dots; more is one dot and a plus. */
 const DOTS_SHOWN = 3
 
-export function openLogSheet(store: Store, at?: DateKey): void {
+export function openLogSheet(
+  store: Store,
+  at?: DateKey,
+  /** Plays a month's tide (src/app/tide.ts); a month with one offers it under its line. */
+  onTide?: (month: MonthKey) => void,
+): void {
   openSheet({
     title: voice.log.title,
     build(body) {
@@ -134,6 +141,7 @@ export function openLogSheet(store: Store, at?: DateKey): void {
             <button type="button" class="icon-button log-next" aria-label="${voice.log.next}"${month >= last ? ' disabled' : ''}>${CHEVRON_RIGHT}</button>
           </div>
           <p class="log-summary">${voice.log.summary(summary.stars, summary.lanterns, summary.minutes)}</p>
+          ${onTide && tideFor(data, month) ? `<button type="button" class="leaf-button is-soft log-tide">${voice.tide.again(tideMonthName(month))}</button>` : ''}
           <div class="log-weekdays" aria-hidden="true">${weekdayLetters()
             .map((d) => `<span>${d}</span>`)
             .join('')}</div>
@@ -221,6 +229,9 @@ export function openLogSheet(store: Store, at?: DateKey): void {
           })
           on('.log-title', () => {
             show({ kind: 'year', year: Number(month.slice(0, 4)) })
+          })
+          on('.log-tide', () => {
+            onTide?.(month)
           })
           body.querySelectorAll<HTMLButtonElement>('.log-cell[data-date]').forEach((cell) => {
             cell.addEventListener('click', () => {

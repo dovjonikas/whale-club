@@ -1,0 +1,295 @@
+/* The night shift (1.3): the month's tide, drift, what's new. Transform and
+   opacity only; under reduced motion everything fades and nothing moves. */
+
+/* The month's tide: a story over the scene. The water comes up from below,
+   then each card fades in where the last one was. */
+.tide {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: var(--s4);
+  padding: calc(var(--safe-top) + var(--s3)) calc(var(--safe-right) + var(--s4))
+    calc(var(--safe-bottom) + var(--s6)) calc(var(--safe-left) + var(--s4));
+  isolation: isolate;
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease-out);
+}
+
+.tide.is-open {
+  opacity: 1;
+}
+
+/* The interface steps back while the tide is told, as it does for a lock-in;
+   the scene stays, under the water. */
+#app.is-behind-tide {
+  opacity: 0;
+}
+
+/* A sheet it was opened from (the log) waits out of sight, and is there after. */
+.sheet.is-behind-tide {
+  visibility: hidden;
+}
+
+.tide-water {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    180deg,
+    rgba(3, 8, 20, 0.62),
+    rgba(6, 18, 43, 0.94) 38%,
+    rgba(2, 4, 9, 0.97)
+  );
+  transform: translate3d(0, 100%, 0);
+  transition: transform var(--dur-sheet-in) var(--ease-drawer);
+}
+
+.tide.is-open .tide-water {
+  transform: none;
+}
+
+.tide-top {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+
+/* How far into the story: one short bar a card, the ones seen lit. */
+.tide-bar {
+  display: flex;
+  flex: 1;
+  gap: var(--s1);
+}
+
+.tide-bar i {
+  flex: 1;
+  height: 3px;
+  border-radius: var(--r-pill);
+  background: rgba(232, 240, 245, 0.18);
+}
+
+.tide-bar i.is-on {
+  background: var(--star-pale);
+}
+
+.tide-stage {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  touch-action: pan-y;
+  cursor: pointer;
+}
+
+.tide-card {
+  display: grid;
+  justify-items: center;
+  gap: var(--s3);
+  max-width: 32ch;
+  text-align: center;
+  opacity: 0;
+  transform: translate3d(0, 8px, 0);
+  transition:
+    opacity var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out);
+}
+
+.tide-card.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.tide-eyebrow {
+  margin: 0;
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+}
+
+.tide-big {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-variation-settings:
+    'opsz' 144,
+    'SOFT' 100,
+    'WONK' 1;
+  font-size: var(--t-xl);
+  line-height: 1.1;
+  color: var(--star-pale);
+  text-wrap: balance;
+}
+
+/* A count is the card: sized to the screen, not for reading. */
+.tide-number {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-variation-settings:
+    'opsz' 144,
+    'SOFT' 100;
+  font-size: clamp(64px, 24vw, 104px);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--star-pale);
+}
+
+.tide-line {
+  margin: 0;
+  font-size: var(--t-md);
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.tide-aside {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--ink-dim);
+}
+
+/* The one true thing: a sentence, the size of a title. */
+.tide-say {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-variation-settings:
+    'opsz' 72,
+    'SOFT' 100,
+    'WONK' 1;
+  font-size: var(--t-lg);
+  line-height: 1.3;
+  color: var(--star-pale);
+  text-wrap: balance;
+}
+
+.tide-art svg {
+  display: block;
+  width: 136px;
+  height: 136px;
+  overflow: visible;
+}
+
+.tide-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* "back" on the first card is not there, but keeps its place. */
+.tide-nav [hidden] {
+  display: inline-block;
+  visibility: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tide-water {
+    transform: none;
+  }
+  .tide-card {
+    transform: none;
+  }
+}
+
+/* Drift: only the sea. The interface fades out over a breath; a tap
+   anywhere is the way back, and the one quiet line says so. */
+/* The interface steps back the way it does for a lock-in (session.css: #app's
+   own opacity transition), and comes back the same way. */
+#app.is-drifting {
+  opacity: 0;
+}
+
+.drift-veil {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: calc(var(--safe-bottom) + var(--s6));
+  cursor: pointer;
+}
+
+.drift-veil:focus-visible {
+  outline-offset: -4px;
+}
+
+.drift-hint {
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+  animation: drift-hint 6s var(--ease-out) forwards;
+}
+
+/* The way back is said, then grows quiet: still there, hardly seen. */
+@keyframes drift-hint {
+  0%,
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.35;
+  }
+}
+
+/* What's new: a card for each new thing, its picture, a line, "try it". */
+.news {
+  display: grid;
+  gap: var(--s3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.news-item {
+  display: grid;
+  grid-template-columns: 56px 1fr auto;
+  align-items: center;
+  gap: var(--s2) var(--s3);
+  padding: var(--s3);
+  border-radius: var(--r);
+  background: rgba(232, 240, 245, 0.05);
+}
+
+.news-art {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(62, 242, 224, 0.1);
+}
+
+.news-art svg {
+  display: block;
+  width: 40px;
+  height: 40px;
+  overflow: visible;
+}
+
+.news-text {
+  display: grid;
+  gap: var(--s1);
+}
+
+.news-title {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.news-line {
+  font-size: var(--t-sm);
+  color: var(--ink-dim);
+  text-wrap: pretty;
+}
+
+/* "try it" at the right of the words; under them on a 320 px phone. */
+@media (max-width: 359px) {
+  .news-item {
+    grid-template-columns: 56px 1fr;
+  }
+  .news-try {
+    grid-column: 2;
+    justify-self: end;
+  }
+}

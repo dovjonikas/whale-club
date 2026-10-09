@@ -187,7 +187,7 @@ test('the thirtieth star: the ceremony, its plaque, and the legendary in the sce
   )
   await expect(page.locator('.collectible[data-id="legend-whale"] .legend-sparkle')).toHaveCount(3)
   // The Collection keeps it in its own row, with the day it was earned.
-  await page.getByRole('button', { name: 'Collection' }).click()
+  await page.getByRole('button', { name: 'Museum' }).click()
   await expect(
     page.getByRole('listitem', {
       name: `the golden whale, earned on ${writtenDate(dateKey(0))} · day 30`,

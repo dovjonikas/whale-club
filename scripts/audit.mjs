@@ -112,6 +112,9 @@ const FIVE_WEEKS = {
     postcardFormat: 'story',
     explained: ['yours', 'firstStar', 'stone', 'lantern', 'kept'],
     goodAskedOn: key(0),
+    // The whale's swim told already today, and November's tide offered: no card over the sky.
+    swimOn: key(0),
+    tideOffered: '2026-11',
   },
 }
 
@@ -200,6 +203,7 @@ function chapterData() {
   // Last week's recap seen already, so the chapter has the slot.
   data.settings.lastRecapWeek = key(-7, MONDAY)
   data.settings.goodAskedOn = key(0, MONDAY)
+  data.settings.swimOn = key(0, MONDAY)
   return data
 }
 
@@ -440,7 +444,7 @@ const SURFACES = [
     name: '28-collection',
     data: FIVE_WEEKS,
     async steps(page) {
-      await role(page, 'Collection').click()
+      await role(page, 'Museum').click()
       await pause(page, 600)
     },
   },
@@ -478,7 +482,7 @@ const SURFACES = [
       await snap('')
       await page.keyboard.press('Escape')
       await pause(page, 400)
-      await role(page, 'Collection').click()
+      await role(page, 'Museum').click()
       await role(page, 'arrange').click()
       await page.getByRole('button', { name: /^sandcastle, place \d$/ }).click()
       await pause(page, 500)
@@ -592,6 +596,76 @@ const SURFACES = [
       await pause(page, 900)
     },
   },
+  // 1.3.0: the museum's cases, the month's tide, drift, the night swim, what's new.
+  {
+    name: '40-museum-case',
+    data: FIVE_WEEKS,
+    async steps(page, snap) {
+      await role(page, 'Museum').click()
+      await pause(page, 500)
+      await role(page, 'a fish, open its case').click()
+      await pause(page, 600)
+      await snap('')
+      await role(page, 'back to the museum').click()
+      await pause(page, 400)
+      await role(page, 'the golden whale, open its case')
+        .click()
+        .catch(() => undefined)
+      await pause(page, 600)
+      await snap('-legendary')
+      return 'done'
+    },
+  },
+  {
+    name: '41-tide',
+    data: FIVE_WEEKS,
+    async steps(page, snap) {
+      await role(page, 'Menu').click()
+      await role(page, 'the log').click()
+      await pause(page, 500)
+      await role(page, 'previous month').click()
+      await pause(page, 500)
+      await page.getByRole('button', { name: /^watch .+’s tide$/ }).click()
+      for (let card = 0; card < 9; card++) {
+        await pause(page, 700)
+        await snap(`-${String(card)}`)
+        const next = role(page, 'next')
+        if (!(await next.isVisible())) break
+        await next.click()
+      }
+      return 'done'
+    },
+  },
+  {
+    name: '42-drift',
+    data: FIVE_WEEKS,
+    async steps(page) {
+      await role(page, 'Menu').click()
+      await role(page, 'drift').click()
+      await pause(page, 2500)
+    },
+  },
+  {
+    name: '43-night-swim',
+    data: (() => {
+      const data = clone(FIVE_WEEKS)
+      delete data.settings.swimOn
+      return data
+    })(),
+    at: new Date(2026, 10, 11, 9, 0),
+    async steps(page) {
+      await pause(page, 2600)
+    },
+  },
+  {
+    name: '44-whats-new',
+    data: FIVE_WEEKS,
+    news: false,
+    async steps(page) {
+      await page.getByRole('dialog', { name: 'what’s new' }).waitFor()
+      await pause(page, 700)
+    },
+  },
   {
     name: '38-toast-update',
     data: FIVE_WEEKS,
@@ -631,7 +705,11 @@ for (const surface of SURFACES) {
     else await page.clock.setFixedTime(at)
     if (surface.init) await page.addInitScript(surface.init)
     if (!surface.intro)
-      await page.addInitScript(() => localStorage.setItem('whaleclub:intro', 'seen'))
+      await page.addInitScript((news) => {
+        localStorage.setItem('whaleclub:intro', 'seen')
+        // This version's "what's new" seen, except where it is the picture.
+        if (news) localStorage.setItem('whaleclub:news', '1.3.0')
+      }, surface.news !== false)
     if (surface.data)
       await page.addInitScript(
         (json) => localStorage.setItem('whaleclub:data', json),

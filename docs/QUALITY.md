@@ -332,3 +332,17 @@ few times a day; it is a view transition, so it is not interruptible, and
 a guard makes a second tap during it do nothing. The card's buttons give
 on press like every other control (down at once, back over 180 ms). The
 bottle's lift is a position, not an animation. Approved.
+
+## 1.3 motion, checked against the same standard before it shipped
+
+| Motion                                | Value                                                                  | Against the standard                                                                                                                                                       |
+| ------------------------------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A find's case opening, and back       | The sheets' crossfade and height ease, 220 ms, `--ease-out`            | Under 300 ms, entering content; none under reduced motion                                                                                                                  |
+| The tide coming in                    | The water rises 480 ms on the drawer curve, the screen fades in 260 ms | The sheets' own timing; a rare moment (once a month), so the slower rise is allowed. Under reduced motion it is there at once                                              |
+| A tide card                           | Opacity and 8 px up, 260 ms, `--ease-out`                              | Under 300 ms; the next card starts where the last one was, so a quick "next" never queues motion. Movement off under reduced motion, the fade stays                        |
+| Drift                                 | The interface fades over 900 ms, the way a lock-in's world steps back  | Deliberate and rare, so slower than a UI response on purpose; asymmetric with nothing to hurry. The quiet line fades from 0.9 to 0.35 once, over six seconds, opacity only |
+| Visitors and the whale while drifting | The scene's own visitor and whale animations, every 22 s               | Reused, already reviewed; none under reduced motion                                                                                                                        |
+| The whale back from its swim          | The scene's surfacing, 900 ms after the card                           | Reused; never during the app's start                                                                                                                                       |
+| Press on the new buttons              | The shared press: down at once, back over 180 ms                       | As every other control                                                                                                                                                     |
+
+Approved.

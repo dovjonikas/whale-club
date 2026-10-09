@@ -71,3 +71,13 @@ The line above the row (the game's one voice) shows in most pictures. A screen
 reader's announcements have no picture: they are listed in docs/QUALITY.md.
 "labas" in the brief (the first hello) is the intro's first screen,
 `34-intro-begin`.
+
+## New in 1.3.0 (after only)
+
+| Picture                        | State                                                           | How it is reached                             |
+| ------------------------------ | --------------------------------------------------------------- | --------------------------------------------- |
+| `40-museum-case`, `-legendary` | A find's case; the golden whale's, with the find half way to it | the museum, a found tile                      |
+| `41-tide-0` to `-7`            | October's tide, card by card, to the postcard                   | the log, a month back, "watch october’s tide" |
+| `42-drift`                     | Only the sea, and the one quiet line                            | the club, "drift"                             |
+| `43-night-swim`                | The whale back in the morning, the card after the check-in      | 09:00, the swim not told yet today            |
+| `44-whats-new`                 | What's new, once after the update                               | data from before, "what's new" not seen       |

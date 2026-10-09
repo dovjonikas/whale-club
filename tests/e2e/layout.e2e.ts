@@ -127,8 +127,8 @@ for (const size of ['device', 'small'] as const) {
     })
 
     test('the collection and a thing’s sheet', async ({ page }) => {
-      await page.getByRole('button', { name: 'Collection' }).click()
-      await expect(page.getByRole('dialog', { name: 'collection' })).toBeVisible()
+      await page.getByRole('button', { name: 'Museum' }).click()
+      await expect(page.getByRole('dialog', { name: 'the museum' })).toBeVisible()
       await check(page, '.sheet.is-open')
       await page.keyboard.press('Escape')
       await page.getByRole('button', { name: 'edit run' }).click()

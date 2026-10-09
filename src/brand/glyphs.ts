@@ -265,7 +265,6 @@ export const GLYPHS: readonly Glyph[] = [
       'korean',
       'chinese',
       'vocab',
-      'duolingo',
       'kalba',
       'kalbos',
       'kalbu',

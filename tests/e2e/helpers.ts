@@ -1,4 +1,5 @@
 import { test as base, expect, type Locator, type Page } from '@playwright/test'
+import { NEWS_KEY, NEWS_VERSION } from '../../src/app/news'
 
 export { expect }
 
@@ -9,13 +10,18 @@ export { expect }
  */
 export const test = base.extend({
   page: async ({ page }, use) => {
-    await page.addInitScript(() => {
-      try {
-        localStorage.setItem('whaleclub:intro', 'seen')
-      } catch {
-        // No storage: the intro would show; nothing here can help that.
-      }
-    })
+    // And this version's "what's new" seen: news.e2e.ts takes it away to see it.
+    await page.addInitScript(
+      ([key, version]) => {
+        try {
+          localStorage.setItem('whaleclub:intro', 'seen')
+          localStorage.setItem(key, version)
+        } catch {
+          // No storage: the intro would show; nothing here can help that.
+        }
+      },
+      [NEWS_KEY, NEWS_VERSION] as const,
+    )
     await use(page)
   },
 })
@@ -73,6 +79,32 @@ export interface SeedData {
   version?: number
 }
 
+/**
+ * Writes a seed into storage before the page loads, once: init scripts run
+ * on every navigation, and a reload must keep what the app saved. The
+ * whale's night swim and the month's tide are marked as told already, by
+ * the page's own clock (so a test's clock is followed), unless the seed
+ * names them; `null` there means not told.
+ */
+async function putSeed(page: Page, payload: { settings: Record<string, unknown> }): Promise<void> {
+  await page.addInitScript(
+    ([key, json]) => {
+      if (localStorage.getItem(key) !== null) return
+      const data = JSON.parse(json) as { settings: Record<string, unknown> }
+      const now = new Date()
+      const pad = (n: number): string => String(n).padStart(2, '0')
+      const today = `${String(now.getFullYear())}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+      if (!('swimOn' in data.settings)) data.settings.swimOn = today
+      if (!('tideOffered' in data.settings)) data.settings.tideOffered = today.slice(0, 7)
+      data.settings = Object.fromEntries(
+        Object.entries(data.settings).filter(([, value]) => value !== null),
+      )
+      localStorage.setItem(key, JSON.stringify(data))
+    },
+    [STORAGE_KEY, JSON.stringify(payload)] as const,
+  )
+}
+
 export async function seed(page: Page, data: SeedData): Promise<void> {
   // A seed that names a kind is the current shape; one that does not runs every migration.
   const current = data.things.some((t) => t.kind !== undefined)
@@ -88,13 +120,7 @@ export async function seed(page: Page, data: SeedData): Promise<void> {
     cracked: data.cracked ?? {},
     settings: { sound: true, ...data.settings },
   }
-  await page.addInitScript(
-    ([key, json]) => {
-      // Init scripts run on every navigation; a reload must keep what the app saved.
-      if (localStorage.getItem(key) === null) localStorage.setItem(key, json)
-    },
-    [STORAGE_KEY, JSON.stringify(payload)] as const,
-  )
+  await putSeed(page, payload)
 }
 
 export async function addThing(
@@ -251,12 +277,7 @@ export async function seedPerson(page: Page, person: Person = {}): Promise<void>
     },
     ...person.extra,
   }
-  await page.addInitScript(
-    ([key, json]) => {
-      if (localStorage.getItem(key) === null) localStorage.setItem(key, json)
-    },
-    [STORAGE_KEY, JSON.stringify(data)] as const,
-  )
+  await putSeed(page, data)
 }
 
 /**

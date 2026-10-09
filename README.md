@@ -59,7 +59,7 @@ what it costs ([`docs/DECISIONS.md`](docs/DECISIONS.md)).
   <tr>
     <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-scene.webp" width="240" alt="The home screen: a night sky with a constellation being lit, a shore with sunflowers, a sea with fish, and three cards with creatures"><br><b>The sea</b><br><sub>Every day you show up is a star in a constellation.</sub></td>
     <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-all-done.webp" width="240" alt="Everything done for the day: the whale surfaces over the horizon and a button offers to send it"><br><b>All done</b><br><sub>The whale surfaces, with one line and one button to send it.</sub></td>
-    <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-collection.webp" width="240" alt="The collection: unlocked finds and the silhouettes of the next ones, each with its day"><br><b>The collection</b><br><sub>Seventy-eight finds, day 3 to day 365. The next one is always in sight.</sub></td>
+    <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-collection.webp" width="240" alt="The museum: unlocked finds and the silhouettes of the next ones, each with its day"><br><b>The museum</b><br><sub>Seventy-eight finds, day 3 to day 365. The next one is always in sight.</sub></td>
   </tr>
   <tr>
     <td align="center" valign="top"><img src="docs/screenshots/iphone-dial.webp" width="240" alt="The lock-in dial set to 30 minutes"><br><b>Lock in</b><br><sub>Turn the dial, from five minutes to ten hours.</sub></td>
@@ -109,6 +109,55 @@ what it costs ([`docs/DECISIONS.md`](docs/DECISIONS.md)).
 
 <p align="center"><sub>Every picture here is made by <code>npm run shots</code> from a seeded history under a pinned clock. Running it twice gives the same files.</sub></p>
 
+## New in 1.3: the night shift
+
+One night's work from one brief: a professional pass over every screen,
+research into what people love in apps and games near this one
+([`docs/IDEAS.md`](docs/IDEAS.md)), and the four ideas that fit the sea best.
+
+<table>
+  <tr>
+    <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-museum.webp" width="240" alt="A find's case in the museum: a school of fish drawn large in a pool of light, its name, its plaque and the day it came"><br><b>The museum</b></td>
+    <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-tide.webp" width="240" alt="The month's tide: this month you were a lanternfish, the lights were yours, with back and next"><br><b>The month's tide</b></td>
+    <td align="center" valign="top" width="33%"><img src="docs/screenshots/iphone-drift.webp" width="240" alt="Drift: only the night sea, no buttons, and one quiet line at the bottom, tap anywhere to come back"><br><b>Drift</b></td>
+  </tr>
+  <tr>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-swim.webp" width="240" alt="A morning card over the scene: back from the sargasso sea, the only sea with no shore at all, with send this and ok, and the whale coming up"><br><b>The night swim</b></td>
+    <td align="center" valign="top"><img src="docs/screenshots/iphone-news.webp" width="240" alt="What's new: a card for each new thing with its picture, one line and try it"><br><b>What's new</b></td>
+    <td align="center" valign="top"><img src="docs/audit/after/12-day-line-390.webp" width="240" alt="The line for the day after the professional pass: the line, who said it on the left, send this and ok on the right"><br><b>A calmer look</b></td>
+  </tr>
+</table>
+
+**The museum.** The collection became a museum. A tap on any find opens
+its case: the find drawn large, a plaque with one silly, warm line about
+itself, the day it came and whose day it was. Earned legendaries show the
+find half way to them.
+
+**The month's tide.** In a month's first week, last month comes back in a
+few cards, one sentence each: the days with a star, the lantern minutes
+(as humpback songs, when there are enough), the best week, the newest find,
+one true thing about the month and the sea creature it was. Every sentence
+has to be true: a part the days do not prove is left out, and nothing
+missed is ever counted. The last card is a postcard; the log keeps every
+month's tide.
+
+**Drift.** One word in the club, and the whole interface fades. Only the
+sea stays, with visitors and the whale passing now and then and the quiet
+surf if sound is on, the screen kept awake. A tap anywhere brings it back.
+
+**The night swim.** Each night the whale swims somewhere real: a bay that
+glows, a kelp forest, the deepest trench. On the first open of the next
+day, after the check-in, it comes up and says where it went and one true
+thing about the place. It never depends on anything done, and a morning not
+opened is simply not told.
+
+**A professional pass.** Every surface in every state (54 of them) pictured
+at 390 × 844 and 320 × 568, checked against one list, fixed, and pictured
+again: one card component for every notice, a calm club, nothing past the
+edge of a small phone, and a test that keeps it so. The pairs are in
+[`docs/audit`](docs/audit/README.md), the findings with file and line in
+[`docs/QUALITY.md`](docs/QUALITY.md).
+
 ## The rules
 
 1. the first rule of whale club is: you show up.
@@ -134,6 +183,10 @@ And underneath all three: nothing dies. You just missed a day.
 - **Arrange your sea.** Every world has its places; finds and dock things stand in them by themselves, and anyone who wants to can move them, swap them, or put them away in a chest. A longer shore, a reef and an island on a whale add room
 - **Postcards** of the whale, a new find or a grown creature, ready for the share sheet, with your arrangement on them
 - **A safe place.** "not today" at the check-in keeps one small thing and lets the rest rest, under a light rain, and the day counts as a quiet one. The evening's good things come back in bottles. Your creatures live in the scene too, to pet for nothing. Late at night the moon says good night. A creature that grows all the way can be given a name
+- **The museum.** Every find has a plaque, one line about itself, and opens in its own case with the day it came
+- **The month's tide.** Last month in a few true sentences, once at the start of a month and any time from the log, ending on a postcard
+- **Drift.** Only the sea, from one word in the club, until a tap
+- **The night swim.** The whale goes somewhere real each night and says where, the next morning
 - **Settings, few and plain.** A day can end at 3:00 for someone up late, the week can start on Sunday, the seasons can follow the south, and the sea can hold still. Every choice takes effect at once
 
 <details>
@@ -252,10 +305,11 @@ type check, the build and every test pass.
 
 | What              | How                                                                                                                                                                                                                                                                           |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Browser tests** | 211 Playwright scenarios against the production build, each run on an iPhone 13, a Pixel 5 and a 1366x768 desktop: the first minute, a lock-in left and resumed, a phone with no network, a phone that died mid-session, a deploy taking over an open page, a backup restored |
+| **Browser tests** | 279 Playwright scenarios against the production build, each run on an iPhone 13, a Pixel 5 and a 1366x768 desktop: the first minute, a lock-in left and resumed, a phone with no network, a phone that died mid-session, a deploy taking over an open page, a backup restored |
 | **Frame timing**  | A year of lanterns (595) measured alone, after the device runs: the main thread works about 5 ms a frame, held as a test at full speed and with the CPU slowed four times; the frame gaps are recorded beside it                                                              |
 | **Lighthouse**    | On the live site, median of three runs (v0.17.0): mobile 85 performance (FCP 1.7 s, LCP 2.7 s, CLS 0), 100 accessibility, 100 best practices, 100 SEO; desktop 100 across the board. Mobile is a first visit, intro and all, on a simulated slow phone                        |
 | **Accessibility** | Audited against the Web Interface Guidelines: names on every control, focus kept and returned by every sheet and the session screen, a live region for what changes, 44 px targets, reduced motion; every colour pair that carries words is tested for contrast               |
+| **Layout**        | Every surface pictured at 390 × 844 and 320 × 568 before and after the 1.3 pass ([`docs/audit`](docs/audit/README.md)); a test holds every control at 44 px to the finger and nothing past the edge, at each device's size and at 320 × 568                                   |
 | **Motion**        | Reviewed against a written standard for curves, durations, interruptibility and origin, with what changed in [`docs/QUALITY.md`](docs/QUALITY.md)                                                                                                                             |
 | **Data**          | Data from every earlier version migrates, and malformed parts are dropped one by one without losing a day                                                                                                                                                                     |
 | **Code**          | ESLint and Prettier on everything; the clock is read in one file only, enforced by a lint rule                                                                                                                                                                                |
@@ -292,7 +346,9 @@ it never takes away anything already earned.
 - [`docs/DECISIONS.md`](docs/DECISIONS.md): the harder calls, and what each one costs
 - [`docs/DESIGN.md`](docs/DESIGN.md): colours, type, layout, the signature moment
 - [`docs/brand/BRAND.md`](docs/brand/BRAND.md): the bubble, the glyphs, the app icon
-- [`docs/QUALITY.md`](docs/QUALITY.md): the motion and interface audits and the polish pass, with what changed and how it was checked
+- [`docs/QUALITY.md`](docs/QUALITY.md): the motion and interface audits, the polish pass and the professional pass, with what changed and how it was checked
+- [`docs/audit`](docs/audit/README.md): every surface before and after the professional pass, and [`docs/audit/SURFACES.md`](docs/audit/SURFACES.md), the list of them
+- [`docs/IDEAS.md`](docs/IDEAS.md): what people love in apps and games near this one, as mechanics, and what of it fits the sea
 - [`docs/COLLECTIBLES.md`](docs/COLLECTIBLES.md): every find, by world, line and day
 - [`docs/LINES.md`](docs/LINES.md): the line for the day, each one's source, and the moments that say them
 - [`docs/ECONOMY.md`](docs/ECONOMY.md): what earns krill, what a steady person makes, what the dock costs

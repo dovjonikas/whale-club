@@ -2,7 +2,40 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
-## 1.3.0 - unreleased: the night shift
+## 1.3.0 - 2026-10-09: the night shift
+
+The author's brief of the morning of 2026-10-09, done in one night: a
+professional pass, research into what people love in apps near this one
+(docs/IDEAS.md), and four new things chosen from it.
+
+### New
+
+- **The museum.** The collection is a museum: a tap on any find opens its
+  case, the find drawn large, its plaque (one silly, warm line about
+  itself, 88 of them, drafts for the author's voice), the day it came and
+  whose day it was. An earned legendary's case shows the find half way to
+  it. The tile of an earned legendary says only its day; the whole plaque
+  is in its case.
+- **The month's tide.** In a month's first week, a card offers last month
+  "in a few lines": a short story over the scene, one sentence a card,
+  moved by "next" and "back" (a swipe or a tap on either side as a
+  shortcut): the days with a star, the lanterns (as humpback songs, when
+  there are enough), the best week, the newest find, one true thing about
+  the month, the month's sea type, and a postcard to keep it. Every part is
+  there only when the days prove it; nothing missed is counted. The log
+  offers every month's tide to watch again.
+- **Drift.** A word in the club: the whole interface fades and only the sea
+  stays, with visitors passing now and then, the whale coming up, the
+  quiet surf if sound is on, the screen kept awake. A tap anywhere, Escape,
+  or leaving the app brings everything back, and one quiet line says so.
+- **The whale's night swim.** Each night the whale goes somewhere real in
+  the sea; on the first open of the next day, after the check-in, a card
+  says where it went and one true thing about the place, and the whale
+  comes up. Once a day, never on the first day, never in the evening; a
+  morning not opened is simply not told.
+- **What's new**, once after this update: a card for each new thing, its
+  picture, one line and "try it", which goes straight there. Afterwards it
+  is in how it works. A first open never shows it.
 
 ### A professional pass
 

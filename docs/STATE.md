@@ -2,17 +2,21 @@
 
 ## Done
 
-v1.2.4 is live at https://dovjonikas.github.io/whale-club/; 1.3.0, "the
-night shift" (the author's brief of 2026-10-09), is being built in three
-parts, each pushed when its tests are green:
+v1.3.0, live at https://dovjonikas.github.io/whale-club/ after the push.
 
-- **A. The professional pass: done.** Every surface pictured before and
-  after (docs/audit/), the findings in docs/QUALITY.md, one card component
-  for the notices, the club redrawn, 320 px fixed, a layout test.
-- **B. The research: done.** docs/IDEAS.md: seventeen candidates and nine
-  rejected, as mechanics, without other apps' names. Chosen for tonight:
-  the month's tide, the museum, drift, the whale's night swim.
-- **C. Build, finish, surprise**: next.
+- **v1.3.0, the night shift** (the author's brief of 2026-10-09, one night,
+  three parts, each pushed when its tests were green):
+  - **A. A professional pass.** Every surface in every state pictured at
+    390 × 844 and 320 × 568, before and after (docs/audit/), the findings
+    with file and line in docs/QUALITY.md; one card component for the
+    notices; the club redrawn; 320 px fixed; a layout test.
+  - **B. Research.** docs/IDEAS.md: seventeen candidates and nine
+    rejected, as mechanics, without other apps' names.
+  - **C. Four new things and what's new.** The museum (a case and a plaque
+    for every find), the month's tide (last month in a few true
+    sentences), drift (only the sea), the whale's night swim (somewhere real
+    each night, told in the morning), and a "what's new" sheet once after
+    the update. A letter for the author: docs/MORNING.md.
 
 - **v0.1.0 to v0.3.0**: the row, the scene, the sky as a calendar, creatures, PWA, collectibles, the whale, rituals, sound, share; a buddy slot (since removed).
 - **v0.4.0**: postcards instead of a buddy; the phone-wide frame; the install leaf after the first thing; Lighthouse through Edge.
@@ -229,7 +233,20 @@ intro's later beats on demand is the next step there.
 
 ## Next
 
-Nothing queued. Ideas the author has mentioned and not asked for yet: the author's own voice lines (src/voice.ts). The lab's strings are in voice.ts too, under `lab`; they are tool labels, not the game's voice.
+The author's choices, from docs/IDEAS.md ("What the author decides"):
+
+1. **A letter to later**: a message to yourself that comes back in a
+   bottle in a month, 100 days or a year. Small; the bottles are ready.
+2. **Breathe first**: three slow breaths with the whale before a lock-in,
+   off unless chosen.
+3. **The long swim** (a real migration on a map) or more night swim places:
+   one of the two.
+4. **The whale's story**: a paragraph per star day, if the author wants to
+   write it.
+
+And the words: the 88 museum plaques (src/scene/collectibles/museum.ts)
+and the new lines in src/voice.ts (tide, swim, drift, news) are drafts
+marked TODO-VOICE. The swim's places must stay true if changed.
 
 ## How to run
 

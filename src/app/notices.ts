@@ -18,6 +18,20 @@ export class Notices {
     this.render()
   }
 
+  /**
+   * Shows this one now, in place of whatever card is up (which comes back
+   * when it is dismissed, if it still applies).
+   */
+  lead(build: NoticeBuilder): void {
+    this.slot.replaceChildren()
+    const element = build(() => {
+      element?.remove()
+      this.render()
+    })
+    if (element) this.slot.replaceChildren(element)
+    else this.render()
+  }
+
   render(): void {
     if (this.slot.childElementCount > 0) return
     for (const build of this.builders) {

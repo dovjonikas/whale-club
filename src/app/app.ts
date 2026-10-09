@@ -71,6 +71,13 @@ import { openThingSheet } from './thingSheet'
 import { Sound } from './sound'
 import { showUndo } from './toast'
 import { surpriseFor } from './surprise'
+import { startDrift } from './drift'
+import { markNewsSeen } from './news'
+import { swimNotice } from './nightSwim'
+import { playTide, tideNotice } from './tide'
+import { newsDue, openWhatsNew } from './whatsNew'
+import { lastMonth, tideFor } from '../store/tide'
+import type { MonthKey } from '../store/log'
 
 const SURPRISE_DELAY_MS = 4000
 /** How often the scene looks at the clock for the late hours, with the app left open. */
@@ -84,6 +91,8 @@ const OFFER_AFTER_FIND_MS = 2800
 const OFFER_AFTER_GROW_MS = 900
 /** How long a deleted card takes to swim off. */
 const LEAVE_MS = 380
+/** "What's new" waits for the scene to be seen first. */
+const NEWS_AFTER_MS = 900
 
 /** Wires the store, the scene, the row and the sheets together. One per page. */
 export function startApp(root: HTMLElement, labEntered = false): void {
@@ -141,26 +150,96 @@ export function startApp(root: HTMLElement, labEntered = false): void {
         postcards.sendNow({ kind: 'sea', line: line.current() || voice.postcard.sea })
       },
       onMenu() {
-        openMenuSheet(store, {
-          onLog: () => {
-            openLogSheet(store)
-          },
-          onHow: () => {
-            openHowItWorks(intro)
-          },
-          onSettings: () => {
-            openSettingsSheet(store, {
-              sound,
-              onHow: () => {
-                openHowItWorks(intro)
-              },
-              onLab: enterLabFromMenu,
-            })
-          },
-        })
+        openClub()
       },
     },
     sound.isMuted(),
+  )
+
+  /** The club: the menu's one screen. */
+  function openClub(): void {
+    openMenuSheet(store, {
+      onLog: () => {
+        log()
+      },
+      onHow: () => {
+        openHowItWorks(intro, news)
+      },
+      onSettings: () => {
+        openSettingsSheet(store, {
+          sound,
+          onHow: () => {
+            openHowItWorks(intro, news)
+          },
+          onLab: enterLabFromMenu,
+        })
+      },
+      onDrift: drift,
+    })
+  }
+
+  /** The log, at a day or this month; a past month offers its tide. */
+  function log(at?: DateKey): void {
+    openLogSheet(store, at, tide)
+  }
+
+  /** Drift: only the sea, until a tap. */
+  function drift(): void {
+    startDrift({ scene, sound, jacket: () => hasJacket(store.get()) })
+  }
+
+  /** A month's tide, its last card a postcard. */
+  function tide(month: MonthKey): void {
+    playTide(store, month, (moment) => {
+      postcards.sendNow(moment)
+    })
+  }
+
+  /** The month "try it" shows: last month's tide if it has one, else this month's so far. */
+  function tideToTry(): MonthKey | null {
+    const today = todayKey()
+    const last = lastMonth(today)
+    if (tideFor(store.get(), last)) return last
+    const now = today.slice(0, 7)
+    return tideFor(store.get(), now) ? now : null
+  }
+
+  /** What's new, with "try it" going straight to each thing. */
+  function news(): void {
+    openWhatsNew({
+      museum: () => {
+        openCollectionSheet(store, () => {
+          startArrange({})
+        })
+      },
+      tide: () => {
+        const month = tideToTry()
+        if (month) tide(month)
+        else line.say(voice.tide.none, { quiet: true })
+      },
+      drift,
+      swim: () => {
+        swimForced = true
+        notices.lead(swim)
+        swimForced = false
+      },
+      calm: openClub,
+    })
+  }
+
+  /** The whale's night swim: told on the first open of the day, or now, from what's new. */
+  let swimForced = false
+  const swim = swimNotice(
+    store,
+    {
+      onBack: () => {
+        scene.surfaceWhale(hasJacket(store.get()))
+      },
+      onSend: (moment) => {
+        postcards.sendNow(moment)
+      },
+    },
+    () => swimForced,
   )
 
   const krill = new KrillChip(() => {
@@ -334,7 +413,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
   })
   // The open sky is the way into the log, as the stars are into their days.
   scene.onSky(() => {
-    openLogSheet(store)
+    log()
   })
 
   /**
@@ -602,7 +681,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
 
     const stars = starDays(data)
     scene.setDays({ dates: stars, today, label: (date) => dayLabel(data, date) }, (date) => {
-      openLogSheet(store, date)
+      log(date)
     })
 
     scene.setLanterns(lanternsFor(data), today)
@@ -652,6 +731,9 @@ export function startApp(root: HTMLElement, labEntered = false): void {
         },
       }),
       goodNotice(store),
+      // After the day's ritual: the month's tide, then the whale back from its swim.
+      tideNotice(store, tide),
+      swim,
       chapterNotice(store),
       nameNotice(store),
     ])
@@ -754,6 +836,13 @@ export function startApp(root: HTMLElement, labEntered = false): void {
   }
   // In the lab the intro plays only when asked for ("first open again"), never over its sheet.
   if ((introDue(store.get()) && !labOn()) || takeIntroRequest()) intro()
+  // A first open is welcomed by the intro; "what's new" is for someone the update found.
+  if (store.get().things.length === 0) markNewsSeen()
+  else if (newsDue(store.get()) && !labOn())
+    window.setTimeout(() => {
+      // Never over something already open: it waits for the next open instead.
+      if (!document.querySelector('[role="dialog"]:not([aria-hidden="true"]), .drift-veil')) news()
+    }, NEWS_AFTER_MS)
 
   const opening = store.get()
   if (isLate(clockNow(), opening.settings.dayEndsAt ?? 0))

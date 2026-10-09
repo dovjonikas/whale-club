@@ -308,7 +308,7 @@ function validateSettings(raw: unknown): Settings {
     for (const [from, on] of Object.entries(raw.bottles)) if (isString(on)) bottles[from] = on
     if (Object.keys(bottles).length > 0) settings.bottles = bottles
   }
-  for (const key of ['bottleOn', 'heavySaidOn', 'goodAskedOn'] as const) {
+  for (const key of ['bottleOn', 'heavySaidOn', 'goodAskedOn', 'swimOn', 'tideOffered'] as const) {
     const value = raw[key]
     if (isString(value)) settings[key] = value
   }
