@@ -1,28 +1,26 @@
 import { reducedMotion } from '../scene/ticker'
 
-/** The name the swapping sheet carries, and only for as long as it swaps. */
-const NAME = 'sheet-swap'
-
 /**
- * Changes what a sheet shows (a month to a day, the dock's list to a
- * thing's page) inside a view transition where the browser has one: the
- * sheet crossfades and eases to its new height instead of cutting. Only
- * the sheet is named, so its own scroll clips the picture and the scene
- * behind stays live. Under reduced motion, or without the API, the change
- * is immediate.
+ * Changes what a sheet or a card shows (a month to a day, the dock's list
+ * to a thing's page, the check-in's question to the next one) inside a
+ * view transition where the browser has one: the box crossfades and eases
+ * to its new height instead of cutting. Only that box is named, and only
+ * while it swaps, so the scene behind stays live. Under reduced motion, or
+ * without the API, the change is immediate; so is a box not on the page.
  */
 export function swap(within: HTMLElement, update: () => void): void {
-  const sheet = within.closest<HTMLElement>('.sheet')
+  const box = within.closest<HTMLElement>('.sheet, .leaf')
   // Older Safari and Firefox have no view transitions: the type says they do.
   const supported = 'startViewTransition' in document
-  if (!sheet || !supported || reducedMotion()) {
+  if (!box?.isConnected || !supported || reducedMotion()) {
     update()
     return
   }
-  // Named on this one sheet only: a sheet still leaving would share the name.
-  sheet.style.setProperty('view-transition-name', NAME)
+  // Named on this one box only: a sheet still leaving would share the name.
+  const name = box.classList.contains('leaf') ? 'leaf-swap' : 'sheet-swap'
+  box.style.setProperty('view-transition-name', name)
   const done = (): void => {
-    sheet.style.removeProperty('view-transition-name')
+    box.style.removeProperty('view-transition-name')
   }
   try {
     document.startViewTransition(update).finished.then(done, done)

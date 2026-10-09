@@ -6,6 +6,7 @@ import type { AppData, DateKey } from '../store/types'
 import { voice } from '../voice'
 import type { NoticeBuilder } from './notices'
 import type { Moment } from './postcard'
+import { leafCard, leafHtml, onAction } from './leaf'
 
 /**
  * The weekly recap: "5/7." and one line, no graph. The days are the
@@ -49,22 +50,20 @@ export function recapNotice(store: Store, onSend: (moment: Moment) => void): Not
     if (!recap) return null
     const weekLine = recap.count / recap.planned >= GOOD_WEEK_WORD ? voice.weekGood : voice.weekBad
     noteSaid(weekLine)
-    const card = document.createElement('aside')
-    card.className = 'leaf recap'
-    card.setAttribute('aria-label', voice.labels.recap)
-    card.innerHTML = `
-      <div>
-        <span class="leaf-title recap-count">${recap.count}/${recap.planned}.</span>
-        <span class="recap-line">${weekLine}</span>
-      </div>
-      <div class="leaf-actions">
-        <button type="button" class="button-quiet recap-send">${voice.postcard.sendThis}</button>
-        <button type="button" class="button-quiet recap-ok">${voice.labels.ok}</button>
-      </div>`
-    card.querySelector('.recap-send')?.addEventListener('click', () => {
+    const card = leafCard(voice.labels.recap, 'recap')
+    card.innerHTML = leafHtml({
+      title: `<span class="leaf-count">${String(recap.count)}/${String(recap.planned)}.</span>`,
+      lead: weekLine,
+      leadClass: 'recap-line',
+      actions: [
+        { label: voice.postcard.sendThis, name: 'recap-send', kind: 'quiet' },
+        { label: voice.labels.ok, name: 'recap-ok', kind: 'soft' },
+      ],
+    })
+    onAction(card, 'recap-send', () => {
       onSend({ kind: 'recap', line: `${recap.count}/${recap.planned}. ${weekLine}` })
     })
-    card.querySelector('.recap-ok')?.addEventListener('click', () => {
+    onAction(card, 'recap-ok', () => {
       store.setSettings({ lastRecapWeek: recap.week })
       dismiss()
     })

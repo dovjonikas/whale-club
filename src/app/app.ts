@@ -105,6 +105,7 @@ export function startApp(root: HTMLElement, labEntered = false): void {
       <div class="not-today" hidden></div>
     </div>`
 
+  watchBottom(query(root, '.bottom'))
   const line = new Line(query(root, '.line'))
   const onboarding = query(root, '.onboarding')
   query(onboarding, 'p').textContent = voice.firstOpen
@@ -812,6 +813,20 @@ export function startApp(root: HTMLElement, labEntered = false): void {
     },
     labEntered,
   )
+}
+
+/**
+ * How tall the bottom block is (the line, the goals, the row), as
+ * `--ui-h` on the frame, so what the scene offers to a tap (the bottle)
+ * can keep above it on a short phone. Read by a ResizeObserver, which
+ * reports after layout: nothing here forces one.
+ */
+function watchBottom(bottom: HTMLElement): void {
+  const frame = host()
+  new ResizeObserver((entries) => {
+    const size = entries[0]?.borderBoxSize[0]
+    if (size) frame.style.setProperty('--ui-h', `${String(Math.round(size.blockSize))}px`)
+  }).observe(bottom)
 }
 
 /** The lab's "first open again" asks for the intro across its reload. */

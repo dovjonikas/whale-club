@@ -271,6 +271,8 @@ export const voice = {
     /** The last star: the legendary. */
     earned: (name: string) => `${name}. earned, not bought.`, // TODO-VOICE
     plaque: (date: string, day: number) => `earned on ${date} · day ${String(day)}`,
+    /** Under an earned legendary's name in its tile: the whole plaque is its label. */
+    onDay: (day: number) => `day ${String(day)}`,
     title: 'legendary',
     ahead: (stars: number) => `${String(stars)} stars to go`,
     later: 'a later constellation',
@@ -370,6 +372,8 @@ export const voice = {
     stones: 'stones',
     days: 'your days',
     pets: 'your creatures', // TODO-VOICE
+    /** Over the three rules, in the club and in how it works. */
+    rules: 'the rules', // TODO-VOICE
   },
   /** Petting a creature in the scene: nothing earned, nothing said, only its name for a screen reader. */
   pet: {

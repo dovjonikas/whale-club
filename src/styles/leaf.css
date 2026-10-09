@@ -1,0 +1,156 @@
+/* The card above the row (src/app/leaf.ts): one shape for every notice.
+   16 px inside on every side, 12 px between its parts, the actions right
+   after the words. */
+.leaf {
+  display: grid;
+  gap: var(--s3);
+  margin: 0 calc(var(--safe-right) + var(--s4)) var(--s3) calc(var(--safe-left) + var(--s4));
+  padding: var(--s4);
+  border-radius: var(--r);
+  background: var(--card);
+  border: 1px solid var(--card-edge);
+  backdrop-filter: var(--float-blur);
+  -webkit-backdrop-filter: var(--float-blur);
+  font-size: var(--t-sm);
+}
+
+.leaf-head {
+  display: flex;
+  align-items: center;
+  gap: var(--s3);
+}
+
+.leaf-text {
+  min-width: 0;
+}
+
+/* A drawing beside the title: the creature to be named. */
+.leaf-art {
+  display: block;
+  flex: none;
+  width: var(--touch);
+}
+
+.leaf-art svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Every card's title: the display face, one size, everywhere. */
+.leaf-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-variation-settings:
+    'opsz' 72,
+    'SOFT' 100,
+    'WONK' 1;
+  font-size: var(--t-md);
+  line-height: 1.25;
+  color: var(--star-pale);
+  text-wrap: balance;
+}
+
+.leaf-lead {
+  margin: var(--s1) 0 0;
+  color: var(--ink-dim);
+  text-wrap: pretty;
+}
+
+/* The week's number: the one title that is a figure. */
+.leaf-title .leaf-count {
+  font-size: var(--t-lg);
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The footer: a quiet note on the left, the actions on the right. On a
+   narrow phone a long note takes its own row and the actions stay right. */
+.leaf-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--s2) var(--s3);
+}
+
+.leaf-note {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--t-xs);
+  color: var(--ink-dim);
+}
+
+.leaf-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s1);
+  margin-left: auto;
+}
+
+/* A button in a card: 40 px to the eye, 44 px to the finger. */
+.leaf-button {
+  position: relative;
+  height: 40px;
+  padding: 0 var(--s4);
+  border-radius: var(--r-pill);
+  font-size: var(--t-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.leaf-button::after {
+  content: '';
+  position: absolute;
+  inset: -2px 0;
+}
+
+.leaf-button.is-primary {
+  background: var(--glow);
+  color: var(--abyss);
+}
+
+/* An acknowledgement: a pill, but not the bright one. */
+.leaf-button.is-soft {
+  background: rgba(62, 242, 224, 0.14);
+  color: var(--star-pale);
+}
+
+.leaf-button.is-quiet {
+  padding: 0 var(--s3);
+  color: var(--ink-dim);
+  font-weight: 400;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .leaf-button.is-quiet:hover {
+    color: var(--ink);
+  }
+}
+
+/* Quiet words alone have air above and below them inside their 44 px: the
+   row gives that back, so the words sit as close to the text as a pill. */
+.leaf-foot.is-quiet {
+  margin: calc(-1 * var(--s2)) 0;
+}
+
+/* A field in a card: the full width, no margin of its own. */
+.leaf .field {
+  margin: 0;
+}
+
+/* The line for the day: a quote, and who said it in the footer. */
+.leaf-quote {
+  margin: 0;
+  font-size: var(--t-md);
+  line-height: 1.35;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+/* Who said it: the same everywhere a line has an author. */
+.quote-by::before {
+  content: '— ';
+}

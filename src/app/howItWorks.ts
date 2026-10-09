@@ -1,4 +1,6 @@
 import { voice } from '../voice'
+import { menuRow } from './menuRow'
+import { rulesHtml } from './rules'
 import { openSheet } from './sheet'
 
 /**
@@ -12,9 +14,9 @@ export function openHowItWorks(onWatch: () => void): void {
     build(body, close) {
       body.innerHTML = `
         <ul class="how-lines">${voice.howItWorks.lines.map((l) => `<li>${l}</li>`).join('')}</ul>
-        <ol class="rules how-rules">${voice.rules.map((rule) => `<li>${rule}</li>`).join('')}</ol>
-        <button type="button" class="button-primary how-watch">${voice.intro.watch}</button>
-        <h3 class="settings-title how-faq-title">${voice.howItWorks.questions}</h3>
+        ${rulesHtml()}
+        <div class="row-group how-watch-group">${menuRow('how-watch', voice.intro.watch, 'play')}</div>
+        <h3 class="eyebrow how-faq-title">${voice.howItWorks.questions}</h3>
         <dl class="how-faq">${voice.howItWorks.faq.map(([q, a]) => `<dt>${q}</dt><dd>${a}</dd>`).join('')}</dl>`
       body.querySelector('.how-watch')?.addEventListener('click', () => {
         close()

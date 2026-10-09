@@ -306,7 +306,7 @@ function onOff(on: boolean): Option[] {
 }
 
 function group(title: string, rows: readonly string[]): string {
-  return `<section class="settings-group"><h3 class="settings-title">${title}</h3>${rows.join('')}</section>`
+  return `<section class="settings-group"><h3 class="eyebrow">${title}</h3>${rows.join('')}</section>`
 }
 
 function choice(key: keyof Settings, label: string, options: readonly Option[]): string {

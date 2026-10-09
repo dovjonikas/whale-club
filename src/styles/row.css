@@ -322,7 +322,7 @@
 .not-today-count {
   font-variant-numeric: tabular-nums;
   min-width: 18px;
-  padding: 0 6px;
+  padding: 0 var(--s1);
   border-radius: var(--r-pill);
   background: rgba(232, 240, 245, 0.1);
 }
@@ -635,6 +635,25 @@
   height: 100%;
 }
 
+/* A goal's words stay on one line: two lines would spill out of the pill. */
+.next-text {
+  white-space: nowrap;
+}
+
+/* On a 320 px phone the goals and "edit" share 288 px: the shapes and the
+   gaps give up a little, the words keep their size. */
+@media (max-width: 359px) {
+  .next-slot,
+  .next-find,
+  .next-legend {
+    gap: var(--s1);
+  }
+  .next-art {
+    width: 20px;
+    height: 20px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .card-hint,
   .card:has(.card-hint)::after {
@@ -661,7 +680,7 @@
 .first-week {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: var(--s1);
   height: 32px;
   padding: 0 var(--s3);
   border-radius: var(--r-pill);

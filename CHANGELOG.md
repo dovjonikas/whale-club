@@ -2,6 +2,39 @@
 
 All notable changes, newest first. Versions follow `package.json`.
 
+## 1.3.0 - unreleased: the night shift
+
+### A professional pass
+
+- **One card for every notice.** The check-in, the line for the day, the
+  evening's good thing, the recap, a new chapter, "name it?" and the
+  install card are one component (`src/app/leaf.ts`): an optional picture,
+  a title in the display face, a lead, an optional field, then one row with
+  a quiet note on the left and the actions on the right, in one order
+  everywhere: quiet words, a soft pill, the one bright primary at the edge.
+  16 px inside on every side. The line for the day and the good thing are
+  no taller than what they say; the check-in changes question in a short
+  crossfade instead of a cut.
+- **The club**, calm: which day of the club under the title, the rows, a
+  small "the rules" over the three rules at reading size, numbered, the
+  repeated "the … rule of whale club is:" quieter than the rule, and the
+  club's line last, after a hairline. How it works shows the same rules,
+  and "watch the intro" is a row.
+- **Settings and sheets**: one small mark for every group; "start over"
+  lined up with the rows above it; a focus ring the rows' rounded group no
+  longer cuts off; a bottle's line set as a quote, not as a field.
+- **320 px**: the log's month fits (it was 28 px wider than the screen), the
+  collection's rows of five fit (13 px), "next find" stays on one line in
+  its pill, and the bottle keeps above the line and the row on a short
+  phone. The krill chip's target is the 44 px it promised (it was 42).
+- **Tokens**: three corner radii and the pill, one floating shadow, spacing
+  on the 4 to 32 scale, and a type scale whose names run in order.
+- **The audit itself**: every surface in every state pictured at 390 × 844
+  and 320 × 568, before and after (`docs/audit/`, `scripts/audit.mjs`), the
+  findings with file and line in docs/QUALITY.md, and a new test
+  (`tests/e2e/layout.e2e.ts`) that keeps every control at 44 px and nothing
+  past the edge, at each device's size and at 320 × 568.
+
 ## 1.2.4 - 2026-10-08
 
 - **Rows that look like rows**: in the menu and in settings, the log, how

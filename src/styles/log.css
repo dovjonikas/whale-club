@@ -21,6 +21,11 @@
   text-align: left;
 }
 
+.row-group .menu-row:focus-visible {
+  outline-offset: -2px;
+  border-radius: var(--r);
+}
+
 .row-group .menu-row + .menu-row {
   border-top: 1px solid rgba(232, 240, 245, 0.07);
 }
@@ -77,10 +82,6 @@
   color: #ff7a72;
 }
 
-.row-group + .rules {
-  margin-top: var(--s4);
-}
-
 .log-head {
   display: grid;
   grid-template-columns: var(--touch) 1fr var(--touch);
@@ -129,6 +130,8 @@
 .log-cell {
   position: relative;
   aspect-ratio: 1;
+  /* Square where seven fit; on a 320 px phone narrower than tall, never past the edge. */
+  min-width: 0;
   min-height: var(--touch);
   display: grid;
   grid-template-rows: 1fr auto;

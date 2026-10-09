@@ -1,4 +1,5 @@
 import { menuRow } from './menuRow'
+import { rulesHtml } from './rules'
 import { noteSaid } from './said'
 import { todayKey } from '../store/dates'
 import { dayNumber, streak } from '../store/derive'
@@ -8,9 +9,11 @@ import { backupStale } from './settingsSheet'
 import { openSheet } from './sheet'
 
 /**
- * The menu is one screen: the club. The log, how it works and the
- * settings, three rules, one sentence about who is in it, and the day
- * count with a small streak. When a backup is due, one quiet line.
+ * The menu is one screen: the club. Under its name, which day of the club
+ * this is (and the run, when there is one); the way to the log, how it
+ * works and the settings; the three rules, quieter, at reading size; and
+ * the club's one line at the end, like a signature. When a backup is due,
+ * one quiet line under the rows. Only the title wears the display face.
  */
 export function openMenuSheet(
   store: Store,
@@ -28,19 +31,19 @@ export function openMenuSheet(
       const day = dayNumber(data, today)
       const run = streak(data, today)
       body.innerHTML = `
+        ${
+          day > 0
+            ? `<p class="club-day">${voice.share.caption(day)}${run > 1 ? ` · ${voice.labels.inARow(run)}` : ''}</p>`
+            : ''
+        }
         <div class="row-group">
           ${menuRow('menu-log', voice.log.title, 'star')}
           ${menuRow('menu-how', voice.howItWorks.title, 'tail')}
           ${menuRow('menu-settings', voice.settings.open, 'settings')}
         </div>
-        ${backupStale(data, today) ? `<p class="sheet-note menu-backup">${voice.settings.backupDue}</p>` : ''}
-        <ol class="rules">${voice.rules.map((rule) => `<li>${rule}</li>`).join('')}</ol>
-        <p class="club-line">${voice.clubLine}</p>
-        <p class="sheet-note">${
-          day > 0
-            ? `${voice.share.caption(day)}${run > 1 ? ` · ${voice.labels.inARow(run)}` : ''}`
-            : ''
-        }</p>`
+        ${backupStale(data, today) ? `<p class="sheet-note row-note menu-backup">${voice.settings.backupDue}</p>` : ''}
+        ${rulesHtml()}
+        <p class="club-line">${voice.clubLine}</p>`
       body.querySelector('.menu-log')?.addEventListener('click', on.onLog)
       body.querySelector('.menu-how')?.addEventListener('click', on.onHow)
       body.querySelector('.menu-settings')?.addEventListener('click', on.onSettings)

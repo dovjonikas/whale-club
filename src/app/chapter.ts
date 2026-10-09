@@ -1,3 +1,4 @@
+import { leafCard, leafHtml, onAction } from './leaf'
 import { noteSaid } from './said'
 import { addDays, fromKey, todayKey, weekStart } from '../store/dates'
 import { starDays } from '../store/derive'
@@ -33,23 +34,20 @@ export function chapterNotice(store: Store): NoticeBuilder {
     const today = todayKey()
     if (!chapterDue(store.get(), today)) return null
     noteSaid(voice.chapter.lead, today)
-    const card = document.createElement('aside')
-    card.className = 'leaf chapter'
-    card.setAttribute('aria-label', voice.chapter.title)
-    card.innerHTML = `
-      <div>
-        <span class="leaf-title">${voice.chapter.title}</span>
-        <span class="leaf-lead">${voice.chapter.lead}</span>
-      </div>
-      <div class="leaf-actions">
-        <button type="button" class="button-primary chapter-yes">${voice.chapter.yes}</button>
-        <button type="button" class="button-quiet chapter-no">${voice.chapter.no}</button>
-      </div>`
-    card.querySelector('.chapter-yes')?.addEventListener('click', () => {
+    const card = leafCard(voice.chapter.title, 'chapter')
+    card.innerHTML = leafHtml({
+      title: voice.chapter.title,
+      lead: voice.chapter.lead,
+      actions: [
+        { label: voice.chapter.no, name: 'chapter-no', kind: 'quiet' },
+        { label: voice.chapter.yes, name: 'chapter-yes', kind: 'primary' },
+      ],
+    })
+    onAction(card, 'chapter-yes', () => {
       store.setSettings({ chapterFrom: today, chapterOffered: today })
       dismiss()
     })
-    card.querySelector('.chapter-no')?.addEventListener('click', () => {
+    onAction(card, 'chapter-no', () => {
       store.setSettings({ chapterOffered: today })
       dismiss()
     })
