@@ -332,12 +332,19 @@
   text-align: center;
 }
 
+/* The back row stays above the find, which sits up under it: the pool of
+   light is clear at its edge, so the two can overlap without a gap. */
+.case-head {
+  position: relative;
+  z-index: 1;
+}
+
 .case-art {
   display: grid;
   place-items: center;
-  width: 168px;
-  height: 168px;
-  margin-bottom: var(--s2);
+  width: 152px;
+  height: 152px;
+  margin-top: calc(-1 * var(--s6));
   border-radius: 50%;
   background: radial-gradient(closest-side, rgba(62, 242, 224, 0.16), transparent);
 }
@@ -347,8 +354,8 @@
 }
 
 .case-art svg {
-  width: 128px;
-  height: 128px;
+  width: 116px;
+  height: 116px;
   overflow: visible;
 }
 
