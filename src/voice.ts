@@ -37,6 +37,14 @@ export const voice = {
     /** A find not reached yet, for a screen reader: its name stays a surprise, as its picture does. */
     locked: 'a find still to come', // TODO-VOICE
   },
+  /** The museum: a find's case, opened from its tile. Its plaque is in src/scene/collectibles/museum.ts. */
+  museum: {
+    open: (name: string) => `${name}, open its case`,
+    back: 'back to the museum',
+    came: (date: string, thing: string, day: number) =>
+      `came on ${date} · ${thing}, day ${String(day)}`,
+    half: (date: string, day: number) => `found on ${date} · day ${String(day)}`,
+  },
   shareDone: 'picture saved.', // TODO-VOICE
   shareFailed: 'could not make the picture.', // TODO-VOICE
   /** What to do then, said right after it. */
@@ -365,9 +373,9 @@ export const voice = {
     checkin: 'check-in',
     club: 'the club',
     inARow: (days: number) => `${String(days)} days in a row`,
-    collection: 'collection',
+    collection: 'the museum', // TODO-VOICE
     sound: 'Sound',
-    collectionButton: 'Collection',
+    collectionButton: 'Museum', // TODO-VOICE
     menu: 'Menu',
     stones: 'stones',
     days: 'your days',
@@ -514,6 +522,103 @@ export const voice = {
     empty: (n: number) => `empty place ${String(n)}`,
   },
   /** The lab: a tool for trying the app across days, not part of the game's voice. */
+  /** The month's tide: last month told back in a few lines (src/app/tide.ts). */
+  tide: {
+    /** The card that offers it, early in a new month, and the story's name. */
+    offer: (month: string) => `${month}, in a few lines`, // TODO-VOICE
+    offerLead: 'the month that went, told back.', // TODO-VOICE
+    watch: 'watch',
+    notNow: 'not now',
+    openLead: 'the month, in a few lines.', // TODO-VOICE
+    starsLine: (n: number) => (n === 1 ? 'day with a star.' : 'days with a star.'), // TODO-VOICE
+    lanternsLine: (n: number, time: string) =>
+      `${n === 1 ? 'lantern' : 'lanterns'}. ${time} locked in.`, // TODO-VOICE
+    /** Only where it is true: a humpback's song lasts ten to twenty minutes; fifteen are counted. */
+    songs: (n: number) => `a humpback’s song, ${String(n)} times over.`, // TODO-VOICE
+    bestWeek: 'the best week', // TODO-VOICE
+    bestWeekLine: (count: number, planned: number) =>
+      `${String(count)} of ${String(planned)} days with a star.`, // TODO-VOICE
+    newest: 'new in the sea', // TODO-VOICE
+    newestLine: (thing: string, day: number) => `${thing}, day ${String(day)}`,
+    together: (a: string, b: string, days: number) =>
+      `${a} and ${b} kept the same days: ${String(days)} of them.`, // TODO-VOICE
+    weekday: (weekday: string, stars: number) =>
+      `${weekday}s had the most stars: ${String(stars)}.`, // TODO-VOICE
+    goods: (n: number) => `${String(n)} evenings kept one good thing.`, // TODO-VOICE
+    longest: (time: string) => `the longest lock in: ${time}.`, // TODO-VOICE
+    typeLead: 'this month you were', // TODO-VOICE
+    /** A sea type for every month, from how it went; every one is said warmly. */
+    types: {
+      lanternfish: ['a lanternfish.', 'the lights were yours.'], // TODO-VOICE
+      turtle: ['a turtle.', 'slow, steady, a little nearly every day.'], // TODO-VOICE
+      dolphin: ['a dolphin.', 'in bursts, and every burst a jump.'], // TODO-VOICE
+      seal: ['a seal.', 'worked, then lay on a warm rock. both count.'], // TODO-VOICE
+      whale: ['a whale.', 'big, slow, and still going.'], // TODO-VOICE
+    },
+    keep: 'keep this month?', // TODO-VOICE
+    keepLead: 'a postcard of it, to keep or to send.', // TODO-VOICE
+    next: 'next',
+    back: 'back',
+    send: 'send this',
+    close: 'close',
+    /** In the log, under a past month's line. */
+    again: (month: string) => `watch ${month}’s tide`, // TODO-VOICE
+    /** "try it" with no month that has a star yet. */
+    none: 'the first tide comes with the first star.', // TODO-VOICE
+    postcard: (month: string, stars: number) =>
+      `${month}: ${String(stars)} ${stars === 1 ? 'day' : 'days'} with a star.`, // TODO-VOICE
+  },
+  /** The whale's night swim: somewhere real each night, told the next morning (src/app/nightSwim.ts). */
+  swim: {
+    label: 'the whale is back', // TODO-VOICE
+    title: (place: string) => `back from ${place}.`, // TODO-VOICE
+    ok: 'ok',
+    send: 'send this',
+    /** Where it went, and one true thing about the place. */
+    places: [
+      ['a bay that glows', 'the blue light is plankton, flashing when the water moves.'], // TODO-VOICE
+      ['the kelp forest', 'kelp can grow half a metre in a day.'], // TODO-VOICE
+      [
+        'the vents at the bottom',
+        'life down there runs on chemicals from the earth, not on sunlight.',
+      ], // TODO-VOICE
+      ['the sargasso sea', 'the only sea with no shore at all.'], // TODO-VOICE
+      ['the twilight zone', 'every night the biggest migration on earth swims up from there.'], // TODO-VOICE
+      ['the reef', 'a whole reef is built by animals smaller than a fingernail.'], // TODO-VOICE
+      ['the gulf stream', 'it carries more water than all the rivers in the world together.'], // TODO-VOICE
+      ['a milky sea', 'a glow so wide it can be seen from space.'], // TODO-VOICE
+      ['the seagrass meadows', 'a meadow under the water. turtles graze it.'], // TODO-VOICE
+      ['the mangroves', 'trees that stand in the sea on their own roots.'], // TODO-VOICE
+      ['a seamount', 'a mountain under the sea that never reaches the air.'], // TODO-VOICE
+      ['the deepest trench', 'it is deeper than the tallest mountain is tall.'], // TODO-VOICE
+      ['under the arctic ice', 'narwhals dive more than a kilometre down there.'], // TODO-VOICE
+      ['the southern ocean', 'it goes all the way round the world, with no land in its way.'], // TODO-VOICE
+      ['the azores', 'sperm whales talk there, in clicks.'], // TODO-VOICE
+      ['the open ocean', 'about half the oxygen in the air was made out there, by plankton.'], // TODO-VOICE
+      ['an iceberg', 'most of it is under the water, keeping quiet.'], // TODO-VOICE
+      ['the lagoon', 'parrotfish there sleep in a bubble they make themselves.'], // TODO-VOICE
+      ['the north atlantic', 'the humpbacks there all sing one song, and change it together.'], // TODO-VOICE
+      ['a sea cave', 'the tide breathes in and out of it twice a day.'], // TODO-VOICE
+      ['the long way round', 'humpbacks swim thousands of kilometres a year, there and back.'], // TODO-VOICE
+    ] as const,
+  },
+  /** Drift: only the sea, until a tap (src/app/drift.ts). */
+  drift: {
+    open: 'drift', // TODO-VOICE
+    label: 'just the sea', // TODO-VOICE
+    back: 'tap anywhere to come back', // TODO-VOICE
+  },
+  /** What's new: once after an update, and from how it works (src/app/whatsNew.ts). */
+  news: {
+    title: 'what’s new',
+    lead: (version: string) => `in ${version}, while you were away.`, // TODO-VOICE
+    tryIt: 'try it',
+    museum: ['the museum', 'every find has a line about itself now. tap one to read it.'], // TODO-VOICE
+    tide: ['the month’s tide', 'last month, told back in a few lines.'], // TODO-VOICE
+    drift: ['drift', 'just the sea, for the evenings you only want to be there.'], // TODO-VOICE
+    swim: ['the night swim', 'the whale goes somewhere at night and tells you in the morning.'], // TODO-VOICE
+    calm: ['a calmer look', 'the cards, the club and the settings, cleaned up.'], // TODO-VOICE
+  },
   lab: {
     title: 'the lab',
     note: 'fake time. your real sea is untouched.',

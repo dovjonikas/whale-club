@@ -393,3 +393,9 @@ button.log-cell {
   color: var(--star);
   font-size: var(--t-xs);
 }
+
+/* A month with a tide offers it under the month's line: the cards' soft pill, centred. */
+.log-tide {
+  display: block;
+  margin: calc(-1 * var(--s2)) auto var(--s4);
+}

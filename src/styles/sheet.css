@@ -94,6 +94,13 @@
   text-wrap: balance;
 }
 
+/* The title takes the focus when a sheet opens, for a screen reader to start
+   there; it is not a control, so it draws no ring, even when the sheet opened
+   by itself (what's new) and the browser would. */
+.sheet-title:focus {
+  outline: none;
+}
+
 .sheet-close {
   position: absolute;
   top: var(--s2);
@@ -292,6 +299,133 @@
   color: var(--ink);
   line-height: 1.2;
   overflow-wrap: break-word;
+}
+
+/* A found tile opens its case in the museum: the whole tile is the button,
+   and gives under a finger like any other. */
+.tile-open {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.tile-open:focus-visible {
+  outline-offset: -2px;
+}
+
+.tile:has(.tile-open) {
+  transition: scale var(--dur-press) var(--ease-out);
+}
+
+.tile:has(.tile-open:active) {
+  scale: var(--press-scale);
+  transition-duration: 0s;
+}
+
+/* A find's case (src/app/museum.ts): the find large in a pool of light,
+   its name, its plaque, and when it came, quietest. */
+.case {
+  display: grid;
+  justify-items: center;
+  gap: var(--s2);
+  padding: 0 0 var(--s6);
+  text-align: center;
+}
+
+.case-art {
+  display: grid;
+  place-items: center;
+  width: 168px;
+  height: 168px;
+  margin-bottom: var(--s2);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(62, 242, 224, 0.16), transparent);
+}
+
+.case[data-rarity='legendary'] .case-art {
+  background: radial-gradient(closest-side, rgba(255, 217, 138, 0.22), transparent);
+}
+
+.case-art svg {
+  width: 128px;
+  height: 128px;
+  overflow: visible;
+}
+
+.case-name {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s2);
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-variation-settings:
+    'opsz' 72,
+    'SOFT' 100,
+    'WONK' 1;
+  font-size: var(--t-lg);
+  color: var(--star-pale);
+  text-wrap: balance;
+}
+
+.case-name:focus {
+  outline: none;
+}
+
+.case .case-rarity {
+  position: static;
+  font-family: var(--font-body);
+}
+
+.case-plaque {
+  max-width: 32ch;
+  margin: 0;
+  font-size: var(--t-md);
+  line-height: 1.4;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.case-came {
+  margin: 0;
+  font-size: var(--t-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-dim);
+}
+
+/* A legendary's case: the find half way to it, under, smaller. */
+.case-half {
+  display: grid;
+  grid-template-columns: var(--touch) 1fr;
+  align-items: center;
+  gap: var(--s3);
+  padding: var(--s3);
+  border-radius: var(--r);
+  background: rgba(232, 240, 245, 0.05);
+}
+
+.case-half-art svg {
+  display: block;
+  width: var(--touch);
+  height: var(--touch);
+  overflow: visible;
+}
+
+.case-half-text {
+  margin: 0;
+  font-size: var(--t-sm);
+  color: var(--ink-dim);
+}
+
+.case-half-name {
+  display: block;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.case-half-text .case-came {
+  display: block;
+  margin-top: var(--s1);
 }
 
 /* A silhouette: the same drawing, flattened to one dark shade. */

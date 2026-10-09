@@ -197,5 +197,5 @@ test('the next find is always in sight, with the Collection count', async ({ pag
   // One day done, the first find at three: two more.
   await expect(page.getByRole('button', { name: 'next find: in 2 days' })).toBeVisible()
   await page.getByRole('button', { name: 'next find: in 2 days' }).click()
-  await expect(page.getByRole('dialog', { name: 'collection' })).toContainText('in 2 days')
+  await expect(page.getByRole('dialog', { name: 'the museum' })).toContainText('in 2 days')
 })

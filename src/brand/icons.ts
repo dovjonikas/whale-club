@@ -17,6 +17,7 @@ export type IconName =
   | 'share'
   | 'restore'
   | 'play'
+  | 'moon'
   | 'send'
   | 'lockIn'
   | 'star'
@@ -51,6 +52,7 @@ export const ICONS: Readonly<Record<IconName, string>> = {
   share:
     '<path d="M12 3.5v11"/><path d="m8 7.5 4-4 4 4"/><path d="M6 11.5v7a1.5 1.5 0 0 0 1.5 1.5h9a1.5 1.5 0 0 0 1.5-1.5v-7"/>',
   play: '<path d="M8.5 5.5v13l10-6.5Z"/>',
+  moon: '<path d="M15.5 4.2A8 8 0 1 0 19.8 15 6.6 6.6 0 0 1 15.5 4.2Z"/>',
   restore:
     '<path d="M12 3.5v11"/><path d="m8 10.5 4 4 4-4"/><path d="M6 11.5v7a1.5 1.5 0 0 0 1.5 1.5h9a1.5 1.5 0 0 0 1.5-1.5v-7"/>',
   send: '<path d="M20.5 3.5 3.5 10.5l7 3 3 7Z"/><path d="m10.5 13.5 4.5-4.5"/>',

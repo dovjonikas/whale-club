@@ -174,7 +174,7 @@ test('the lab bar is on every screen, a sheet and a session too, and nothing cov
   await dismissInstallLeaf(page)
   await clearNotices(page)
 
-  await page.getByRole('button', { name: 'Collection' }).click()
+  await page.getByRole('button', { name: 'Museum' }).click()
   await expect(page.getByRole('dialog')).toBeVisible()
   expect(await barIsOnTop()).toBe(true)
   await page.getByRole('dialog').getByRole('button', { name: 'Close' }).click()

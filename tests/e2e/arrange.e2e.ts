@@ -18,7 +18,7 @@ async function placement(page: Page): Promise<Record<string, string> | undefined
 }
 
 async function openArranging(page: Page): Promise<Locator> {
-  await page.getByRole('button', { name: 'Collection' }).click()
+  await page.getByRole('button', { name: 'Museum' }).click()
   await page.getByRole('button', { name: 'arrange', exact: true }).click()
   const dialog = page.getByRole('dialog', { name: 'arrange your sea' })
   await expect(dialog).toBeVisible()

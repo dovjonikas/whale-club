@@ -94,8 +94,8 @@ test('a waiting stone shows in the Collection', async ({ page }) => {
     settings: { installDismissedAt: dateKey(0) },
   })
   await page.goto('')
-  await page.getByRole('button', { name: 'Collection' }).click()
-  const sheet = page.getByRole('dialog', { name: 'collection' })
+  await page.getByRole('button', { name: 'Museum' }).click()
+  const sheet = page.getByRole('dialog', { name: 'the museum' })
   await expect(sheet.locator('.tile.is-stone')).toHaveCount(1)
   await expect(sheet.locator('.tile.is-stone')).toContainText('a stone. crack it.')
   await expect(sheet.locator('.tile.is-unlocked')).toHaveCount(0)

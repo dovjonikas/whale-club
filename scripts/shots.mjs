@@ -121,6 +121,9 @@ const data = {
     explained: ['yours', 'firstStar', 'stone', 'lantern', 'kept'],
     // Tonight's good thing was asked already: no card over the sky.
     goodAskedOn: key(0),
+    // The whale's swim told and November's tide offered already: the same.
+    swimOn: key(0),
+    tideOffered: '2026-11',
   },
 }
 
@@ -132,7 +135,16 @@ const targets = [
 
 const shot = (page, file) => page.screenshot({ path: resolve(out, file) })
 
-const browser = await chromium.launch()
+const launched = await chromium.launch()
+// Every page has seen this version's "what's new": the pictures are of the app, not of the sheet.
+const browser = {
+  async newContext(options) {
+    const context = await launched.newContext(options)
+    await context.addInitScript(() => localStorage.setItem('whaleclub:news', '1.3.0'))
+    return context
+  },
+  close: () => launched.close(),
+}
 for (const { name, options } of targets) {
   const context = await browser.newContext(options)
   const page = await context.newPage()
@@ -195,7 +207,7 @@ for (const { name, options } of targets) {
     save(cards[1], 'postcard-square.png')
   }
 
-  await page.getByRole('button', { name: 'Collection' }).click()
+  await page.getByRole('button', { name: 'Museum' }).click()
   await page.waitForTimeout(500)
   await shot(page, `${name}-collection.png`)
   await context.close()
@@ -421,7 +433,7 @@ for (const [file, off] of [
   await shot(page, 'iphone-dock.png')
   await page.keyboard.press('Escape')
   await page.waitForTimeout(400)
-  await page.getByRole('button', { name: 'Collection' }).click()
+  await page.getByRole('button', { name: 'Museum' }).click()
   await page.getByRole('button', { name: 'arrange', exact: true }).click()
   await page.getByRole('button', { name: /^sandcastle, place \d$/ }).click()
   await page.waitForTimeout(500)
@@ -535,6 +547,68 @@ await pathScene(29, 'iphone-ceremony.png', async (page) => {
   await page.goto(base)
   await page.waitForTimeout(1800)
   await shot(page, 'iphone-late.png')
+  await context.close()
+}
+
+// 1.3, the night shift: a find's case in the museum, October's tide, drift,
+// the whale back from its swim, and what's new.
+{
+  const context = await browser.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.setFixedTime(NOW)
+  await page.addInitScript(
+    (json) => localStorage.setItem('whaleclub:data', json),
+    JSON.stringify(data),
+  )
+  await page.goto(base)
+  await page.waitForTimeout(1200)
+  await page.getByRole('button', { name: 'Museum' }).click()
+  await page.getByRole('button', { name: 'a school of fish, open its case' }).click()
+  await page.waitForTimeout(700)
+  await shot(page, 'iphone-museum.png')
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(400)
+  await page.getByRole('button', { name: 'Menu' }).click()
+  await page.getByRole('button', { name: 'the log' }).click()
+  await page.getByRole('button', { name: 'previous month' }).click()
+  await page.getByRole('button', { name: 'watch october’s tide' }).click()
+  // The month's sea type, a card in.
+  for (let card = 0; card < 8; card++) {
+    if (await page.getByText('this month you were').isVisible()) break
+    await page.getByRole('button', { name: 'next', exact: true }).click()
+    await page.waitForTimeout(400)
+  }
+  await page.waitForTimeout(500)
+  await shot(page, 'iphone-tide.png')
+  await page.keyboard.press('Escape')
+  await page.keyboard.press('Escape')
+  await page.waitForTimeout(500)
+  await page.getByRole('button', { name: 'Menu' }).click()
+  await page.getByRole('button', { name: 'drift', exact: true }).click()
+  await page.waitForTimeout(2200)
+  await shot(page, 'iphone-drift.png')
+  await context.close()
+}
+{
+  const morning = new Date(NOW)
+  morning.setHours(9, 10)
+  const swimData = JSON.parse(JSON.stringify(data))
+  delete swimData.settings.swimOn
+  const context = await launched.newContext({ ...devices['iPhone 13'] })
+  const page = await context.newPage()
+  await page.clock.setFixedTime(morning)
+  await page.addInitScript(
+    (json) => localStorage.setItem('whaleclub:data', json),
+    JSON.stringify(swimData),
+  )
+  await page.goto(base)
+  await page.getByRole('dialog', { name: 'what’s new' }).waitFor()
+  await page.waitForTimeout(800)
+  await shot(page, 'iphone-news.png')
+  await page.keyboard.press('Escape')
+  await page.getByRole('complementary', { name: 'the whale is back' }).waitFor()
+  await page.waitForTimeout(1500)
+  await shot(page, 'iphone-swim.png')
   await context.close()
 }
 

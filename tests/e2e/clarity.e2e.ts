@@ -103,9 +103,9 @@ test('fifteen everyday jobs, by visible words, each within two taps', async ({ p
 
   // 8. Find the Collection.
   await fromFirstScreen(page)
-  await within2(button(page, 'Collection'))
-  await tap(button(page, 'Collection'))
-  await expect(page.getByRole('dialog', { name: 'collection' })).toBeVisible()
+  await within2(button(page, 'Museum'))
+  await tap(button(page, 'Museum'))
+  await expect(page.getByRole('dialog', { name: 'the museum' })).toBeVisible()
 
   // 9. Send a postcard.
   await fromFirstScreen(page)
@@ -174,7 +174,7 @@ test('16. move a find: arrange is in sight within two taps, then the find and it
   })
   await page.goto('')
   await fromFirstScreen(page)
-  await tap(button(page, 'Collection'))
+  await tap(button(page, 'Museum'))
   await within2(button(page, 'arrange'))
   await tap(button(page, 'arrange'))
   // The find and a free place of its world, both by their names.
@@ -252,4 +252,89 @@ test('19. pet a creature: in sight on the first screen, by its name', async ({ p
   if (await recap.isVisible()) await tap(recap.getByRole('button', { name: 'ok' }))
   await within2(button(page, 'pet run'))
   await tap(button(page, 'pet run'))
+})
+
+/** Forty days in, today's check-in done, at noon: the first screen of a person who uses it. */
+async function fortyDays(page: Page, settings: Record<string, unknown> = {}): Promise<void> {
+  await page.clock.install({ time: middayToday() })
+  const days: Record<string, { done: string[]; checkin?: boolean }> = {}
+  for (let i = -40; i < 0; i++) days[dateKey(i)] = { done: ['run'] }
+  days[dateKey(0)] = { done: [], checkin: true }
+  await seed(page, {
+    things: [
+      { id: 'run', name: 'run', world: 'sea', createdAt: dateKey(-40), order: 0, kind: 'tap' },
+    ],
+    days,
+    cracked: { run: 30 },
+    settings: { installDismissedAt: dateKey(-1), lastRecapWeek: dateKey(0), ...settings },
+  })
+  await page.goto('')
+  await fromFirstScreen(page)
+  const recap = page.getByRole('complementary', { name: 'weekly recap' })
+  if (await recap.isVisible()) await tap(recap.getByRole('button', { name: 'ok' }))
+  taps = 0
+}
+
+test('20. read a find’s plaque: its case is two taps away, by the find’s name', async ({
+  page,
+}) => {
+  await fortyDays(page)
+  await tap(button(page, 'Museum'))
+  await within2(button(page, 'a fish, open its case'))
+  await tap(button(page, 'a fish, open its case'))
+  await expect(page.getByRole('heading', { name: 'a fish' })).toBeVisible()
+})
+
+test('21. drift: the word is in the club, and the way back is said', async ({ page }) => {
+  await fortyDays(page)
+  await tap(button(page, 'Menu'))
+  await within2(button(page, 'drift'))
+  await tap(button(page, 'drift'))
+  await expect(page.getByText('tap anywhere to come back')).toBeVisible()
+  await tap(page.getByRole('button', { name: 'tap anywhere to come back' }))
+  await expect(button(page, 'Menu')).toBeVisible()
+})
+
+test('22. hear where the whale went: on the first screen, after the check-in', async ({ page }) => {
+  const morning = middayToday()
+  morning.setHours(9)
+  await page.clock.install({ time: morning })
+  const days: Record<string, { done: string[]; checkin?: boolean }> = {}
+  for (let i = -5; i < 0; i++) days[dateKey(i, morning)] = { done: ['run'] }
+  days[dateKey(0, morning)] = { done: [], checkin: true }
+  await seed(page, {
+    things: [
+      {
+        id: 'run',
+        name: 'run',
+        world: 'sea',
+        createdAt: dateKey(-5, morning),
+        order: 0,
+        kind: 'tap',
+      },
+    ],
+    days,
+    settings: { installDismissedAt: dateKey(-1, morning), swimOn: null },
+  })
+  await page.goto('')
+  await fromFirstScreen(page)
+  const recap = page.getByRole('complementary', { name: 'weekly recap' })
+  if (await recap.isVisible()) await tap(recap.getByRole('button', { name: 'ok' }))
+  const swim = page.getByRole('complementary', { name: 'the whale is back' })
+  await within2(swim.getByRole('button', { name: 'ok' }))
+})
+
+test('23. what’s new: in how it works, two taps from the first screen', async ({ page }) => {
+  await fortyDays(page)
+  await tap(button(page, 'Menu'))
+  await tap(button(page, 'how it works'))
+  await within2(button(page, 'what’s new'))
+})
+
+test('24. watch last month’s tide: the log, a month back, its own word', async ({ page }) => {
+  await fortyDays(page)
+  await tap(button(page, 'Menu'))
+  await tap(button(page, 'the log'))
+  await page.getByRole('button', { name: 'previous month' }).click()
+  await expect(page.getByRole('button', { name: /^watch .+’s tide$/ })).toBeVisible()
 })

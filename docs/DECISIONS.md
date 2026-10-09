@@ -1213,3 +1213,72 @@ The brief's example for the month's tide ("on days you ran, you said
 good!!! more often") cannot be true: the check-in's two answers are fixed
 and always happy. The tide says only what the data can carry, and leaves a
 card out rather than invent one.
+
+## 2026-10-09 The collection is the museum
+
+The brief: the collection becomes a sea museum. The sheet and its button
+are named so ("the museum", "Museum"), because a button that says
+Collection opening a page called the museum would be two names for one
+place. A tap on a found tile opens its case inside the same sheet, in the
+sheets' own crossfade, and "back to the museum" returns to the tile it
+came from, scrolled where it was. The plaques live beside the finds'
+names and hints (src/scene/collectibles/museum.ts), not in voice.ts: a
+find is defined in one place, its words with it. A test holds that every
+find has one and none is longer than its case.
+
+When a find "came" is the day it was earned (the day its stone fell), not
+the day the stone was cracked: that day is not stored, and the earned day
+can be worked out exactly from the days.
+
+## 2026-10-09 The tide says only what the days prove
+
+Each part of the month's tide has a threshold, written beside it in
+src/store/tide.ts: two things are "together" from five shared days and
+seven in ten of the rarer one's days; a weekday is named when it had the
+most stars on its own, three or more; a best week needs a month of two
+weeks to compare; the humpback songs need two whole songs (a song is
+counted as fifteen minutes, inside the ten to twenty they last). A part
+that does not reach its threshold is left out, never put more vaguely.
+The newest find is one already out of its stone, so the tide never spoils
+a stone still waiting. The sea type is every month's, from the first rule
+that fits, and all of them are said warmly.
+
+The tide is offered in the first seven days of a month, once; a tide for
+a month not over yet can be watched from the log or from what's new, and
+says the month so far. The store knows nothing of the scene: the newest
+find is worked out in src/app/tide.ts, where the finds are.
+
+## 2026-10-09 The swim and the tide come after the check-in
+
+The cards above the row are one at a time (Notices). The morning goes:
+the check-in, its line for the day, then the month's tide (in a month's
+first week), then the whale back from its swim. The check-in is the day's
+ritual and comes first; the swim is a reward for opening the app, not a
+gate before it. The whale comes up 900 ms after the card is made, never
+while the app is still starting (2026-10-07, nothing reads layout then).
+
+## 2026-10-09 Drift is a word in the club, not a gesture
+
+The brief allowed a long press on the moon or the word "drift" in the
+menu. Only the word: every action has a visible word (the clarity rule),
+and the moon already says good night at its hour. Drift fades the whole
+interface the way a lock-in does (#app's own opacity transition), keeps
+the screen awake, and ends on a tap anywhere, Escape, or the page hiding.
+Its veil is `.drift-veil`: `.drift` was already the motion of the finds
+that drift, and the veil had inherited their endless animation.
+
+## 2026-10-09 What's new is marked on the phone, not in the sea
+
+"What's new" is shown once per version and remembered in its own key
+(`whaleclub:news`), beside the intro's, not in the data: it is about what
+this phone has seen, and a restore from a backup should not show it again
+or hide it. A first open marks it seen at once (the intro is the welcome).
+Tests mark it seen in their fixture; a test about it takes the mark away.
+
+## 2026-10-09 No app's name, even as a keyword
+
+A sweep for other apps' names before the 1.3.0 push found one from 0.12:
+a language-learning app's name in the glyph keywords (src/brand/glyphs.ts),
+so a thing called by that name got the languages glyph. The rule has no
+exception for keywords: it is gone, and a thing named so gets the glyph
+its name's letter or other words give it, like any other name.

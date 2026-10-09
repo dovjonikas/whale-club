@@ -25,10 +25,12 @@ src/
     iconField.ts     a thing's picture: it follows the name until one is picked; common ones, more
     intro.ts         the first minute: the promise, the truth, the first step
     score.ts         the intro's music, all synthesised: piano, pad, the whale's low voice, a room
-    howItWorks.ts    the idea in a few lines, the rules, the intro again, the first questions
+    howItWorks.ts    the idea in a few lines, the rules, the intro again, what's new, the first questions
+    rules.ts         the three rules as the club and how it works show them, numbered, at reading size
+    menuRow.ts       a row that opens or does something: an icon in a soft circle, the words, a chevron
     addSheet.ts      the add sheet: a name, its picture, how it is done, the days; three starters
     sheet.ts         a bottom sheet: one at a time, modal, focus in and back, the rest inert
-    swap.ts          a sheet's change of view (the log's, the dock's) inside a view transition
+    swap.ts          a sheet's or a card's change of view (the log's, a case, the check-in's) in a view transition
     toast.ts         one line at the top, the undo at the bottom, the screen reader's announcements
     line.ts          the one row of text the app speaks through
     session.ts       a lock-in, measured by timestamps: only what the timer saw counts; undo, one pause
@@ -51,7 +53,8 @@ src/
     dial.ts          the lock-in dial, five minutes to ten hours, spread over LENGTH_STOPS
     wakeLock.ts      the screen kept on during a session
     header.ts        the title and the four buttons
-    notices.ts       one notice above the row at a time
+    notices.ts       one notice above the row at a time, and "try it" bringing one to the front
+    leaf.ts          the one card every notice is: title, lead, a field, the footer's note and actions
     checkin.ts, recap.ts   the two rituals, as notice builders; the check-in ends on the line for the day,
                      and asks for the evening's good thing on its own after an early check-in
     lines.ts         the twenty lines for the day, walked by the date (docs/LINES.md)
@@ -60,9 +63,15 @@ src/
     bottles.ts       the evening's good things coming back: which one, when, and its "a while ago"
     lateNight.ts     the late hours of the person's own day, and the good night screen
     nameNotice.ts    "name it?", once, when a creature first reaches its last stage
+    tide.ts          the month's tide: its offer in a month's first week, and the story, card by card
+    nightSwim.ts     the whale's night swim: where it went, told once on the first open of a day
+    drift.ts         drift: only the sea, until a tap
+    whatsNew.ts      what's new, once after an update, with "try it" for each new thing
+    news.ts          which version's what's new this phone has seen (its own key, not the data)
     thingSheet.ts    a thing's own sheet: name, picture, how it is done, the seven days, today's exception
     daysField.ts     the seven day chips, shared with the add sheet
-    collectionSheet.ts the Collection: found, waiting as a stone, next as a silhouette; arranging
+    collectionSheet.ts the museum: found, waiting as a stone, next as a silhouette; arranging
+    museum.ts        a find's case: the find large, its plaque, when it came; a legendary's half way find
     menuSheet.ts     the club: the log, how it works, settings, the rules, one sentence, the day count
     postcard.ts      the scene repainted from the data as a 1080px PNG
     postcards.ts     the button after a moment, the format choice, the share sheet
@@ -106,6 +115,7 @@ src/
       index.ts       COLLECTIBLES, a line's finds in order, art slots, the scene's weather, companions
       build.ts       the Collectible type and the helpers that build an entry, one per world
       sea.ts, sky.ts, garden.ts  each world's finds, line A then line B
+      museum.ts      the plaques: one line about every find, legendary and half way find
     draw.ts          small shared drawing helpers: tints, faces, fish, jellies, stems
     art/             the larger find drawings
       index.ts       all of them, by world
@@ -122,6 +132,7 @@ src/
     store.ts         load, save, actions, subscribe; the only localStorage reader for data
     clock.ts         now() and today(): the only place that reads the device clock
     log.ts           the log's arithmetic: a month's summary, a day's entry, weeks
+    tide.ts          the month's tide: what the days prove (stars, the best week, one truth, the sea type)
     lab.ts           the lab's storage: which keys are live, the sandbox copy, the offset
     migrate.ts       a strict guard from stored JSON to AppData, by version
     derive.ts        last7, stage, totalDone, stones waiting, found, stars, streak, asleep: all arithmetic
@@ -144,7 +155,8 @@ scripts/             icons.mjs (SVG to PNG), splash.mjs (iOS startup images),
                      shots.mjs (README screenshots, seeded and pinned), hero.mjs (the README banner),
                      squeeze.mjs (the screenshots to WebP under 300 KB),
                      art-check.mjs (which finds have a picture, and which pictures are wrong),
-                     score-render.js (the intro's score rendered offline and measured)
+                     score-render.js (the intro's score rendered offline and measured),
+                     audit.mjs (every surface at 390 × 844 and 320 × 568, into docs/audit/)
 public/icons/        the app icon
 public/splash/       the iOS startup images
 brand.html           the look on one page, drawn by src/brand/page.ts

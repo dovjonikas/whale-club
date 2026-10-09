@@ -17,14 +17,14 @@ import { openSheet } from './sheet'
  */
 export function openMenuSheet(
   store: Store,
-  on: { onLog: () => void; onHow: () => void; onSettings: () => void },
+  on: { onLog: () => void; onHow: () => void; onSettings: () => void; onDrift: () => void },
 ): void {
   // The month's dot on the menu button has been seen.
   const month = todayKey().slice(0, 7)
   if (store.get().settings.backupNudged !== month) store.setSettings({ backupNudged: month })
   openSheet({
     title: voice.labels.club,
-    build(body) {
+    build(body, close) {
       noteSaid(voice.clubLine)
       const data = store.get()
       const today = todayKey()
@@ -41,12 +41,17 @@ export function openMenuSheet(
           ${menuRow('menu-how', voice.howItWorks.title, 'tail')}
           ${menuRow('menu-settings', voice.settings.open, 'settings')}
         </div>
+        <div class="row-group">${menuRow('menu-drift', voice.drift.open, 'moon')}</div>
         ${backupStale(data, today) ? `<p class="sheet-note row-note menu-backup">${voice.settings.backupDue}</p>` : ''}
         ${rulesHtml()}
         <p class="club-line">${voice.clubLine}</p>`
       body.querySelector('.menu-log')?.addEventListener('click', on.onLog)
       body.querySelector('.menu-how')?.addEventListener('click', on.onHow)
       body.querySelector('.menu-settings')?.addEventListener('click', on.onSettings)
+      body.querySelector('.menu-drift')?.addEventListener('click', () => {
+        close()
+        on.onDrift()
+      })
     },
   })
 }
